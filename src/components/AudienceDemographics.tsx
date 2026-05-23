@@ -3,7 +3,7 @@ import { ageDemographics, topCountries } from "../data/mockData";
 
 export function AudienceDemographics() {
   return (
-    <Card title="Audience Demographics" className="col-span-2">
+    <Card title="Audience Demographics">
       <div className="grid grid-cols-2 gap-6 p-4">
         <div>
           <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dt-muted">

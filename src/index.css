@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
   --color-dt-bg: #080808;
   --color-dt-panel: #0f0f0f;
   --color-dt-card: #121212;
   --color-dt-border: #1e1e1e;
-  --color-dt-muted: #6b6b6b;
-  --color-dt-text: #f5f5f5;
+  --color-dt-muted: #8a8a8a;
+  --color-dt-text: #f0f0f0;
   --color-dt-red: #e50914;
   --color-dt-red-hover: #ff1a26;
   --color-dt-green: #22c55e;
@@ -30,6 +31,11 @@ body {
   background: var(--color-dt-bg);
   color: var(--color-dt-text);
   -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.01em;
+}
+
+.font-display {
+  font-family: var(--font-display);
 }
 
 ::-webkit-scrollbar {
@@ -40,4 +46,11 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 3px;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
 }

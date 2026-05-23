@@ -8,7 +8,7 @@ const partners = [
 
 export function MonetizationOverview() {
   return (
-    <Card title="Monetization Overview" className="col-span-2 h-[260px]">
+    <Card title="Monetization Overview" className="h-full min-h-[260px]">
       <div className="grid grid-cols-3 gap-4 p-4">
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
           <p className="text-[11px] text-dt-muted">Total Audience Segments</p>

@@ -1,28 +1,30 @@
-import {
-  Plus,
-  Calendar,
-  SlidersHorizontal,
-  Bell,
-} from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus, Calendar, SlidersHorizontal, Bell } from "lucide-react";
 
-export function Header() {
+export function Header({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
   return (
     <header className="flex shrink-0 items-center justify-between border-b border-dt-border bg-dt-panel px-6 py-4">
       <div>
-        <h1 className="text-xl font-bold text-white">Dashboard Overview</h1>
-        <p className="mt-0.5 text-sm text-dt-muted">
-          Real-time performance of the DameTime ecosystem.
-        </p>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-white">
+          {title}
+        </h1>
+        <p className="mt-0.5 text-sm text-dt-muted">{subtitle}</p>
       </div>
 
       <div className="flex items-center gap-3">
-        <button
-          type="button"
+        <Link
+          to="/content/upload"
           className="flex items-center gap-2 rounded-md bg-dt-red px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-dt-red-hover"
         >
           <Plus size={16} />
           Upload Content
-        </button>
+        </Link>
 
         <button
           type="button"
@@ -48,10 +50,8 @@ export function Header() {
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-dt-red" />
         </button>
 
-        <div className="ml-1 h-9 w-9 overflow-hidden rounded-full border-2 border-dt-red bg-gradient-to-br from-[#333] to-[#111]">
-          <div className="flex h-full w-full items-center justify-center text-xs font-bold text-white">
-            D
-          </div>
+        <div className="ml-1 flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-dt-red bg-gradient-to-br from-[#333] to-[#111] text-xs font-bold text-white">
+          D
         </div>
       </div>
     </header>

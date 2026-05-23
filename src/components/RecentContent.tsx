@@ -7,7 +7,7 @@ const tabs = ["All Content", "Videos", "Images", "Articles", "Audio"];
 
 export function RecentContent() {
   return (
-    <Card className="col-span-3">
+    <Card>
       <div className="border-b border-dt-border px-4 py-3">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white">Recent Content</h3>

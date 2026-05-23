@@ -1,3 +1,4 @@
+import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Film,
@@ -7,8 +8,11 @@ import {
   DollarSign,
   Settings,
   ChevronDown,
+  ExternalLink,
+  Zap,
 } from "lucide-react";
-import { navSections } from "../data/mockData";
+import { navSections } from "../config/navigation";
+import { BrandLogo } from "./BrandLogo";
 
 const iconMap: Record<string, typeof LayoutDashboard> = {
   "layout-dashboard": LayoutDashboard,
@@ -21,60 +25,79 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
 };
 
 export function Sidebar() {
+  const { pathname } = useLocation();
+
   return (
-    <aside className="flex h-full w-[240px] shrink-0 flex-col border-r border-dt-border bg-dt-panel">
-      <div className="border-b border-dt-border px-5 py-5">
-        <div className="text-xl font-extrabold tracking-tight">
-          <span className="text-white">DAME</span>
-          <span className="text-dt-red">.TIME</span>
-        </div>
+    <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-dt-border bg-dt-panel">
+      <div className="border-b border-dt-border px-4 py-4">
+        <NavLink to="/">
+          <BrandLogo />
+        </NavLink>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-auto px-2.5 py-3">
         {navSections.map((section) => {
           const Icon = iconMap[section.icon] ?? LayoutDashboard;
-          const isDashboard = section.label === "DASHBOARD";
+          const activeSection = section.items.some(
+            (item) =>
+              !item.external &&
+              (item.path === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.path)),
+          );
 
           return (
-            <div key={section.label} className="mb-4">
-              {isDashboard ? (
-                <button
-                  type="button"
-                  className="mb-2 flex w-full items-center gap-2 rounded-md bg-dt-red px-3 py-2 text-xs font-bold tracking-wider text-white"
-                >
-                  <Icon size={16} />
-                  {section.label}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="mb-1 flex w-full items-center justify-between rounded-md px-3 py-2 text-[10px] font-bold tracking-widest text-dt-muted hover:text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    <Icon size={14} />
-                    {section.label}
-                  </span>
-                  <ChevronDown size={12} />
-                </button>
-              )}
+            <div key={section.label} className="mb-3">
+              <div
+                className={`mb-1 flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[10px] font-semibold tracking-[0.12em] ${
+                  activeSection
+                    ? "bg-dt-red/15 text-white"
+                    : "text-dt-muted"
+                }`}
+              >
+                <Icon size={14} className={activeSection ? "text-dt-red" : ""} />
+                {section.label}
+                {section.label !== "DASHBOARD" && (
+                  <ChevronDown size={11} className="ml-auto opacity-50" />
+                )}
+              </div>
 
-              <ul className="space-y-0.5 pl-2">
+              <ul className="space-y-0.5 pl-1">
                 {section.items.map((item) => {
-                  const label = typeof item === "string" ? item : item.label;
-                  const active = typeof item === "object" && item.active;
+                  if (item.external) {
+                    return (
+                      <li key={item.label}>
+                        <a
+                          href={item.path}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-[13px] text-[#b0b0b0] transition-colors hover:bg-white/[0.04] hover:text-white"
+                        >
+                          {item.label === "Flash Updates" ? (
+                            <Zap size={13} className="text-dt-red" />
+                          ) : null}
+                          {item.label}
+                          <ExternalLink size={11} className="ml-auto opacity-40" />
+                        </a>
+                      </li>
+                    );
+                  }
 
                   return (
-                    <li key={label}>
-                      <button
-                        type="button"
-                        className={`w-full rounded-md px-3 py-1.5 text-left text-[13px] transition-colors ${
-                          active
-                            ? "font-medium text-white"
-                            : "text-[#a3a3a3] hover:text-white"
-                        }`}
+                    <li key={item.label}>
+                      <NavLink
+                        to={item.path}
+                        end={item.path === "/"}
+                        className={({ isActive }) =>
+                          `block w-full rounded-md px-3 py-1.5 text-left text-[13px] transition-colors ${
+                            isActive
+                              ? "bg-white/[0.06] font-medium text-white"
+                              : "text-[#b0b0b0] hover:bg-white/[0.03] hover:text-white"
+                          }`
+                        }
                       >
-                        {label}
-                      </button>
+                        {item.label}
+                      </NavLink>
                     </li>
                   );
                 })}
@@ -84,13 +107,8 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t border-dt-border px-5 py-4">
-        <p className="text-[10px] font-bold tracking-widest text-dt-muted">
-          <span className="text-white">DAME.TIME</span>
-        </p>
-        <p className="mt-0.5 text-[9px] tracking-wider text-dt-muted">
-          POWERED BY <span className="text-dt-red">AMX</span>
-        </p>
+      <div className="border-t border-dt-border px-4 py-4">
+        <BrandLogo compact />
       </div>
     </aside>
   );

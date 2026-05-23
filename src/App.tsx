@@ -1,56 +1,77 @@
-import { Sidebar } from "./components/Sidebar";
-import { Header } from "./components/Header";
-import { KpiCards } from "./components/KpiCards";
-import { TrafficChart } from "./components/TrafficChart";
-import { TrafficSourcesChart } from "./components/TrafficSourcesChart";
-import { AudienceSnapshot } from "./components/AudienceSnapshot";
-import { LiveActivityFeed } from "./components/LiveActivityFeed";
-import { RecentContent } from "./components/RecentContent";
-import { UploadWidget } from "./components/UploadWidget";
-import { AudienceDemographics } from "./components/AudienceDemographics";
-import { DeviceBreakdown } from "./components/DeviceBreakdown";
-import { EmailSmsGrowth } from "./components/EmailSmsGrowth";
-import { MonetizationOverview } from "./components/MonetizationOverview";
-import { TopPerformingContent } from "./components/TopPerformingContent";
-import { Footer } from "./components/Footer";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AppLayout } from "./layouts/AppLayout";
+import { DashboardPage } from "./pages/DashboardPage";
+import {
+  AllContentPage,
+  UploadContentPage,
+  ContentCalendarPage,
+  MediaLibraryPage,
+  PlaylistsPage,
+} from "./pages/ContentPages";
+import {
+  EngagementOverviewPage,
+  CommentsPage,
+  MessagesPage,
+  PollsPage,
+} from "./pages/EngagementPages";
+import {
+  AudienceOverviewPage,
+  FanProfilesPage,
+  SegmentsPage,
+  SubscribersPage,
+  BehaviorInsightsPage,
+} from "./pages/FansPages";
+import {
+  TrafficOverviewPage,
+  ConversionFunnelPage,
+  CampaignsPage,
+  ReportsPage,
+} from "./pages/PerformancePages";
+import {
+  PartnersPage,
+  AudiencesPage,
+  RevenuePage,
+} from "./pages/MonetizationPages";
+import {
+  TeamPage,
+  RolesPage,
+  IntegrationsPage,
+  AccountPage,
+} from "./pages/SettingsPages";
 
 export default function App() {
   return (
-    <div className="flex h-screen overflow-hidden bg-dt-bg">
-      <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-x-auto overflow-y-auto px-5 py-4">
-          <div className="mx-auto min-w-[1200px] max-w-[1600px] space-y-4">
-            <KpiCards />
-
-            <div className="grid grid-cols-4 gap-3">
-              <TrafficChart />
-              <TrafficSourcesChart />
-              <AudienceSnapshot />
-              <LiveActivityFeed />
-            </div>
-
-            <div className="grid grid-cols-4 gap-3">
-              <RecentContent />
-              <UploadWidget />
-            </div>
-
-            <div className="grid grid-cols-4 gap-3">
-              <AudienceDemographics />
-              <DeviceBreakdown />
-              <EmailSmsGrowth />
-            </div>
-
-            <div className="grid grid-cols-4 gap-3">
-              <MonetizationOverview />
-              <TopPerformingContent />
-            </div>
-
-            <Footer />
-          </div>
-        </main>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="content/all" element={<AllContentPage />} />
+          <Route path="content/upload" element={<UploadContentPage />} />
+          <Route path="content/calendar" element={<ContentCalendarPage />} />
+          <Route path="content/media" element={<MediaLibraryPage />} />
+          <Route path="content/playlists" element={<PlaylistsPage />} />
+          <Route path="engagement/overview" element={<EngagementOverviewPage />} />
+          <Route path="engagement/comments" element={<CommentsPage />} />
+          <Route path="engagement/messages" element={<MessagesPage />} />
+          <Route path="engagement/polls" element={<PollsPage />} />
+          <Route path="fans/audience" element={<AudienceOverviewPage />} />
+          <Route path="fans/profiles" element={<FanProfilesPage />} />
+          <Route path="fans/segments" element={<SegmentsPage />} />
+          <Route path="fans/subscribers" element={<SubscribersPage />} />
+          <Route path="fans/behavior" element={<BehaviorInsightsPage />} />
+          <Route path="performance/traffic" element={<TrafficOverviewPage />} />
+          <Route path="performance/funnel" element={<ConversionFunnelPage />} />
+          <Route path="performance/campaigns" element={<CampaignsPage />} />
+          <Route path="performance/reports" element={<ReportsPage />} />
+          <Route path="monetization/partners" element={<PartnersPage />} />
+          <Route path="monetization/audiences" element={<AudiencesPage />} />
+          <Route path="monetization/revenue" element={<RevenuePage />} />
+          <Route path="settings/team" element={<TeamPage />} />
+          <Route path="settings/roles" element={<RolesPage />} />
+          <Route path="settings/integrations" element={<IntegrationsPage />} />
+          <Route path="settings/account" element={<AccountPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }

@@ -3,7 +3,7 @@ import { Card } from "./ui/Card";
 
 export function UploadWidget() {
   return (
-    <Card className="col-span-1">
+    <Card className="h-full min-h-[320px]">
       <div className="flex h-full min-h-[320px] flex-col items-center justify-center border-2 border-dashed border-dt-border/80 m-4 rounded-lg px-6 py-8 text-center">
         <div className="mb-4 rounded-full border border-dt-red/30 bg-dt-red/10 p-4 text-dt-red">
           <CloudUpload size={36} strokeWidth={1.25} />

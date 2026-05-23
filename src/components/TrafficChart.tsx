@@ -12,7 +12,7 @@ import { trafficOverTime } from "../data/mockData";
 
 export function TrafficChart() {
   return (
-    <Card title="Traffic Over Time" className="col-span-2 h-[280px]">
+    <Card title="Traffic Over Time" className="h-[280px]">
       <div className="h-[230px] px-2 pb-2 pt-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={trafficOverTime}>
