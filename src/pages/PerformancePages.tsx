@@ -18,9 +18,9 @@ const campaigns = [
 ];
 
 const reports = [
-  { name: "Weekly Performance Summary", type: "Automated", last: "May 19, 2024" },
-  { name: "Audience Growth Report", type: "Manual", last: "May 15, 2024" },
-  { name: "Monetization Partner Export", type: "Scheduled", last: "May 12, 2024" },
+  { name: "Weekly Performance Summary", type: "Automated", last: "Jun 2, 2026" },
+  { name: "Audience Growth Report", type: "Manual", last: "May 29, 2026" },
+  { name: "Monetization Partner Export", type: "Scheduled", last: "May 25, 2026" },
   { name: "Campaign ROI Breakdown", type: "Manual", last: "May 10, 2024" },
 ];
 

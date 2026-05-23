@@ -8,14 +8,14 @@ export const kpiMetrics = [
 ];
 
 export const trafficOverTime = [
-  { date: "May 12", visitors: 142000 },
-  { date: "May 13", visitors: 168000 },
-  { date: "May 14", visitors: 155000 },
-  { date: "May 15", visitors: 189000 },
-  { date: "May 16", visitors: 201000 },
-  { date: "May 17", visitors: 178000 },
-  { date: "May 18", visitors: 215000 },
-  { date: "May 19", visitors: 198000 },
+  { date: "May 25", visitors: 142000 },
+  { date: "May 26", visitors: 168000 },
+  { date: "May 27", visitors: 155000 },
+  { date: "May 28", visitors: 189000 },
+  { date: "May 29", visitors: 201000 },
+  { date: "May 30", visitors: 178000 },
+  { date: "May 31", visitors: 215000 },
+  { date: "Jun 2", visitors: 198000 },
 ];
 
 export const trafficSources = [
@@ -50,7 +50,7 @@ export const recentContent = [
     title: "Behind the Scenes — Studio Session",
     type: "Video",
     status: "Published",
-    published: "May 19, 2:14 PM",
+    published: "Jun 2, 2:14 PM",
     views: "284K",
     engagement: "41.2%",
     thumb: "studio",
@@ -59,7 +59,7 @@ export const recentContent = [
     title: "Inner Circle Exclusive Drop",
     type: "Video",
     status: "Published",
-    published: "May 18, 6:30 PM",
+    published: "May 31, 6:30 PM",
     views: "412K",
     engagement: "52.8%",
     thumb: "drop",
@@ -68,7 +68,7 @@ export const recentContent = [
     title: "Tour Announcement Teaser",
     type: "Image",
     status: "Scheduled",
-    published: "May 20, 9:00 AM",
+    published: "Jun 3, 9:00 AM",
     views: "—",
     engagement: "—",
     thumb: "tour",
@@ -77,7 +77,7 @@ export const recentContent = [
     title: "Fan Q&A Recap Article",
     type: "Article",
     status: "Published",
-    published: "May 17, 11:45 AM",
+    published: "May 29, 11:45 AM",
     views: "98K",
     engagement: "28.4%",
     thumb: "qa",
@@ -86,7 +86,7 @@ export const recentContent = [
     title: "New Single — Acoustic Version",
     type: "Audio",
     status: "Published",
-    published: "May 16, 8:00 PM",
+    published: "May 28, 8:00 PM",
     views: "156K",
     engagement: "36.1%",
     thumb: "audio",
@@ -117,14 +117,14 @@ export const deviceBreakdown = [
 ];
 
 export const emailSmsGrowth = [
-  { day: "May 12", count: 820 },
-  { day: "May 13", count: 1240 },
-  { day: "May 14", count: 980 },
-  { day: "May 15", count: 1560 },
-  { day: "May 16", count: 1420 },
-  { day: "May 17", count: 1890 },
-  { day: "May 18", count: 2100 },
-  { day: "May 19", count: 1780 },
+  { day: "May 25", count: 820 },
+  { day: "May 26", count: 1240 },
+  { day: "May 27", count: 980 },
+  { day: "May 28", count: 1560 },
+  { day: "May 29", count: 1420 },
+  { day: "May 30", count: 1890 },
+  { day: "May 31", count: 2100 },
+  { day: "Jun 2", count: 1780 },
 ];
 
 export const topPerforming = [

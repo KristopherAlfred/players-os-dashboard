@@ -31,7 +31,7 @@ export function Header({
           className="flex items-center gap-2 rounded-md border border-dt-border bg-dt-card px-3 py-2 text-sm text-[#d4d4d4]"
         >
           <Calendar size={14} className="text-dt-muted" />
-          May 12 — May 19, 2024
+          May 25 — June 2, 2026
         </button>
 
         <button
