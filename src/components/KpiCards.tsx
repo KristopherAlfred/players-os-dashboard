@@ -19,7 +19,7 @@ const iconMap: Record<string, typeof Users> = {
 
 export function KpiCards() {
   return (
-    <div className="grid grid-cols-6 gap-3">
+    <div className="grid grid-cols-6 gap-3 min-w-0">
       {kpiMetrics.map((kpi) => {
         const Icon = iconMap[kpi.icon] ?? Users;
         return (

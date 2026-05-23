@@ -20,8 +20,8 @@ export default function App() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto px-5 py-4">
-          <div className="mx-auto max-w-[1400px] space-y-4">
+        <main className="flex-1 overflow-x-auto overflow-y-auto px-5 py-4">
+          <div className="mx-auto min-w-[1200px] max-w-[1600px] space-y-4">
             <KpiCards />
 
             <div className="grid grid-cols-4 gap-3">
