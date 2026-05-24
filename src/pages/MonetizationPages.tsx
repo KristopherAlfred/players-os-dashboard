@@ -17,12 +17,12 @@ const audiences = [
 export function PartnersPage() {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Active DSPs" value="14" />
         <StatCard label="Synced Segments" value="28" />
         <StatCard label="Last Sync" value="2h ago" />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {partners.map((p) => (
           <div key={p.name} className="flex items-center gap-4 rounded-lg border border-dt-border bg-dt-card p-4">
             <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-dt-red/20 text-sm font-bold text-dt-red">{p.abbr}</span>
@@ -67,7 +67,7 @@ export function RevenuePage() {
   ];
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Revenue (MTD)" value="$96,420" trend="+24.7%" />
         <StatCard label="Partner Yield" value="$68,200" />
         <StatCard label="Direct Sales" value="$28,220" />

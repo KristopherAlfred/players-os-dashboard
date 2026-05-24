@@ -26,13 +26,13 @@ const polls = [
 export function EngagementOverviewPage() {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Comments (7d)" value="18.4K" trend="+22%" />
         <StatCard label="Reactions" value="142K" trend="+15%" />
         <StatCard label="Shares" value="28.6K" trend="+31%" />
         <StatCard label="Poll Votes" value="45.4K" trend="+18%" />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Panel title="Engagement by Channel">
           {["Instagram", "TikTok", "YouTube", "Twitter/X"].map((ch, i) => (
             <div key={ch} className="mb-3">
@@ -96,7 +96,7 @@ export function CommentsPage() {
 export function MessagesPage() {
   const [selected, setSelected] = useState(0);
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Panel title="Inbox">
         {messages.map((m, i) => (
           <button key={m.from} type="button" onClick={() => setSelected(i)} className={`mb-1 w-full rounded-md p-3 text-left ${selected === i ? "border border-dt-red/30 bg-dt-red/15" : "hover:bg-white/[0.03]"}`}>

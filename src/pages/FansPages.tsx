@@ -27,12 +27,12 @@ const subscribers = [
 export function AudienceOverviewPage() {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {audienceSnapshot.slice(0, 4).map((s) => (
           <StatCard key={s.label} label={s.label} value={s.value} />
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Panel title="Age Distribution">
           {ageDemographics.map((a) => (
             <div key={a.range} className="mb-2">
@@ -80,7 +80,7 @@ export function SegmentsPage() {
   return (
     <div className="space-y-4">
       <div className="flex justify-end"><button type="button" className="rounded-md bg-dt-red px-4 py-2 text-sm font-semibold">+ Create Segment</button></div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {segments.map((s) => (
           <div key={s.name} className="rounded-lg border border-dt-border bg-dt-card p-4">
             <div className="flex items-start justify-between"><p className="font-medium">{s.name}</p><Users size={16} className="text-dt-red" /></div>
@@ -97,7 +97,7 @@ export function SegmentsPage() {
 export function SubscribersPage() {
   return (
     <Panel title="Email / SMS Subscribers">
-      <div className="mb-4 grid grid-cols-3 gap-3">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Email Subscribers" value="362,540" trend="+4.2%" />
         <StatCard label="SMS Subscribers" value="89,210" trend="+8.1%" />
         <StatCard label="Deliverability" value="98.4%" hint="Last 30 days" />

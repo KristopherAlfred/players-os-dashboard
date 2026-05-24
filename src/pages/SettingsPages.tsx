@@ -68,7 +68,7 @@ export function RolesPage() {
 
 export function IntegrationsPage() {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {integrations.map((i) => (
         <div key={i.name} className="rounded-lg border border-dt-border bg-dt-card p-4">
           <div className="flex items-center justify-between">
@@ -126,7 +126,7 @@ export function AccountPage() {
         </div>
       </Panel>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <Panel title="Profile">
         <form className="space-y-3 text-sm">
           <label className="block"><span className="text-dt-muted">Display Name</span><input defaultValue="Dame Time Admin" className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2" /></label>

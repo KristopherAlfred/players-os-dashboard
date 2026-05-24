@@ -11,7 +11,7 @@ export function AllContentPage() {
   const [view, setView] = useState<"grid" | "list">("grid");
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Assets" value="248" trend="+12 this week" />
         <StatCard label="Published" value="186" />
         <StatCard label="Scheduled" value="34" />
@@ -27,7 +27,7 @@ export function AllContentPage() {
           <button type="button" onClick={() => setView("grid")} className={`rounded-md p-2 ${view === "grid" ? "bg-dt-red text-white" : "border border-dt-border"}`}><Grid size={14} /></button>
           <button type="button" onClick={() => setView("list")} className={`rounded-md p-2 ${view === "list" ? "bg-dt-red text-white" : "border border-dt-border"}`}><List size={14} /></button>
         </div>
-        <div className={view === "grid" ? "grid grid-cols-3 gap-3" : "space-y-2"}>
+        <div className={view === "grid" ? "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" : "space-y-2"}>
           {recentContent.map((item) => {
             const Icon = typeIcons[item.type as keyof typeof typeIcons] ?? Play;
             return (
@@ -48,8 +48,8 @@ export function AllContentPage() {
 
 export function UploadContentPage() {
   return (
-    <div className="grid grid-cols-3 gap-4">
-      <div className="col-span-2">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="col-span-1 lg:col-span-2">
         <Panel title="Upload Files">
           <div className="flex min-h-[280px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-dt-border py-12">
             <CloudUpload size={48} className="text-dt-red" />
@@ -81,8 +81,8 @@ const calendarEvents = [
 
 export function ContentCalendarPage() {
   return (
-    <div className="grid grid-cols-3 gap-4">
-      <div className="col-span-2">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="col-span-1 lg:col-span-2">
         <Panel title="May 2024">
           <div className="grid grid-cols-7 gap-1 text-center text-xs">
             {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => <div key={d} className="py-2 text-dt-muted">{d}</div>)}
@@ -120,7 +120,7 @@ const folders = [
 export function MediaLibraryPage() {
   return (
     <Panel title="Folders">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {folders.map((f) => (
           <button
             key={f.name}
@@ -178,7 +178,7 @@ export function PlaylistsPage() {
           + New Playlist
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {playlists.map((p) => (
           <div
             key={p.name}

@@ -9,7 +9,7 @@ const partners = [
 export function MonetizationOverview() {
   return (
     <Card title="Monetization Overview" className="flex h-full w-full flex-col">
-      <div className="grid grid-cols-3 gap-4 p-4">
+      <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-3">
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
           <p className="text-[11px] text-dt-muted">Total Audience Segments</p>
           <p className="mt-1 text-2xl font-bold text-white">28</p>
@@ -28,7 +28,7 @@ export function MonetizationOverview() {
         <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-dt-muted">
           Top Partners
         </p>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           {partners.map((p) => (
             <div
               key={p.name}

@@ -45,10 +45,10 @@ export function DashboardPage() {
         <div className="col-span-12 lg:col-span-6">
           <AudienceDemographics />
         </div>
-        <div className="col-span-6 lg:col-span-3">
+        <div className="col-span-12 sm:col-span-6 lg:col-span-3">
           <DeviceBreakdown />
         </div>
-        <div className="col-span-6 lg:col-span-3">
+        <div className="col-span-12 sm:col-span-6 lg:col-span-3">
           <EmailSmsGrowth />
         </div>
       </div>

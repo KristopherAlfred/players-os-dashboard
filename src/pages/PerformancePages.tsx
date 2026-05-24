@@ -27,13 +27,13 @@ const reports = [
 export function TrafficOverviewPage() {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Sessions (7d)" value="1.26M" trend="+18.4%" />
         <StatCard label="Avg. Duration" value="4m 32s" trend="+6%" />
         <StatCard label="Bounce Rate" value="24.8%" trend="-3.2%" />
         <StatCard label="Pages / Session" value="3.8" trend="+0.4" />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Panel title="Sessions Over Time">
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={trafficOverTime}>

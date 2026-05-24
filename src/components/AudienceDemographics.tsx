@@ -4,7 +4,7 @@ import { ageDemographics, topCountries } from "../data/mockData";
 export function AudienceDemographics() {
   return (
     <Card title="Audience Demographics">
-      <div className="grid grid-cols-2 gap-6 p-4">
+      <div className="grid grid-cols-1 gap-6 p-4 md:grid-cols-2">
         <div>
           <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dt-muted">
             Age
