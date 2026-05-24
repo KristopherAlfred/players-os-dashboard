@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { navSections } from "../config/navigation";
 import { BrandLogo } from "./BrandLogo";
+import { useTheme } from "../theme/ThemeContext";
 
 const iconMap: Record<string, typeof LayoutDashboard> = {
   "layout-dashboard": LayoutDashboard,
@@ -24,8 +25,19 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
   settings: Settings,
 };
 
+const sectionGlowStyle = {
+  textShadow:
+    "0 0 6px rgba(255,255,255,0.9), 0 0 14px rgba(255,255,255,0.45), 0 0 24px rgba(255,255,255,0.2)",
+};
+
 export function Sidebar() {
   const { pathname } = useLocation();
+  const { palette } = useTheme();
+
+  const iconGlowStyle = {
+    color: palette.accent,
+    filter: `drop-shadow(0 0 3px color-mix(in srgb, ${palette.accent} 85%, transparent)) drop-shadow(0 0 8px color-mix(in srgb, ${palette.accent} 50%, transparent))`,
+  };
 
   return (
     <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-dt-border bg-dt-panel">
@@ -49,16 +61,14 @@ export function Sidebar() {
           return (
             <div key={section.label} className="mb-3">
               <div
-                className={`mb-1 flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[10px] font-semibold tracking-[0.12em] ${
-                  activeSection
-                    ? "bg-dt-red/15 text-white"
-                    : "text-dt-muted"
+                className={`mb-1 flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[10px] font-bold tracking-[0.12em] text-white ${
+                  activeSection ? "bg-white/[0.04]" : ""
                 }`}
               >
-                <Icon size={14} className={activeSection ? "text-dt-red" : ""} />
-                {section.label}
+                <Icon size={14} strokeWidth={2.25} style={iconGlowStyle} />
+                <span style={sectionGlowStyle}>{section.label}</span>
                 {section.label !== "DASHBOARD" && (
-                  <ChevronDown size={11} className="ml-auto opacity-50" />
+                  <ChevronDown size={11} className="ml-auto text-white/50" />
                 )}
               </div>
 
@@ -71,13 +81,13 @@ export function Sidebar() {
                           href={item.path}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-[13px] text-[#b0b0b0] transition-colors hover:bg-white/[0.04] hover:text-white"
+                          className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-[13px] text-white transition-colors hover:bg-white/[0.06]"
                         >
                           {item.label === "Flash Updates" ? (
-                            <Zap size={13} className="text-dt-red" />
+                            <Zap size={13} style={{ color: palette.accent }} />
                           ) : null}
                           {item.label}
-                          <ExternalLink size={11} className="ml-auto opacity-40" />
+                          <ExternalLink size={11} className="ml-auto text-white/40" />
                         </a>
                       </li>
                     );
@@ -89,10 +99,10 @@ export function Sidebar() {
                         to={item.path}
                         end={item.path === "/"}
                         className={({ isActive }) =>
-                          `block w-full rounded-md px-3 py-1.5 text-left text-[13px] transition-colors ${
+                          `block w-full rounded-md px-3 py-1.5 text-left text-[13px] text-white transition-colors ${
                             isActive
-                              ? "bg-white/[0.06] font-medium text-white"
-                              : "text-[#b0b0b0] hover:bg-white/[0.03] hover:text-white"
+                              ? "bg-white/[0.08] font-semibold"
+                              : "font-normal hover:bg-white/[0.05]"
                           }`
                         }
                       >
