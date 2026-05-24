@@ -15,8 +15,8 @@ export function AppLayout() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header title={meta.title} subtitle={meta.subtitle} />
-        <main className="flex-1 overflow-x-auto overflow-y-auto px-5 py-4">
-          <div className="mx-auto min-w-[1200px] max-w-[1600px]">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto px-4 py-4 lg:px-5">
+          <div className="mx-auto w-full min-w-0 max-w-[1600px]">
             <Outlet />
           </div>
         </main>
