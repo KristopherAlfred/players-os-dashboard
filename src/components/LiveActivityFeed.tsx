@@ -7,7 +7,7 @@ export function LiveActivityFeed() {
       title="Live Activity Feed"
       className="h-[280px]"
       action={
-        <span className="flex items-center gap-1.5 text-[10px] font-medium text-dt-green">
+        <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[10px] font-medium text-dt-green">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-dt-green" />
           LIVE
         </span>

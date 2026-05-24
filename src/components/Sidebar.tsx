@@ -26,8 +26,7 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
 };
 
 const sectionGlowStyle = {
-  textShadow:
-    "0 0 6px rgba(255,255,255,0.9), 0 0 14px rgba(255,255,255,0.45), 0 0 24px rgba(255,255,255,0.2)",
+  textShadow: "0 0 4px rgba(255,255,255,0.35), 0 0 8px rgba(255,255,255,0.15)",
 };
 
 export function Sidebar() {
@@ -36,18 +35,18 @@ export function Sidebar() {
 
   const iconGlowStyle = {
     color: palette.accent,
-    filter: `drop-shadow(0 0 3px color-mix(in srgb, ${palette.accent} 85%, transparent)) drop-shadow(0 0 8px color-mix(in srgb, ${palette.accent} 50%, transparent))`,
+    filter: `drop-shadow(0 0 2px color-mix(in srgb, ${palette.accent} 60%, transparent))`,
   };
 
   return (
-    <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-dt-border bg-dt-panel">
+    <aside className="flex h-full w-[268px] shrink-0 flex-col border-r border-dt-border bg-dt-panel">
       <div className="border-b border-dt-border">
         <NavLink to="/" className="block">
           <BrandLogo variant="sidebar" />
         </NavLink>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2.5 py-3">
+      <nav className="flex-1 overflow-y-auto px-3 py-3">
         {navSections.map((section) => {
           const Icon = iconMap[section.icon] ?? LayoutDashboard;
           const activeSection = section.items.some(
@@ -59,20 +58,30 @@ export function Sidebar() {
           );
 
           return (
-            <div key={section.label} className="mb-3">
+            <div key={section.label} className="mb-3.5">
               <div
-                className={`mb-1 flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[10px] font-bold tracking-[0.12em] text-white ${
+                className={`mb-1.5 flex w-full items-center gap-2 rounded-md px-2 py-2 ${
                   activeSection ? "bg-white/[0.04]" : ""
                 }`}
               >
-                <Icon size={14} strokeWidth={2.25} style={iconGlowStyle} />
-                <span style={sectionGlowStyle}>{section.label}</span>
+                <Icon
+                  size={14}
+                  strokeWidth={2.25}
+                  className="shrink-0"
+                  style={iconGlowStyle}
+                />
+                <span
+                  className="min-w-0 flex-1 text-[10px] font-bold leading-tight tracking-[0.08em] text-white"
+                  style={sectionGlowStyle}
+                >
+                  {section.label}
+                </span>
                 {section.label !== "DASHBOARD" && (
-                  <ChevronDown size={11} className="ml-auto text-white/50" />
+                  <ChevronDown size={11} className="shrink-0 text-white/50" />
                 )}
               </div>
 
-              <ul className="space-y-0.5 pl-1">
+              <ul className="space-y-0.5 pl-0.5">
                 {section.items.map((item) => {
                   if (item.external) {
                     return (
@@ -84,10 +93,17 @@ export function Sidebar() {
                           className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-[13px] text-white transition-colors hover:bg-white/[0.06]"
                         >
                           {item.label === "Flash Updates" ? (
-                            <Zap size={13} style={{ color: palette.accent }} />
+                            <Zap
+                              size={13}
+                              className="shrink-0"
+                              style={{ color: palette.accent }}
+                            />
                           ) : null}
-                          {item.label}
-                          <ExternalLink size={11} className="ml-auto text-white/40" />
+                          <span className="min-w-0 flex-1">{item.label}</span>
+                          <ExternalLink
+                            size={11}
+                            className="shrink-0 text-white/40"
+                          />
                         </a>
                       </li>
                     );

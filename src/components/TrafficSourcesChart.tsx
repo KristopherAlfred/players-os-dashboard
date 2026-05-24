@@ -8,15 +8,15 @@ export function TrafficSourcesChart() {
 
   return (
     <Card title="Top Traffic Sources" className="h-[280px]">
-      <div className="flex h-[230px] flex-col items-center px-4 pb-2">
-        <ResponsiveContainer width="100%" height={140}>
+      <div className="flex h-[230px] flex-col px-3 pb-3 pt-1">
+        <ResponsiveContainer width="100%" height={118}>
           <PieChart>
             <Pie
               data={trafficSources}
               cx="50%"
               cy="50%"
-              innerRadius={42}
-              outerRadius={62}
+              innerRadius={36}
+              outerRadius={54}
               paddingAngle={2}
               dataKey="value"
             >
@@ -31,24 +31,27 @@ export function TrafficSourcesChart() {
                 border: "1px solid #2a2a2a",
                 borderRadius: 8,
                 fontSize: 12,
+                color: "#fff",
               }}
+              labelStyle={{ color: "#fff" }}
+              itemStyle={{ color: "#fff" }}
             />
           </PieChart>
         </ResponsiveContainer>
-        <ul className="mt-1 grid w-full grid-cols-2 gap-x-2 gap-y-1">
+        <ul className="mt-2 flex-1 space-y-1.5 overflow-y-auto">
           {trafficSources.map((s, i) => (
             <li
               key={s.name}
-              className="flex items-center justify-between text-[11px]"
+              className="flex items-center justify-between gap-3 text-[11px]"
             >
-              <span className="flex items-center gap-1.5 text-[#a3a3a3]">
+              <span className="flex min-w-0 items-center gap-2 text-[#a3a3a3]">
                 <span
-                  className="h-2 w-2 rounded-full"
+                  className="h-2 w-2 shrink-0 rounded-full"
                   style={{ background: palette.trafficShades[i] }}
                 />
-                {s.name}
+                <span className="truncate">{s.name}</span>
               </span>
-              <span className="font-medium text-white">{s.value}%</span>
+              <span className="shrink-0 font-medium text-white">{s.value}%</span>
             </li>
           ))}
         </ul>

@@ -18,13 +18,13 @@ export function DashboardPage() {
       <KpiCards />
 
       <div className="grid grid-cols-12 items-stretch gap-3">
-        <div className="col-span-12 lg:col-span-5">
+        <div className="col-span-12 lg:col-span-4">
           <TrafficChart />
         </div>
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-12 sm:col-span-6 lg:col-span-3">
           <TrafficSourcesChart />
         </div>
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-12 sm:col-span-6 lg:col-span-2">
           <AudienceSnapshot />
         </div>
         <div className="col-span-12 lg:col-span-3">

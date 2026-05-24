@@ -16,13 +16,13 @@ export function Card({
       className={`rounded-lg border border-dt-border bg-dt-card ${className}`}
     >
       {(title || action) && (
-        <div className="flex items-center justify-between border-b border-dt-border px-4 py-3">
+        <div className="flex items-center justify-between gap-3 border-b border-dt-border px-4 py-3">
           {title && (
-            <h3 className="text-sm font-semibold tracking-wide text-white">
+            <h3 className="min-w-0 flex-1 truncate text-sm font-semibold tracking-wide text-white">
               {title}
             </h3>
           )}
-          {action}
+          {action && <div className="shrink-0">{action}</div>}
         </div>
       )}
       {children}
