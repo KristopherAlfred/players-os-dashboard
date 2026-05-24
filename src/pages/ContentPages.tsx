@@ -111,10 +111,10 @@ export function ContentCalendarPage() {
 }
 
 const folders = [
-  { name: "Tour 2024", files: 42, size: "18.4 GB" },
-  { name: "Studio Sessions", files: 86, size: "124 GB" },
-  { name: "Brand Assets", files: 156, size: "2.1 GB" },
-  { name: "Social Exports", files: 312, size: "8.6 GB" },
+  { name: "Tour 2024", files: 42, size: "18.4 GB", image: "/content/tour.jpg" },
+  { name: "Studio Sessions", files: 86, size: "124 GB", image: "/content/studio.jpg" },
+  { name: "Brand Assets", files: 156, size: "2.1 GB", image: "/dame-brand.png" },
+  { name: "Social Exports", files: 312, size: "8.6 GB", image: "/content/drop.jpg" },
 ];
 
 export function MediaLibraryPage() {
@@ -122,10 +122,22 @@ export function MediaLibraryPage() {
     <Panel title="Folders">
       <div className="grid grid-cols-4 gap-3">
         {folders.map((f) => (
-          <button key={f.name} type="button" className="rounded-lg border border-dt-border bg-dt-bg/50 p-4 text-left hover:border-dt-red/40">
-            <div className="mb-3 h-10 w-10 rounded-md bg-dt-red/15" />
+          <button
+            key={f.name}
+            type="button"
+            className="rounded-lg border border-dt-border bg-dt-bg/50 p-4 text-left hover:border-dt-red/40"
+          >
+            <div className="mb-3 h-12 w-12 overflow-hidden rounded-md border border-dt-border/60">
+              <img
+                src={f.image}
+                alt=""
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
             <p className="font-medium">{f.name}</p>
-            <p className="mt-1 text-xs text-dt-muted">{f.files} files · {f.size}</p>
+            <p className="mt-1 text-xs text-dt-muted">
+              {f.files} files · {f.size}
+            </p>
           </button>
         ))}
       </div>
@@ -134,24 +146,62 @@ export function MediaLibraryPage() {
 }
 
 const playlists = [
-  { name: "Inner Circle Exclusives", tracks: 24, followers: "48.2K" },
-  { name: "Tour Hype", tracks: 18, followers: "112K" },
-  { name: "Behind The Scenes", tracks: 31, followers: "76K" },
-  { name: "Fan Favorites", tracks: 42, followers: "203K" },
+  {
+    name: "Inner Circle Exclusives",
+    tracks: 24,
+    followers: "48.2K",
+    image: "/content/studio.jpg",
+  },
+  { name: "Tour Hype", tracks: 18, followers: "112K", image: "/content/drop.jpg" },
+  {
+    name: "Behind The Scenes",
+    tracks: 31,
+    followers: "76K",
+    image: "/content/tour.jpg",
+  },
+  {
+    name: "Fan Favorites",
+    tracks: 42,
+    followers: "203K",
+    image: "/content/qa.jpg",
+  },
 ];
 
 export function PlaylistsPage() {
   return (
     <div className="space-y-4">
-      <div className="flex justify-end"><button type="button" className="rounded-md bg-dt-red px-4 py-2 text-sm font-semibold">+ New Playlist</button></div>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="rounded-md bg-dt-red px-4 py-2 text-sm font-semibold"
+        >
+          + New Playlist
+        </button>
+      </div>
       <div className="grid grid-cols-2 gap-3">
-        {playlists.map((p, i) => (
-          <div key={p.name} className="flex gap-4 rounded-lg border border-dt-border bg-dt-card p-4">
-            <div className={`h-16 w-16 rounded-md bg-gradient-to-br ${i % 2 ? "from-red-800 to-black" : "from-zinc-700 to-black"}`} />
+        {playlists.map((p) => (
+          <div
+            key={p.name}
+            className="flex gap-4 rounded-lg border border-dt-border bg-dt-card p-4"
+          >
+            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border border-dt-border/60">
+              <img
+                src={p.image}
+                alt=""
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
             <div>
               <p className="font-medium">{p.name}</p>
-              <p className="mt-1 text-sm text-dt-muted">{p.tracks} items · {p.followers} followers</p>
-              <button type="button" className="mt-2 text-xs text-dt-red hover:underline">Edit playlist</button>
+              <p className="mt-1 text-sm text-dt-muted">
+                {p.tracks} items · {p.followers} followers
+              </p>
+              <button
+                type="button"
+                className="mt-2 text-xs text-dt-red hover:underline"
+              >
+                Edit playlist
+              </button>
             </div>
           </div>
         ))}

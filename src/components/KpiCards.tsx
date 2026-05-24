@@ -19,24 +19,30 @@ const iconMap: Record<string, typeof Users> = {
 
 export function KpiCards() {
   return (
-    <div className="grid grid-cols-6 gap-3 min-w-0">
+    <div className="grid min-w-0 grid-cols-6 gap-3">
       {kpiMetrics.map((kpi) => {
         const Icon = iconMap[kpi.icon] ?? Users;
         return (
           <div
             key={kpi.label}
-            className="rounded-lg border border-dt-border bg-dt-card p-4"
+            className="relative overflow-hidden rounded-lg border border-dt-border bg-dt-card p-4 pr-12"
           >
-            <div className="mb-3 flex items-start justify-between">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-dt-muted">
-                {kpi.label}
-              </p>
-              <div className="rounded-md border border-dt-red/40 p-1.5 text-dt-red">
-                <Icon size={16} strokeWidth={1.5} />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-white">{kpi.value}</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-dt-muted">
+              {kpi.label}
+            </p>
+            <p className="mt-2 text-2xl font-bold text-white">{kpi.value}</p>
             <p className="mt-1 text-xs font-medium text-dt-green">{kpi.change}</p>
+            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+              <Icon
+                size={22}
+                strokeWidth={1.75}
+                className="text-dt-red"
+                style={{
+                  filter:
+                    "drop-shadow(0 0 4px color-mix(in srgb, var(--theme-accent) 90%, transparent)) drop-shadow(0 0 14px color-mix(in srgb, var(--theme-accent) 55%, transparent))",
+                }}
+              />
+            </div>
           </div>
         );
       })}
