@@ -1,4 +1,21 @@
-export function BrandLogo({ compact = false }: { compact?: boolean }) {
+type BrandLogoProps = {
+  compact?: boolean;
+  variant?: "default" | "sidebar";
+};
+
+export function BrandLogo({ compact = false, variant = "default" }: BrandLogoProps) {
+  if (variant === "sidebar") {
+    return (
+      <div className="block w-full overflow-hidden bg-black">
+        <img
+          src="/dame-brand.png"
+          alt="DAME TIME — Powered by AMX"
+          className="h-[72px] w-full object-cover object-center"
+        />
+      </div>
+    );
+  }
+
   if (compact) {
     return (
       <div className="flex flex-col gap-0.5">

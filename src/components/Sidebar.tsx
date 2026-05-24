@@ -29,9 +29,9 @@ export function Sidebar() {
 
   return (
     <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-dt-border bg-dt-panel">
-      <div className="border-b border-dt-border px-4 py-4">
-        <NavLink to="/">
-          <BrandLogo />
+      <div className="border-b border-dt-border">
+        <NavLink to="/" className="block">
+          <BrandLogo variant="sidebar" />
         </NavLink>
       </div>
 
@@ -106,10 +106,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-
-      <div className="border-t border-dt-border px-4 py-4">
-        <BrandLogo compact />
-      </div>
     </aside>
   );
 }

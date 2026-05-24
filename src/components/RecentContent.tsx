@@ -7,7 +7,7 @@ const tabs = ["All Content", "Videos", "Images", "Articles", "Audio"];
 
 export function RecentContent() {
   return (
-    <Card>
+    <Card className="flex h-full w-full flex-col">
       <div className="border-b border-dt-border px-4 py-3">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white">Recent Content</h3>
@@ -64,7 +64,7 @@ export function RecentContent() {
                 key={row.title}
                 className="border-b border-dt-border/60 hover:bg-white/[0.02]"
               >
-                <td className="px-4 py-3">
+                <td className="px-4 py-2.5 align-middle">
                   <div className="flex items-center gap-3">
                     <ContentThumb id={row.thumb} />
                     <span className="max-w-[200px] truncate font-medium text-white">
@@ -72,8 +72,8 @@ export function RecentContent() {
                     </span>
                   </div>
                 </td>
-                <td className="px-3 text-[#a3a3a3]">{row.type}</td>
-                <td className="px-3">
+                <td className="px-3 py-2.5 align-middle text-[#a3a3a3]">{row.type}</td>
+                <td className="px-3 py-2.5 align-middle">
                   <span
                     className={`rounded px-2 py-0.5 text-[11px] font-medium ${
                       row.status === "Published"
@@ -84,10 +84,10 @@ export function RecentContent() {
                     {row.status}
                   </span>
                 </td>
-                <td className="px-3 text-[#a3a3a3]">{row.published}</td>
-                <td className="px-3 text-white">{row.views}</td>
-                <td className="px-3 text-white">{row.engagement}</td>
-                <td className="px-4">
+                <td className="px-3 py-2.5 align-middle text-[#a3a3a3]">{row.published}</td>
+                <td className="px-3 py-2.5 align-middle text-white">{row.views}</td>
+                <td className="px-3 py-2.5 align-middle text-white">{row.engagement}</td>
+                <td className="px-4 py-2.5 align-middle">
                   <div className="flex gap-1">
                     <button
                       type="button"

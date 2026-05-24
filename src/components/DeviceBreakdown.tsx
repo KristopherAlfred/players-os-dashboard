@@ -1,10 +1,12 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Card } from "./ui/Card";
 import { deviceBreakdown } from "../data/mockData";
-
-const COLORS = ["#e50914", "#991b1b", "#450a0a"];
+import { useTheme } from "../theme/ThemeContext";
 
 export function DeviceBreakdown() {
+  const { palette } = useTheme();
+  const COLORS = [palette.accent, palette.chartSecondary, palette.chartTertiary];
+
   return (
     <Card title="Device Breakdown" className="h-[260px]">
       <div className="flex flex-col items-center px-4 pb-3">

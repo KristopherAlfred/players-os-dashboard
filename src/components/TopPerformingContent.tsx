@@ -4,12 +4,12 @@ import { topPerforming } from "../data/mockData";
 
 export function TopPerformingContent() {
   return (
-    <Card title="Top Performing Content" className="h-[260px]">
-      <ol className="space-y-0 divide-y divide-dt-border px-2">
+    <Card title="Top Performing Content" className="flex h-full w-full flex-col">
+      <ol className="flex-1 divide-y divide-dt-border px-2">
         {topPerforming.map((item) => (
           <li
             key={item.rank}
-            className="flex items-center gap-3 px-2 py-2.5"
+            className="flex items-center gap-3 px-2 py-2"
           >
             <span className="w-4 text-center text-xs font-bold text-dt-red">
               {item.rank}

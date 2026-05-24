@@ -8,7 +8,7 @@ export function ContentThumb({
   id: string;
   size?: "sm" | "md";
 }) {
-  const dim = size === "sm" ? "h-8 w-12" : "h-10 w-14";
+  const dim = size === "sm" ? "h-9 w-14" : "h-10 w-16";
   const meta = contentThumbs[id];
 
   if (!meta) {
@@ -24,7 +24,7 @@ export function ContentThumb({
       <img
         src={meta.src}
         alt=""
-        className="h-full w-full object-cover object-top"
+        className="h-full w-full object-cover object-center"
       />
       {meta.isVideo && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/35">

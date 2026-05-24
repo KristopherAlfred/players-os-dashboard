@@ -9,8 +9,11 @@ import {
 } from "recharts";
 import { Card } from "./ui/Card";
 import { emailSmsGrowth } from "../data/mockData";
+import { useTheme } from "../theme/ThemeContext";
 
 export function EmailSmsGrowth() {
+  const { palette } = useTheme();
+
   return (
     <Card title="Email/SMS Growth" className="h-[260px]">
       <div className="h-[200px] px-2 pb-2">
@@ -36,7 +39,7 @@ export function EmailSmsGrowth() {
                 fontSize: 12,
               }}
             />
-            <Bar dataKey="count" fill="#e50914" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="count" fill={palette.accent} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -1,3 +1,4 @@
+import { useTheme } from "../theme/ThemeContext";
 import {
   LineChart,
   Line,
@@ -11,6 +12,7 @@ import { Card } from "./ui/Card";
 import { trafficOverTime } from "../data/mockData";
 
 export function TrafficChart() {
+  const { palette } = useTheme();
   return (
     <Card title="Traffic Over Time" className="h-[280px]">
       <div className="h-[230px] px-2 pb-2 pt-1">
@@ -41,9 +43,9 @@ export function TrafficChart() {
             <Line
               type="monotone"
               dataKey="visitors"
-              stroke="#e50914"
+              stroke={palette.accent}
               strokeWidth={2}
-              dot={{ fill: "#e50914", r: 3 }}
+              dot={{ fill: palette.accent, r: 3 }}
               activeDot={{ r: 5 }}
             />
           </LineChart>

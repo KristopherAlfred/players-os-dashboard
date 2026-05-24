@@ -1,16 +1,35 @@
 @import "tailwindcss";
 
+:root {
+  --theme-bg: #080808;
+  --theme-panel: #0f0f0f;
+  --theme-card: #121212;
+  --theme-border: #1e1e1e;
+  --theme-muted: #8a8a8a;
+  --theme-text: #f0f0f0;
+  --theme-accent: #e50914;
+  --theme-accent-hover: #ff1a26;
+  --theme-chart-secondary: #991b1b;
+  --theme-chart-tertiary: #450a0a;
+  --theme-traffic-0: #e50914;
+  --theme-traffic-1: #ff4444;
+  --theme-traffic-2: #cc0000;
+  --theme-traffic-3: #990000;
+  --theme-traffic-4: #660000;
+  --theme-traffic-5: #440000;
+}
+
 @theme {
   --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
-  --color-dt-bg: #080808;
-  --color-dt-panel: #0f0f0f;
-  --color-dt-card: #121212;
-  --color-dt-border: #1e1e1e;
-  --color-dt-muted: #8a8a8a;
-  --color-dt-text: #f0f0f0;
-  --color-dt-red: #e50914;
-  --color-dt-red-hover: #ff1a26;
+  --color-dt-bg: var(--theme-bg);
+  --color-dt-panel: var(--theme-panel);
+  --color-dt-card: var(--theme-card);
+  --color-dt-border: var(--theme-border);
+  --color-dt-muted: var(--theme-muted);
+  --color-dt-text: var(--theme-text);
+  --color-dt-red: var(--theme-accent);
+  --color-dt-red-hover: var(--theme-accent-hover);
   --color-dt-green: #22c55e;
   --color-dt-orange: #f97316;
 }
