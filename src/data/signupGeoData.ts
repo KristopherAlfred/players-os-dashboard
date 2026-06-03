@@ -72,7 +72,7 @@ const ukRegionIntensity: Record<string, number> = {
   England: 0.78, Scotland: 0.52, Wales: 0.45, "Northern Ireland": 0.4,
 };
 
-const worldCountryMap: Record<string, CountryViewId | "other"> = {
+const worldCountryMap: Record<string, CountryViewId> = {
   "United States of America": "USA",
   Canada: "Canada",
   "United Kingdom": "UK",
