@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "d3-scale": "^4.0.2",
     "lucide-react": "^0.511.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.15.1",
+    "react-simple-maps": "^3.0.0",
     "recharts": "^2.15.3"
   },
   "devDependencies": {
