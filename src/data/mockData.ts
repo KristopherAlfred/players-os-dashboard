@@ -102,6 +102,23 @@ export const ageDemographics = [
   { range: "55+", pct: 4 },
 ];
 
+export const signupHeatmapMock = {
+  totalFans: 482400,
+  mappedFans: 468200,
+  points: [
+    { lat: 45.5, lng: -122.7, count: 8420, label: "Portland, OR, United States" },
+    { lat: 40.7, lng: -74.0, count: 6120, label: "New York, NY, United States" },
+    { lat: 34.1, lng: -118.2, count: 5890, label: "Los Angeles, CA, United States" },
+    { lat: 33.7, lng: -84.4, count: 3210, label: "Atlanta, GA, United States" },
+    { lat: 41.9, lng: -87.6, count: 2980, label: "Chicago, IL, United States" },
+    { lat: 43.7, lng: -79.4, count: 2140, label: "Toronto, ON, Canada" },
+    { lat: 51.5, lng: -0.1, count: 1820, label: "London, United Kingdom" },
+    { lat: -33.9, lng: 151.2, count: 1240, label: "Sydney, Australia" },
+    { lat: 29.8, lng: -95.4, count: 980, label: "Houston, TX, United States" },
+    { lat: 25.8, lng: -80.2, count: 860, label: "Miami, FL, United States" },
+  ],
+};
+
 export const topCountries = [
   { country: "USA", flag: "🇺🇸", pct: 52.4 },
   { country: "Canada", flag: "🇨🇦", pct: 12.8 },

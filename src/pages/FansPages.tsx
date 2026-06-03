@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Users, Mail, Smartphone } from "lucide-react";
 import { Panel, StatCard } from "../components/PageShell";
+import { SignupHeatmap } from "../components/SignupHeatmap";
 import { ageDemographics, topCountries, audienceSnapshot } from "../data/mockData";
 
 const fans = [
@@ -49,6 +50,9 @@ export function AudienceOverviewPage() {
           ))}
         </Panel>
       </div>
+      <Panel title="Signup locations">
+        <SignupHeatmap />
+      </Panel>
     </div>
   );
 }

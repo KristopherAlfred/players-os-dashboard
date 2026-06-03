@@ -42,7 +42,7 @@ export function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-12 items-stretch gap-3">
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 lg:col-span-8">
           <AudienceDemographics />
         </div>
         <div className="col-span-12 sm:col-span-6 lg:col-span-3">
