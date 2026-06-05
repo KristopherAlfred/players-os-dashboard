@@ -3,20 +3,19 @@ import { ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import {
   countryOverview,
-  geoUrlFor,
   getRegionIntensity,
   intensityToColor,
   legendSteps,
+  mapViewConfig,
   type CountryViewId,
   worldCountryFromName,
 } from "../data/signupGeoData";
 
-const UK_REGIONS = [
-  { name: "England", intensity: 0.78 },
-  { name: "Scotland", intensity: 0.52 },
-  { name: "Wales", intensity: 0.45 },
-  { name: "Northern Ireland", intensity: 0.4 },
-];
+type GeoFeature = {
+  rsmKey: string;
+  id?: string;
+  properties?: { name?: string };
+};
 
 type SignupGeoExplorerProps = {
   className?: string;
@@ -43,81 +42,53 @@ function ChoroplethMap({
   view: CountryViewId;
   onSelectCountry?: (id: CountryViewId) => void;
 }) {
-  const url = geoUrlFor(view);
-  const projection = view === "USA" ? "geoAlbersUsa" : view === "Australia" ? "geoMercator" : "geoMercator";
-  const scale = view === "USA" ? 1000 : view === "world" ? 140 : view === "Canada" ? 520 : 600;
-  const center: [number, number] =
-    view === "USA" ? [-96, 38] : view === "Canada" ? [-96, 62] : view === "Australia" ? [134, -28] : [0, 20];
+  const config = mapViewConfig[view];
+  const clickable = view === "world" || view === "Other";
 
   return (
-    <ComposableMap
-      projection={projection}
-      projectionConfig={{ scale, center }}
-      className="h-full w-full"
-      style={{ background: "#060608" }}
-    >
-      <Geographies geography={url}>
-        {({ geographies }: { geographies: { rsmKey: string; id?: string; properties?: { name?: string } }[] }) =>
-          geographies.map((geo) => {
-            const name = (geo.properties as { name?: string }).name ?? "";
-            const id = String(geo.id ?? "");
-            const intensity = getRegionIntensity(view, id, name);
-            const fill = intensityToColor(intensity);
-            const clickable = view === "world";
-            const target = worldCountryFromName(name);
+    <div className="flex h-full w-full items-center justify-center p-1">
+      <ComposableMap
+        projection={config.projection}
+        width={config.width}
+        height={config.height}
+        projectionConfig={{ scale: config.scale, center: config.center }}
+        style={{ width: "100%", height: "auto", maxHeight: "100%" }}
+      >
+        <Geographies geography={config.url}>
+          {({ geographies }: { geographies: GeoFeature[] }) =>
+            geographies.map((geo) => {
+              const name = geo.properties?.name ?? "";
+              const id = String(geo.id ?? "");
+              const intensity = getRegionIntensity(view, id, name);
+              const fill = intensityToColor(intensity);
+              const target = worldCountryFromName(name);
 
-            return (
-              <Geography
-                key={geo.rsmKey}
-                geography={geo}
-                fill={fill}
-                stroke="#1a1a1a"
-                strokeWidth={view === "world" ? 0.4 : 0.6}
-                style={{
-                  default: { outline: "none", opacity: 1 },
-                  hover: { fill: clickable && target ? "#e50914" : fill, outline: "none", cursor: clickable && target ? "pointer" : "default" },
-                  pressed: { outline: "none" },
-                }}
-                onClick={() => {
-                  if (view === "world" && target && onSelectCountry) onSelectCountry(target);
-                }}
-              />
-            );
-          })
-        }
-      </Geographies>
-    </ComposableMap>
-  );
-}
-
-function UKRegionsView() {
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 p-6">
-      <p className="text-xs text-dt-muted">Regional signup share — United Kingdom</p>
-      <div className="grid w-full max-w-md grid-cols-2 gap-2">
-        {UK_REGIONS.map((r) => (
-          <div
-            key={r.name}
-            className="rounded-lg border border-dt-border px-4 py-6 text-center transition hover:brightness-110"
-            style={{ backgroundColor: intensityToColor(r.intensity) }}
-          >
-            <p className="text-sm font-semibold text-black/80">{r.name}</p>
-            <p className="mt-1 text-xs text-black/60">{Math.round(r.intensity * 100)}% intensity</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function OtherWorldNote() {
-  return (
-    <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-      <Globe className="mb-3 text-dt-red" size={40} />
-      <p className="text-sm font-medium text-white">All other regions</p>
-      <p className="mt-2 max-w-sm text-xs text-dt-muted">
-        19% of signups come from outside USA, Canada, UK, and Australia. Use world view and click a country to drill in.
-      </p>
+              return (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill={fill}
+                  stroke="#1a1a1a"
+                  strokeWidth={view === "world" || view === "Other" ? 0.35 : 0.55}
+                  style={{
+                    default: { outline: "none", opacity: 1 },
+                    hover: {
+                      fill: clickable && target ? "#e50914" : fill,
+                      outline: "none",
+                      cursor: clickable && target ? "pointer" : "default",
+                      opacity: 1,
+                    },
+                    pressed: { outline: "none" },
+                  }}
+                  onClick={() => {
+                    if (clickable && target && onSelectCountry) onSelectCountry(target);
+                  }}
+                />
+              );
+            })
+          }
+        </Geographies>
+      </ComposableMap>
     </div>
   );
 }
@@ -146,7 +117,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
     view === "world"
       ? "World — fan signups by country"
       : view === "Other"
-        ? "Other regions"
+        ? "Other regions — rest of world"
         : `${countryOverview.find((c) => c.id === view)?.flag ?? ""} ${view} — regional signup heatmap`;
 
   return (
@@ -182,53 +153,49 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         </div>
       </div>
 
-      <div className="flex min-h-[340px] overflow-hidden rounded-lg border border-dt-border bg-[#060608]">
-        <div className="hidden p-4 sm:flex">
+      <div className="flex flex-col overflow-hidden rounded-lg border border-dt-border bg-[#060608] lg:flex-row lg:min-h-[400px]">
+        <div className="hidden border-b border-dt-border p-4 lg:flex lg:border-b-0 lg:border-r">
           <MapLegend />
         </div>
 
-        <div className="relative min-h-[280px] flex-1 sm:min-h-[340px]">
-          {view === "UK" ? (
-            <UKRegionsView />
-          ) : view === "Other" ? (
-            <OtherWorldNote />
-          ) : (
-            <ChoroplethMap view={view} onSelectCountry={setView} />
-          )}
+        <div className="relative h-[360px] w-full min-w-0 flex-1 sm:h-[400px]">
+          <ChoroplethMap view={view} onSelectCountry={setView} />
         </div>
 
-        <div className="flex w-[148px] shrink-0 flex-col border-l border-dt-border bg-dt-bg/40 p-3">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Countries</p>
+        <div className="flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-t border-dt-border bg-dt-bg/40 p-2 lg:w-[148px] lg:flex-col lg:overflow-x-visible lg:border-l lg:border-t-0 lg:p-3">
+          <p className="mb-0 hidden text-[10px] font-semibold uppercase tracking-wide text-dt-muted lg:mb-2 lg:block">
+            Countries
+          </p>
           {countryOverview.map((c) => (
             <button
               key={c.id}
               type="button"
               onClick={() => setView(c.id)}
-              className={`mb-1 flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-xs transition ${
+              className={`shrink-0 rounded-md px-2 py-2 text-left text-xs transition lg:mb-1 lg:flex lg:w-full lg:items-center lg:justify-between ${
                 view === c.id ? "bg-dt-red/20 text-white ring-1 ring-dt-red/50" : "text-dt-muted hover:bg-white/5 hover:text-white"
               }`}
             >
               <span>
                 {c.flag} {c.label}
               </span>
-              <span className="font-semibold tabular-nums">{c.pct}%</span>
+              <span className="ml-2 font-semibold tabular-nums lg:ml-0">{c.pct}%</span>
             </button>
           ))}
           <button
             type="button"
             onClick={() => setView("world")}
-            className={`mt-2 flex w-full items-center gap-1.5 rounded-md px-2 py-2 text-xs ${
+            className={`shrink-0 rounded-md px-2 py-2 text-xs lg:mt-2 lg:flex lg:w-full lg:items-center lg:gap-1.5 ${
               view === "world" ? "bg-dt-red/20 text-white" : "text-dt-muted hover:bg-white/5"
             }`}
           >
-            <Globe size={14} />
-            All continents
+            <Globe size={14} className="inline lg:mr-0" />
+            <span className="ml-1 lg:ml-0">All continents</span>
           </button>
         </div>
       </div>
 
-      <p className="mt-2 text-[10px] text-dt-muted sm:hidden">
-        Legend: blue = fewer signups → red = most signups. Tap a country on the map or use the list.
+      <p className="mt-2 text-[10px] text-dt-muted lg:hidden">
+        Legend: blue = fewer signups → red = most signups. Tap a country or use the list.
       </p>
     </div>
   );
