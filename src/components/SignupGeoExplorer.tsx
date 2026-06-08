@@ -44,15 +44,19 @@ function ChoroplethMap({
 }) {
   const config = mapViewConfig[view];
   const clickable = view === "world" || view === "Other";
+  const projectionConfig =
+    config.projection === "geoAlbersUsa"
+      ? { scale: config.scale }
+      : { scale: config.scale, center: config.center ?? [0, 0] };
 
   return (
-    <div className="flex h-full w-full items-center justify-center p-1">
+    <div className="flex h-full w-full items-center justify-center overflow-visible px-3 py-2">
       <ComposableMap
         projection={config.projection}
         width={config.width}
         height={config.height}
-        projectionConfig={{ scale: config.scale, center: config.center }}
-        style={{ width: "100%", height: "auto", maxHeight: "100%" }}
+        projectionConfig={projectionConfig}
+        style={{ width: "100%", height: "auto", maxHeight: "100%", display: "block" }}
       >
         <Geographies geography={config.url}>
           {({ geographies }: { geographies: GeoFeature[] }) =>
@@ -158,7 +162,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
           <MapLegend />
         </div>
 
-        <div className="relative h-[360px] w-full min-w-0 flex-1 sm:h-[400px]">
+        <div className="relative h-[400px] w-full min-w-0 flex-1 overflow-visible sm:h-[440px]">
           <ChoroplethMap view={view} onSelectCountry={setView} />
         </div>
 

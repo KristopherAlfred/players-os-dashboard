@@ -11,7 +11,7 @@ export type MapViewConfig = {
   url: string;
   projection: string;
   scale: number;
-  center: [number, number];
+  center?: [number, number];
   width: number;
   height: number;
 };
@@ -44,50 +44,49 @@ export const mapViewConfig: Record<CountryViewId, MapViewConfig> = {
   world: {
     url: GEO_URLS.world,
     projection: "geoEqualEarth",
-    scale: 150,
-    center: [0, 0],
-    width: 760,
-    height: 380,
+    scale: 130,
+    center: [0, 4],
+    width: 800,
+    height: 420,
   },
   USA: {
     url: GEO_URLS.usa,
     projection: "geoAlbersUsa",
-    scale: 1000,
-    center: [0, 0],
-    width: 760,
-    height: 380,
+    scale: 680,
+    width: 800,
+    height: 420,
   },
   Canada: {
     url: GEO_URLS.canada,
-    projection: "geoAzimuthalEqualArea",
-    scale: 520,
-    center: [-96, 62],
-    width: 760,
-    height: 380,
+    projection: "geoMercator",
+    scale: 310,
+    center: [-96, 60],
+    width: 800,
+    height: 420,
   },
   UK: {
     url: GEO_URLS.uk,
     projection: "geoMercator",
-    scale: 2200,
-    center: [-2, 54],
-    width: 760,
-    height: 380,
+    scale: 780,
+    center: [-2, 54.5],
+    width: 800,
+    height: 420,
   },
   Australia: {
     url: GEO_URLS.australia,
     projection: "geoMercator",
-    scale: 700,
-    center: [134, -26],
-    width: 760,
-    height: 380,
+    scale: 520,
+    center: [134, -27],
+    width: 800,
+    height: 420,
   },
   Other: {
     url: GEO_URLS.world,
     projection: "geoEqualEarth",
-    scale: 150,
-    center: [0, 0],
-    width: 760,
-    height: 380,
+    scale: 130,
+    center: [0, 4],
+    width: 800,
+    height: 420,
   },
 };
 
