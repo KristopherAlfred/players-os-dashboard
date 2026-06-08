@@ -157,7 +157,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         </div>
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-lg border border-dt-border bg-[#060608] lg:flex-row lg:min-h-[400px]">
+      <div className="flex flex-col overflow-visible rounded-lg border border-dt-border bg-[#060608] lg:flex-row lg:min-h-[400px]">
         <div className="hidden border-b border-dt-border p-4 lg:flex lg:border-b-0 lg:border-r">
           <MapLegend />
         </div>
