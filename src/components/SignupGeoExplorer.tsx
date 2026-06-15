@@ -23,10 +23,16 @@ type SignupGeoExplorerProps = {
   className?: string;
 };
 
-function MapLegend({ paletteId }: { paletteId: HeatmapPaletteId }) {
+function MapLegend({
+  paletteId,
+  onPaletteChange,
+}: {
+  paletteId: HeatmapPaletteId;
+  onPaletteChange: (id: HeatmapPaletteId) => void;
+}) {
   const steps = heatmapPalettes[paletteId].steps;
   return (
-    <div className="flex w-[132px] shrink-0 flex-col gap-2 border-r border-dt-border pr-4">
+    <div className="flex w-[148px] shrink-0 flex-col gap-2 border-r border-dt-border pr-4">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Signup density</p>
       {steps.map((step) => (
         <div key={step.label} className="flex items-center gap-2">
@@ -34,6 +40,7 @@ function MapLegend({ paletteId }: { paletteId: HeatmapPaletteId }) {
           <span className="text-[10px] leading-tight text-dt-muted">{step.label}</span>
         </div>
       ))}
+      <PalettePicker paletteId={paletteId} onChange={onPaletteChange} variant="sidebar" />
     </div>
   );
 }
@@ -41,14 +48,44 @@ function MapLegend({ paletteId }: { paletteId: HeatmapPaletteId }) {
 function PalettePicker({
   paletteId,
   onChange,
+  variant = "compact",
 }: {
   paletteId: HeatmapPaletteId;
   onChange: (id: HeatmapPaletteId) => void;
+  variant?: "compact" | "sidebar";
 }) {
+  if (variant === "sidebar") {
+    return (
+      <div className="mt-4 flex flex-col gap-2 border-t border-dt-border pt-4">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Color palette</p>
+        {heatmapPaletteList.map((palette) => {
+          const active = palette.id === paletteId;
+          const gradient = `linear-gradient(90deg, ${palette.colors.join(", ")})`;
+          return (
+            <button
+              key={palette.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(palette.id)}
+              className={`flex w-full items-center gap-2 rounded-md border px-2 py-1.5 text-left transition ${
+                active
+                  ? "border-dt-red bg-dt-red/10 text-white ring-1 ring-dt-red/50"
+                  : "border-dt-border text-dt-muted hover:border-white/20 hover:text-white"
+              }`}
+            >
+              <span className="h-3 w-8 shrink-0 rounded-sm border border-white/10" style={{ background: gradient }} />
+              <span className="text-[10px] font-medium">{palette.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-1.5">
-      <span className="hidden text-[10px] font-semibold uppercase tracking-wide text-dt-muted sm:inline">Palette</span>
-      <div className="flex flex-wrap gap-1">
+    <div className="flex flex-col gap-1.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Color palette</p>
+      <div className="flex flex-wrap gap-1.5">
         {heatmapPaletteList.map((palette) => {
           const active = palette.id === paletteId;
           const gradient = `linear-gradient(90deg, ${palette.colors.join(", ")})`;
@@ -60,11 +97,13 @@ function PalettePicker({
               aria-label={`${palette.label} color palette`}
               aria-pressed={active}
               onClick={() => onChange(palette.id)}
-              className={`h-6 w-10 shrink-0 rounded-md border transition ${
-                active ? "border-dt-red ring-1 ring-dt-red/60" : "border-dt-border hover:border-white/30"
+              className={`flex items-center gap-1.5 rounded-md border px-2 py-1 transition ${
+                active ? "border-dt-red bg-dt-red/10 ring-1 ring-dt-red/60" : "border-dt-border hover:border-white/30"
               }`}
-              style={{ background: gradient }}
-            />
+            >
+              <span className="h-3 w-8 shrink-0 rounded-sm border border-white/10" style={{ background: gradient }} />
+              <span className="text-[10px] font-medium text-dt-muted">{palette.label}</span>
+            </button>
           );
         })}
       </div>
@@ -168,9 +207,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
     <div className={className}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-dt-muted">{title}</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <PalettePicker paletteId={paletteId} onChange={setPaletteId} />
-          <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={goPrev}
@@ -196,13 +233,16 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
           >
             <ChevronRight size={16} />
           </button>
-          </div>
         </div>
+      </div>
+
+      <div className="mb-3 lg:hidden">
+        <PalettePicker paletteId={paletteId} onChange={setPaletteId} />
       </div>
 
       <div className="flex flex-col overflow-visible rounded-lg border border-dt-border bg-[#060608] lg:flex-row lg:min-h-[400px]">
         <div className="hidden border-b border-dt-border p-4 lg:flex lg:border-b-0 lg:border-r">
-          <MapLegend paletteId={paletteId} />
+          <MapLegend paletteId={paletteId} onPaletteChange={setPaletteId} />
         </div>
 
         <div className="relative h-[400px] w-full min-w-0 flex-1 overflow-visible sm:h-[440px]">
