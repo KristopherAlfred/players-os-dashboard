@@ -1,20 +1,25 @@
 import { useState, type FormEvent } from "react";
 import {
   BarChart3,
+  Briefcase,
   Calendar,
   CheckCircle2,
   Clock3,
   Eye,
   FileEdit,
   Film,
+  Lock,
   LogIn,
   LogOut,
+  Mail,
   Play,
   Shield,
   Sparkles,
   Trophy,
   Upload,
+  User,
   UserCircle2,
+  Users,
 } from "lucide-react";
 import { AthleteUploadPanel } from "../components/AthleteUploadPanel";
 import { ContentThumb } from "../components/ContentThumb";
@@ -65,6 +70,23 @@ function saveSession(session: AthleteSession | null) {
   else sessionStorage.removeItem(SESSION_KEY);
 }
 
+const loginRoles: {
+  id: AthleteRole;
+  label: string;
+  icon: typeof Trophy;
+  hint: string;
+}[] = [
+  { id: "athlete", label: "Athlete", icon: Trophy, hint: "Your own content" },
+  { id: "agent", label: "Agent", icon: Briefcase, hint: "On behalf of talent" },
+  { id: "representative", label: "Rep", icon: Users, hint: "Team & PR access" },
+];
+
+const loginPerks = [
+  "Upload video, images, and audio",
+  "Schedule drops before they go live",
+  "Track views and engagement per post",
+];
+
 function AthleteLogin({ onLogin }: { onLogin: (session: AthleteSession) => void }) {
   const [role, setRole] = useState<AthleteRole>("athlete");
   const [name, setName] = useState("");
@@ -85,83 +107,164 @@ function AthleteLogin({ onLogin }: { onLogin: (session: AthleteSession) => void 
     });
   }
 
+  const inputClass =
+    "w-full rounded-lg border border-dt-border bg-dt-bg/80 py-2.5 pl-10 pr-3 text-sm text-white outline-none transition placeholder:text-dt-muted/70 focus:border-dt-red/50 focus:ring-1 focus:ring-dt-red/30";
+
   return (
-    <div className="mx-auto max-w-lg">
-      <Panel title="Athlete Hub Sign In">
-        <p className="mb-5 text-sm text-dt-muted">
-          Athletes, agents, and representatives can sign in here to upload content, manage drafts, and publish to DameTime.
-        </p>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <label className="block text-sm">
-            <span className="text-dt-muted">Signing in as</span>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as AthleteRole)}
-              className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-white"
-            >
-              <option value="athlete">Athlete</option>
-              <option value="agent">Agent</option>
-              <option value="representative">Representative</option>
-            </select>
-          </label>
+    <div className="mx-auto flex w-full max-w-5xl items-center justify-center py-4 sm:py-8">
+      <div className="grid w-full overflow-hidden rounded-2xl border border-dt-border bg-dt-card shadow-2xl shadow-black/40 lg:grid-cols-5">
+        <div className="relative overflow-hidden lg:col-span-2">
+          <img
+            src="/content/studio.jpg"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/55 to-dt-red/40" />
+          <div className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full bg-dt-red/30 blur-3xl" />
 
-          {role !== "athlete" && (
+          <div className="relative flex h-full min-h-[220px] flex-col justify-between p-6 sm:min-h-[480px] sm:p-8">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-dt-red/40 bg-dt-red/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-dt-red">
+                <Trophy size={12} />
+                Athlete Hub
+              </div>
+              <h2 className="font-display text-3xl font-semibold leading-tight tracking-wide text-white sm:text-4xl">
+                Your stage.
+                <br />
+                Your uploads.
+              </h2>
+              <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/75">
+                The creator portal for athletes and the people who represent them — built for DameTime.
+              </p>
+            </div>
+
+            <ul className="mt-6 hidden space-y-2.5 sm:block">
+              {loginPerks.map((perk) => (
+                <li key={perk} className="flex items-center gap-2.5 text-sm text-white/85">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-dt-red/20 text-dt-red">
+                    <Sparkles size={11} />
+                  </span>
+                  {perk}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 hidden rounded-xl border border-white/10 bg-black/30 p-3 backdrop-blur-sm sm:block">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Trusted by</p>
+              <p className="mt-1 text-sm font-medium text-white">Athletes · Agents · Reps</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative border-t border-dt-border bg-dt-card p-6 sm:p-8 lg:col-span-3 lg:border-l lg:border-t-0">
+          <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 bg-[radial-gradient(circle,rgba(229,9,20,0.15),transparent_70%)]" />
+
+          <div className="relative mb-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-dt-red">Welcome back</p>
+            <h3 className="mt-1 font-display text-2xl font-semibold tracking-wide text-white">Sign in</h3>
+            <p className="mt-1 text-sm text-dt-muted">Choose your role and enter your credentials.</p>
+          </div>
+
+          <form className="relative space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <p className="mb-2 text-xs font-medium text-dt-muted">Signing in as</p>
+              <div className="grid grid-cols-3 gap-2">
+                {loginRoles.map(({ id, label, icon: Icon, hint }) => {
+                  const active = role === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setRole(id)}
+                      className={`rounded-xl border px-2 py-3 text-center transition ${
+                        active
+                          ? "border-dt-red bg-dt-red/15 text-white shadow-md shadow-dt-red/15"
+                          : "border-dt-border bg-dt-bg/50 text-dt-muted hover:border-white/20 hover:text-white"
+                      }`}
+                    >
+                      <Icon size={16} className={`mx-auto ${active ? "text-dt-red" : ""}`} />
+                      <p className="mt-1.5 text-xs font-semibold">{label}</p>
+                      <p className="mt-0.5 hidden text-[10px] opacity-70 sm:block">{hint}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {role !== "athlete" && (
+              <label className="block text-sm">
+                <span className="mb-1.5 block text-xs font-medium text-dt-muted">Athlete name</span>
+                <div className="relative">
+                  <Trophy size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dt-muted" />
+                  <input
+                    value={athleteName}
+                    onChange={(e) => setAthleteName(e.target.value)}
+                    className={inputClass}
+                    placeholder="Athlete you're representing"
+                    required
+                  />
+                </div>
+              </label>
+            )}
+
             <label className="block text-sm">
-              <span className="text-dt-muted">Athlete name</span>
-              <input
-                value={athleteName}
-                onChange={(e) => setAthleteName(e.target.value)}
-                className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-white outline-none"
-                placeholder="Athlete you're representing"
-                required
-              />
+              <span className="mb-1.5 block text-xs font-medium text-dt-muted">Your name</span>
+              <div className="relative">
+                <User size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dt-muted" />
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={inputClass}
+                  placeholder="Full name"
+                  required
+                />
+              </div>
             </label>
-          )}
 
-          <label className="block text-sm">
-            <span className="text-dt-muted">Your name</span>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-white outline-none"
-              placeholder="Full name"
-              required
-            />
-          </label>
+            <label className="block text-sm">
+              <span className="mb-1.5 block text-xs font-medium text-dt-muted">Email</span>
+              <div className="relative">
+                <Mail size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dt-muted" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
+                  placeholder="you@agency.com"
+                  required
+                />
+              </div>
+            </label>
 
-          <label className="block text-sm">
-            <span className="text-dt-muted">Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-white outline-none"
-              placeholder="you@agency.com"
-              required
-            />
-          </label>
+            <label className="block text-sm">
+              <span className="mb-1.5 block text-xs font-medium text-dt-muted">Password</span>
+              <div className="relative">
+                <Lock size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dt-muted" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={inputClass}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </label>
 
-          <label className="block text-sm">
-            <span className="text-dt-muted">Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-white outline-none"
-              placeholder="••••••••"
-              required
-            />
-          </label>
+            <button
+              type="submit"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-dt-red py-3 text-sm font-semibold text-white shadow-lg shadow-dt-red/25 transition hover:bg-dt-red-hover hover:shadow-dt-red/35"
+            >
+              <LogIn size={16} />
+              Enter Athlete Hub
+            </button>
 
-          <button
-            type="submit"
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-dt-red py-2.5 text-sm font-semibold text-white hover:bg-dt-red-hover"
-          >
-            <LogIn size={16} />
-            Sign in to Athlete Hub
-          </button>
-        </form>
-      </Panel>
+            <p className="text-center text-[11px] text-dt-muted">
+              Demo login — any email and password will work for now.
+            </p>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
