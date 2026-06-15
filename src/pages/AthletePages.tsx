@@ -37,6 +37,7 @@ type AthleteSession = {
 };
 
 const SESSION_KEY = "dametime_athlete_hub_session";
+const HUB_ATHLETE_NAME = "Damian Lillard";
 
 const roleLabels: Record<AthleteRole, string> = {
   athlete: "Athlete",
@@ -77,8 +78,8 @@ const loginRoles: {
   hint: string;
 }[] = [
   { id: "athlete", label: "Athlete", icon: Trophy, hint: "Your own content" },
-  { id: "agent", label: "Agent", icon: Briefcase, hint: "On behalf of talent" },
-  { id: "representative", label: "Rep", icon: Users, hint: "Team & PR access" },
+  { id: "agent", label: "Agent", icon: Briefcase, hint: "Dame's team" },
+  { id: "representative", label: "Rep", icon: Users, hint: "Dame's team" },
 ];
 
 const loginPerks = [
@@ -91,19 +92,17 @@ function AthleteLogin({ onLogin }: { onLogin: (session: AthleteSession) => void 
   const [role, setRole] = useState<AthleteRole>("athlete");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [athleteName, setAthleteName] = useState("");
   const [password, setPassword] = useState("");
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !password.trim()) return;
-    if (role !== "athlete" && !athleteName.trim()) return;
 
     onLogin({
       name: name.trim(),
       email: email.trim(),
       role,
-      athleteName: role === "athlete" ? name.trim() : athleteName.trim(),
+      athleteName: HUB_ATHLETE_NAME,
     });
   }
 
@@ -162,7 +161,11 @@ function AthleteLogin({ onLogin }: { onLogin: (session: AthleteSession) => void 
           <div className="relative mb-6">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-dt-red">Welcome back</p>
             <h3 className="mt-1 font-display text-2xl font-semibold tracking-wide text-white">Sign in</h3>
-            <p className="mt-1 text-sm text-dt-muted">Choose your role and enter your credentials.</p>
+            <p className="mt-1 text-sm text-dt-muted">
+              {role === "athlete"
+                ? "Sign in to upload and manage your DameTime content."
+                : `Sign in to manage ${HUB_ATHLETE_NAME}'s DameTime content.`}
+            </p>
           </div>
 
           <form className="relative space-y-4" onSubmit={handleSubmit}>
@@ -192,19 +195,17 @@ function AthleteLogin({ onLogin }: { onLogin: (session: AthleteSession) => void 
             </div>
 
             {role !== "athlete" && (
-              <label className="block text-sm">
-                <span className="mb-1.5 block text-xs font-medium text-dt-muted">Athlete name</span>
-                <div className="relative">
-                  <Trophy size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dt-muted" />
-                  <input
-                    value={athleteName}
-                    onChange={(e) => setAthleteName(e.target.value)}
-                    className={inputClass}
-                    placeholder="Athlete you're representing"
-                    required
-                  />
+              <div className="flex items-center gap-3 rounded-xl border border-dt-red/25 bg-dt-red/10 px-3 py-2.5">
+                <img
+                  src="/dame-headshot.png"
+                  alt=""
+                  className="h-9 w-9 rounded-lg border border-dt-red/30 object-cover object-top"
+                />
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-red">This dashboard</p>
+                  <p className="text-sm font-medium text-white">{HUB_ATHLETE_NAME}</p>
                 </div>
-              </label>
+              </div>
             )}
 
             <label className="block text-sm">
@@ -346,7 +347,16 @@ function AthleteHubDashboard({
                 {session.athleteName}
               </h2>
               <p className="mt-1 text-sm text-dt-muted">
-                Signed in as <span className="text-white">{session.name}</span> · {roleLabels[session.role]}
+                {session.role === "athlete" ? (
+                  <>
+                    Signed in as <span className="text-white">{session.name}</span> · Athlete
+                  </>
+                ) : (
+                  <>
+                    <span className="text-white">{session.name}</span> · {roleLabels[session.role]} for{" "}
+                    <span className="text-white">{session.athleteName}</span>
+                  </>
+                )}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 <span className="rounded-full border border-dt-red/30 bg-dt-red/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-dt-red">
