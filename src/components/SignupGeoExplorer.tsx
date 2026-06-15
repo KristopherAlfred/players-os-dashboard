@@ -4,10 +4,12 @@ import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import {
   countryOverview,
   getRegionIntensity,
+  heatmapPaletteList,
+  heatmapPalettes,
   intensityToColor,
-  legendSteps,
   mapViewConfig,
   type CountryViewId,
+  type HeatmapPaletteId,
   worldCountryFromName,
 } from "../data/signupGeoData";
 
@@ -21,11 +23,12 @@ type SignupGeoExplorerProps = {
   className?: string;
 };
 
-function MapLegend() {
+function MapLegend({ paletteId }: { paletteId: HeatmapPaletteId }) {
+  const steps = heatmapPalettes[paletteId].steps;
   return (
     <div className="flex w-[132px] shrink-0 flex-col gap-2 border-r border-dt-border pr-4">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Signup density</p>
-      {legendSteps.map((step) => (
+      {steps.map((step) => (
         <div key={step.label} className="flex items-center gap-2">
           <span className="h-3 w-5 shrink-0 rounded-sm border border-white/10" style={{ backgroundColor: step.color }} />
           <span className="text-[10px] leading-tight text-dt-muted">{step.label}</span>
@@ -35,11 +38,47 @@ function MapLegend() {
   );
 }
 
+function PalettePicker({
+  paletteId,
+  onChange,
+}: {
+  paletteId: HeatmapPaletteId;
+  onChange: (id: HeatmapPaletteId) => void;
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="hidden text-[10px] font-semibold uppercase tracking-wide text-dt-muted sm:inline">Palette</span>
+      <div className="flex flex-wrap gap-1">
+        {heatmapPaletteList.map((palette) => {
+          const active = palette.id === paletteId;
+          const gradient = `linear-gradient(90deg, ${palette.colors.join(", ")})`;
+          return (
+            <button
+              key={palette.id}
+              type="button"
+              title={palette.label}
+              aria-label={`${palette.label} color palette`}
+              aria-pressed={active}
+              onClick={() => onChange(palette.id)}
+              className={`h-6 w-10 shrink-0 rounded-md border transition ${
+                active ? "border-dt-red ring-1 ring-dt-red/60" : "border-dt-border hover:border-white/30"
+              }`}
+              style={{ background: gradient }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ChoroplethMap({
   view,
+  paletteId,
   onSelectCountry,
 }: {
   view: CountryViewId;
+  paletteId: HeatmapPaletteId;
   onSelectCountry?: (id: CountryViewId) => void;
 }) {
   const config = mapViewConfig[view];
@@ -64,7 +103,7 @@ function ChoroplethMap({
               const name = geo.properties?.name ?? "";
               const id = String(geo.id ?? "");
               const intensity = getRegionIntensity(view, id, name);
-              const fill = intensityToColor(intensity);
+              const fill = intensityToColor(intensity, paletteId);
               const target = worldCountryFromName(name);
 
               return (
@@ -99,6 +138,7 @@ function ChoroplethMap({
 
 export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
   const [view, setView] = useState<CountryViewId>("world");
+  const [paletteId, setPaletteId] = useState<HeatmapPaletteId>("ocean");
 
   const countryIndex = useMemo(
     () => countryOverview.findIndex((c) => c.id === view),
@@ -128,7 +168,9 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
     <div className={className}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-dt-muted">{title}</p>
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <PalettePicker paletteId={paletteId} onChange={setPaletteId} />
+          <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={goPrev}
@@ -154,16 +196,17 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
           >
             <ChevronRight size={16} />
           </button>
+          </div>
         </div>
       </div>
 
       <div className="flex flex-col overflow-visible rounded-lg border border-dt-border bg-[#060608] lg:flex-row lg:min-h-[400px]">
         <div className="hidden border-b border-dt-border p-4 lg:flex lg:border-b-0 lg:border-r">
-          <MapLegend />
+          <MapLegend paletteId={paletteId} />
         </div>
 
         <div className="relative h-[400px] w-full min-w-0 flex-1 overflow-visible sm:h-[440px]">
-          <ChoroplethMap view={view} onSelectCountry={setView} />
+          <ChoroplethMap view={view} paletteId={paletteId} onSelectCountry={setView} />
         </div>
 
         <div className="flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-t border-dt-border bg-dt-bg/40 p-2 lg:w-[148px] lg:flex-col lg:overflow-x-visible lg:border-l lg:border-t-0 lg:p-3">
@@ -199,7 +242,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
       </div>
 
       <p className="mt-2 text-[10px] text-dt-muted lg:hidden">
-        Legend: blue = fewer signups → red = most signups. Tap a country or use the list.
+        Legend: lighter = fewer signups, brighter = most. Tap a country or use the list.
       </p>
     </div>
   );

@@ -1,5 +1,14 @@
 export type CountryViewId = "world" | "USA" | "Canada" | "UK" | "Australia" | "Other";
 
+export type HeatmapPaletteId = "ocean" | "inferno" | "emerald" | "sunset" | "slate";
+
+export type HeatmapPalette = {
+  id: HeatmapPaletteId;
+  label: string;
+  steps: { label: string; color: string }[];
+  colors: [string, string, string, string, string];
+};
+
 export type CountryOverview = {
   id: CountryViewId;
   label: string;
@@ -24,13 +33,81 @@ export const countryOverview: CountryOverview[] = [
   { id: "Other", label: "Other", flag: "🌍", pct: 19.0 },
 ];
 
-export const legendSteps = [
-  { label: "Fewest signups", color: "#3288bd" },
-  { label: "Below average", color: "#abdda4" },
-  { label: "Average", color: "#fee08b" },
-  { label: "Above average", color: "#fdae61" },
-  { label: "Most signups", color: "#d73027" },
-];
+const legendLabels = [
+  "Fewest signups",
+  "Below average",
+  "Average",
+  "Above average",
+  "Most signups",
+] as const;
+
+export const heatmapPalettes: Record<HeatmapPaletteId, HeatmapPalette> = {
+  ocean: {
+    id: "ocean",
+    label: "Ocean",
+    colors: ["#3288bd", "#66c2a5", "#fee08b", "#fc8d59", "#d73027"],
+    steps: [
+      { label: legendLabels[0], color: "#3288bd" },
+      { label: legendLabels[1], color: "#66c2a5" },
+      { label: legendLabels[2], color: "#fee08b" },
+      { label: legendLabels[3], color: "#fc8d59" },
+      { label: legendLabels[4], color: "#d73027" },
+    ],
+  },
+  inferno: {
+    id: "inferno",
+    label: "Inferno",
+    colors: ["#2c115f", "#b73779", "#fb8861", "#fec287", "#fcffa4"],
+    steps: [
+      { label: legendLabels[0], color: "#2c115f" },
+      { label: legendLabels[1], color: "#b73779" },
+      { label: legendLabels[2], color: "#fb8861" },
+      { label: legendLabels[3], color: "#fec287" },
+      { label: legendLabels[4], color: "#fcffa4" },
+    ],
+  },
+  emerald: {
+    id: "emerald",
+    label: "Emerald",
+    colors: ["#084081", "#2b8cbe", "#4eb3d3", "#7bccc4", "#a8ddb5"],
+    steps: [
+      { label: legendLabels[0], color: "#084081" },
+      { label: legendLabels[1], color: "#2b8cbe" },
+      { label: legendLabels[2], color: "#4eb3d3" },
+      { label: legendLabels[3], color: "#7bccc4" },
+      { label: legendLabels[4], color: "#a8ddb5" },
+    ],
+  },
+  sunset: {
+    id: "sunset",
+    label: "Sunset",
+    colors: ["#4a1486", "#9c27b0", "#e91e63", "#ff7043", "#ffca28"],
+    steps: [
+      { label: legendLabels[0], color: "#4a1486" },
+      { label: legendLabels[1], color: "#9c27b0" },
+      { label: legendLabels[2], color: "#e91e63" },
+      { label: legendLabels[3], color: "#ff7043" },
+      { label: legendLabels[4], color: "#ffca28" },
+    ],
+  },
+  slate: {
+    id: "slate",
+    label: "Slate",
+    colors: ["#1e293b", "#334155", "#64748b", "#94a3b8", "#e2e8f0"],
+    steps: [
+      { label: legendLabels[0], color: "#1e293b" },
+      { label: legendLabels[1], color: "#334155" },
+      { label: legendLabels[2], color: "#64748b" },
+      { label: legendLabels[3], color: "#94a3b8" },
+      { label: legendLabels[4], color: "#e2e8f0" },
+    ],
+  },
+};
+
+export const heatmapPaletteList = Object.values(heatmapPalettes);
+
+/** @deprecated Use heatmapPalettes[paletteId].steps */
+export const legendSteps = heatmapPalettes.ocean.steps;
 
 const GEO_URLS = {
   world: "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json",
@@ -94,13 +171,14 @@ export function geoUrlFor(view: CountryViewId) {
   return mapViewConfig[view].url;
 }
 
-export function intensityToColor(value: number) {
+export function intensityToColor(value: number, paletteId: HeatmapPaletteId = "ocean") {
+  const colors = heatmapPalettes[paletteId].colors;
   const v = Math.max(0, Math.min(1, value));
-  if (v < 0.25) return "#3288bd";
-  if (v < 0.45) return "#66c2a5";
-  if (v < 0.6) return "#fee08b";
-  if (v < 0.78) return "#fc8d59";
-  return "#d73027";
+  if (v < 0.25) return colors[0];
+  if (v < 0.45) return colors[1];
+  if (v < 0.6) return colors[2];
+  if (v < 0.78) return colors[3];
+  return colors[4];
 }
 
 const usStateIntensity: Record<string, number> = {
