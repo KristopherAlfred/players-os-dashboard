@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import { Plus, Calendar, SlidersHorizontal, Bell, Menu } from "lucide-react";
+import { Calendar, SlidersHorizontal, Bell, Menu } from "lucide-react";
 
 export function Header({
   title,
@@ -33,14 +32,6 @@ export function Header({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-3">
-          <Link
-            to="/content/upload"
-            className="flex items-center gap-1.5 rounded-md bg-dt-red px-2.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-dt-red-hover sm:gap-2 sm:px-3 lg:px-4"
-          >
-            <Plus size={16} />
-            <span className="hidden sm:inline">Upload Content</span>
-          </Link>
-
           <button
             type="button"
             className="hidden items-center gap-2 rounded-md border border-dt-border bg-dt-card px-2.5 py-2 text-sm text-[#d4d4d4] md:flex lg:px-3"

@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ExternalLink,
   Zap,
+  Trophy,
   X,
 } from "lucide-react";
 import { navSections } from "../config/navigation";
@@ -24,6 +25,7 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
   "bar-chart-2": BarChart2,
   "dollar-sign": DollarSign,
   settings: Settings,
+  trophy: Trophy,
 };
 
 const sectionGlowStyle = {

@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import { DashboardPage } from "./pages/DashboardPage";
 import {
   AllContentPage,
-  UploadContentPage,
   ContentCalendarPage,
   MediaLibraryPage,
   PlaylistsPage,
@@ -38,6 +38,7 @@ import {
   IntegrationsPage,
   AccountPage,
 } from "./pages/SettingsPages";
+import { AthleteHubPage } from "./pages/AthletePages";
 
 export default function App() {
   return (
@@ -46,7 +47,8 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="content/all" element={<AllContentPage />} />
-          <Route path="content/upload" element={<UploadContentPage />} />
+          <Route path="content/upload" element={<Navigate to="/athletes/hub" replace />} />
+          <Route path="athletes/hub" element={<AthleteHubPage />} />
           <Route path="content/calendar" element={<ContentCalendarPage />} />
           <Route path="content/media" element={<MediaLibraryPage />} />
           <Route path="content/playlists" element={<PlaylistsPage />} />

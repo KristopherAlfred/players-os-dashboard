@@ -21,7 +21,6 @@ export const navSections: NavSection[] = [
     icon: "film",
     items: [
       { label: "All Content", path: "/content/all" },
-      { label: "Upload Content", path: "/content/upload" },
       { label: "Content Calendar", path: "/content/calendar" },
       { label: "Media Library", path: "/content/media" },
       { label: "Playlists", path: "/content/playlists" },
@@ -72,6 +71,11 @@ export const navSections: NavSection[] = [
     ],
   },
   {
+    label: "FOR ATHLETES",
+    icon: "trophy",
+    items: [{ label: "Athlete Hub", path: "/athletes/hub" }],
+  },
+  {
     label: "SETTINGS",
     icon: "settings",
     items: [
@@ -96,6 +100,10 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/content/all": {
     title: "All Content",
     subtitle: "Browse, filter, and manage every asset in your library.",
+  },
+  "/athletes/hub": {
+    title: "Athlete Hub",
+    subtitle: "Athletes and representatives sign in to upload and manage content.",
   },
   "/content/upload": {
     title: "Upload Content",
