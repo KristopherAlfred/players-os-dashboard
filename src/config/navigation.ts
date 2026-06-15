@@ -27,18 +27,9 @@ export const navSections: NavSection[] = [
     ],
   },
   {
-    label: "ENGAGEMENT",
-    icon: "message-circle",
-    items: [
-      { label: "Overview", path: "/engagement/overview" },
-      { label: "Messages", path: "/engagement/messages" },
-      { label: "Polls", path: "/engagement/polls" },
-      {
-        label: "Flash Updates",
-        path: "https://amx-newsletter-copilot.vercel.app/",
-        external: true,
-      },
-    ],
+    label: "FOR ATHLETES",
+    icon: "trophy",
+    items: [{ label: "Athlete Hub", path: "/athletes/hub" }],
   },
   {
     label: "FANS & DATA",
@@ -71,9 +62,18 @@ export const navSections: NavSection[] = [
     ],
   },
   {
-    label: "FOR ATHLETES",
-    icon: "trophy",
-    items: [{ label: "Athlete Hub", path: "/athletes/hub" }],
+    label: "ENGAGEMENT",
+    icon: "message-circle",
+    items: [
+      { label: "Overview", path: "/engagement/overview" },
+      { label: "Messages", path: "/engagement/messages" },
+      { label: "Polls", path: "/engagement/polls" },
+      {
+        label: "Flash Updates",
+        path: "https://amx-newsletter-copilot.vercel.app/",
+        external: true,
+      },
+    ],
   },
   {
     label: "SETTINGS",
