@@ -32,7 +32,6 @@ export const navSections: NavSection[] = [
     icon: "message-circle",
     items: [
       { label: "Overview", path: "/engagement/overview" },
-      { label: "Comments", path: "/engagement/comments" },
       { label: "Messages", path: "/engagement/messages" },
       { label: "Polls", path: "/engagement/polls" },
       {
