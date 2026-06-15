@@ -388,7 +388,7 @@ function AthleteHubDashboard({
             <button
               type="button"
               onClick={onSignOut}
-              className="flex items-center gap-1.5 rounded-md border border-dt-border px-3 py-2 text-xs text-dt-muted hover:text-white"
+              className="flex items-center gap-1.5 rounded-md border border-dt-red/50 bg-dt-red px-3 py-2 text-xs font-semibold text-white hover:bg-dt-red-hover"
             >
               <LogOut size={14} />
               Sign out
