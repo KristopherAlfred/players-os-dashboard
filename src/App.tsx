@@ -19,19 +19,11 @@ import {
 import {
   AudienceOverviewPage,
   FanProfilesPage,
-  SegmentsPage,
   SubscribersPage,
-  BehaviorInsightsPage,
 } from "./pages/FansPages";
-import {
-  TrafficOverviewPage,
-  ConversionFunnelPage,
-  CampaignsPage,
-  ReportsPage,
-} from "./pages/PerformancePages";
+import { TrafficOverviewPage } from "./pages/PerformancePages";
 import {
   PartnersPage,
-  AudiencesPage,
   RevenuePage,
 } from "./pages/MonetizationPages";
 import {
@@ -65,15 +57,15 @@ export default function App() {
           <Route path="engagement/polls" element={<PollsPage />} />
           <Route path="fans/audience" element={<AudienceOverviewPage />} />
           <Route path="fans/profiles" element={<FanProfilesPage />} />
-          <Route path="fans/segments" element={<SegmentsPage />} />
+          <Route path="fans/segments" element={<Navigate to="/fans/audience" replace />} />
           <Route path="fans/subscribers" element={<SubscribersPage />} />
-          <Route path="fans/behavior" element={<BehaviorInsightsPage />} />
+          <Route path="fans/behavior" element={<Navigate to="/fans/audience" replace />} />
           <Route path="performance/traffic" element={<TrafficOverviewPage />} />
-          <Route path="performance/funnel" element={<ConversionFunnelPage />} />
-          <Route path="performance/campaigns" element={<CampaignsPage />} />
-          <Route path="performance/reports" element={<ReportsPage />} />
+          <Route path="performance/funnel" element={<Navigate to="/performance/traffic" replace />} />
+          <Route path="performance/campaigns" element={<Navigate to="/performance/traffic" replace />} />
+          <Route path="performance/reports" element={<Navigate to="/performance/traffic" replace />} />
           <Route path="monetization/partners" element={<PartnersPage />} />
-          <Route path="monetization/audiences" element={<AudiencesPage />} />
+          <Route path="monetization/audiences" element={<Navigate to="/monetization/partners" replace />} />
           <Route path="monetization/revenue" element={<RevenuePage />} />
           <Route path="settings/team" element={<TeamPage />} />
           <Route path="settings/roles" element={<RolesPage />} />

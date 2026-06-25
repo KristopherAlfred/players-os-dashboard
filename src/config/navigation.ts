@@ -39,27 +39,19 @@ export const navSections: NavSection[] = [
     items: [
       { label: "Audience Overview", path: "/fans/audience" },
       { label: "Fan Profiles", path: "/fans/profiles" },
-      { label: "Segments", path: "/fans/segments" },
       { label: "Email/SMS List", path: "/fans/subscribers" },
-      { label: "Behavior Insights", path: "/fans/behavior" },
     ],
   },
   {
     label: "PERFORMANCE",
     icon: "bar-chart-2",
-    items: [
-      { label: "Traffic Overview", path: "/performance/traffic" },
-      { label: "Conversion Funnel", path: "/performance/funnel" },
-      { label: "Campaigns", path: "/performance/campaigns" },
-      { label: "Reports", path: "/performance/reports" },
-    ],
+    items: [{ label: "Traffic Overview", path: "/performance/traffic" }],
   },
   {
     label: "MONETIZATION",
     icon: "dollar-sign",
     items: [
       { label: "Partners & DSPs", path: "/monetization/partners" },
-      { label: "Audiences", path: "/monetization/audiences" },
       { label: "Revenue", path: "/monetization/revenue" },
     ],
   },
@@ -155,41 +147,17 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Fan Profiles",
     subtitle: "Search and explore individual fan journeys and loyalty tiers.",
   },
-  "/fans/segments": {
-    title: "Segments",
-    subtitle: "Build dynamic audiences for campaigns and exclusives.",
-  },
   "/fans/subscribers": {
     title: "Email / SMS List",
     subtitle: "Manage opt-ins, deliverability, and subscriber health.",
-  },
-  "/fans/behavior": {
-    title: "Behavior Insights",
-    subtitle: "Paths, drop-off points, and high-intent fan actions.",
   },
   "/performance/traffic": {
     title: "Traffic Overview",
     subtitle: "Sessions, sources, and landing performance over time.",
   },
-  "/performance/funnel": {
-    title: "Conversion Funnel",
-    subtitle: "Track visitors from first touch to Inner Circle conversion.",
-  },
-  "/performance/campaigns": {
-    title: "Campaigns",
-    subtitle: "UTM campaigns, ad spend, and attributed conversions.",
-  },
-  "/performance/reports": {
-    title: "Reports",
-    subtitle: "Exportable snapshots for stakeholders and partners.",
-  },
   "/monetization/partners": {
     title: "Partners & DSPs",
     subtitle: "LiveRamp, Trade Desk, DV360, and partner sync status.",
-  },
-  "/monetization/audiences": {
-    title: "Audiences",
-    subtitle: "Monetizable segments activated across demand-side platforms.",
   },
   "/monetization/revenue": {
     title: "Revenue",
