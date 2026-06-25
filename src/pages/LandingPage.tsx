@@ -134,9 +134,9 @@ export function LandingPage() {
                 </label>
 
                 <label className="block text-sm">
-                  <span className="mb-1.5 block text-xs font-medium text-white/60">Email</span>
+                  <span className={fieldLabelClass}>Email</span>
                   <div className="relative">
-                    <Mail size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <Mail size={15} className={fieldIconClass} />
                     <input
                       type="email"
                       value={email}
