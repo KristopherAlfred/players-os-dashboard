@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Check, LogOut } from "lucide-react";
 import { Panel } from "../components/PageShell";
+import { saveDashboardSession } from "../lib/dashboardAuth";
 import { useTheme } from "../theme/ThemeContext";
 import type { ThemeTemplate } from "../theme/themes";
 
@@ -149,8 +151,25 @@ export function AccountPage() {
 }
 
 export function SettingsPage() {
+  const navigate = useNavigate();
+
+  function handleSignOut() {
+    saveDashboardSession(null);
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="flex items-center gap-2 rounded-md border border-dt-red/50 bg-dt-red px-4 py-2 text-sm font-semibold text-white hover:bg-dt-red-hover"
+        >
+          <LogOut size={15} />
+          Sign out of AMX Dashboard
+        </button>
+      </div>
       <TeamPage />
       <RolesPage />
       <IntegrationsPage />

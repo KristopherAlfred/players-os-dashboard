@@ -27,12 +27,24 @@ import {
 } from "./pages/MonetizationPages";
 import { SettingsPage } from "./pages/SettingsPages";
 import { AthleteHubPage } from "./pages/AthletePages";
+import { LandingPage } from "./pages/LandingPage";
+import { RequireAuth, PublicOnly } from "./components/RequireAuth";
+import { isDashboardAuthed } from "./lib/dashboardAuth";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AppLayout />}>
+        <Route
+          path="/login"
+          element={
+            <PublicOnly>
+              <LandingPage />
+            </PublicOnly>
+          }
+        />
+        <Route element={<RequireAuth />}>
+          <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="content/social" element={<SocialContentPage />} />
           <Route path="content/news" element={<NewsContentPage />} />
@@ -66,7 +78,9 @@ export default function App() {
           <Route path="settings/roles" element={<Navigate to="/settings" replace />} />
           <Route path="settings/integrations" element={<Navigate to="/settings" replace />} />
           <Route path="settings/account" element={<Navigate to="/settings" replace />} />
+          </Route>
         </Route>
+        <Route path="*" element={<Navigate to={isDashboardAuthed() ? "/" : "/login"} replace />} />
       </Routes>
     </BrowserRouter>
   );
