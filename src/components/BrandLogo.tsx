@@ -6,11 +6,11 @@ type BrandLogoProps = {
 export function BrandLogo({ compact = false, variant = "default" }: BrandLogoProps) {
   if (variant === "sidebar") {
     return (
-      <div className="flex w-full items-center px-3 py-4">
+      <div className="flex h-[72px] w-full items-center justify-center bg-transparent px-4 py-3">
         <img
           src="/amx-dashboard-logo.png"
           alt="AMX Dashboard"
-          className="h-10 w-auto max-w-full object-contain object-left"
+          className="h-full w-full object-contain object-center"
         />
       </div>
     );
