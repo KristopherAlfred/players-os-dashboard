@@ -85,7 +85,7 @@ export function LandingPage() {
             <>
               <div className="border-b border-white/10 bg-gradient-to-r from-dt-red/20 to-transparent px-6 py-4">
                 <p className="text-sm font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
-                <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-white">Sign in</h1>
+                <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-white">Sign In</h1>
               </div>
 
               <form className="space-y-4 p-6" onSubmit={handleSignIn}>
