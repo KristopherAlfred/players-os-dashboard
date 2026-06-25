@@ -66,13 +66,13 @@ export function LandingPage() {
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-black">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-black to-[#0a0000]" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#0a0000] to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#1a0000] to-[#0a0000]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#220000] to-black" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.98),transparent_40%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.32),transparent_52%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(140,0,0,0.2),transparent_48%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.92),transparent_50%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.55),transparent_72%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.48),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(180,0,0,0.32),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.88),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.45),transparent_70%)]" />
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
         <div className="mb-8 w-full max-w-md text-center">
@@ -86,12 +86,12 @@ export function LandingPage() {
           </p>
         </div>
 
-        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/85 via-black/70 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">
+        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#1a0000]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">
           {view === "signin" && (
             <>
               <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#0a0000] to-black" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/15 via-black/40 to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#1a0000] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/35 via-dt-red/10 to-black" />
                 <div className="relative">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
                   <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-white">Sign In</h1>
@@ -193,8 +193,8 @@ export function LandingPage() {
           {view === "signup" && (
             <>
               <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#0a0000] to-black" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/15 via-black/40 to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#1a0000] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/35 via-dt-red/10 to-black" />
                 <div className="relative">
                 <button
                   type="button"
