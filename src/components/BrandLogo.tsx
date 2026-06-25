@@ -6,11 +6,11 @@ type BrandLogoProps = {
 export function BrandLogo({ compact = false, variant = "default" }: BrandLogoProps) {
   if (variant === "sidebar") {
     return (
-      <div className="block w-full overflow-hidden bg-black">
+      <div className="flex w-full items-center px-3 py-4">
         <img
-          src="/dame-brand.png"
-          alt="DAME TIME — Powered by AMX"
-          className="h-[72px] w-full object-cover object-center"
+          src="/amx-dashboard-logo.png"
+          alt="AMX Dashboard"
+          className="h-10 w-auto max-w-full object-contain object-left"
         />
       </div>
     );
@@ -18,23 +18,18 @@ export function BrandLogo({ compact = false, variant = "default" }: BrandLogoPro
 
   if (compact) {
     return (
-      <div className="flex flex-col gap-0.5">
-        <img
-          src="/dame-brand.png"
-          alt="DAME TIME"
-          className="h-8 w-auto max-w-[160px] object-contain object-left"
-        />
-        <p className="text-[7px] font-medium uppercase tracking-[0.16em] text-dt-muted">
-          Powered by <span className="text-dt-red">AMX</span>
-        </p>
-      </div>
+      <img
+        src="/amx-dashboard-logo.png"
+        alt="AMX Dashboard"
+        className="h-8 w-auto max-w-[160px] object-contain object-left"
+      />
     );
   }
 
   return (
     <img
-      src="/dame-brand.png"
-      alt="DAME TIME — Powered by AMX"
+      src="/amx-dashboard-logo.png"
+      alt="AMX Dashboard"
       className="h-11 w-auto max-w-[200px] object-contain object-left"
     />
   );
