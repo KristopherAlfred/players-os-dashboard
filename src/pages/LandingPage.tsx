@@ -80,8 +80,8 @@ export function LandingPage() {
             alt="AMX Dashboard"
             className="mx-auto h-16 w-auto max-w-[280px] object-contain sm:h-20"
           />
-          <p className="mt-4 text-sm text-white/75">
-            The athlete &amp; admin platform for DameTime, built for the pros.
+          <p className="mt-4 text-sm text-white">
+            The athlete &amp; admin platform for the culture, built for the pros.
           </p>
         </div>
 
