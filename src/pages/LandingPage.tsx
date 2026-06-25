@@ -86,12 +86,16 @@ export function LandingPage() {
           </p>
         </div>
 
-        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl shadow-black/80 backdrop-blur-md">
+        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/85 via-black/70 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">
           {view === "signin" && (
             <>
-              <div className="border-b border-white/10 bg-gradient-to-r from-dt-red/20 to-transparent px-6 py-4">
-                <p className="text-sm font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
-                <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-white">Sign In</h1>
+              <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#0a0000] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/15 via-black/40 to-black" />
+                <div className="relative">
+                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
+                  <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-white">Sign In</h1>
+                </div>
               </div>
 
               <form className="space-y-4 p-6" onSubmit={handleSignIn}>
@@ -188,7 +192,10 @@ export function LandingPage() {
 
           {view === "signup" && (
             <>
-              <div className="border-b border-white/10 bg-gradient-to-r from-dt-red/20 to-transparent px-6 py-4">
+              <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#0a0000] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/15 via-black/40 to-black" />
+                <div className="relative">
                 <button
                   type="button"
                   onClick={() => setView("signin")}
@@ -202,6 +209,7 @@ export function LandingPage() {
                 <p className="mt-1 text-xs text-white/60">
                   Select an athlete and request verification to join their team on AMX.
                 </p>
+                </div>
               </div>
 
               <form className="space-y-4 p-6" onSubmit={handleSignupRequest}>
