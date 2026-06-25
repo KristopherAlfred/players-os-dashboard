@@ -84,8 +84,8 @@ export function LandingPage() {
           {view === "signin" && (
             <>
               <div className="border-b border-white/10 bg-gradient-to-r from-dt-red/20 to-transparent px-6 py-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
-                <h1 className="mt-1 font-display text-2xl font-semibold tracking-wide text-white">Sign in</h1>
+                <p className="text-sm font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
+                <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-white">Sign in</h1>
               </div>
 
               <form className="space-y-4 p-6" onSubmit={handleSignIn}>
@@ -321,7 +321,7 @@ export function LandingPage() {
           )}
         </div>
 
-        <p className="mt-6 max-w-sm text-center text-[11px] text-white/40">
+        <p className="mt-6 max-w-sm text-center text-sm font-semibold text-white sm:text-base">
           Authorized athletes and team staff only.
         </p>
       </div>
