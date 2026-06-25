@@ -57,7 +57,12 @@ export function LandingPage() {
   }
 
   const inputClass =
-    "w-full rounded-lg border border-white/15 bg-black/40 py-2.5 pl-10 pr-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-dt-red/60 focus:ring-1 focus:ring-dt-red/40";
+    "w-full rounded-lg border border-white/15 bg-black/40 py-2.5 pl-10 pr-3 text-sm text-white outline-none placeholder:text-white focus:border-dt-red/60 focus:ring-1 focus:ring-dt-red/40";
+
+  const fieldIconClass =
+    "pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dt-red";
+
+  const fieldLabelClass = "mb-1.5 block text-xs font-medium text-white";
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-black">
@@ -90,7 +95,7 @@ export function LandingPage() {
 
               <form className="space-y-4 p-6" onSubmit={handleSignIn}>
                 <div>
-                  <p className="mb-2 text-xs font-medium text-white/60">Signing in as</p>
+                  <p className="mb-2 text-xs font-medium text-white">Signing in as</p>
                   <div className="grid grid-cols-2 gap-2">
                     {(
                       [
@@ -116,9 +121,9 @@ export function LandingPage() {
                 </div>
 
                 <label className="block text-sm">
-                  <span className="mb-1.5 block text-xs font-medium text-white/60">Name</span>
+                  <span className={fieldLabelClass}>Name</span>
                   <div className="relative">
-                    <User size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <User size={15} className={fieldIconClass} />
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -144,9 +149,9 @@ export function LandingPage() {
                 </label>
 
                 <label className="block text-sm">
-                  <span className="mb-1.5 block text-xs font-medium text-white/60">Password</span>
+                  <span className={fieldLabelClass}>Password</span>
                   <div className="relative">
-                    <Lock size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <Lock size={15} className={fieldIconClass} />
                     <input
                       type="password"
                       value={password}
@@ -166,7 +171,7 @@ export function LandingPage() {
                   Enter AMX Dashboard
                 </button>
 
-                <p className="text-center text-sm text-white/55">
+                <p className="text-center text-sm text-white">
                   Not a member?{" "}
                   <button
                     type="button"
