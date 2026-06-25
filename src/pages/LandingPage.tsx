@@ -3,68 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Lock, LogIn, Mail, Shield, Trophy, User } from "lucide-react";
 import { saveDashboardSession, type DashboardRole } from "../lib/dashboardAuth";
 
-const nbaTeams = [
-  "Lakers", "Celtics", "Warriors", "Heat", "Knicks", "Bulls", "Nets", "Suns",
-  "Bucks", "Nuggets", "Mavericks", "Clippers", "Sixers", "Raptors", "Spurs", "Thunder",
-];
-
-const nflTeams = [
-  "Chiefs", "Cowboys", "Eagles", "49ers", "Ravens", "Bills", "Dolphins", "Lions",
-  "Packers", "Steelers", "Bengals", "Vikings", "Jets", "Giants", "Broncos", "Seahawks",
-];
-
-const wnbaTeams = [
-  "Liberty", "Aces", "Storm", "Lynx", "Fever", "Sun", "Sky", "Wings",
-  "Mercury", "Sparks", "Dream", "Mystics",
-];
-
-function MarqueeRow({
-  items,
-  reverse = false,
-  className = "",
-}: {
-  items: string[];
-  reverse?: boolean;
-  className?: string;
-}) {
-  const track = [...items, ...items];
-  return (
-    <div className={`overflow-hidden ${className}`}>
-      <div
-        className={`flex w-max gap-3 ${reverse ? "animate-marquee-reverse" : "animate-marquee"}`}
-      >
-        {track.map((team, i) => (
-          <span
-            key={`${team}-${i}`}
-            className="shrink-0 rounded-full border border-white/10 bg-black/30 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white/70 backdrop-blur-sm"
-          >
-            {team}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function LeagueBadge({
-  label,
-  sublabel,
-  colors,
-}: {
-  label: string;
-  sublabel: string;
-  colors: string;
-}) {
-  return (
-    <div
-      className={`flex h-14 w-14 flex-col items-center justify-center rounded-xl border border-white/15 bg-gradient-to-br ${colors} shadow-lg`}
-    >
-      <span className="font-display text-sm font-bold leading-none text-white">{label}</span>
-      <span className="mt-0.5 text-[7px] font-semibold uppercase tracking-wider text-white/80">{sublabel}</span>
-    </div>
-  );
-}
-
 export function LandingPage() {
   const navigate = useNavigate();
   const [role, setRole] = useState<DashboardRole>("athlete");
@@ -89,36 +27,26 @@ export function LandingPage() {
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-black">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#8b0000] via-[#1a0000] to-black" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(229,9,20,0.35),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,0,0,0.9),transparent_50%)]" />
-
-      <div className="pointer-events-none absolute inset-0 flex flex-col justify-center gap-5 opacity-40">
-        <MarqueeRow items={nbaTeams} className="mt-8" />
-        <MarqueeRow items={nflTeams} reverse />
-        <MarqueeRow items={wnbaTeams} className="mb-8" />
-      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#0a0000] to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-black to-[#1a0000]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(229,9,20,0.18),transparent_45%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,0,0,0.95),transparent_40%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.85),transparent_70%)]" />
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
-        <div className="mb-6 w-full max-w-md text-center">
+        <div className="mb-8 w-full max-w-md text-center">
           <img
             src="/amx-dashboard-logo.png"
             alt="AMX Dashboard"
             className="mx-auto h-16 w-auto max-w-[280px] object-contain sm:h-20"
           />
-          <p className="mt-4 text-sm text-white/75">
+          <p className="mt-4 text-sm text-white/70">
             The athlete &amp; admin platform for DameTime — built for the pros.
           </p>
-
-          <div className="mt-6 flex items-center justify-center gap-4">
-            <LeagueBadge label="NBA" sublabel="League" colors="from-[#1d428a] to-[#c8102e]" />
-            <LeagueBadge label="NFL" sublabel="League" colors="from-[#013369] to-[#d50a0a]" />
-            <LeagueBadge label="WNBA" sublabel="League" colors="from-[#fa4b00] to-[#c4002b]" />
-          </div>
         </div>
 
-        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-black/50 shadow-2xl shadow-black/60 backdrop-blur-md">
-          <div className="border-b border-white/10 bg-gradient-to-r from-dt-red/20 to-transparent px-6 py-4">
+        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl shadow-black/80 backdrop-blur-md">
+          <div className="border-b border-white/10 bg-gradient-to-r from-dt-red/15 to-transparent px-6 py-4">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
             <h1 className="mt-1 font-display text-2xl font-semibold tracking-wide text-white">Sign in</h1>
             <p className="mt-1 text-xs text-white/60">Athletes and admins — demo login, any email works.</p>
@@ -204,8 +132,8 @@ export function LandingPage() {
           </form>
         </div>
 
-        <p className="mt-6 max-w-sm text-center text-[11px] text-white/45">
-          NBA · NFL · WNBA athletes and authorized team staff only.
+        <p className="mt-6 max-w-sm text-center text-[11px] text-white/40">
+          Authorized athletes and team staff only.
         </p>
       </div>
     </div>
