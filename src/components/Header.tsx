@@ -25,7 +25,7 @@ export function Header({
             <h1 className="truncate text-base font-semibold text-white sm:text-lg lg:text-xl">
               {title}
             </h1>
-            <p className="mt-0.5 hidden truncate text-sm text-dt-muted sm:block">
+            <p className="mt-0.5 hidden truncate text-sm text-white sm:block">
               {subtitle}
             </p>
           </div>
