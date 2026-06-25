@@ -14,7 +14,6 @@ import {
   EngagementOverviewPage,
   CommentsPage,
   MessagesPage,
-  PollsPage,
 } from "./pages/EngagementPages";
 import {
   AudienceOverviewPage,
@@ -26,12 +25,7 @@ import {
   PartnersPage,
   RevenuePage,
 } from "./pages/MonetizationPages";
-import {
-  TeamPage,
-  RolesPage,
-  IntegrationsPage,
-  AccountPage,
-} from "./pages/SettingsPages";
+import { SettingsPage } from "./pages/SettingsPages";
 import { AthleteHubPage } from "./pages/AthletePages";
 
 export default function App() {
@@ -54,7 +48,7 @@ export default function App() {
           <Route path="engagement/overview" element={<EngagementOverviewPage />} />
           <Route path="engagement/comments" element={<CommentsPage />} />
           <Route path="engagement/messages" element={<MessagesPage />} />
-          <Route path="engagement/polls" element={<PollsPage />} />
+          <Route path="engagement/polls" element={<Navigate to="/engagement/overview" replace />} />
           <Route path="fans/audience" element={<AudienceOverviewPage />} />
           <Route path="fans/profiles" element={<FanProfilesPage />} />
           <Route path="fans/segments" element={<Navigate to="/fans/audience" replace />} />
@@ -67,10 +61,11 @@ export default function App() {
           <Route path="monetization/partners" element={<PartnersPage />} />
           <Route path="monetization/audiences" element={<Navigate to="/monetization/partners" replace />} />
           <Route path="monetization/revenue" element={<RevenuePage />} />
-          <Route path="settings/team" element={<TeamPage />} />
-          <Route path="settings/roles" element={<RolesPage />} />
-          <Route path="settings/integrations" element={<IntegrationsPage />} />
-          <Route path="settings/account" element={<AccountPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="settings/team" element={<Navigate to="/settings" replace />} />
+          <Route path="settings/roles" element={<Navigate to="/settings" replace />} />
+          <Route path="settings/integrations" element={<Navigate to="/settings" replace />} />
+          <Route path="settings/account" element={<Navigate to="/settings" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

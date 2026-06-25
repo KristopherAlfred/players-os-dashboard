@@ -14,10 +14,13 @@ export type NavSection = {
   icon: string;
   items: NavItem[];
   groups?: NavGroup[];
+  /** Header navigates directly — no dropdown */
+  directPath?: string;
 };
 
 function sectionPaths(section: NavSection): string[] {
-  const paths = section.items.filter((i) => !i.external).map((i) => i.path);
+  const paths = section.directPath ? [section.directPath] : [];
+  paths.push(...section.items.filter((i) => !i.external).map((i) => i.path));
   for (const group of section.groups ?? []) {
     paths.push(...group.items.filter((i) => !i.external).map((i) => i.path));
   }
@@ -84,23 +87,13 @@ export const navSections: NavSection[] = [
     items: [
       { label: "Overview", path: "/engagement/overview" },
       { label: "Messages", path: "/engagement/messages" },
-      { label: "Polls", path: "/engagement/polls" },
-      {
-        label: "Flash Updates",
-        path: "https://amx-newsletter-copilot.vercel.app/",
-        external: true,
-      },
     ],
   },
   {
     label: "SETTINGS",
     icon: "settings",
-    items: [
-      { label: "Team Members", path: "/settings/team" },
-      { label: "Roles & Permissions", path: "/settings/roles" },
-      { label: "Integrations", path: "/settings/integrations" },
-      { label: "Account Settings", path: "/settings/account" },
-    ],
+    items: [],
+    directPath: "/settings",
   },
 ];
 
@@ -158,9 +151,9 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Messages",
     subtitle: "Direct fan messages and Inner Circle conversations.",
   },
-  "/engagement/polls": {
-    title: "Polls",
-    subtitle: "Create polls, track votes, and surface fan sentiment.",
+  "/settings": {
+    title: "Settings",
+    subtitle: "Team, integrations, account preferences, and dashboard appearance.",
   },
   "/fans/audience": {
     title: "Audience Overview",
@@ -185,21 +178,5 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/monetization/revenue": {
     title: "Revenue",
     subtitle: "MTD earnings, partner splits, and segment-level yield.",
-  },
-  "/settings/team": {
-    title: "Team Members",
-    subtitle: "Invite collaborators and manage workspace access.",
-  },
-  "/settings/roles": {
-    title: "Roles & Permissions",
-    subtitle: "Fine-grained control over who can publish, export, and monetize.",
-  },
-  "/settings/integrations": {
-    title: "Integrations",
-    subtitle: "Connect social, email, SMS, analytics, and DSP tools.",
-  },
-  "/settings/account": {
-    title: "Account Settings",
-    subtitle: "Profile, billing, security, and notification preferences.",
   },
 };

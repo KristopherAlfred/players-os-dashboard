@@ -148,3 +148,14 @@ export function AccountPage() {
   );
 }
 
+export function SettingsPage() {
+  return (
+    <div className="space-y-4">
+      <TeamPage />
+      <RolesPage />
+      <IntegrationsPage />
+      <AccountPage />
+    </div>
+  );
+}
+

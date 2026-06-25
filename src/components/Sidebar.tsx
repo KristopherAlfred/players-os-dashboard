@@ -182,8 +182,33 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
     const Icon = iconMap[section.icon] ?? LayoutDashboard;
     const activeSection = isSectionActive(pathname, section);
     const isDashboard = section.label === "DASHBOARD";
-    const sectionOpen = isDashboard ? true : (openSections[section.label] ?? false);
-    const hasDropdown = !isDashboard;
+    const isDirectLink = Boolean(section.directPath);
+    const sectionOpen = isDashboard ? true : isDirectLink ? false : (openSections[section.label] ?? false);
+    const hasDropdown = !isDashboard && !isDirectLink;
+
+    if (isDirectLink && section.directPath) {
+      return (
+        <div key={section.label} className="mb-3.5">
+          <NavLink
+            to={section.directPath}
+            onClick={onClose}
+            className={({ isActive }) =>
+              `flex w-full items-center gap-2 rounded-md px-2 py-2 transition-colors ${
+                isActive ? "bg-white/[0.08]" : "hover:bg-white/[0.03]"
+              }`
+            }
+          >
+            <Icon size={14} strokeWidth={2.25} className="shrink-0" style={iconGlowStyle} />
+            <span
+              className="min-w-0 flex-1 text-[10px] font-bold leading-tight tracking-[0.08em] text-white"
+              style={sectionGlowStyle}
+            >
+              {section.label}
+            </span>
+          </NavLink>
+        </div>
+      );
+    }
 
     return (
       <div key={section.label} className="mb-3.5">
