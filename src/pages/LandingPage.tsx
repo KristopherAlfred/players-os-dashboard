@@ -66,12 +66,13 @@ export function LandingPage() {
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-black">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#3a0000] to-[#140000]" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#2a0000] to-[#1a0000]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.95),transparent_35%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.42),transparent_58%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(180,0,0,0.28),transparent_50%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,0,0,0.85),transparent_45%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-black to-[#0a0000]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#0a0000] to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.98),transparent_40%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.32),transparent_52%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(140,0,0,0.2),transparent_48%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.92),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.55),transparent_72%)]" />
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
         <div className="mb-8 w-full max-w-md text-center">
