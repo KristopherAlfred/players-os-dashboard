@@ -3,10 +3,12 @@ import { Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import { DashboardPage } from "./pages/DashboardPage";
 import {
-  AllContentPage,
+  SocialContentPage,
+  NewsContentPage,
+  VideosContentPage,
+  MusicContentPage,
+  EventsGiveawaysPage,
   ContentCalendarPage,
-  MediaLibraryPage,
-  PlaylistsPage,
 } from "./pages/ContentPages";
 import {
   EngagementOverviewPage,
@@ -46,12 +48,17 @@ export default function App() {
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
-          <Route path="content/all" element={<AllContentPage />} />
+          <Route path="content/social" element={<SocialContentPage />} />
+          <Route path="content/news" element={<NewsContentPage />} />
+          <Route path="content/videos" element={<VideosContentPage />} />
+          <Route path="content/music" element={<MusicContentPage />} />
+          <Route path="content/events" element={<EventsGiveawaysPage />} />
+          <Route path="content/all" element={<Navigate to="/content/social" replace />} />
+          <Route path="content/media" element={<Navigate to="/content/videos" replace />} />
+          <Route path="content/playlists" element={<Navigate to="/content/music" replace />} />
           <Route path="content/upload" element={<Navigate to="/athletes/hub" replace />} />
           <Route path="athletes/hub" element={<AthleteHubPage />} />
           <Route path="content/calendar" element={<ContentCalendarPage />} />
-          <Route path="content/media" element={<MediaLibraryPage />} />
-          <Route path="content/playlists" element={<PlaylistsPage />} />
           <Route path="engagement/overview" element={<EngagementOverviewPage />} />
           <Route path="engagement/comments" element={<CommentsPage />} />
           <Route path="engagement/messages" element={<MessagesPage />} />

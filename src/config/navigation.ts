@@ -20,10 +20,12 @@ export const navSections: NavSection[] = [
     label: "CONTENT",
     icon: "film",
     items: [
-      { label: "All Content", path: "/content/all" },
+      { label: "Social", path: "/content/social" },
+      { label: "News", path: "/content/news" },
+      { label: "Videos", path: "/content/videos" },
+      { label: "Music", path: "/content/music" },
+      { label: "Events & Giveaways", path: "/content/events" },
       { label: "Content Calendar", path: "/content/calendar" },
-      { label: "Media Library", path: "/content/media" },
-      { label: "Playlists", path: "/content/playlists" },
     ],
   },
   {
@@ -97,9 +99,29 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Dashboard Overview",
     subtitle: "Real-time performance of the DameTime ecosystem.",
   },
-  "/content/all": {
-    title: "All Content",
-    subtitle: "Browse, filter, and manage every asset in your library.",
+  "/content/social": {
+    title: "Social",
+    subtitle: "Posts, stories, and reels across Instagram, TikTok, and X.",
+  },
+  "/content/news": {
+    title: "News",
+    subtitle: "Articles, press releases, and features for fans and media.",
+  },
+  "/content/videos": {
+    title: "Videos",
+    subtitle: "Exclusive drops, BTS footage, and long-form video content.",
+  },
+  "/content/music": {
+    title: "Music",
+    subtitle: "Tracks, playlists, snippets, and audio exclusives.",
+  },
+  "/content/events": {
+    title: "Events & Giveaways",
+    subtitle: "Meet & greets, listening parties, merch drops, and fan contests.",
+  },
+  "/content/calendar": {
+    title: "Content Calendar",
+    subtitle: "Plan drops, schedule posts, and coordinate your release cadence.",
   },
   "/athletes/hub": {
     title: "Athlete Hub",
@@ -108,18 +130,6 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/content/upload": {
     title: "Upload Content",
     subtitle: "Publish videos, images, articles, and audio to your fans.",
-  },
-  "/content/calendar": {
-    title: "Content Calendar",
-    subtitle: "Plan drops, schedule posts, and coordinate your release cadence.",
-  },
-  "/content/media": {
-    title: "Media Library",
-    subtitle: "Organized storage for raw files, exports, and brand assets.",
-  },
-  "/content/playlists": {
-    title: "Playlists",
-    subtitle: "Curate collections for tours, exclusives, and fan journeys.",
   },
   "/engagement/overview": {
     title: "Engagement Overview",
