@@ -31,10 +31,11 @@ type SignupGeoExplorerProps = {
 function MapGradientBackground() {
   return (
     <>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#0a0000] to-[#120000]" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#150000] to-black" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.12),transparent_62%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.85),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#0a0000] to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#180000] to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.16),transparent_58%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.95),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.9),transparent_45%)]" />
     </>
   );
 }
@@ -317,7 +318,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
           <ChoroplethMap view={view} paletteId={paletteId} onSelectCountry={setView} />
         </div>
 
-        <div className="relative z-[1] flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-t border-dt-border bg-black/30 p-2 backdrop-blur-sm lg:w-[148px] lg:flex-col lg:overflow-x-visible lg:border-l lg:border-t-0 lg:p-3">
+        <div className="relative z-[1] flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-t border-dt-border bg-dt-bg/60 p-2 backdrop-blur-sm lg:w-[148px] lg:flex-col lg:overflow-x-visible lg:border-l lg:border-t-0 lg:p-3">
           <p className="mb-0 hidden text-[10px] font-semibold uppercase tracking-wide text-dt-muted lg:mb-2 lg:block">
             Countries
           </p>

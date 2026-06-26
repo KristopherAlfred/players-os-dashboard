@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --theme-bg: #080808;
-  --theme-panel: #0f0f0f;
-  --theme-card: #121212;
+  --theme-bg: #050505;
+  --theme-panel: #080808;
+  --theme-card: #0a0a0a;
   --theme-border: #1e1e1e;
   --theme-muted: #8a8a8a;
   --theme-text: #f0f0f0;
@@ -17,15 +17,32 @@
   --theme-traffic-3: #990000;
   --theme-traffic-4: #660000;
   --theme-traffic-5: #440000;
-  --gradient-bg: linear-gradient(165deg, #050505 0%, #100303 42%, #080808 100%);
-  --gradient-panel: linear-gradient(180deg, #0e0e0e 0%, #180808 46%, #0a0a0a 100%);
-  --gradient-card: linear-gradient(145deg, #161616 0%, #220909 34%, #151515 68%, #0e0e0e 100%);
-  --gradient-inset: linear-gradient(135deg, #111111 0%, #1c0606 48%, #0d0d0d 100%);
-  --gradient-header: linear-gradient(90deg, rgba(229, 9, 20, 0.14) 0%, rgba(229, 9, 20, 0.04) 42%, transparent 100%);
-  --gradient-input: linear-gradient(160deg, #0c0c0c 0%, #160505 55%, #0a0a0a 100%);
-  --surface-border: color-mix(in srgb, var(--theme-border) 72%, var(--theme-accent) 28%);
-  --surface-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --surface-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --gradient-bg:
+    radial-gradient(ellipse 90% 55% at 50% -10%, rgba(229, 9, 20, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 45% at 100% 100%, rgba(0, 0, 0, 0.9) 0%, transparent 50%),
+    linear-gradient(180deg, #000000 0%, #0c0202 32%, #160404 52%, #080202 78%, #000000 100%);
+  --gradient-panel:
+    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, #000000 0%, #100303 28%, #1e0707 52%, #0a0202 76%, #000000 100%);
+  --gradient-card:
+    radial-gradient(ellipse 110% 70% at 8% -15%, rgba(229, 9, 20, 0.14) 0%, transparent 52%),
+    radial-gradient(ellipse 90% 55% at 95% 110%, rgba(0, 0, 0, 0.75) 0%, transparent 48%),
+    linear-gradient(152deg, #000000 0%, #1a0505 20%, #080808 42%, #280909 64%, #0c0c0c 82%, #000000 100%);
+  --gradient-inset:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(229, 9, 20, 0.07) 0%, transparent 50%),
+    linear-gradient(140deg, #000000 0%, #180404 38%, #060606 68%, #000000 100%);
+  --gradient-header:
+    linear-gradient(90deg, rgba(229, 9, 20, 0.22) 0%, rgba(100, 0, 0, 0.1) 38%, rgba(0, 0, 0, 0.55) 72%, transparent 100%);
+  --gradient-input:
+    radial-gradient(ellipse 100% 80% at 50% 0%, rgba(229, 9, 20, 0.06) 0%, transparent 55%),
+    linear-gradient(168deg, #000000 0%, #140303 42%, #060606 72%, #000000 100%);
+  --gradient-main:
+    radial-gradient(ellipse 85% 50% at 50% 0%, rgba(229, 9, 20, 0.11) 0%, transparent 48%),
+    radial-gradient(ellipse 75% 40% at 50% 100%, rgba(0, 0, 0, 0.92) 0%, transparent 52%),
+    linear-gradient(180deg, #000000 0%, #0a0202 45%, #120303 62%, #000000 100%);
+  --surface-border: color-mix(in srgb, var(--theme-border) 65%, var(--theme-accent) 35%);
+  --surface-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
 }
 
 @theme {
@@ -58,10 +75,15 @@ body,
 body {
   font-family: var(--font-sans);
   background: var(--gradient-bg);
-  background-color: var(--color-dt-bg);
+  background-color: #000000;
   color: var(--color-dt-text);
   -webkit-font-smoothing: antialiased;
   letter-spacing: 0.01em;
+}
+
+#root {
+  background: var(--gradient-bg);
+  background-color: #000000;
 }
 
 .font-display {
@@ -69,6 +91,12 @@ body {
 }
 
 @layer components {
+  .dt-main-canvas {
+    position: relative;
+    background: var(--gradient-main);
+    background-color: #000000;
+  }
+
   .dt-surface {
     background: var(--gradient-card);
     border-color: var(--surface-border);
@@ -82,46 +110,54 @@ body {
   .dt-surface-inset {
     background: var(--gradient-inset);
     border-color: var(--surface-border);
-    box-shadow: var(--surface-highlight);
+    box-shadow: var(--surface-highlight), var(--surface-shadow);
   }
 }
 
 @layer utilities {
   .bg-dt-bg {
     background: var(--gradient-bg) !important;
-    background-color: var(--color-dt-bg) !important;
+    background-color: #000000 !important;
   }
 
   .bg-dt-panel {
     background: var(--gradient-panel) !important;
-    background-color: var(--color-dt-panel) !important;
-    box-shadow: var(--surface-highlight);
+    background-color: #000000 !important;
+    box-shadow: var(--surface-highlight), var(--surface-shadow);
   }
 
   .bg-dt-card {
     background: var(--gradient-card) !important;
-    background-color: var(--color-dt-card) !important;
+    background-color: #0a0a0a !important;
     box-shadow: var(--surface-highlight), var(--surface-shadow);
   }
 
   .bg-dt-bg\/40 {
-    background: linear-gradient(135deg, rgb(12 12 12 / 0.88) 0%, rgb(26 8 8 / 0.82) 50%, rgb(10 10 10 / 0.86) 100%) !important;
-    box-shadow: var(--surface-highlight);
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(229, 9, 20, 0.06) 0%, transparent 50%),
+      linear-gradient(135deg, rgb(0 0 0 / 0.92) 0%, rgb(28 6 6 / 0.85) 48%, rgb(0 0 0 / 0.9) 100%) !important;
+    box-shadow: var(--surface-highlight), var(--surface-shadow);
   }
 
   .bg-dt-bg\/50 {
-    background: linear-gradient(135deg, rgb(14 14 14 / 0.94) 0%, rgb(30 8 8 / 0.9) 50%, rgb(12 12 12 / 0.92) 100%) !important;
-    box-shadow: var(--surface-highlight);
+    background:
+      radial-gradient(ellipse 75% 55% at 50% 0%, rgba(229, 9, 20, 0.07) 0%, transparent 50%),
+      linear-gradient(135deg, rgb(0 0 0 / 0.95) 0%, rgb(34 8 8 / 0.9) 50%, rgb(4 4 4 / 0.93) 100%) !important;
+    box-shadow: var(--surface-highlight), var(--surface-shadow);
   }
 
   .bg-dt-bg\/60 {
-    background: linear-gradient(135deg, rgb(16 16 16 / 0.96) 0%, rgb(34 10 10 / 0.92) 50%, rgb(14 14 14 / 0.94) 100%) !important;
-    box-shadow: var(--surface-highlight);
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 50%),
+      linear-gradient(135deg, rgb(0 0 0 / 0.97) 0%, rgb(40 10 10 / 0.92) 50%, rgb(6 6 6 / 0.95) 100%) !important;
+    box-shadow: var(--surface-highlight), var(--surface-shadow);
   }
 
   .bg-dt-bg\/80 {
-    background: linear-gradient(160deg, rgb(10 10 10 / 0.98) 0%, rgb(24 6 6 / 0.95) 55%, rgb(12 12 12 / 0.97) 100%) !important;
-    box-shadow: var(--surface-highlight);
+    background:
+      radial-gradient(ellipse 85% 60% at 50% 0%, rgba(229, 9, 20, 0.09) 0%, transparent 52%),
+      linear-gradient(160deg, rgb(0 0 0 / 0.98) 0%, rgb(30 6 6 / 0.94) 55%, rgb(0 0 0 / 0.97) 100%) !important;
+    box-shadow: var(--surface-highlight), var(--surface-shadow);
   }
 
   .border-dt-border {
@@ -132,6 +168,7 @@ body {
   select.bg-dt-bg,
   textarea.bg-dt-bg {
     background: var(--gradient-input) !important;
+    background-color: #000000 !important;
     box-shadow: var(--surface-highlight);
   }
 }
@@ -142,7 +179,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: linear-gradient(180deg, #2a0a0a 0%, #1a1a1a 100%);
   border-radius: 3px;
 }
 
