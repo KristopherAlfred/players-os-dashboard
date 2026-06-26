@@ -9,7 +9,7 @@ export function Footer() {
       </div>
       <div className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest text-white md:text-[11px]">
         <Star size={14} className="text-dt-red" />
-        OWNED BY DAME.
+        OWNED BY ATHLETES.
       </div>
       <div className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest text-white md:justify-end md:text-[11px]">
         REAL FANS. REAL DATA. REAL VALUE.
