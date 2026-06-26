@@ -18,15 +18,15 @@ export function TrafficChart() {
       <div className="h-[230px] px-2 pb-2 pt-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={trafficOverTime}>
-            <CartesianGrid stroke="#1e1e1e" strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#ffffff" strokeDasharray="3 3" strokeOpacity={0.25} vertical={false} />
             <XAxis
               dataKey="date"
-              tick={{ fill: "#6b6b6b", fontSize: 11 }}
+              tick={{ fill: "#ffffff", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: "#6b6b6b", fontSize: 11 }}
+              tick={{ fill: "#ffffff", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
