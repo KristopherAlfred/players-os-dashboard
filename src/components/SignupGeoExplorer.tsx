@@ -117,10 +117,6 @@ function isWorldMapView(view: CountryViewId) {
   return view === "world" || view === "Other";
 }
 
-function shouldHideWorldRegion(name: string) {
-  return name === "Antarctica" || name === "French Southern and Antarctic Lands";
-}
-
 function ChoroplethMap({
   view,
   paletteId,
@@ -159,12 +155,7 @@ function ChoroplethMap({
       >
         <Geographies geography={config.url}>
           {({ geographies }: { geographies: GeoFeature[] }) =>
-            geographies
-              .filter((geo) => {
-                const name = geo.properties?.name ?? "";
-                return worldView ? !shouldHideWorldRegion(name) : true;
-              })
-              .map((geo) => {
+            geographies.map((geo) => {
               const name = geo.properties?.name ?? "";
               const id = String(geo.id ?? "");
               const intensity = getRegionIntensity(view, id, name);
