@@ -113,6 +113,14 @@ function PalettePicker({
   );
 }
 
+function isWorldMapView(view: CountryViewId) {
+  return view === "world" || view === "Other";
+}
+
+function shouldHideWorldRegion(name: string) {
+  return name === "Antarctica" || name === "French Southern and Antarctic Lands";
+}
+
 function ChoroplethMap({
   view,
   paletteId,
@@ -123,7 +131,8 @@ function ChoroplethMap({
   onSelectCountry?: (id: CountryViewId) => void;
 }) {
   const config = mapViewConfig[view];
-  const clickable = view === "world" || view === "Other";
+  const worldView = isWorldMapView(view);
+  const clickable = worldView;
   const projectionConfig =
     config.projection === "geoAlbersUsa"
       ? { scale: config.scale }
@@ -137,17 +146,25 @@ function ChoroplethMap({
         height={config.height}
         projectionConfig={projectionConfig}
         background={heatmapMapBackground}
+        preserveAspectRatio="xMidYMid meet"
         style={{
           width: "100%",
-          height: "auto",
+          height: worldView ? "100%" : "auto",
+          maxWidth: "100%",
           maxHeight: "100%",
           display: "block",
           backgroundColor: heatmapMapBackground,
+          ...(worldView ? { aspectRatio: `${config.width} / ${config.height}` } : {}),
         }}
       >
         <Geographies geography={config.url}>
           {({ geographies }: { geographies: GeoFeature[] }) =>
-            geographies.map((geo) => {
+            geographies
+              .filter((geo) => {
+                const name = geo.properties?.name ?? "";
+                return worldView ? !shouldHideWorldRegion(name) : true;
+              })
+              .map((geo) => {
               const name = geo.properties?.name ?? "";
               const id = String(geo.id ?? "");
               const intensity = getRegionIntensity(view, id, name);
@@ -160,7 +177,7 @@ function ChoroplethMap({
                   geography={geo}
                   fill={fill}
                   stroke={heatmapRegionStroke}
-                  strokeWidth={view === "world" || view === "Other" ? 0.35 : 0.55}
+                  strokeWidth={worldView ? 0.35 : 0.55}
                   style={{
                     default: { outline: "none", opacity: 1 },
                     hover: {

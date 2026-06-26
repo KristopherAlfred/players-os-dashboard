@@ -17,6 +17,7 @@ declare module "react-simple-maps" {
     projectionConfig?: { scale?: number; center?: [number, number] };
     background?: string;
     className?: string;
+    preserveAspectRatio?: string;
     style?: Record<string, string>;
     children?: ReactNode;
   }): React.JSX.Element;

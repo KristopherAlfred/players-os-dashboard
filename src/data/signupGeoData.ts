@@ -124,10 +124,10 @@ export const mapViewConfig: Record<CountryViewId, MapViewConfig> = {
   world: {
     url: GEO_URLS.world,
     projection: "geoEqualEarth",
-    scale: 130,
-    center: [0, 4],
-    width: 800,
-    height: 420,
+    scale: 200,
+    center: [0, 12],
+    width: 900,
+    height: 500,
   },
   USA: {
     url: GEO_URLS.usa,
@@ -163,10 +163,10 @@ export const mapViewConfig: Record<CountryViewId, MapViewConfig> = {
   Other: {
     url: GEO_URLS.world,
     projection: "geoEqualEarth",
-    scale: 130,
-    center: [0, 4],
-    width: 800,
-    height: 420,
+    scale: 200,
+    center: [0, 12],
+    width: 900,
+    height: 500,
   },
 };
 
