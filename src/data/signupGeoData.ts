@@ -1,20 +1,16 @@
 export type CountryViewId = "world" | "USA" | "Canada" | "UK" | "Australia" | "Other";
 
-/** Smooth red density scale: near-black → brand red */
-export const heatmapGradient = [
-  "#050000",
-  "#120000",
-  "#2a0000",
-  "#520000",
-  "#8f0000",
-  "#c40000",
-  "#e50914",
-] as const;
+export type HeatmapPaletteId = "ocean" | "inferno" | "emerald" | "sunset" | "slate";
 
-export const heatmapGradientCss = `linear-gradient(90deg, ${heatmapGradient.join(", ")})`;
+export type HeatmapPalette = {
+  id: HeatmapPaletteId;
+  label: string;
+  steps: { label: string; color: string }[];
+  colors: [string, string, string, string, string];
+};
 
 export const heatmapMapBackground = "transparent";
-export const heatmapRegionStroke = "#1a0505";
+export const heatmapRegionStroke = "#1a1a1a";
 
 export const heatmapLegendLabels = [
   "Fewest signups",
@@ -50,11 +46,79 @@ export const countryOverview: CountryOverview[] = [
 
 const legendLabels = heatmapLegendLabels;
 
-/** @deprecated Use heatmapGradient + intensityToColor */
-export const legendSteps = legendLabels.map((label, index) => ({
-  label,
-  color: heatmapGradient[Math.min(index, heatmapGradient.length - 1)],
-}));
+export const heatmapPalettes: Record<HeatmapPaletteId, HeatmapPalette> = {
+  ocean: {
+    id: "ocean",
+    label: "Ocean",
+    colors: ["#3288bd", "#66c2a5", "#fee08b", "#fc8d59", "#d73027"],
+    steps: [
+      { label: legendLabels[0], color: "#3288bd" },
+      { label: legendLabels[1], color: "#66c2a5" },
+      { label: legendLabels[2], color: "#fee08b" },
+      { label: legendLabels[3], color: "#fc8d59" },
+      { label: legendLabels[4], color: "#d73027" },
+    ],
+  },
+  inferno: {
+    id: "inferno",
+    label: "Inferno",
+    colors: ["#2c115f", "#b73779", "#fb8861", "#fec287", "#fcffa4"],
+    steps: [
+      { label: legendLabels[0], color: "#2c115f" },
+      { label: legendLabels[1], color: "#b73779" },
+      { label: legendLabels[2], color: "#fb8861" },
+      { label: legendLabels[3], color: "#fec287" },
+      { label: legendLabels[4], color: "#fcffa4" },
+    ],
+  },
+  emerald: {
+    id: "emerald",
+    label: "Emerald",
+    colors: ["#084081", "#2b8cbe", "#4eb3d3", "#7bccc4", "#a8ddb5"],
+    steps: [
+      { label: legendLabels[0], color: "#084081" },
+      { label: legendLabels[1], color: "#2b8cbe" },
+      { label: legendLabels[2], color: "#4eb3d3" },
+      { label: legendLabels[3], color: "#7bccc4" },
+      { label: legendLabels[4], color: "#a8ddb5" },
+    ],
+  },
+  sunset: {
+    id: "sunset",
+    label: "Sunset",
+    colors: ["#4a1486", "#9c27b0", "#e91e63", "#ff7043", "#ffca28"],
+    steps: [
+      { label: legendLabels[0], color: "#4a1486" },
+      { label: legendLabels[1], color: "#9c27b0" },
+      { label: legendLabels[2], color: "#e91e63" },
+      { label: legendLabels[3], color: "#ff7043" },
+      { label: legendLabels[4], color: "#ffca28" },
+    ],
+  },
+  slate: {
+    id: "slate",
+    label: "Slate",
+    colors: ["#1e293b", "#334155", "#64748b", "#94a3b8", "#e2e8f0"],
+    steps: [
+      { label: legendLabels[0], color: "#1e293b" },
+      { label: legendLabels[1], color: "#334155" },
+      { label: legendLabels[2], color: "#64748b" },
+      { label: legendLabels[3], color: "#94a3b8" },
+      { label: legendLabels[4], color: "#e2e8f0" },
+    ],
+  },
+};
+
+export const heatmapPaletteList = Object.values(heatmapPalettes);
+
+export function paletteGradientCss(paletteId: HeatmapPaletteId, direction: "horizontal" | "vertical" = "horizontal") {
+  const colors = heatmapPalettes[paletteId].colors.join(", ");
+  const angle = direction === "vertical" ? "180deg" : "90deg";
+  return `linear-gradient(${angle}, ${colors})`;
+}
+
+/** @deprecated Use heatmapPalettes[paletteId].steps */
+export const legendSteps = heatmapPalettes.ocean.steps;
 
 const GEO_URLS = {
   world: "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json",
@@ -137,8 +201,8 @@ function lerpHex(a: string, b: string, t: number): string {
   return `#${[r, g, bl].map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 }
 
-export function intensityToColor(value: number) {
-  const colors = heatmapGradient;
+export function intensityToColor(value: number, paletteId: HeatmapPaletteId = "ocean") {
+  const colors = heatmapPalettes[paletteId].colors;
   const v = Math.max(0, Math.min(1, value));
   const position = v * (colors.length - 1);
   const index = Math.floor(position);

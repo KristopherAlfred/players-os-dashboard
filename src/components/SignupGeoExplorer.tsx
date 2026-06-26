@@ -4,13 +4,15 @@ import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import {
   countryOverview,
   getRegionIntensity,
-  heatmapGradientCss,
-  heatmapLegendLabels,
+  heatmapPaletteList,
+  heatmapPalettes,
   heatmapMapBackground,
   heatmapRegionStroke,
   intensityToColor,
   mapViewConfig,
+  paletteGradientCss,
   type CountryViewId,
+  type HeatmapPaletteId,
   worldCountryFromName,
 } from "../data/signupGeoData";
 
@@ -29,28 +31,101 @@ function MapGradientBackground() {
     <>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#0a0000] to-[#120000]" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#150000] to-black" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.14),transparent_62%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.12),transparent_62%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.85),transparent_55%)]" />
     </>
   );
 }
 
-function MapLegend() {
+function PalettePicker({
+  paletteId,
+  onChange,
+  variant = "compact",
+}: {
+  paletteId: HeatmapPaletteId;
+  onChange: (id: HeatmapPaletteId) => void;
+  variant?: "compact" | "sidebar";
+}) {
+  if (variant === "sidebar") {
+    return (
+      <div className="mt-4 flex flex-col gap-2 border-t border-dt-border pt-4">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Color palette</p>
+        {heatmapPaletteList.map((palette) => {
+          const active = palette.id === paletteId;
+          const gradient = paletteGradientCss(palette.id);
+          return (
+            <button
+              key={palette.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(palette.id)}
+              className={`flex w-full items-center gap-2 rounded-md border px-2 py-1.5 text-left transition ${
+                active
+                  ? "border-dt-red bg-dt-red/10 text-white ring-1 ring-dt-red/50"
+                  : "border-dt-border text-dt-muted hover:border-white/20 hover:text-white"
+              }`}
+            >
+              <span className="h-3 w-8 shrink-0 rounded-sm border border-white/10" style={{ background: gradient }} />
+              <span className="text-[10px] font-medium">{palette.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex w-[148px] shrink-0 flex-col gap-3 border-r border-dt-border pr-4">
+    <div className="flex flex-col gap-1.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Color palette</p>
+      <div className="flex flex-wrap gap-1.5">
+        {heatmapPaletteList.map((palette) => {
+          const active = palette.id === paletteId;
+          const gradient = paletteGradientCss(palette.id);
+          return (
+            <button
+              key={palette.id}
+              type="button"
+              title={palette.label}
+              aria-label={`${palette.label} color palette`}
+              aria-pressed={active}
+              onClick={() => onChange(palette.id)}
+              className={`flex items-center gap-1.5 rounded-md border px-2 py-1 transition ${
+                active ? "border-dt-red bg-dt-red/10 ring-1 ring-dt-red/60" : "border-dt-border hover:border-white/30"
+              }`}
+            >
+              <span className="h-3 w-8 shrink-0 rounded-sm border border-white/10" style={{ background: gradient }} />
+              <span className="text-[10px] font-medium text-dt-muted">{palette.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MapLegend({
+  paletteId,
+  onPaletteChange,
+}: {
+  paletteId: HeatmapPaletteId;
+  onPaletteChange: (id: HeatmapPaletteId) => void;
+}) {
+  const steps = heatmapPalettes[paletteId].steps;
+  return (
+    <div className="flex w-[148px] shrink-0 flex-col gap-2 border-r border-dt-border pr-4">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Signup density</p>
       <div
-        className="h-28 w-full rounded-md border border-white/10"
-        style={{ background: heatmapGradientCss.replace("90deg", "180deg") }}
+        className="mb-1 h-3 w-full rounded-sm border border-white/10"
+        style={{ background: paletteGradientCss(paletteId) }}
         aria-hidden
       />
-      <div className="flex flex-col gap-1.5">
-        {heatmapLegendLabels.map((label) => (
-          <span key={label} className="text-[10px] leading-tight text-dt-muted">
-            {label}
-          </span>
-        ))}
-      </div>
+      {steps.map((step) => (
+        <div key={step.label} className="flex items-center gap-2">
+          <span className="h-3 w-5 shrink-0 rounded-sm border border-white/10" style={{ backgroundColor: step.color }} />
+          <span className="text-[10px] leading-tight text-dt-muted">{step.label}</span>
+        </div>
+      ))}
+      <PalettePicker paletteId={paletteId} onChange={onPaletteChange} variant="sidebar" />
     </div>
   );
 }
@@ -61,9 +136,11 @@ function isWorldMapView(view: CountryViewId) {
 
 function ChoroplethMap({
   view,
+  paletteId,
   onSelectCountry,
 }: {
   view: CountryViewId;
+  paletteId: HeatmapPaletteId;
   onSelectCountry?: (id: CountryViewId) => void;
 }) {
   const config = mapViewConfig[view];
@@ -101,7 +178,7 @@ function ChoroplethMap({
               const name = geo.properties?.name ?? "";
               const id = String(geo.id ?? "");
               const intensity = getRegionIntensity(view, id, name);
-              const fill = intensityToColor(intensity);
+              const fill = intensityToColor(intensity, paletteId);
               const target = worldCountryFromName(name);
 
               return (
@@ -114,7 +191,7 @@ function ChoroplethMap({
                   style={{
                     default: { outline: "none", opacity: 1 },
                     hover: {
-                      fill: clickable && target ? "#ff2a35" : fill,
+                      fill: clickable && target ? "#e50914" : fill,
                       outline: "none",
                       cursor: clickable && target ? "pointer" : "default",
                       opacity: 1,
@@ -136,6 +213,7 @@ function ChoroplethMap({
 
 export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
   const [view, setView] = useState<CountryViewId>("world");
+  const [paletteId, setPaletteId] = useState<HeatmapPaletteId>("ocean");
 
   const countryIndex = useMemo(
     () => countryOverview.findIndex((c) => c.id === view),
@@ -194,14 +272,18 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         </div>
       </div>
 
+      <div className="mb-3 lg:hidden">
+        <PalettePicker paletteId={paletteId} onChange={setPaletteId} />
+      </div>
+
       <div className="relative flex flex-col overflow-hidden rounded-lg border border-dt-border lg:flex-row lg:min-h-[400px]">
         <MapGradientBackground />
         <div className="relative z-[1] hidden border-b border-dt-border p-4 lg:flex lg:border-b-0 lg:border-r">
-          <MapLegend />
+          <MapLegend paletteId={paletteId} onPaletteChange={setPaletteId} />
         </div>
 
         <div className="relative z-[1] h-[400px] w-full min-w-0 flex-1 overflow-hidden sm:h-[440px]">
-          <ChoroplethMap view={view} onSelectCountry={setView} />
+          <ChoroplethMap view={view} paletteId={paletteId} onSelectCountry={setView} />
         </div>
 
         <div className="relative z-[1] flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-t border-dt-border bg-black/30 p-2 backdrop-blur-sm lg:w-[148px] lg:flex-col lg:overflow-x-visible lg:border-l lg:border-t-0 lg:p-3">
@@ -236,17 +318,9 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         </div>
       </div>
 
-      <div className="mt-2 lg:hidden">
-        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Signup density</p>
-        <div
-          className="mb-1.5 h-3 w-full rounded-sm border border-white/10"
-          style={{ background: heatmapGradientCss }}
-          aria-hidden
-        />
-        <p className="text-[10px] text-dt-muted">
-          Darker = fewer signups, brighter red = most. Tap a country or use the list.
-        </p>
-      </div>
+      <p className="mt-2 text-[10px] text-dt-muted lg:hidden">
+        Legend: lighter = fewer signups, brighter = most. Tap a country or use the list.
+      </p>
     </div>
   );
 }
