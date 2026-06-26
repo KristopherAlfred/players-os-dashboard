@@ -69,13 +69,13 @@ function NavItemLink({
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClose}
-        className={`flex w-full items-center gap-2 rounded-md py-1.5 text-left text-[13px] text-white transition-colors hover:bg-white/[0.06] ${
-          nested ? "px-3 pl-6" : "px-3"
+        className={`flex w-full items-center gap-2.5 rounded-md py-2 text-left text-[15px] text-white transition-colors hover:bg-white/[0.06] ${
+          nested ? "px-3.5 pl-7" : "px-3.5"
         }`}
       >
-        {item.label === "Flash Updates" ? <Zap size={13} className="shrink-0 text-dt-red" /> : null}
+        {item.label === "Flash Updates" ? <Zap size={15} className="shrink-0 text-dt-red" /> : null}
         <span className="min-w-0 flex-1">{item.label}</span>
-        <ExternalLink size={11} className="shrink-0 text-white/40" />
+        <ExternalLink size={13} className="shrink-0 text-white/40" />
       </a>
     );
   }
@@ -86,8 +86,8 @@ function NavItemLink({
       end={item.path === "/"}
       onClick={onClose}
       className={({ isActive }) =>
-        `block w-full rounded-md py-1.5 text-left text-[13px] text-white transition-colors ${
-          nested ? "px-3 pl-6" : "px-3"
+        `block w-full rounded-md py-2.5 text-left text-[15px] text-white transition-colors ${
+          nested ? "px-3.5 pl-7" : "px-3.5"
         } ${isActive ? "bg-white/[0.08] font-semibold" : "font-normal hover:bg-white/[0.05]"}`
       }
     >
@@ -154,14 +154,14 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         <button
           type="button"
           onClick={() => toggleGroup(section.label, group.label)}
-          className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-[13px] transition-colors ${
+          className={`flex w-full items-center gap-2.5 rounded-md px-3.5 py-2 text-left text-[14px] transition-colors ${
             groupActive ? "bg-white/[0.04] font-semibold text-white" : "text-white/90 hover:bg-white/[0.05]"
           }`}
         >
-          <Film size={13} className="shrink-0 text-dt-muted" />
+          <Film size={16} className="shrink-0 text-dt-muted" />
           <span className="min-w-0 flex-1">{group.label}</span>
           <ChevronDown
-            size={11}
+            size={13}
             className={`shrink-0 text-white/50 transition-transform ${groupOpen ? "rotate-180" : ""}`}
           />
         </button>
@@ -188,19 +188,19 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
 
     if (isDirectLink && section.directPath) {
       return (
-        <div key={section.label} className="mb-3.5">
+        <div key={section.label} className="mb-4">
           <NavLink
             to={section.directPath}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex w-full items-center gap-2 rounded-md px-2 py-2 transition-colors ${
+              `flex w-full items-center gap-2.5 rounded-md px-2.5 py-2.5 transition-colors ${
                 isActive ? "bg-white/[0.08]" : "hover:bg-white/[0.03]"
               }`
             }
           >
-            <Icon size={14} strokeWidth={2.25} className="shrink-0" style={iconGlowStyle} />
+            <Icon size={17} strokeWidth={2.25} className="shrink-0" style={iconGlowStyle} />
             <span
-              className="min-w-0 flex-1 text-[10px] font-bold leading-tight tracking-[0.08em] text-white"
+              className="min-w-0 flex-1 text-xs font-bold leading-tight tracking-[0.08em] text-white"
               style={sectionGlowStyle}
             >
               {section.label}
@@ -211,32 +211,32 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
     }
 
     return (
-      <div key={section.label} className="mb-3.5">
+      <div key={section.label} className="mb-4">
         <button
           type="button"
           onClick={() => toggleSection(section.label)}
           disabled={isDashboard}
-          className={`mb-1.5 flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors ${
+          className={`mb-1.5 flex w-full items-center gap-2.5 rounded-md px-2.5 py-2.5 text-left transition-colors ${
             activeSection ? "bg-white/[0.04]" : "hover:bg-white/[0.03]"
           } ${isDashboard ? "cursor-default" : ""}`}
         >
-          <Icon size={14} strokeWidth={2.25} className="shrink-0" style={iconGlowStyle} />
+          <Icon size={17} strokeWidth={2.25} className="shrink-0" style={iconGlowStyle} />
           <span
-            className="min-w-0 flex-1 text-[10px] font-bold leading-tight tracking-[0.08em] text-white"
+            className="min-w-0 flex-1 text-xs font-bold leading-tight tracking-[0.08em] text-white"
             style={sectionGlowStyle}
           >
             {section.label}
           </span>
           {hasDropdown && (
             <ChevronDown
-              size={11}
+              size={13}
               className={`shrink-0 text-white/50 transition-transform ${sectionOpen ? "rotate-180" : ""}`}
             />
           )}
         </button>
 
         {sectionOpen && (
-          <ul className="space-y-0.5 pl-0.5">
+          <ul className="space-y-1 pl-0.5">
             {section.items.map((item) => (
               <li key={item.label}>
                 <NavItemLink item={item} onClose={onClose} />
@@ -261,7 +261,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[min(288px,88vw)] flex-col border-r border-dt-border bg-dt-panel transition-transform duration-200 ease-out lg:static lg:z-auto lg:w-[268px] lg:shrink-0 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[min(320px,88vw)] flex-col border-r border-dt-border bg-dt-panel transition-transform duration-200 ease-out lg:static lg:z-auto lg:w-[300px] lg:shrink-0 lg:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -279,7 +279,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-3">{navSections.map(renderSection)}</nav>
+        <nav className="flex-1 overflow-y-auto px-4 py-4">{navSections.map(renderSection)}</nav>
       </aside>
     </>
   );
