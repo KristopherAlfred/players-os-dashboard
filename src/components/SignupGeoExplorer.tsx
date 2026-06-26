@@ -307,7 +307,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         <PalettePicker paletteId={paletteId} onChange={setPaletteId} />
       </div>
 
-      <div className="relative flex flex-col overflow-hidden rounded-lg border border-dt-border lg:flex-row lg:min-h-[400px]">
+      <div className="relative flex flex-col overflow-hidden rounded-lg border border-dt-border bg-dt-card lg:flex-row lg:min-h-[400px]">
         <MapGradientBackground />
         <div className="relative z-[1] hidden border-b border-dt-border p-4 lg:flex lg:border-b-0 lg:border-r">
           <MapLegend paletteId={paletteId} onPaletteChange={setPaletteId} />

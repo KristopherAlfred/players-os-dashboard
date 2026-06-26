@@ -13,10 +13,10 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-lg border border-dt-border bg-dt-card ${className}`}
+      className={`dt-surface rounded-lg border border-dt-border bg-dt-card ${className}`}
     >
       {(title || action) && (
-        <div className="flex items-center justify-between gap-3 border-b border-dt-border px-4 py-3">
+        <div className="dt-surface-header flex items-center justify-between gap-3 border-b border-dt-border px-4 py-3">
           {title && (
             <h3 className="min-w-0 flex-1 truncate text-sm font-semibold tracking-wide text-white">
               {title}

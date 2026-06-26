@@ -27,7 +27,7 @@ export function StatCard({
   trend?: string;
 }) {
   return (
-    <div className="rounded-lg border border-dt-border bg-dt-card p-4">
+    <div className="dt-surface rounded-lg border border-dt-border bg-dt-card p-4">
       <p className="text-[11px] font-medium uppercase tracking-wide text-dt-muted">
         {label}
       </p>
@@ -52,8 +52,8 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <div className={`rounded-lg border border-dt-border bg-dt-card ${className}`}>
-      <div className="border-b border-dt-border px-4 py-3">
+    <div className={`dt-surface rounded-lg border border-dt-border bg-dt-card ${className}`}>
+      <div className="dt-surface-header border-b border-dt-border px-4 py-3">
         <h2 className="font-display text-sm font-semibold tracking-wide text-white">
           {title}
         </h2>

@@ -8,7 +8,7 @@ const tabs = ["All Content", "Videos", "Images", "Articles", "Audio"];
 export function RecentContent() {
   return (
     <Card className="flex h-full w-full flex-col">
-      <div className="border-b border-dt-border px-4 py-3">
+      <div className="border-b border-dt-border bg-gradient-to-r from-dt-red/10 via-transparent to-transparent px-4 py-3">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white">Recent Content</h3>
         </div>
