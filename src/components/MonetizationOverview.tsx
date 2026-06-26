@@ -11,21 +11,21 @@ export function MonetizationOverview() {
     <Card title="Monetization Overview" className="flex h-full w-full flex-col">
       <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-3">
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
-          <p className="text-[11px] text-dt-muted">Total Audience Segments</p>
+          <p className="text-[11px] text-white">Total Audience Segments</p>
           <p className="mt-1 text-2xl font-bold text-white">28</p>
         </div>
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
-          <p className="text-[11px] text-dt-muted">Active on DSPs</p>
+          <p className="text-[11px] text-white">Active on DSPs</p>
           <p className="mt-1 text-2xl font-bold text-white">14</p>
         </div>
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
-          <p className="text-[11px] text-dt-muted">Revenue (MTD)</p>
+          <p className="text-[11px] text-white">Revenue (MTD)</p>
           <p className="mt-1 text-2xl font-bold text-white">$96,420</p>
           <p className="text-xs font-medium text-dt-green">+24.7%</p>
         </div>
       </div>
       <div className="border-t border-dt-border px-4 py-3">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-dt-muted">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white">
           Top Partners
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
