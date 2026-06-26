@@ -25,9 +25,9 @@ export function LiveActivityFeed() {
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13px] text-white">
                 <span className="font-medium">{item.user}</span>
-                <span className="text-dt-muted"> — {item.action}</span>
+                <span className="text-white"> — {item.action}</span>
               </p>
-              <p className="text-[11px] text-dt-muted">{item.time}</p>
+              <p className="text-[11px] text-white">{item.time}</p>
             </div>
           </div>
         ))}

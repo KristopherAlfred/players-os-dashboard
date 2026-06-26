@@ -10,7 +10,7 @@ export function AudienceSnapshot() {
             key={row.label}
             className="flex items-center justify-between gap-3 px-3 py-2"
           >
-            <span className="min-w-0 text-[12px] leading-snug text-dt-muted">
+            <span className="min-w-0 text-[12px] leading-snug text-white">
               {row.label}
             </span>
             <span className="shrink-0 whitespace-nowrap text-[13px] font-semibold text-white">
