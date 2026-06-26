@@ -20,7 +20,7 @@ export function RecentContent() {
               className={`rounded-md px-3 py-1.5 text-xs font-medium ${
                 i === 0
                   ? "bg-dt-red text-white"
-                  : "text-dt-muted hover:text-white"
+                  : "text-white/80 hover:text-white"
               }`}
             >
               {tab}
@@ -29,17 +29,17 @@ export function RecentContent() {
         </div>
         <div className="flex gap-2">
           <div className="flex flex-1 items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-1.5">
-            <Search size={14} className="text-dt-muted" />
+            <Search size={14} className="text-white" />
             <input
               type="text"
               placeholder="Search content..."
-              className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-dt-muted"
+              className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/50"
             />
           </div>
-          <select className="rounded-md border border-dt-border bg-dt-bg px-3 py-1.5 text-xs text-[#d4d4d4]">
+          <select className="rounded-md border border-dt-border bg-dt-bg px-3 py-1.5 text-xs text-white">
             <option>Status</option>
           </select>
-          <select className="rounded-md border border-dt-border bg-dt-bg px-3 py-1.5 text-xs text-[#d4d4d4]">
+          <select className="rounded-md border border-dt-border bg-dt-bg px-3 py-1.5 text-xs text-white">
             <option>Types</option>
           </select>
         </div>
@@ -48,7 +48,7 @@ export function RecentContent() {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-[13px]">
           <thead>
-            <tr className="border-b border-dt-border text-[11px] uppercase tracking-wide text-dt-muted">
+            <tr className="border-b border-dt-border text-[11px] uppercase tracking-wide text-white">
               <th className="px-4 py-2.5 font-medium">Content</th>
               <th className="px-3 py-2.5 font-medium">Type</th>
               <th className="px-3 py-2.5 font-medium">Status</th>
@@ -72,7 +72,7 @@ export function RecentContent() {
                     </span>
                   </div>
                 </td>
-                <td className="px-3 py-2.5 align-middle text-[#a3a3a3]">{row.type}</td>
+                <td className="px-3 py-2.5 align-middle text-white">{row.type}</td>
                 <td className="px-3 py-2.5 align-middle">
                   <span
                     className={`rounded px-2 py-0.5 text-[11px] font-medium ${
@@ -84,20 +84,20 @@ export function RecentContent() {
                     {row.status}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 align-middle text-[#a3a3a3]">{row.published}</td>
+                <td className="px-3 py-2.5 align-middle text-white">{row.published}</td>
                 <td className="px-3 py-2.5 align-middle text-white">{row.views}</td>
                 <td className="px-3 py-2.5 align-middle text-white">{row.engagement}</td>
                 <td className="px-4 py-2.5 align-middle">
                   <div className="flex gap-1">
                     <button
                       type="button"
-                      className="rounded p-1 text-dt-muted hover:bg-dt-border hover:text-white"
+                      className="rounded p-1 text-white hover:bg-dt-border hover:text-white"
                     >
                       <Pencil size={14} />
                     </button>
                     <button
                       type="button"
-                      className="rounded p-1 text-dt-muted hover:bg-dt-border hover:text-white"
+                      className="rounded p-1 text-white hover:bg-dt-border hover:text-white"
                     >
                       <MoreHorizontal size={14} />
                     </button>
