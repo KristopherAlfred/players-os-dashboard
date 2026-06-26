@@ -7,7 +7,6 @@ import { RecentContent } from "../components/RecentContent";
 import { UploadWidget } from "../components/UploadWidget";
 import { AudienceDemographics } from "../components/AudienceDemographics";
 import { DeviceBreakdown } from "../components/DeviceBreakdown";
-import { EmailSmsGrowth } from "../components/EmailSmsGrowth";
 import { MonetizationOverview } from "../components/MonetizationOverview";
 import { TopPerformingContent } from "../components/TopPerformingContent";
 import { Footer } from "../components/Footer";
@@ -45,11 +44,8 @@ export function DashboardPage() {
         <div className="col-span-12 lg:col-span-8">
           <AudienceDemographics />
         </div>
-        <div className="col-span-12 sm:col-span-6 lg:col-span-3">
+        <div className="col-span-12 lg:col-span-4">
           <DeviceBreakdown />
-        </div>
-        <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-          <EmailSmsGrowth />
         </div>
       </div>
 

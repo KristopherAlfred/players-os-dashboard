@@ -1,5 +1,4 @@
 import { Card } from "./ui/Card";
-import { SignupHeatmap } from "./SignupHeatmap";
 import { ageDemographics, topCountries } from "../data/mockData";
 
 export function AudienceDemographics() {
@@ -36,10 +35,6 @@ export function AudienceDemographics() {
             ))}
           </ul>
         </div>
-      </div>
-      <div className="border-t border-dt-border px-4 pb-4 pt-4">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dt-muted">Signup Heatmap</p>
-        <SignupHeatmap />
       </div>
     </Card>
   );
