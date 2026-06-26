@@ -211,6 +211,28 @@ export function intensityToColor(value: number, paletteId: HeatmapPaletteId = "o
   return lerpHex(colors[index], colors[index + 1], blend);
 }
 
+export type CountryGradientStop = { offset: string; color: string };
+
+/** Multi-stop fill gradient inside each region, spanning the palette around its intensity. */
+export function countryGradientStops(
+  intensity: number,
+  paletteId: HeatmapPaletteId = "ocean",
+): CountryGradientStop[] {
+  const v = Math.max(0, Math.min(1, intensity));
+  const spread = Math.max(0.24, 0.18);
+  const low = Math.max(0, v - spread);
+  const high = Math.min(1, v + spread);
+
+  return [0, 0.2, 0.45, 0.7, 1].map((t) => ({
+    offset: `${Math.round(t * 100)}%`,
+    color: intensityToColor(low + (high - low) * t, paletteId),
+  }));
+}
+
+export function countryGradientId(key: string) {
+  return `country-grad-${key.replace(/[^a-zA-Z0-9_-]/g, "")}`;
+}
+
 const usStateIntensity: Record<string, number> = {
   "06": 0.92, "41": 0.9, "53": 0.82, "16": 0.78, "32": 0.85, "04": 0.8, "49": 0.76,
   "30": 0.7, "56": 0.68, "08": 0.72, "35": 0.74, "48": 0.7, "40": 0.65,

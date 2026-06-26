@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import {
   countryOverview,
+  countryGradientId,
+  countryGradientStops,
   getRegionIntensity,
   heatmapPaletteList,
   heatmapPalettes,
@@ -173,12 +175,40 @@ function ChoroplethMap({
         }}
       >
         <Geographies geography={config.url}>
-          {({ geographies }: { geographies: GeoFeature[] }) =>
-            geographies.map((geo) => {
+          {({ geographies }: { geographies: GeoFeature[] }) => (
+            <>
+              <defs>
+                {geographies.map((geo) => {
+                  const name = geo.properties?.name ?? "";
+                  const id = String(geo.id ?? "");
+                  const intensity = getRegionIntensity(view, id, name);
+                  const gradId = countryGradientId(geo.rsmKey);
+                  const stops = countryGradientStops(intensity, paletteId);
+
+                  return (
+                    <linearGradient
+                      key={gradId}
+                      id={gradId}
+                      x1="10%"
+                      y1="90%"
+                      x2="90%"
+                      y2="10%"
+                      gradientUnits="objectBoundingBox"
+                    >
+                      {stops.map((stop) => (
+                        <stop key={stop.offset} offset={stop.offset} stopColor={stop.color} />
+                      ))}
+                    </linearGradient>
+                  );
+                })}
+              </defs>
+              {geographies.map((geo) => {
               const name = geo.properties?.name ?? "";
               const id = String(geo.id ?? "");
               const intensity = getRegionIntensity(view, id, name);
-              const fill = intensityToColor(intensity, paletteId);
+              const gradId = countryGradientId(geo.rsmKey);
+              const fill = `url(#${gradId})`;
+              const hoverFill = intensityToColor(intensity, paletteId);
               const target = worldCountryFromName(name);
 
               return (
@@ -191,7 +221,7 @@ function ChoroplethMap({
                   style={{
                     default: { outline: "none", opacity: 1 },
                     hover: {
-                      fill: clickable && target ? "#e50914" : fill,
+                      fill: clickable && target ? "#e50914" : hoverFill,
                       outline: "none",
                       cursor: clickable && target ? "pointer" : "default",
                       opacity: 1,
@@ -203,8 +233,9 @@ function ChoroplethMap({
                   }}
                 />
               );
-            })
-          }
+            })}
+            </>
+          )}
         </Geographies>
       </ComposableMap>
     </div>
