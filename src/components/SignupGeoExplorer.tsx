@@ -6,6 +6,8 @@ import {
   getRegionIntensity,
   heatmapPaletteList,
   heatmapPalettes,
+  heatmapMapBackground,
+  heatmapRegionStroke,
   intensityToColor,
   mapViewConfig,
   type CountryViewId,
@@ -121,7 +123,6 @@ function ChoroplethMap({
   onSelectCountry?: (id: CountryViewId) => void;
 }) {
   const config = mapViewConfig[view];
-  const palette = heatmapPalettes[paletteId];
   const clickable = view === "world" || view === "Other";
   const projectionConfig =
     config.projection === "geoAlbersUsa"
@@ -129,22 +130,19 @@ function ChoroplethMap({
       : { scale: config.scale, center: config.center ?? [0, 0] };
 
   return (
-    <div
-      className="flex h-full w-full items-center justify-center overflow-visible px-3 py-2"
-      style={{ backgroundColor: palette.background }}
-    >
+    <div className="flex h-full w-full items-center justify-center overflow-visible bg-black px-3 py-2">
       <ComposableMap
         projection={config.projection}
         width={config.width}
         height={config.height}
         projectionConfig={projectionConfig}
-        background={palette.background}
+        background={heatmapMapBackground}
         style={{
           width: "100%",
           height: "auto",
           maxHeight: "100%",
           display: "block",
-          backgroundColor: palette.background,
+          backgroundColor: heatmapMapBackground,
         }}
       >
         <Geographies geography={config.url}>
@@ -161,7 +159,7 @@ function ChoroplethMap({
                   key={geo.rsmKey}
                   geography={geo}
                   fill={fill}
-                  stroke={palette.stroke}
+                  stroke={heatmapRegionStroke}
                   strokeWidth={view === "world" || view === "Other" ? 0.35 : 0.55}
                   style={{
                     default: { outline: "none", opacity: 1 },
@@ -214,8 +212,6 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         ? "Other regions — rest of world"
         : `${countryOverview.find((c) => c.id === view)?.flag ?? ""} ${view} — regional signup heatmap`;
 
-  const palette = heatmapPalettes[paletteId];
-
   return (
     <div className={className}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -253,10 +249,7 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         <PalettePicker paletteId={paletteId} onChange={setPaletteId} />
       </div>
 
-      <div
-        className="flex flex-col overflow-visible rounded-lg border border-dt-border transition-colors duration-300 lg:flex-row lg:min-h-[400px]"
-        style={{ backgroundColor: palette.background }}
-      >
+      <div className="flex flex-col overflow-visible rounded-lg border border-dt-border bg-black lg:flex-row lg:min-h-[400px]">
         <div className="hidden border-b border-dt-border p-4 lg:flex lg:border-b-0 lg:border-r">
           <MapLegend paletteId={paletteId} onPaletteChange={setPaletteId} />
         </div>

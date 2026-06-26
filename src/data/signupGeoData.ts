@@ -7,9 +7,10 @@ export type HeatmapPalette = {
   label: string;
   steps: { label: string; color: string }[];
   colors: [string, string, string, string, string];
-  background: string;
-  stroke: string;
 };
+
+export const heatmapMapBackground = "#000000";
+export const heatmapRegionStroke = "#1a1a1a";
 
 export type CountryOverview = {
   id: CountryViewId;
@@ -48,8 +49,6 @@ export const heatmapPalettes: Record<HeatmapPaletteId, HeatmapPalette> = {
     id: "ocean",
     label: "Ocean",
     colors: ["#3288bd", "#66c2a5", "#fee08b", "#fc8d59", "#d73027"],
-    background: "#0b1a2e",
-    stroke: "#081420",
     steps: [
       { label: legendLabels[0], color: "#3288bd" },
       { label: legendLabels[1], color: "#66c2a5" },
@@ -62,8 +61,6 @@ export const heatmapPalettes: Record<HeatmapPaletteId, HeatmapPalette> = {
     id: "inferno",
     label: "Inferno",
     colors: ["#2c115f", "#b73779", "#fb8861", "#fec287", "#fcffa4"],
-    background: "#16081f",
-    stroke: "#0f0516",
     steps: [
       { label: legendLabels[0], color: "#2c115f" },
       { label: legendLabels[1], color: "#b73779" },
@@ -76,8 +73,6 @@ export const heatmapPalettes: Record<HeatmapPaletteId, HeatmapPalette> = {
     id: "emerald",
     label: "Emerald",
     colors: ["#084081", "#2b8cbe", "#4eb3d3", "#7bccc4", "#a8ddb5"],
-    background: "#041525",
-    stroke: "#021018",
     steps: [
       { label: legendLabels[0], color: "#084081" },
       { label: legendLabels[1], color: "#2b8cbe" },
@@ -90,8 +85,6 @@ export const heatmapPalettes: Record<HeatmapPaletteId, HeatmapPalette> = {
     id: "sunset",
     label: "Sunset",
     colors: ["#4a1486", "#9c27b0", "#e91e63", "#ff7043", "#ffca28"],
-    background: "#1a0c28",
-    stroke: "#12081c",
     steps: [
       { label: legendLabels[0], color: "#4a1486" },
       { label: legendLabels[1], color: "#9c27b0" },
@@ -104,8 +97,6 @@ export const heatmapPalettes: Record<HeatmapPaletteId, HeatmapPalette> = {
     id: "slate",
     label: "Slate",
     colors: ["#1e293b", "#334155", "#64748b", "#94a3b8", "#e2e8f0"],
-    background: "#0f172a",
-    stroke: "#0a101c",
     steps: [
       { label: legendLabels[0], color: "#1e293b" },
       { label: legendLabels[1], color: "#334155" },
