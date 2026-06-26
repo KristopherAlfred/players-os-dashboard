@@ -31,11 +31,11 @@ type SignupGeoExplorerProps = {
 function MapGradientBackground() {
   return (
     <>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#0a0000] to-black" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#180000] to-black" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.16),transparent_58%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.95),transparent_50%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.9),transparent_45%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#030303] to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-black to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.05),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.98),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.98),transparent_45%)]" />
     </>
   );
 }
