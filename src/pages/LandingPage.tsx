@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { type FormEvent, useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -25,6 +25,7 @@ type SignupRole = "agent" | "representative";
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [view, setView] = useState<"signin" | "signup" | "signup-sent">("signin");
   const [role, setRole] = useState<DashboardRole>("athlete");
   const [name, setName] = useState("");
@@ -37,6 +38,12 @@ export function LandingPage() {
   const [signupRole, setSignupRole] = useState<SignupRole>("agent");
 
   const selectedAthlete = rosterAthletes.find((a) => a.id === selectedAthleteId) ?? rosterAthletes[0];
+
+  useEffect(() => {
+    const mode = searchParams.get("mode");
+    if (mode === "signup") setView("signup");
+    else if (mode === "signin") setView("signin");
+  }, [searchParams]);
 
   function handleSignIn(e: FormEvent) {
     e.preventDefault();
@@ -75,15 +82,19 @@ export function LandingPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.45),transparent_70%)]" />
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
-        <div className="mb-8 w-full max-w-md text-center">
+        <div className="mb-6 w-full max-w-md text-center">
+          <Link
+            to="/welcome"
+            className="mb-6 inline-flex items-center gap-1 text-xs text-white/50 transition hover:text-white"
+          >
+            <ArrowLeft size={13} />
+            Back to AMX home
+          </Link>
           <img
             src="/amx-dashboard-logo.png"
             alt="AMX Dashboard"
-            className="mx-auto h-16 w-auto max-w-[280px] object-contain sm:h-20"
+            className="mx-auto h-14 w-auto max-w-[240px] object-contain sm:h-16"
           />
-          <p className="mt-4 text-sm text-white">
-            The athlete &amp; admin platform for the culture, built for the pros.
-          </p>
         </div>
 
         <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#1a0000]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">

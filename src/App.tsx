@@ -28,6 +28,7 @@ import {
 import { SettingsPage } from "./pages/SettingsPages";
 import { AthleteHubPage } from "./pages/AthletePages";
 import { LandingPage } from "./pages/LandingPage";
+import { MarketingLandingPage } from "./pages/MarketingLandingPage";
 import { RequireAuth, PublicOnly } from "./components/RequireAuth";
 import { isDashboardAuthed } from "./lib/dashboardAuth";
 
@@ -35,6 +36,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route
+          path="/welcome"
+          element={
+            <PublicOnly>
+              <MarketingLandingPage />
+            </PublicOnly>
+          }
+        />
         <Route
           path="/login"
           element={
@@ -80,7 +89,7 @@ export default function App() {
           <Route path="settings/account" element={<Navigate to="/settings" replace />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to={isDashboardAuthed() ? "/" : "/login"} replace />} />
+        <Route path="*" element={<Navigate to={isDashboardAuthed() ? "/" : "/welcome"} replace />} />
       </Routes>
     </BrowserRouter>
   );

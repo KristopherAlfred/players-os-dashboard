@@ -5,7 +5,7 @@ export function RequireAuth() {
   const location = useLocation();
 
   if (!isDashboardAuthed()) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/welcome" replace state={{ from: location.pathname }} />;
   }
 
   return <Outlet />;
