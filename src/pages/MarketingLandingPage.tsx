@@ -99,7 +99,7 @@ export function MarketingLandingPage() {
       <main className="relative z-10">
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pt-20 lg:pb-24 lg:pt-24">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-dt-red/40 bg-dt-red/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-dt-red">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-dt-red/40 bg-dt-red/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white">
               <Sparkles size={14} />
               Built for athletes &amp; their teams
             </div>
