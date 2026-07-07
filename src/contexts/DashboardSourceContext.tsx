@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
-export type DashboardSource = "overview" | "dametime" | "instagram" | "youtube" | "facebook";
+export type DashboardSource = "overview" | "dametime" | "instagram" | "youtube" | "facebook" | "twitter";
 
 type DashboardSourceContextValue = {
   source: DashboardSource;
@@ -16,6 +16,7 @@ const sourceLabels: Record<DashboardSource, string> = {
   instagram: "Instagram",
   youtube: "YouTube",
   facebook: "Facebook",
+  twitter: "X (Twitter)",
 };
 
 export function DashboardSourceProvider({ children }: { children: ReactNode }) {

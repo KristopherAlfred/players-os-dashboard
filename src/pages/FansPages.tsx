@@ -22,6 +22,12 @@ import {
   textPreview,
   type FacebookAnalytics,
 } from "../lib/facebookAnalyticsApi";
+import {
+  formatMetric as formatTwMetric,
+  formatPostDate as formatTwPostDate,
+  textPreview as twTextPreview,
+  type TwitterAnalytics,
+} from "../lib/twitterAnalyticsApi";
 import { ageDemographics, topCountries, audienceSnapshot } from "../data/mockData";
 
 const fans = [
@@ -329,6 +335,79 @@ function FacebookAudienceOverview({ analytics }: { analytics: FacebookAnalytics 
   );
 }
 
+function TwitterAudienceOverview({ analytics }: { analytics: TwitterAnalytics }) {
+  const stats = [
+    { label: "Followers", value: formatTwMetric(analytics.kpis.followers, true) },
+    { label: "Following", value: formatTwMetric(analytics.kpis.following, true) },
+    { label: "Sampled Posts", value: formatTwMetric(analytics.kpis.sampledPosts, true) },
+    { label: "Engagement", value: `${analytics.kpis.engagementRate}%` },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <StatCard key={stat.label} label={stat.label} value={stat.value} />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Profile Reach">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Followers</span>
+              <span className="font-medium">{analytics.profile.followersLabel}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Following</span>
+              <span className="font-medium">{formatTwMetric(analytics.profile.following)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Total posts</span>
+              <span className="font-medium">{formatTwMetric(analytics.profile.totalPosts)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Engagement rate</span>
+              <span className="font-medium text-dt-green">{analytics.kpis.engagementRate}%</span>
+            </div>
+          </div>
+        </Panel>
+        <Panel title="Recent Engagement">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Avg. likes</span>
+              <span className="font-medium">{formatTwMetric(analytics.kpis.avgLikes)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Avg. replies</span>
+              <span className="font-medium">{formatTwMetric(analytics.kpis.avgReplies)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Avg. reposts</span>
+              <span className="font-medium">{formatTwMetric(analytics.kpis.avgReposts)}</span>
+            </div>
+          </div>
+        </Panel>
+      </div>
+      <Panel title="Top Posts">
+        {analytics.topPosts.map((post) => (
+          <a
+            key={post.id}
+            href={post.permalink}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-between border-b border-dt-border/50 py-2 text-sm last:border-0 hover:text-dt-red"
+          >
+            <span className="line-clamp-1 pr-3">{twTextPreview(post.text, 60)}</span>
+            <span className="shrink-0 font-medium">
+              {formatTwMetric(post.likes + post.replies + post.reposts)} engagement
+            </span>
+          </a>
+        ))}
+      </Panel>
+    </div>
+  );
+}
+
 function OverviewAudiencePage() {
   return (
     <div className="space-y-4">
@@ -380,6 +459,7 @@ export function AudienceOverviewPage() {
       instagram={(analytics) => <InstagramAudienceOverview analytics={analytics} />}
       youtube={(analytics) => <YouTubeAudienceOverview analytics={analytics} />}
       facebook={(analytics) => <FacebookAudienceOverview analytics={analytics} />}
+      twitter={(analytics) => <TwitterAudienceOverview analytics={analytics} />}
     />
   );
 }
@@ -563,6 +643,51 @@ function FacebookFanProfiles({ analytics }: { analytics: FacebookAnalytics }) {
   );
 }
 
+function TwitterFanProfiles({ analytics }: { analytics: TwitterAnalytics }) {
+  const [query, setQuery] = useState("");
+  const filtered = analytics.recentPosts.filter((post) =>
+    post.text.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  return (
+    <Panel title="Recent X Posts">
+      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
+        <Search size={14} className="text-dt-muted" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search posts..."
+          className="flex-1 bg-transparent text-sm outline-none"
+        />
+      </div>
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-dt-border text-xs text-dt-muted">
+            <th className="pb-2">Post</th>
+            <th className="pb-2">Likes</th>
+            <th className="pb-2">Replies</th>
+            <th className="pb-2">Posted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((post) => (
+            <tr key={post.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
+              <td className="py-3">
+                <a href={post.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-dt-red">
+                  {twTextPreview(post.text, 50)}
+                </a>
+              </td>
+              <td className="py-3">{formatTwMetric(post.likes)}</td>
+              <td className="py-3">{formatTwMetric(post.replies)}</td>
+              <td className="py-3 text-dt-muted">{formatTwPostDate(post.createdAt)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Panel>
+  );
+}
+
 export function FanProfilesPage() {
   const [query, setQuery] = useState("");
   const filtered = fans.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()));
@@ -610,6 +735,7 @@ export function FanProfilesPage() {
       instagram={(analytics) => <InstagramFanProfiles analytics={analytics} />}
       youtube={(analytics) => <YouTubeFanProfiles analytics={analytics} />}
       facebook={(analytics) => <FacebookFanProfiles analytics={analytics} />}
+      twitter={(analytics) => <TwitterFanProfiles analytics={analytics} />}
     />
   );
 }
@@ -739,6 +865,29 @@ function FacebookSubscribers({ analytics }: { analytics: FacebookAnalytics }) {
   );
 }
 
+function TwitterSubscribers({ analytics }: { analytics: TwitterAnalytics }) {
+  return (
+    <Panel title="@Dame_Lillard on X">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <StatCard label="Followers" value={formatTwMetric(analytics.kpis.followers)} />
+        <StatCard label="Following" value={formatTwMetric(analytics.kpis.following)} />
+        <StatCard label="Engagement" value={`${analytics.kpis.engagementRate}%`} />
+      </div>
+      <p className="mb-3 text-sm text-dt-muted">
+        X does not expose email/SMS subscribers publicly. Showing live profile reach instead.
+      </p>
+      <a
+        href={analytics.profile.permalink}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex text-sm text-dt-red hover:underline"
+      >
+        View {analytics.profile.handle} on X
+      </a>
+    </Panel>
+  );
+}
+
 export function SubscribersPage() {
   return (
     <AnalyticsPageGate
@@ -786,6 +935,7 @@ export function SubscribersPage() {
       instagram={(analytics) => <InstagramSubscribers analytics={analytics} />}
       youtube={(analytics) => <YouTubeSubscribers analytics={analytics} />}
       facebook={(analytics) => <FacebookSubscribers analytics={analytics} />}
+      twitter={(analytics) => <TwitterSubscribers analytics={analytics} />}
     />
   );
 }
@@ -909,6 +1059,32 @@ export function BehaviorInsightsPage() {
                     <span className="font-medium">{s.step}</span>
                     <span>
                       {formatFbMetric(s.users)}
+                      {s.suffix ?? ""}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+      twitter={(analytics) => (
+        <Panel title="X Engagement Funnel">
+          <div className="space-y-2">
+            {[
+              { step: "Followers", users: analytics.kpis.followers },
+              { step: "Following", users: analytics.kpis.following },
+              { step: "Avg. likes per post", users: analytics.kpis.avgLikes },
+              { step: "Recent posts sampled", users: analytics.recentPosts.length },
+              { step: "Engagement rate", users: analytics.kpis.engagementRate, suffix: "%" },
+            ].map((s, i) => (
+              <div key={s.step} className="flex items-center gap-4">
+                <span className="w-6 text-center text-xs font-bold text-dt-red">{i + 1}</span>
+                <div className="flex-1 rounded-lg border border-dt-border bg-dt-bg/50 p-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">{s.step}</span>
+                    <span>
+                      {formatTwMetric(s.users)}
                       {s.suffix ?? ""}
                     </span>
                   </div>

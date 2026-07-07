@@ -4,6 +4,7 @@ import type { DametimeAnalytics } from "../../lib/dametimeAnalyticsApi";
 import type { InstagramAnalytics } from "../../lib/instagramAnalyticsApi";
 import type { YouTubeAnalytics } from "../../lib/youtubeAnalyticsApi";
 import type { FacebookAnalytics } from "../../lib/facebookAnalyticsApi";
+import type { TwitterAnalytics } from "../../lib/twitterAnalyticsApi";
 
 export function SourceLoading({ message = "Loading analytics…" }: { message?: string }) {
   return (
@@ -37,7 +38,7 @@ export function DametimeError({ message }: { message: string }) {
 }
 
 export function SourceBanner() {
-  const { isDametime, isInstagram, isYoutube, isFacebook, analytics, loading, instagram, youtube, facebook } =
+  const { isDametime, isInstagram, isYoutube, isFacebook, isTwitter, analytics, loading, instagram, youtube, facebook, twitter } =
     useAnalyticsView();
 
   if (isDametime) {
@@ -103,6 +104,22 @@ export function SourceBanner() {
     );
   }
 
+  if (isTwitter) {
+    return (
+      <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
+        <p className="text-xs font-medium text-white">
+          X filter active — showing{" "}
+          {twitter.analytics?.source === "cache" ? "cached" : "live"} analytics for @Dame_Lillard.
+        </p>
+        {!twitter.loading && twitter.analytics && (
+          <p className="mt-0.5 text-[11px] text-dt-muted">
+            Last synced {new Date(twitter.analytics.syncedAt).toLocaleString()}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -150,12 +167,14 @@ export function AnalyticsPageGate({
   instagram,
   youtube,
   facebook,
+  twitter,
 }: {
   mock: ReactNode;
   dametime?: (analytics: DametimeAnalytics) => ReactNode;
   instagram?: (analytics: InstagramAnalytics) => ReactNode;
   youtube?: (analytics: YouTubeAnalytics) => ReactNode;
   facebook?: (analytics: FacebookAnalytics) => ReactNode;
+  twitter?: (analytics: TwitterAnalytics) => ReactNode;
 }) {
   const view = useAnalyticsView();
 
@@ -197,6 +216,17 @@ export function AnalyticsPageGate({
       return <SourceError title="Could not load Facebook analytics" message="No data available." />;
     }
     return <>{facebook(view.facebook.analytics)}</>;
+  }
+
+  if (view.isTwitter && twitter) {
+    if (view.twitter.loading) return <SourceLoading message="Loading X analytics…" />;
+    if (view.twitter.error) {
+      return <SourceError title="Could not load X analytics" message={view.twitter.error} />;
+    }
+    if (!view.twitter.analytics) {
+      return <SourceError title="Could not load X analytics" message="No data available." />;
+    }
+    return <>{twitter(view.twitter.analytics)}</>;
   }
 
   return mock;

@@ -23,6 +23,11 @@ import {
   textPreview,
   type FacebookAnalytics,
 } from "../lib/facebookAnalyticsApi";
+import {
+  formatMetric as formatTwMetric,
+  textPreview as twTextPreview,
+  type TwitterAnalytics,
+} from "../lib/twitterAnalyticsApi";
 import { liveActivity } from "../data/mockData";
 
 const comments = [
@@ -251,6 +256,57 @@ function FacebookEngagementOverview({ analytics }: { analytics: FacebookAnalytic
   );
 }
 
+function TwitterEngagementOverview({ analytics }: { analytics: TwitterAnalytics }) {
+  const totalEngagement = analytics.recentPosts.reduce(
+    (sum, post) => sum + post.likes + post.replies + post.reposts,
+    0,
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Followers" value={formatTwMetric(analytics.kpis.followers, true)} />
+        <StatCard label="Avg. Likes" value={formatTwMetric(analytics.kpis.avgLikes, true)} />
+        <StatCard label="Avg. Replies" value={formatTwMetric(analytics.kpis.avgReplies, true)} />
+        <StatCard label="Recent Engagement" value={formatTwMetric(totalEngagement, true)} />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Performance Mix">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Following</span>
+              <span className="font-medium">{formatTwMetric(analytics.profile.following)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Posts sampled</span>
+              <span className="font-medium">{formatTwMetric(analytics.kpis.sampledPosts)}</span>
+            </div>
+            <div className="h-2 rounded-full bg-dt-border">
+              <div className="h-full rounded-full bg-dt-red" style={{ width: "72%" }} />
+            </div>
+          </div>
+        </Panel>
+        <Panel title="Recent Posts">
+          {analytics.recentPosts.slice(0, 6).map((post) => (
+            <a
+              key={post.id}
+              href={post.permalink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between border-b border-dt-border/50 py-2 last:border-0 hover:text-dt-red"
+            >
+              <p className="line-clamp-1 flex-1 pr-3 text-sm text-white">{twTextPreview(post.text, 60)}</p>
+              <p className="shrink-0 text-xs text-dt-muted">
+                {formatTwMetric(post.likes)} likes · {formatTwMetric(post.replies)} replies
+              </p>
+            </a>
+          ))}
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
 function OverviewEngagementPage() {
   return (
     <div className="space-y-4">
@@ -302,6 +358,7 @@ export function EngagementOverviewPage() {
       instagram={(analytics) => <InstagramEngagementOverview analytics={analytics} />}
       youtube={(analytics) => <YouTubeEngagementOverview analytics={analytics} />}
       facebook={(analytics) => <FacebookEngagementOverview analytics={analytics} />}
+      twitter={(analytics) => <TwitterEngagementOverview analytics={analytics} />}
     />
   );
 }
@@ -442,6 +499,29 @@ export function CommentsPage() {
           </div>
         </Panel>
       )}
+      twitter={(analytics) => (
+        <Panel title="Top Posts by Engagement">
+          <div className="space-y-2">
+            {analytics.topPosts.map((post, index) => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-dt-red">{index + 1}</span>
+                  <span className="line-clamp-1 text-sm font-medium">{twTextPreview(post.text, 50)}</span>
+                </div>
+                <span className="shrink-0 text-sm text-dt-muted">
+                  {formatTwMetric(post.likes + post.replies + post.reposts)} interactions
+                </span>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
     />
   );
 }
@@ -564,6 +644,26 @@ export function MessagesPage() {
                 <p className="line-clamp-2 flex-1 pr-3 text-sm text-white">{textPreview(post.text, 80)}</p>
                 <p className="shrink-0 text-xs text-dt-muted">
                   {formatFbMetric(post.likes)} likes · {formatFbMetric(post.comments)} comments
+                </p>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
+      twitter={(analytics) => (
+        <Panel title="Recent X Posts">
+          <div className="space-y-2">
+            {analytics.recentPosts.map((post) => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0 hover:text-dt-red"
+              >
+                <p className="line-clamp-2 flex-1 pr-3 text-sm text-white">{twTextPreview(post.text, 80)}</p>
+                <p className="shrink-0 text-xs text-dt-muted">
+                  {formatTwMetric(post.likes)} likes · {formatTwMetric(post.replies)} replies
                 </p>
               </a>
             ))}

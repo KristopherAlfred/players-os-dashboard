@@ -14,6 +14,7 @@ import { DametimeAnalyticsDashboard } from "../components/dametime/DametimeAnaly
 import { InstagramAnalyticsDashboard } from "../components/instagram/InstagramAnalyticsDashboard";
 import { YouTubeAnalyticsDashboard } from "../components/youtube/YouTubeAnalyticsDashboard";
 import { FacebookAnalyticsDashboard } from "../components/facebook/FacebookAnalyticsDashboard";
+import { TwitterAnalyticsDashboard } from "../components/twitter/TwitterAnalyticsDashboard";
 import { useDashboardSource } from "../contexts/DashboardSourceContext";
 
 function OverviewDashboard() {
@@ -85,6 +86,10 @@ export function DashboardPage() {
 
   if (source === "facebook") {
     return <FacebookAnalyticsDashboard />;
+  }
+
+  if (source === "twitter") {
+    return <TwitterAnalyticsDashboard />;
   }
 
   return <OverviewDashboard />;

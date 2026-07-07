@@ -8,6 +8,7 @@ import { DametimeAnalyticsProvider } from "../contexts/DametimeAnalyticsContext"
 import { InstagramAnalyticsProvider } from "../contexts/InstagramAnalyticsContext";
 import { YouTubeAnalyticsProvider } from "../contexts/YouTubeAnalyticsContext";
 import { FacebookAnalyticsProvider } from "../contexts/FacebookAnalyticsContext";
+import { TwitterAnalyticsProvider } from "../contexts/TwitterAnalyticsContext";
 import { SourceBanner } from "../components/dametime/DametimeAnalyticsStates";
 
 export function AppLayout() {
@@ -35,6 +36,7 @@ export function AppLayout() {
         <InstagramAnalyticsProvider>
           <YouTubeAnalyticsProvider>
             <FacebookAnalyticsProvider>
+            <TwitterAnalyticsProvider>
             <div className="flex h-[100dvh] overflow-hidden bg-dt-bg">
             <Sidebar
               mobileOpen={mobileNavOpen}
@@ -54,6 +56,7 @@ export function AppLayout() {
               </main>
             </div>
           </div>
+          </TwitterAnalyticsProvider>
           </FacebookAnalyticsProvider>
           </YouTubeAnalyticsProvider>
         </InstagramAnalyticsProvider>
