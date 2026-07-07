@@ -152,7 +152,7 @@ async function enrichFollowerStats(analytics: FacebookAnalytics): Promise<Facebo
 
 export async function fetchFacebookAnalytics(): Promise<FacebookAnalytics | null> {
   const base = getApiBase();
-  const apiUrls = [`${base}/api/facebook/analytics`, `${base}/api/facebook-analytics`];
+  const apiUrls = [`${base}/api/social/analytics?source=facebook`, `${base}/api/facebook/analytics`, `${base}/api/facebook-analytics`];
 
   for (const url of apiUrls) {
     try {

@@ -67,17 +67,25 @@ export function instagramProfileImage(profile: InstagramAnalytics["profile"]) {
 }
 
 export async function fetchInstagramAnalytics(): Promise<InstagramAnalytics | null> {
-  try {
-    const response = await fetch(
-      `${getApiBase()}/api/instagram/analytics?username=damianlillard`,
-    );
-    if (!response.ok) return null;
-    const data = (await response.json()) as InstagramAnalytics & { ok?: boolean };
-    if (!data?.kpis) return null;
-    return data;
-  } catch {
-    return null;
+  const base = getApiBase();
+  const apiUrls = [
+    `${base}/api/social/analytics?source=instagram&username=damianlillard`,
+    `${base}/api/instagram/analytics?username=damianlillard`,
+  ];
+
+  for (const url of apiUrls) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const data = (await response.json()) as InstagramAnalytics & { ok?: boolean };
+      if (!data?.kpis) continue;
+      return data;
+    } catch {
+      // try next source
+    }
   }
+
+  return null;
 }
 
 export function formatMetric(value: number, compact = false) {
