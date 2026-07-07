@@ -10,8 +10,10 @@ import { DeviceBreakdown } from "../components/DeviceBreakdown";
 import { MonetizationOverview } from "../components/MonetizationOverview";
 import { TopPerformingContent } from "../components/TopPerformingContent";
 import { Footer } from "../components/Footer";
+import { DametimeAnalyticsDashboard } from "../components/dametime/DametimeAnalyticsDashboard";
+import { useDashboardSource } from "../contexts/DashboardSourceContext";
 
-export function DashboardPage() {
+function OverviewDashboard() {
   return (
     <div className="space-y-3 pb-4">
       <KpiCards />
@@ -61,4 +63,14 @@ export function DashboardPage() {
       <Footer />
     </div>
   );
+}
+
+export function DashboardPage() {
+  const { source } = useDashboardSource();
+
+  if (source === "dametime") {
+    return <DametimeAnalyticsDashboard />;
+  }
+
+  return <OverviewDashboard />;
 }
