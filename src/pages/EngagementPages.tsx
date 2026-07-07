@@ -13,6 +13,11 @@ import {
   formatMetric as formatIgMetric,
   type InstagramAnalytics,
 } from "../lib/instagramAnalyticsApi";
+import {
+  formatMetric as formatYtMetric,
+  titlePreview,
+  type YouTubeAnalytics,
+} from "../lib/youtubeAnalyticsApi";
 import { liveActivity } from "../data/mockData";
 
 const comments = [
@@ -139,6 +144,57 @@ function InstagramEngagementOverview({ analytics }: { analytics: InstagramAnalyt
   );
 }
 
+function YouTubeEngagementOverview({ analytics }: { analytics: YouTubeAnalytics }) {
+  const totalEngagement = analytics.recentVideos.reduce(
+    (sum, video) => sum + video.viewCount + video.likeCount,
+    0,
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Subscribers" value={formatYtMetric(analytics.kpis.subscribers, true)} />
+        <StatCard label="Avg. Views" value={formatYtMetric(analytics.kpis.avgViews, true)} />
+        <StatCard label="Avg. Likes" value={formatYtMetric(analytics.kpis.avgLikes, true)} />
+        <StatCard label="Recent Engagement" value={formatYtMetric(totalEngagement, true)} />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Performance Mix">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Total views (tracked)</span>
+              <span className="font-medium">{formatYtMetric(analytics.kpis.totalViews)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Videos tracked</span>
+              <span className="font-medium">{formatYtMetric(analytics.kpis.totalVideos)}</span>
+            </div>
+            <div className="h-2 rounded-full bg-dt-border">
+              <div className="h-full rounded-full bg-dt-red" style={{ width: "72%" }} />
+            </div>
+          </div>
+        </Panel>
+        <Panel title="Recent Videos">
+          {analytics.recentVideos.slice(0, 6).map((video) => (
+            <a
+              key={video.id}
+              href={video.permalink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between border-b border-dt-border/50 py-2 last:border-0 hover:text-dt-red"
+            >
+              <p className="line-clamp-1 flex-1 pr-3 text-sm text-white">{titlePreview(video.title, 60)}</p>
+              <p className="shrink-0 text-xs text-dt-muted">
+                {formatYtMetric(video.viewCount)} views · {formatYtMetric(video.likeCount)} likes
+              </p>
+            </a>
+          ))}
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
 function OverviewEngagementPage() {
   return (
     <div className="space-y-4">
@@ -188,6 +244,7 @@ export function EngagementOverviewPage() {
       mock={<OverviewEngagementPage />}
       dametime={(analytics) => <DametimeEngagementOverview analytics={analytics} />}
       instagram={(analytics) => <InstagramEngagementOverview analytics={analytics} />}
+      youtube={(analytics) => <YouTubeEngagementOverview analytics={analytics} />}
     />
   );
 }
@@ -282,6 +339,29 @@ export function CommentsPage() {
           </div>
         </Panel>
       )}
+      youtube={(analytics) => (
+        <Panel title="Top Videos by Engagement">
+          <div className="space-y-2">
+            {analytics.topVideos.map((video, index) => (
+              <a
+                key={video.id}
+                href={video.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-dt-red">{index + 1}</span>
+                  <span className="line-clamp-1 text-sm font-medium">{titlePreview(video.title, 50)}</span>
+                </div>
+                <span className="shrink-0 text-sm text-dt-muted">
+                  {formatYtMetric(video.viewCount + video.likeCount)} interactions
+                </span>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
     />
   );
 }
@@ -364,6 +444,26 @@ export function MessagesPage() {
                 <p className="line-clamp-2 flex-1 pr-3 text-sm text-white">{captionPreview(post.caption, 80)}</p>
                 <p className="shrink-0 text-xs text-dt-muted">
                   {formatIgMetric(post.likes)} likes · {formatIgMetric(post.comments)} comments
+                </p>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
+      youtube={(analytics) => (
+        <Panel title="Recent YouTube Videos">
+          <div className="space-y-2">
+            {analytics.recentVideos.map((video) => (
+              <a
+                key={video.id}
+                href={video.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0 hover:text-dt-red"
+              >
+                <p className="line-clamp-2 flex-1 pr-3 text-sm text-white">{titlePreview(video.title, 80)}</p>
+                <p className="shrink-0 text-xs text-dt-muted">
+                  {formatYtMetric(video.viewCount)} views · {formatYtMetric(video.likeCount)} likes
                 </p>
               </a>
             ))}

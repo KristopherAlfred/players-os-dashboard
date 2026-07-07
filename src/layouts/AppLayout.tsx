@@ -6,6 +6,7 @@ import { routeMeta } from "../config/navigation";
 import { DashboardSourceProvider } from "../contexts/DashboardSourceContext";
 import { DametimeAnalyticsProvider } from "../contexts/DametimeAnalyticsContext";
 import { InstagramAnalyticsProvider } from "../contexts/InstagramAnalyticsContext";
+import { YouTubeAnalyticsProvider } from "../contexts/YouTubeAnalyticsContext";
 import { SourceBanner } from "../components/dametime/DametimeAnalyticsStates";
 
 export function AppLayout() {
@@ -31,7 +32,8 @@ export function AppLayout() {
     <DashboardSourceProvider>
       <DametimeAnalyticsProvider>
         <InstagramAnalyticsProvider>
-          <div className="flex h-[100dvh] overflow-hidden bg-dt-bg">
+          <YouTubeAnalyticsProvider>
+            <div className="flex h-[100dvh] overflow-hidden bg-dt-bg">
             <Sidebar
               mobileOpen={mobileNavOpen}
               onClose={() => setMobileNavOpen(false)}
@@ -50,6 +52,7 @@ export function AppLayout() {
               </main>
             </div>
           </div>
+          </YouTubeAnalyticsProvider>
         </InstagramAnalyticsProvider>
       </DametimeAnalyticsProvider>
     </DashboardSourceProvider>

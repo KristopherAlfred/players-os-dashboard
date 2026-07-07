@@ -9,6 +9,7 @@ const filterOptions: { id: DashboardSource; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "dametime", label: "Dametime" },
   { id: "instagram", label: "Instagram" },
+  { id: "youtube", label: "YouTube" },
 ];
 
 export function Header({

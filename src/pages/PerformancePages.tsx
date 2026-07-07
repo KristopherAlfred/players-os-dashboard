@@ -18,6 +18,11 @@ import {
   formatMetric as formatIgMetric,
   type InstagramAnalytics,
 } from "../lib/instagramAnalyticsApi";
+import {
+  formatMetric as formatYtMetric,
+  titlePreview,
+  type YouTubeAnalytics,
+} from "../lib/youtubeAnalyticsApi";
 import { trafficOverTime, trafficSources } from "../data/mockData";
 
 const campaigns = [
@@ -160,6 +165,85 @@ function InstagramTrafficOverview({ analytics }: { analytics: InstagramAnalytics
   );
 }
 
+function YouTubeTrafficOverview({ analytics }: { analytics: YouTubeAnalytics }) {
+  const lineData = [...analytics.recentVideos]
+    .sort((a, b) => Date.parse(a.publishedAt) - Date.parse(b.publishedAt))
+    .map((video) => ({
+      label: new Date(video.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      views: video.viewCount,
+      likes: video.likeCount,
+    }));
+
+  const barData = analytics.topVideos.slice(0, 6).map((video, index) => ({
+    label: `#${index + 1}`,
+    views: video.viewCount,
+    likes: video.likeCount,
+  }));
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Subscribers" value={formatYtMetric(analytics.kpis.subscribers, true)} />
+        <StatCard label="Total Videos" value={formatYtMetric(analytics.kpis.totalVideos, true)} />
+        <StatCard label="Avg. Views" value={formatYtMetric(analytics.kpis.avgViews, true)} />
+        <StatCard label="Engagement" value={`${analytics.kpis.engagementRate}%`} />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Video Performance Over Time">
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={lineData}>
+              <CartesianGrid stroke="#1e1e1e" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line type="monotone" dataKey="views" name="Views" stroke="#e50914" strokeWidth={2} dot={{ fill: "#e50914", r: 3 }} />
+              <Line type="monotone" dataKey="likes" name="Likes" stroke="#22c55e" strokeWidth={2} dot={{ fill: "#22c55e", r: 2 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Panel>
+        <Panel title="Top Videos by Views">
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={barData}>
+              <CartesianGrid stroke="#1e1e1e" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: "#6b6b6b", fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="views" name="Views" fill="#e50914" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="likes" name="Likes" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Panel>
+      </div>
+      <Panel title="Top Videos">
+        {analytics.topVideos.map((video) => (
+          <a
+            key={video.id}
+            href={video.permalink}
+            target="_blank"
+            rel="noreferrer"
+            className="mb-3 block"
+          >
+            <div className="mb-1 flex justify-between text-sm">
+              <span className="line-clamp-1 pr-3">{titlePreview(video.title, 40)}</span>
+              <span>{formatYtMetric(video.viewCount)} views</span>
+            </div>
+            <div className="h-2 rounded-full bg-dt-border">
+              <div
+                className="h-full rounded-full bg-dt-red"
+                style={{
+                  width: `${Math.max(8, Math.round((video.viewCount / Math.max(analytics.topVideos[0]?.viewCount ?? 1, 1)) * 100))}%`,
+                }}
+              />
+            </div>
+          </a>
+        ))}
+      </Panel>
+    </div>
+  );
+}
+
 function OverviewTrafficPage() {
   return (
     <div className="space-y-4">
@@ -210,6 +294,7 @@ export function TrafficOverviewPage() {
       mock={<OverviewTrafficPage />}
       dametime={(analytics) => <DametimeTrafficOverview analytics={analytics} />}
       instagram={(analytics) => <InstagramTrafficOverview analytics={analytics} />}
+      youtube={(analytics) => <YouTubeTrafficOverview analytics={analytics} />}
     />
   );
 }
@@ -288,6 +373,33 @@ export function ConversionFunnelPage() {
                     <span className="font-medium line-clamp-1 pr-3">{captionPreview(post.caption, 40)}</span>
                     <span>
                       {formatIgMetric(post.likes)} likes ({pct}%)
+                    </span>
+                  </div>
+                  <div className="h-8 overflow-hidden rounded-md bg-dt-border">
+                    <div
+                      className="flex h-full items-center rounded-md bg-dt-red px-3 text-xs font-medium"
+                      style={{ width: `${Math.max(pct, 8)}%` }}
+                    >
+                      {pct}%
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Panel>
+      )}
+      youtube={(analytics) => (
+        <Panel title="Video Performance Funnel">
+          <div className="space-y-3">
+            {analytics.topVideos.slice(0, 5).map((video, _index, arr) => {
+              const pct = arr[0]?.viewCount ? Math.round((video.viewCount / arr[0].viewCount) * 100) : 0;
+              return (
+                <div key={video.id}>
+                  <div className="mb-1 flex justify-between text-sm">
+                    <span className="line-clamp-1 pr-3 font-medium">{titlePreview(video.title, 40)}</span>
+                    <span>
+                      {formatYtMetric(video.viewCount)} views ({pct}%)
                     </span>
                   </div>
                   <div className="h-8 overflow-hidden rounded-md bg-dt-border">

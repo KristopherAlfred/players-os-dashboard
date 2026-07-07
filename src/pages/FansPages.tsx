@@ -10,6 +10,12 @@ import {
   formatRelativeTime,
   type InstagramAnalytics,
 } from "../lib/instagramAnalyticsApi";
+import {
+  formatMetric as formatYtMetric,
+  formatRelativeTime as formatYtRelativeTime,
+  titlePreview,
+  type YouTubeAnalytics,
+} from "../lib/youtubeAnalyticsApi";
 import { ageDemographics, topCountries, audienceSnapshot } from "../data/mockData";
 
 const fans = [
@@ -177,6 +183,73 @@ function InstagramAudienceOverview({ analytics }: { analytics: InstagramAnalytic
   );
 }
 
+function YouTubeAudienceOverview({ analytics }: { analytics: YouTubeAnalytics }) {
+  const stats = [
+    { label: "Subscribers", value: formatYtMetric(analytics.kpis.subscribers, true) },
+    { label: "Total Videos", value: formatYtMetric(analytics.kpis.totalVideos, true) },
+    { label: "Total Views", value: formatYtMetric(analytics.kpis.totalViews, true) },
+    { label: "Engagement", value: `${analytics.kpis.engagementRate}%` },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <StatCard key={stat.label} label={stat.label} value={stat.value} />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Channel Reach">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Subscribers</span>
+              <span className="font-medium">{analytics.channel.subscribersLabel}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Videos tracked</span>
+              <span className="font-medium">{formatYtMetric(analytics.kpis.totalVideos)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Total views</span>
+              <span className="font-medium">{formatYtMetric(analytics.kpis.totalViews)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Avg. views / video</span>
+              <span className="font-medium text-dt-green">{formatYtMetric(analytics.kpis.avgViews)}</span>
+            </div>
+          </div>
+        </Panel>
+        <Panel title="Engagement">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Avg. likes</span>
+              <span className="font-medium">{formatYtMetric(analytics.kpis.avgLikes)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Engagement rate</span>
+              <span className="font-medium">{analytics.kpis.engagementRate}%</span>
+            </div>
+          </div>
+        </Panel>
+      </div>
+      <Panel title="Top Videos">
+        {analytics.topVideos.map((video) => (
+          <a
+            key={video.id}
+            href={video.permalink}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-between border-b border-dt-border/50 py-2 text-sm last:border-0 hover:text-dt-red"
+          >
+            <span className="line-clamp-1 pr-3">{titlePreview(video.title, 60)}</span>
+            <span className="shrink-0 font-medium">{formatYtMetric(video.viewCount)} views</span>
+          </a>
+        ))}
+      </Panel>
+    </div>
+  );
+}
+
 function OverviewAudiencePage() {
   return (
     <div className="space-y-4">
@@ -226,6 +299,7 @@ export function AudienceOverviewPage() {
       mock={<OverviewAudiencePage />}
       dametime={(analytics) => <DametimeAudienceOverview analytics={analytics} />}
       instagram={(analytics) => <InstagramAudienceOverview analytics={analytics} />}
+      youtube={(analytics) => <YouTubeAudienceOverview analytics={analytics} />}
     />
   );
 }
@@ -319,6 +393,51 @@ function InstagramFanProfiles({ analytics }: { analytics: InstagramAnalytics }) 
   );
 }
 
+function YouTubeFanProfiles({ analytics }: { analytics: YouTubeAnalytics }) {
+  const [query, setQuery] = useState("");
+  const filtered = analytics.recentVideos.filter((video) =>
+    video.title.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  return (
+    <Panel title="Recent YouTube Videos">
+      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
+        <Search size={14} className="text-dt-muted" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search titles..."
+          className="flex-1 bg-transparent text-sm outline-none"
+        />
+      </div>
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-dt-border text-xs text-dt-muted">
+            <th className="pb-2">Video</th>
+            <th className="pb-2">Views</th>
+            <th className="pb-2">Likes</th>
+            <th className="pb-2">Posted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((video) => (
+            <tr key={video.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
+              <td className="py-3">
+                <a href={video.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-dt-red">
+                  {titlePreview(video.title, 50)}
+                </a>
+              </td>
+              <td className="py-3">{formatYtMetric(video.viewCount)}</td>
+              <td className="py-3">{formatYtMetric(video.likeCount)}</td>
+              <td className="py-3 text-dt-muted">{formatYtRelativeTime(video.publishedAt)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Panel>
+  );
+}
+
 export function FanProfilesPage() {
   const [query, setQuery] = useState("");
   const filtered = fans.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()));
@@ -364,6 +483,7 @@ export function FanProfilesPage() {
       }
       dametime={(analytics) => <DametimeFanProfiles analytics={analytics} />}
       instagram={(analytics) => <InstagramFanProfiles analytics={analytics} />}
+      youtube={(analytics) => <YouTubeFanProfiles analytics={analytics} />}
     />
   );
 }
@@ -447,6 +567,29 @@ function InstagramSubscribers({ analytics }: { analytics: InstagramAnalytics }) 
   );
 }
 
+function YouTubeSubscribers({ analytics }: { analytics: YouTubeAnalytics }) {
+  return (
+    <Panel title="@DamianLillard on YouTube">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <StatCard label="Subscribers" value={formatYtMetric(analytics.kpis.subscribers)} />
+        <StatCard label="Total Views" value={formatYtMetric(analytics.kpis.totalViews)} />
+        <StatCard label="Avg. Engagement" value={`${analytics.kpis.engagementRate}%`} />
+      </div>
+      <p className="mb-3 text-sm text-dt-muted">
+        YouTube does not expose email/SMS subscribers publicly. Showing live channel reach instead.
+      </p>
+      <a
+        href={analytics.channel.permalink}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex text-sm text-dt-red hover:underline"
+      >
+        View {analytics.channel.handle} on YouTube
+      </a>
+    </Panel>
+  );
+}
+
 export function SubscribersPage() {
   return (
     <AnalyticsPageGate
@@ -492,6 +635,7 @@ export function SubscribersPage() {
       }
       dametime={(analytics) => <DametimeSubscribers analytics={analytics} />}
       instagram={(analytics) => <InstagramSubscribers analytics={analytics} />}
+      youtube={(analytics) => <YouTubeSubscribers analytics={analytics} />}
     />
   );
 }
@@ -563,6 +707,32 @@ export function BehaviorInsightsPage() {
                     <span className="font-medium">{s.step}</span>
                     <span>
                       {formatIgMetric(s.users)}
+                      {s.suffix ?? ""}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+      youtube={(analytics) => (
+        <Panel title="YouTube Engagement Funnel">
+          <div className="space-y-2">
+            {[
+              { step: "Subscribers", users: analytics.kpis.subscribers },
+              { step: "Avg. views per video", users: analytics.kpis.avgViews },
+              { step: "Avg. likes per video", users: analytics.kpis.avgLikes },
+              { step: "Recent videos sampled", users: analytics.recentVideos.length },
+              { step: "Engagement rate", users: analytics.kpis.engagementRate, suffix: "%" },
+            ].map((s, i) => (
+              <div key={s.step} className="flex items-center gap-4">
+                <span className="w-6 text-center text-xs font-bold text-dt-red">{i + 1}</span>
+                <div className="flex-1 rounded-lg border border-dt-border bg-dt-bg/50 p-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">{s.step}</span>
+                    <span>
+                      {formatYtMetric(s.users)}
                       {s.suffix ?? ""}
                     </span>
                   </div>

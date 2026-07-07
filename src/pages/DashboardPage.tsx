@@ -12,6 +12,7 @@ import { TopPerformingContent } from "../components/TopPerformingContent";
 import { Footer } from "../components/Footer";
 import { DametimeAnalyticsDashboard } from "../components/dametime/DametimeAnalyticsDashboard";
 import { InstagramAnalyticsDashboard } from "../components/instagram/InstagramAnalyticsDashboard";
+import { YouTubeAnalyticsDashboard } from "../components/youtube/YouTubeAnalyticsDashboard";
 import { useDashboardSource } from "../contexts/DashboardSourceContext";
 
 function OverviewDashboard() {
@@ -75,6 +76,10 @@ export function DashboardPage() {
 
   if (source === "instagram") {
     return <InstagramAnalyticsDashboard />;
+  }
+
+  if (source === "youtube") {
+    return <YouTubeAnalyticsDashboard />;
   }
 
   return <OverviewDashboard />;

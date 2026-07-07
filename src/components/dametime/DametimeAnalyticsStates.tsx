@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useAnalyticsView } from "../../hooks/useAnalyticsView";
 import type { DametimeAnalytics } from "../../lib/dametimeAnalyticsApi";
 import type { InstagramAnalytics } from "../../lib/instagramAnalyticsApi";
+import type { YouTubeAnalytics } from "../../lib/youtubeAnalyticsApi";
 
 export function SourceLoading({ message = "Loading analytics…" }: { message?: string }) {
   return (
@@ -35,7 +36,8 @@ export function DametimeError({ message }: { message: string }) {
 }
 
 export function SourceBanner() {
-  const { isDametime, isInstagram, analytics, loading, instagram } = useAnalyticsView();
+  const { isDametime, isInstagram, isYoutube, analytics, loading, instagram, youtube } =
+    useAnalyticsView();
 
   if (isDametime) {
     return (
@@ -62,6 +64,22 @@ export function SourceBanner() {
         {!instagram.loading && instagram.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
             Last synced {new Date(instagram.analytics.syncedAt).toLocaleString()}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (isYoutube) {
+    return (
+      <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
+        <p className="text-xs font-medium text-white">
+          YouTube filter active — showing{" "}
+          {youtube.analytics?.source === "cache" ? "cached" : "live"} analytics for @DamianLillard.
+        </p>
+        {!youtube.loading && youtube.analytics && (
+          <p className="mt-0.5 text-[11px] text-dt-muted">
+            Last synced {new Date(youtube.analytics.syncedAt).toLocaleString()}
           </p>
         )}
       </div>
@@ -113,10 +131,12 @@ export function AnalyticsPageGate({
   mock,
   dametime,
   instagram,
+  youtube,
 }: {
   mock: ReactNode;
   dametime?: (analytics: DametimeAnalytics) => ReactNode;
   instagram?: (analytics: InstagramAnalytics) => ReactNode;
+  youtube?: (analytics: YouTubeAnalytics) => ReactNode;
 }) {
   const view = useAnalyticsView();
 
@@ -136,6 +156,17 @@ export function AnalyticsPageGate({
       return <SourceError title="Could not load Instagram analytics" message="No data available." />;
     }
     return <>{instagram(view.instagram.analytics)}</>;
+  }
+
+  if (view.isYoutube && youtube) {
+    if (view.youtube.loading) return <SourceLoading message="Loading YouTube analytics…" />;
+    if (view.youtube.error) {
+      return <SourceError title="Could not load YouTube analytics" message={view.youtube.error} />;
+    }
+    if (!view.youtube.analytics) {
+      return <SourceError title="Could not load YouTube analytics" message="No data available." />;
+    }
+    return <>{youtube(view.youtube.analytics)}</>;
   }
 
   return mock;
