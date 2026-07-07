@@ -42,6 +42,9 @@ async function fetchJsonAnalytics(url: string): Promise<FacebookAnalytics | null
   if (!response.ok || !contentType.includes("application/json")) return null;
   const data = (await response.json()) as FacebookAnalytics & { ok?: boolean };
   if (!data?.kpis) return null;
+  const hasEngagement =
+    Number(data.kpis.avgLikes ?? 0) + Number(data.kpis.avgComments ?? 0) + Number(data.kpis.avgShares ?? 0) > 0;
+  if (!hasEngagement && data.source === "cache") return null;
   return data;
 }
 
