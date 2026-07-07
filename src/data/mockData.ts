@@ -55,7 +55,7 @@ export const recentContent = [
   },
   {
     title: "Y.A.G.I. mixtape out now on all platforms!",
-    type: "Audio",
+    type: "Article",
     status: "Published",
     published: "Oct 3",
     views: "1.8K",
