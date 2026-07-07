@@ -16,8 +16,17 @@ import { YouTubeAnalyticsDashboard } from "../components/youtube/YouTubeAnalytic
 import { FacebookAnalyticsDashboard } from "../components/facebook/FacebookAnalyticsDashboard";
 import { TwitterAnalyticsDashboard } from "../components/twitter/TwitterAnalyticsDashboard";
 import { useDashboardSource } from "../contexts/DashboardSourceContext";
+import { OverviewMetricsProvider } from "../contexts/OverviewMetricsContext";
 
 function OverviewDashboard() {
+  return (
+    <OverviewMetricsProvider>
+      <OverviewDashboardContent />
+    </OverviewMetricsProvider>
+  );
+}
+
+function OverviewDashboardContent() {
   return (
     <div className="space-y-3 pb-4">
       <KpiCards />

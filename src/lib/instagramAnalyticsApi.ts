@@ -85,6 +85,19 @@ export async function fetchInstagramAnalytics(): Promise<InstagramAnalytics | nu
     }
   }
 
+  const cacheUrls = ["/data/instagram-analytics.json", `${base}/data/instagram-analytics.json`];
+  for (const url of cacheUrls) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const data = (await response.json()) as InstagramAnalytics;
+      if (!data?.kpis) continue;
+      return { ...data, source: "cache" };
+    } catch {
+      // try next source
+    }
+  }
+
   return null;
 }
 

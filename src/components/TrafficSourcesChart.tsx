@@ -1,18 +1,20 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Card } from "./ui/Card";
-import { trafficSources } from "../data/mockData";
+import { useOverviewMetrics } from "../contexts/OverviewMetricsContext";
 import { useTheme } from "../theme/ThemeContext";
 
 export function TrafficSourcesChart() {
   const { palette } = useTheme();
+  const { metrics } = useOverviewMetrics();
+  const platformShares = metrics.platformShares;
 
   return (
-    <Card title="Top Traffic Sources" className="h-[280px]">
+    <Card title="Followers by Platform" className="h-[280px]">
       <div className="flex h-[230px] flex-col px-3 pb-3 pt-1">
         <ResponsiveContainer width="100%" height={118}>
           <PieChart>
             <Pie
-              data={trafficSources}
+              data={platformShares}
               cx="50%"
               cy="50%"
               innerRadius={36}
@@ -20,12 +22,15 @@ export function TrafficSourcesChart() {
               paddingAngle={2}
               dataKey="value"
             >
-              {trafficSources.map((entry, i) => (
+              {platformShares.map((entry, i) => (
                 <Cell key={entry.name} fill={palette.trafficShades[i]} />
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number) => [`${value}%`, "Share"]}
+              formatter={(value: number, _name, item) => [
+                `${value}% · ${(item?.payload?.followers ?? 0).toLocaleString()}`,
+                "Share",
+              ]}
               contentStyle={{
                 background: "#1a1a1a",
                 border: "1px solid #2a2a2a",
@@ -39,7 +44,7 @@ export function TrafficSourcesChart() {
           </PieChart>
         </ResponsiveContainer>
         <ul className="mt-2 flex-1 space-y-1.5 overflow-y-auto">
-          {trafficSources.map((s, i) => (
+          {platformShares.map((s, i) => (
             <li
               key={s.name}
               className="flex items-center justify-between gap-3 text-[11px]"

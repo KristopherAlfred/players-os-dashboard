@@ -6,7 +6,7 @@ import {
   Eye,
   TrendingUp,
 } from "lucide-react";
-import { kpiMetrics } from "../data/mockData";
+import { useOverviewMetrics } from "../contexts/OverviewMetricsContext";
 
 const iconMap: Record<string, typeof Users> = {
   users: Users,
@@ -18,9 +18,11 @@ const iconMap: Record<string, typeof Users> = {
 };
 
 export function KpiCards() {
+  const { metrics } = useOverviewMetrics();
+
   return (
     <div className="grid w-full min-w-0 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-      {kpiMetrics.map((kpi) => {
+      {metrics.kpis.map((kpi) => {
         const Icon = iconMap[kpi.icon] ?? Users;
         return (
           <div

@@ -11,17 +11,17 @@ export function MonetizationOverview() {
     <Card title="Monetization Overview" className="flex h-full w-full flex-col">
       <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-3">
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
-          <p className="text-[11px] text-white">Total Audience Segments</p>
-          <p className="mt-1 text-2xl font-bold text-white">28</p>
+          <p className="text-[11px] text-white">Combined Social Reach</p>
+          <p className="mt-1 text-2xl font-bold text-white">20.3M</p>
         </div>
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
-          <p className="text-[11px] text-white">Active on DSPs</p>
-          <p className="mt-1 text-2xl font-bold text-white">14</p>
+          <p className="text-[11px] text-white">Platforms Tracked</p>
+          <p className="mt-1 text-2xl font-bold text-white">4</p>
         </div>
         <div className="rounded-lg border border-dt-border bg-dt-bg/50 p-3">
-          <p className="text-[11px] text-white">Revenue (MTD)</p>
-          <p className="mt-1 text-2xl font-bold text-white">$96,420</p>
-          <p className="text-xs font-medium text-dt-green">+24.7%</p>
+          <p className="text-[11px] text-white">Avg. Likes / Post</p>
+          <p className="mt-1 text-2xl font-bold text-white">31.7K</p>
+          <p className="text-xs font-medium text-dt-green">+6.3%</p>
         </div>
       </div>
       <div className="border-t border-dt-border px-4 py-3">
