@@ -126,12 +126,25 @@ function InstagramAudienceOverview({ analytics }: { analytics: InstagramAnalytic
         ))}
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Panel title="Profile">
-          <p className="text-sm font-medium text-white">{analytics.profile.fullName}</p>
-          <p className="text-xs text-pink-400">@{analytics.profile.username}</p>
-          {analytics.profile.biography && (
-            <p className="mt-2 text-sm text-dt-muted">{analytics.profile.biography}</p>
-          )}
+        <Panel title="Audience Reach">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Followers</span>
+              <span className="font-medium">{formatIgMetric(analytics.kpis.followers)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Following</span>
+              <span className="font-medium">{formatIgMetric(analytics.kpis.following)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Total posts</span>
+              <span className="font-medium">{formatIgMetric(analytics.kpis.totalPosts)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Engagement rate</span>
+              <span className="font-medium text-dt-green">{analytics.kpis.engagementRate}%</span>
+            </div>
+          </div>
         </Panel>
         <Panel title="Recent Engagement">
           <div className="space-y-2">
@@ -153,7 +166,7 @@ function InstagramAudienceOverview({ analytics }: { analytics: InstagramAnalytic
             href={post.permalink}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-between border-b border-dt-border/50 py-2 text-sm last:border-0 hover:text-pink-400"
+            className="flex items-center justify-between border-b border-dt-border/50 py-2 text-sm last:border-0 hover:text-dt-red"
           >
             <span className="line-clamp-1 pr-3">{captionPreview(post.caption, 60)}</span>
             <span className="shrink-0 font-medium">{formatIgMetric(post.likes)} likes</span>
@@ -291,7 +304,7 @@ function InstagramFanProfiles({ analytics }: { analytics: InstagramAnalytics }) 
           {filtered.map((post) => (
             <tr key={post.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
               <td className="py-3">
-                <a href={post.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-pink-400">
+                <a href={post.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-dt-red">
                   {captionPreview(post.caption, 50)}
                 </a>
               </td>
@@ -426,7 +439,7 @@ function InstagramSubscribers({ analytics }: { analytics: InstagramAnalytics }) 
         href={analytics.profile.permalink}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex text-sm text-pink-400 hover:underline"
+        className="inline-flex text-sm text-dt-red hover:underline"
       >
         View @{analytics.profile.username} on Instagram
       </a>
@@ -544,7 +557,7 @@ export function BehaviorInsightsPage() {
               { step: "Engagement rate", users: analytics.kpis.engagementRate, suffix: "%" },
             ].map((s, i) => (
               <div key={s.step} className="flex items-center gap-4">
-                <span className="w-6 text-center text-xs font-bold text-pink-500">{i + 1}</span>
+                <span className="w-6 text-center text-xs font-bold text-dt-red">{i + 1}</span>
                 <div className="flex-1 rounded-lg border border-dt-border bg-dt-bg/50 p-3">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium">{s.step}</span>

@@ -1,11 +1,14 @@
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { Panel, StatCard } from "../components/PageShell";
 import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
@@ -79,61 +82,80 @@ function DametimeTrafficOverview({ analytics }: { analytics: DametimeAnalytics }
 }
 
 function InstagramTrafficOverview({ analytics }: { analytics: InstagramAnalytics }) {
-  const chartData = analytics.recentPosts
-    .slice()
-    .reverse()
+  const lineData = [...analytics.recentPosts]
+    .sort((a, b) => Date.parse(a.takenAt) - Date.parse(b.takenAt))
     .map((post) => ({
       label: new Date(post.takenAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
       likes: post.likes,
       comments: post.comments,
     }));
 
+  const barData = analytics.topPosts.slice(0, 6).map((post) => ({
+    label: new Date(post.takenAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    likes: post.likes,
+    comments: post.comments,
+  }));
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Followers" value={formatIgMetric(analytics.kpis.followers, true)} />
+        <StatCard label="Following" value={formatIgMetric(analytics.kpis.following, true)} />
         <StatCard label="Avg. Likes" value={formatIgMetric(analytics.kpis.avgLikes, true)} />
-        <StatCard label="Avg. Comments" value={formatIgMetric(analytics.kpis.avgComments, true)} />
         <StatCard label="Engagement" value={`${analytics.kpis.engagementRate}%`} />
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Panel title="Recent Post Performance">
+        <Panel title="Post Engagement Over Time">
           <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={chartData}>
+            <LineChart data={lineData}>
               <CartesianGrid stroke="#1e1e1e" vertical={false} />
               <XAxis dataKey="label" tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8 }} />
-              <Line type="monotone" dataKey="likes" stroke="#e50914" strokeWidth={2} dot={{ fill: "#e50914", r: 3 }} />
-              <Line type="monotone" dataKey="comments" stroke="#ffffff" strokeWidth={2} dot={{ fill: "#ffffff", r: 2 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line type="monotone" dataKey="likes" name="Likes" stroke="#e50914" strokeWidth={2} dot={{ fill: "#e50914", r: 3 }} />
+              <Line type="monotone" dataKey="comments" name="Comments" stroke="#22c55e" strokeWidth={2} dot={{ fill: "#22c55e", r: 2 }} />
             </LineChart>
           </ResponsiveContainer>
         </Panel>
-        <Panel title="Top Posts">
-          {analytics.topPosts.map((post) => (
-            <a
-              key={post.id}
-              href={post.permalink}
-              target="_blank"
-              rel="noreferrer"
-              className="mb-3 block"
-            >
-              <div className="mb-1 flex justify-between text-sm">
-                <span className="line-clamp-1 pr-3">{captionPreview(post.caption, 40)}</span>
-                <span>{formatIgMetric(post.likes)} likes</span>
-              </div>
-              <div className="h-2 rounded-full bg-dt-border">
-                <div
-                  className="h-full rounded-full bg-pink-500"
-                  style={{
-                    width: `${Math.max(8, Math.round((post.likes / Math.max(analytics.topPosts[0]?.likes ?? 1, 1)) * 100))}%`,
-                  }}
-                />
-              </div>
-            </a>
-          ))}
+        <Panel title="Top Posts by Engagement">
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={barData}>
+              <CartesianGrid stroke="#1e1e1e" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: "#6b6b6b", fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="likes" name="Likes" fill="#e50914" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="comments" name="Comments" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </Panel>
       </div>
+      <Panel title="Top Posts">
+        {analytics.topPosts.map((post) => (
+          <a
+            key={post.id}
+            href={post.permalink}
+            target="_blank"
+            rel="noreferrer"
+            className="mb-3 block"
+          >
+            <div className="mb-1 flex justify-between text-sm">
+              <span className="line-clamp-1 pr-3">{captionPreview(post.caption, 40)}</span>
+              <span>{formatIgMetric(post.likes)} likes</span>
+            </div>
+            <div className="h-2 rounded-full bg-dt-border">
+              <div
+                className="h-full rounded-full bg-dt-red"
+                style={{
+                  width: `${Math.max(8, Math.round((post.likes / Math.max(analytics.topPosts[0]?.likes ?? 1, 1)) * 100))}%`,
+                }}
+              />
+            </div>
+          </a>
+        ))}
+      </Panel>
     </div>
   );
 }
@@ -270,7 +292,7 @@ export function ConversionFunnelPage() {
                   </div>
                   <div className="h-8 overflow-hidden rounded-md bg-dt-border">
                     <div
-                      className="flex h-full items-center rounded-md bg-pink-500 px-3 text-xs font-medium"
+                      className="flex h-full items-center rounded-md bg-dt-red px-3 text-xs font-medium"
                       style={{ width: `${Math.max(pct, 8)}%` }}
                     >
                       {pct}%

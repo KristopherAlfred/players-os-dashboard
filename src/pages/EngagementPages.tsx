@@ -11,7 +11,6 @@ import {
 import {
   captionPreview,
   formatMetric as formatIgMetric,
-  instagramPostImage,
   type InstagramAnalytics,
 } from "../lib/instagramAnalyticsApi";
 import { liveActivity } from "../data/mockData";
@@ -113,7 +112,7 @@ function InstagramEngagementOverview({ analytics }: { analytics: InstagramAnalyt
                   <span>{pct}%</span>
                 </div>
                 <div className="h-2 rounded-full bg-dt-border">
-                  <div className="h-full rounded-full bg-pink-500" style={{ width: `${pct}%` }} />
+                  <div className="h-full rounded-full bg-dt-red" style={{ width: `${pct}%` }} />
                 </div>
               </div>
             );
@@ -126,15 +125,12 @@ function InstagramEngagementOverview({ analytics }: { analytics: InstagramAnalyt
               href={post.permalink}
               target="_blank"
               rel="noreferrer"
-              className="flex gap-3 border-b border-dt-border/50 py-2 last:border-0"
+              className="flex items-center justify-between border-b border-dt-border/50 py-2 last:border-0 hover:text-dt-red"
             >
-              <img src={instagramPostImage(post)} alt="" className="h-10 w-10 rounded object-cover" />
-              <div>
-                <p className="line-clamp-1 text-sm text-white">{captionPreview(post.caption, 60)}</p>
-                <p className="text-xs text-dt-muted">
-                  {formatIgMetric(post.likes)} likes · {formatIgMetric(post.comments)} comments
-                </p>
-              </div>
+              <p className="line-clamp-1 flex-1 pr-3 text-sm text-white">{captionPreview(post.caption, 60)}</p>
+              <p className="shrink-0 text-xs text-dt-muted">
+                {formatIgMetric(post.likes)} likes · {formatIgMetric(post.comments)} comments
+              </p>
             </a>
           ))}
         </Panel>
@@ -275,7 +271,7 @@ export function CommentsPage() {
                 className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-pink-500">{index + 1}</span>
+                  <span className="text-xs font-bold text-dt-red">{index + 1}</span>
                   <span className="line-clamp-1 text-sm font-medium">{captionPreview(post.caption, 50)}</span>
                 </div>
                 <span className="shrink-0 text-sm text-dt-muted">
@@ -363,15 +359,12 @@ export function MessagesPage() {
                 href={post.permalink}
                 target="_blank"
                 rel="noreferrer"
-                className="flex gap-3 border-b border-dt-border/50 py-3 last:border-0"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0 hover:text-dt-red"
               >
-                <img src={instagramPostImage(post)} alt="" className="h-12 w-12 rounded object-cover" />
-                <div>
-                  <p className="line-clamp-2 text-sm text-white">{captionPreview(post.caption, 80)}</p>
-                  <p className="text-xs text-dt-muted">
-                    {formatIgMetric(post.likes)} likes · {formatIgMetric(post.comments)} comments
-                  </p>
-                </div>
+                <p className="line-clamp-2 flex-1 pr-3 text-sm text-white">{captionPreview(post.caption, 80)}</p>
+                <p className="shrink-0 text-xs text-dt-muted">
+                  {formatIgMetric(post.likes)} likes · {formatIgMetric(post.comments)} comments
+                </p>
               </a>
             ))}
           </div>

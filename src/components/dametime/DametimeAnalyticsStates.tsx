@@ -54,7 +54,7 @@ export function SourceBanner() {
 
   if (isInstagram) {
     return (
-      <div className="mb-3 rounded-lg border border-pink-500/30 bg-pink-500/10 px-3 py-2">
+      <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           Instagram filter active — showing{" "}
           {instagram.analytics?.source === "cache" ? "cached" : "live"} analytics for @damianlillard.
