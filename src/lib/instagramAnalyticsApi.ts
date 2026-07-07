@@ -12,6 +12,7 @@ export type InstagramPostAnalytics = {
 
 export type InstagramAnalytics = {
   syncedAt: string;
+  source?: "live" | "cache";
   profile: {
     username: string;
     fullName: string;

@@ -56,7 +56,8 @@ export function SourceBanner() {
     return (
       <div className="mb-3 rounded-lg border border-pink-500/30 bg-pink-500/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
-          Instagram filter active — showing live analytics for @damianlillard.
+          Instagram filter active — showing{" "}
+          {instagram.analytics?.source === "cache" ? "cached" : "live"} analytics for @damianlillard.
         </p>
         {!instagram.loading && instagram.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
