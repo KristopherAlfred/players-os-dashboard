@@ -2,8 +2,14 @@ import { useState } from "react";
 import { Search, Mail, Smartphone } from "lucide-react";
 import { Panel, StatCard } from "../components/PageShell";
 import { SignupHeatmap } from "../components/SignupHeatmap";
-import { DametimePageGate } from "../components/dametime/DametimeAnalyticsStates";
+import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
 import { formatMetric, type DametimeAnalytics } from "../lib/dametimeAnalyticsApi";
+import {
+  captionPreview,
+  formatMetric as formatIgMetric,
+  formatRelativeTime,
+  type InstagramAnalytics,
+} from "../lib/instagramAnalyticsApi";
 import { ageDemographics, topCountries, audienceSnapshot } from "../data/mockData";
 
 const fans = [
@@ -104,6 +110,60 @@ function DametimeAudienceOverview({ analytics }: { analytics: DametimeAnalytics 
   );
 }
 
+function InstagramAudienceOverview({ analytics }: { analytics: InstagramAnalytics }) {
+  const stats = [
+    { label: "Followers", value: formatIgMetric(analytics.kpis.followers, true) },
+    { label: "Following", value: formatIgMetric(analytics.kpis.following, true) },
+    { label: "Total Posts", value: formatIgMetric(analytics.kpis.totalPosts, true) },
+    { label: "Engagement", value: `${analytics.kpis.engagementRate}%` },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <StatCard key={stat.label} label={stat.label} value={stat.value} />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Profile">
+          <p className="text-sm font-medium text-white">{analytics.profile.fullName}</p>
+          <p className="text-xs text-pink-400">@{analytics.profile.username}</p>
+          {analytics.profile.biography && (
+            <p className="mt-2 text-sm text-dt-muted">{analytics.profile.biography}</p>
+          )}
+        </Panel>
+        <Panel title="Recent Engagement">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Avg. likes</span>
+              <span className="font-medium">{formatIgMetric(analytics.kpis.avgLikes)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Avg. comments</span>
+              <span className="font-medium">{formatIgMetric(analytics.kpis.avgComments)}</span>
+            </div>
+          </div>
+        </Panel>
+      </div>
+      <Panel title="Top Posts">
+        {analytics.topPosts.map((post) => (
+          <a
+            key={post.id}
+            href={post.permalink}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-between border-b border-dt-border/50 py-2 text-sm last:border-0 hover:text-pink-400"
+          >
+            <span className="line-clamp-1 pr-3">{captionPreview(post.caption, 60)}</span>
+            <span className="shrink-0 font-medium">{formatIgMetric(post.likes)} likes</span>
+          </a>
+        ))}
+      </Panel>
+    </div>
+  );
+}
+
 function OverviewAudiencePage() {
   return (
     <div className="space-y-4">
@@ -149,9 +209,11 @@ function OverviewAudiencePage() {
 
 export function AudienceOverviewPage() {
   return (
-    <DametimePageGate mock={<OverviewAudiencePage />}>
-      {(analytics) => <DametimeAudienceOverview analytics={analytics} />}
-    </DametimePageGate>
+    <AnalyticsPageGate
+      mock={<OverviewAudiencePage />}
+      dametime={(analytics) => <DametimeAudienceOverview analytics={analytics} />}
+      instagram={(analytics) => <InstagramAudienceOverview analytics={analytics} />}
+    />
   );
 }
 
@@ -199,12 +261,57 @@ function DametimeFanProfiles({ analytics }: { analytics: DametimeAnalytics }) {
   );
 }
 
+function InstagramFanProfiles({ analytics }: { analytics: InstagramAnalytics }) {
+  const [query, setQuery] = useState("");
+  const filtered = analytics.recentPosts.filter((post) =>
+    post.caption.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  return (
+    <Panel title="Recent Instagram Posts">
+      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
+        <Search size={14} className="text-dt-muted" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search captions..."
+          className="flex-1 bg-transparent text-sm outline-none"
+        />
+      </div>
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-dt-border text-xs text-dt-muted">
+            <th className="pb-2">Post</th>
+            <th className="pb-2">Likes</th>
+            <th className="pb-2">Comments</th>
+            <th className="pb-2">Posted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((post) => (
+            <tr key={post.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
+              <td className="py-3">
+                <a href={post.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-pink-400">
+                  {captionPreview(post.caption, 50)}
+                </a>
+              </td>
+              <td className="py-3">{formatIgMetric(post.likes)}</td>
+              <td className="py-3">{formatIgMetric(post.comments)}</td>
+              <td className="py-3 text-dt-muted">{formatRelativeTime(post.takenAt)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Panel>
+  );
+}
+
 export function FanProfilesPage() {
   const [query, setQuery] = useState("");
   const filtered = fans.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <DametimePageGate
+    <AnalyticsPageGate
       mock={
         <Panel title="Fan Profiles">
           <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
@@ -242,9 +349,9 @@ export function FanProfilesPage() {
           </table>
         </Panel>
       }
-    >
-      {(analytics) => <DametimeFanProfiles analytics={analytics} />}
-    </DametimePageGate>
+      dametime={(analytics) => <DametimeFanProfiles analytics={analytics} />}
+      instagram={(analytics) => <InstagramFanProfiles analytics={analytics} />}
+    />
   );
 }
 
@@ -304,9 +411,32 @@ function DametimeSubscribers({ analytics }: { analytics: DametimeAnalytics }) {
   );
 }
 
+function InstagramSubscribers({ analytics }: { analytics: InstagramAnalytics }) {
+  return (
+    <Panel title="@damianlillard on Instagram">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <StatCard label="Followers" value={formatIgMetric(analytics.kpis.followers)} />
+        <StatCard label="Following" value={formatIgMetric(analytics.kpis.following)} />
+        <StatCard label="Avg. Engagement" value={`${analytics.kpis.engagementRate}%`} />
+      </div>
+      <p className="mb-3 text-sm text-dt-muted">
+        Instagram does not expose email/SMS subscribers publicly. Showing live profile reach instead.
+      </p>
+      <a
+        href={analytics.profile.permalink}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex text-sm text-pink-400 hover:underline"
+      >
+        View @{analytics.profile.username} on Instagram
+      </a>
+    </Panel>
+  );
+}
+
 export function SubscribersPage() {
   return (
-    <DametimePageGate
+    <AnalyticsPageGate
       mock={
         <Panel title="Email / SMS Subscribers">
           <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -347,15 +477,15 @@ export function SubscribersPage() {
           </table>
         </Panel>
       }
-    >
-      {(analytics) => <DametimeSubscribers analytics={analytics} />}
-    </DametimePageGate>
+      dametime={(analytics) => <DametimeSubscribers analytics={analytics} />}
+      instagram={(analytics) => <InstagramSubscribers analytics={analytics} />}
+    />
   );
 }
 
 export function BehaviorInsightsPage() {
   return (
-    <DametimePageGate
+    <AnalyticsPageGate
       mock={
         <Panel title="Fan Journey Funnel">
           <div className="space-y-2">
@@ -380,8 +510,7 @@ export function BehaviorInsightsPage() {
           </div>
         </Panel>
       }
-    >
-      {(analytics) => (
+      dametime={(analytics) => (
         <Panel title="Fan Journey Funnel">
           <div className="space-y-2">
             {[
@@ -404,6 +533,32 @@ export function BehaviorInsightsPage() {
           </div>
         </Panel>
       )}
-    </DametimePageGate>
+      instagram={(analytics) => (
+        <Panel title="Instagram Engagement Funnel">
+          <div className="space-y-2">
+            {[
+              { step: "Followers", users: analytics.kpis.followers },
+              { step: "Avg. likes per post", users: analytics.kpis.avgLikes },
+              { step: "Avg. comments per post", users: analytics.kpis.avgComments },
+              { step: "Recent posts sampled", users: analytics.recentPosts.length },
+              { step: "Engagement rate", users: analytics.kpis.engagementRate, suffix: "%" },
+            ].map((s, i) => (
+              <div key={s.step} className="flex items-center gap-4">
+                <span className="w-6 text-center text-xs font-bold text-pink-500">{i + 1}</span>
+                <div className="flex-1 rounded-lg border border-dt-border bg-dt-bg/50 p-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">{s.step}</span>
+                    <span>
+                      {formatIgMetric(s.users)}
+                      {s.suffix ?? ""}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+    />
   );
 }

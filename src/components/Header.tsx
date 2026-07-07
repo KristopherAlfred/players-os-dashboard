@@ -8,6 +8,7 @@ import {
 const filterOptions: { id: DashboardSource; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "dametime", label: "Dametime" },
+  { id: "instagram", label: "Instagram" },
 ];
 
 export function Header({

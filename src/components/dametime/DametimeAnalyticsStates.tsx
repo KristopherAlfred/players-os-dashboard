@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import type { DametimeAnalytics } from "../../lib/dametimeAnalyticsApi";
 import { useAnalyticsView } from "../../hooks/useAnalyticsView";
+import type { DametimeAnalytics } from "../../lib/dametimeAnalyticsApi";
+import type { InstagramAnalytics } from "../../lib/instagramAnalyticsApi";
 
-export function DametimeLoading({ message = "Loading Dametime analytics…" }: { message?: string }) {
+export function SourceLoading({ message = "Loading analytics…" }: { message?: string }) {
   return (
     <div className="dt-surface flex min-h-[280px] items-center justify-center rounded-lg border border-dt-border bg-dt-card p-6">
       <p className="text-sm text-dt-muted">{message}</p>
@@ -10,39 +11,63 @@ export function DametimeLoading({ message = "Loading Dametime analytics…" }: {
   );
 }
 
-export function DametimeError({ message }: { message: string }) {
+export function SourceError({
+  title,
+  message,
+}: {
+  title: string;
+  message: string;
+}) {
   return (
     <div className="dt-surface rounded-lg border border-dt-red/40 bg-dt-card p-6">
-      <p className="text-sm font-medium text-white">Could not load Dametime analytics</p>
+      <p className="text-sm font-medium text-white">{title}</p>
       <p className="mt-2 text-sm text-dt-muted">{message}</p>
     </div>
   );
 }
 
-export function DametimeSyncedAt({ analytics }: { analytics: DametimeAnalytics }) {
-  return (
-    <p className="text-xs text-dt-muted">
-      Live from DameTime app · synced {new Date(analytics.syncedAt).toLocaleString()}
-    </p>
-  );
+export function DametimeLoading({ message = "Loading Dametime analytics…" }: { message?: string }) {
+  return <SourceLoading message={message} />;
 }
 
-export function DametimeSourceBanner() {
-  const { isDametime, analytics, loading } = useAnalyticsView();
-  if (!isDametime) return null;
+export function DametimeError({ message }: { message: string }) {
+  return <SourceError title="Could not load Dametime analytics" message={message} />;
+}
 
-  return (
-    <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
-      <p className="text-xs font-medium text-white">
-        Dametime filter active — showing live analytics from the DameTime app.
-      </p>
-      {!loading && analytics && (
-        <p className="mt-0.5 text-[11px] text-dt-muted">
-          Last synced {new Date(analytics.syncedAt).toLocaleString()}
+export function SourceBanner() {
+  const { isDametime, isInstagram, analytics, loading, instagram } = useAnalyticsView();
+
+  if (isDametime) {
+    return (
+      <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
+        <p className="text-xs font-medium text-white">
+          Dametime filter active — showing live analytics from the DameTime app.
         </p>
-      )}
-    </div>
-  );
+        {!loading && analytics && (
+          <p className="mt-0.5 text-[11px] text-dt-muted">
+            Last synced {new Date(analytics.syncedAt).toLocaleString()}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (isInstagram) {
+    return (
+      <div className="mb-3 rounded-lg border border-pink-500/30 bg-pink-500/10 px-3 py-2">
+        <p className="text-xs font-medium text-white">
+          Instagram filter active — showing live analytics for @damianlillard.
+        </p>
+        {!instagram.loading && instagram.analytics && (
+          <p className="mt-0.5 text-[11px] text-dt-muted">
+            Last synced {new Date(instagram.analytics.syncedAt).toLocaleString()}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export function DametimePageGate({
@@ -60,4 +85,57 @@ export function DametimePageGate({
   if (!analytics) return <DametimeError message="No analytics data available." />;
 
   return <>{children(analytics)}</>;
+}
+
+export function InstagramPageGate({
+  mock,
+  children,
+}: {
+  mock: ReactNode;
+  children: (analytics: InstagramAnalytics) => ReactNode;
+}) {
+  const { isInstagram, instagram } = useAnalyticsView();
+
+  if (!isInstagram) return mock;
+  if (instagram.loading) return <SourceLoading message="Loading Instagram analytics…" />;
+  if (instagram.error) {
+    return <SourceError title="Could not load Instagram analytics" message={instagram.error} />;
+  }
+  if (!instagram.analytics) {
+    return <SourceError title="Could not load Instagram analytics" message="No data available." />;
+  }
+
+  return <>{children(instagram.analytics)}</>;
+}
+
+export function AnalyticsPageGate({
+  mock,
+  dametime,
+  instagram,
+}: {
+  mock: ReactNode;
+  dametime?: (analytics: DametimeAnalytics) => ReactNode;
+  instagram?: (analytics: InstagramAnalytics) => ReactNode;
+}) {
+  const view = useAnalyticsView();
+
+  if (view.isDametime && dametime) {
+    if (view.loading) return <DametimeLoading />;
+    if (view.error) return <DametimeError message={view.error} />;
+    if (!view.analytics) return <DametimeError message="No analytics data available." />;
+    return <>{dametime(view.analytics)}</>;
+  }
+
+  if (view.isInstagram && instagram) {
+    if (view.instagram.loading) return <SourceLoading message="Loading Instagram analytics…" />;
+    if (view.instagram.error) {
+      return <SourceError title="Could not load Instagram analytics" message={view.instagram.error} />;
+    }
+    if (!view.instagram.analytics) {
+      return <SourceError title="Could not load Instagram analytics" message="No data available." />;
+    }
+    return <>{instagram(view.instagram.analytics)}</>;
+  }
+
+  return mock;
 }

@@ -11,6 +11,7 @@ import { MonetizationOverview } from "../components/MonetizationOverview";
 import { TopPerformingContent } from "../components/TopPerformingContent";
 import { Footer } from "../components/Footer";
 import { DametimeAnalyticsDashboard } from "../components/dametime/DametimeAnalyticsDashboard";
+import { InstagramAnalyticsDashboard } from "../components/instagram/InstagramAnalyticsDashboard";
 import { useDashboardSource } from "../contexts/DashboardSourceContext";
 
 function OverviewDashboard() {
@@ -70,6 +71,10 @@ export function DashboardPage() {
 
   if (source === "dametime") {
     return <DametimeAnalyticsDashboard />;
+  }
+
+  if (source === "instagram") {
+    return <InstagramAnalyticsDashboard />;
   }
 
   return <OverviewDashboard />;

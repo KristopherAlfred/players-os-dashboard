@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { MessageSquare, Send, BarChart3 } from "lucide-react";
 import { Panel, StatCard } from "../components/PageShell";
-import { DametimePageGate } from "../components/dametime/DametimeAnalyticsStates";
+import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
 import {
   formatMetric,
   formatRelativeTime,
   initialsFromName,
   type DametimeAnalytics,
 } from "../lib/dametimeAnalyticsApi";
+import {
+  captionPreview,
+  formatMetric as formatIgMetric,
+  type InstagramAnalytics,
+} from "../lib/instagramAnalyticsApi";
 import { liveActivity } from "../data/mockData";
 
 const comments = [
@@ -81,6 +86,62 @@ function DametimeEngagementOverview({ analytics }: { analytics: DametimeAnalytic
   );
 }
 
+function InstagramEngagementOverview({ analytics }: { analytics: InstagramAnalytics }) {
+  const totalEngagement = analytics.recentPosts.reduce((sum, post) => sum + post.likes + post.comments, 0);
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Followers" value={formatIgMetric(analytics.kpis.followers, true)} />
+        <StatCard label="Avg. Likes" value={formatIgMetric(analytics.kpis.avgLikes, true)} />
+        <StatCard label="Avg. Comments" value={formatIgMetric(analytics.kpis.avgComments, true)} />
+        <StatCard label="Recent Engagement" value={formatIgMetric(totalEngagement, true)} />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Media Mix">
+          {(["image", "video", "carousel", "unknown"] as const).map((type) => {
+            const count = analytics.recentPosts.filter((post) => post.mediaType === type).length;
+            const pct = analytics.recentPosts.length
+              ? Math.round((count / analytics.recentPosts.length) * 100)
+              : 0;
+            if (!count) return null;
+            return (
+              <div key={type} className="mb-3">
+                <div className="mb-1 flex justify-between text-sm capitalize">
+                  <span>{type}</span>
+                  <span>{pct}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-dt-border">
+                  <div className="h-full rounded-full bg-pink-500" style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            );
+          })}
+        </Panel>
+        <Panel title="Recent Posts">
+          {analytics.recentPosts.slice(0, 6).map((post) => (
+            <a
+              key={post.id}
+              href={post.permalink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex gap-3 border-b border-dt-border/50 py-2 last:border-0"
+            >
+              <img src={post.thumbnailUrl} alt="" className="h-10 w-10 rounded object-cover" />
+              <div>
+                <p className="line-clamp-1 text-sm text-white">{captionPreview(post.caption, 60)}</p>
+                <p className="text-xs text-dt-muted">
+                  {formatIgMetric(post.likes)} likes · {formatIgMetric(post.comments)} comments
+                </p>
+              </div>
+            </a>
+          ))}
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
 function OverviewEngagementPage() {
   return (
     <div className="space-y-4">
@@ -126,9 +187,11 @@ function OverviewEngagementPage() {
 
 export function EngagementOverviewPage() {
   return (
-    <DametimePageGate mock={<OverviewEngagementPage />}>
-      {(analytics) => <DametimeEngagementOverview analytics={analytics} />}
-    </DametimePageGate>
+    <AnalyticsPageGate
+      mock={<OverviewEngagementPage />}
+      dametime={(analytics) => <DametimeEngagementOverview analytics={analytics} />}
+      instagram={(analytics) => <InstagramEngagementOverview analytics={analytics} />}
+    />
   );
 }
 
@@ -137,7 +200,7 @@ export function CommentsPage() {
   const list = filter === "flagged" ? comments.filter((c) => c.flagged) : comments;
 
   return (
-    <DametimePageGate
+    <AnalyticsPageGate
       mock={
         <Panel title="Comment Moderation">
           <div className="mb-4 flex gap-2">
@@ -177,8 +240,7 @@ export function CommentsPage() {
           </div>
         </Panel>
       }
-    >
-      {(analytics) => (
+      dametime={(analytics) => (
         <Panel title="Top Clicked Content">
           <div className="space-y-2">
             {analytics.topTargets.length === 0 ? (
@@ -200,7 +262,30 @@ export function CommentsPage() {
           </div>
         </Panel>
       )}
-    </DametimePageGate>
+      instagram={(analytics) => (
+        <Panel title="Top Posts by Engagement">
+          <div className="space-y-2">
+            {analytics.topPosts.map((post, index) => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-pink-500">{index + 1}</span>
+                  <span className="line-clamp-1 text-sm font-medium">{captionPreview(post.caption, 50)}</span>
+                </div>
+                <span className="shrink-0 text-sm text-dt-muted">
+                  {formatIgMetric(post.likes + post.comments)} interactions
+                </span>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
+    />
   );
 }
 
@@ -208,7 +293,7 @@ export function MessagesPage() {
   const [selected, setSelected] = useState(0);
 
   return (
-    <DametimePageGate
+    <AnalyticsPageGate
       mock={
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Panel title="Inbox">
@@ -247,8 +332,7 @@ export function MessagesPage() {
           </div>
         </div>
       }
-    >
-      {(analytics) => (
+      dametime={(analytics) => (
         <Panel title="Recent Fan Activity">
           <div className="space-y-2">
             {analytics.recentActivity.map((item) => (
@@ -269,7 +353,30 @@ export function MessagesPage() {
           </div>
         </Panel>
       )}
-    </DametimePageGate>
+      instagram={(analytics) => (
+        <Panel title="Recent Instagram Posts">
+          <div className="space-y-2">
+            {analytics.recentPosts.map((post) => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex gap-3 border-b border-dt-border/50 py-3 last:border-0"
+              >
+                <img src={post.thumbnailUrl} alt="" className="h-12 w-12 rounded object-cover" />
+                <div>
+                  <p className="line-clamp-2 text-sm text-white">{captionPreview(post.caption, 80)}</p>
+                  <p className="text-xs text-dt-muted">
+                    {formatIgMetric(post.likes)} likes · {formatIgMetric(post.comments)} comments
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
+    />
   );
 }
 

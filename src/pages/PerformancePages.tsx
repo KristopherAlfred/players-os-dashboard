@@ -8,8 +8,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Panel, StatCard } from "../components/PageShell";
-import { DametimePageGate } from "../components/dametime/DametimeAnalyticsStates";
+import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
 import { formatMetric, type DametimeAnalytics } from "../lib/dametimeAnalyticsApi";
+import {
+  captionPreview,
+  formatMetric as formatIgMetric,
+  type InstagramAnalytics,
+} from "../lib/instagramAnalyticsApi";
 import { trafficOverTime, trafficSources } from "../data/mockData";
 
 const campaigns = [
@@ -73,6 +78,66 @@ function DametimeTrafficOverview({ analytics }: { analytics: DametimeAnalytics }
   );
 }
 
+function InstagramTrafficOverview({ analytics }: { analytics: InstagramAnalytics }) {
+  const chartData = analytics.recentPosts
+    .slice()
+    .reverse()
+    .map((post) => ({
+      label: new Date(post.takenAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      likes: post.likes,
+      comments: post.comments,
+    }));
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Followers" value={formatIgMetric(analytics.kpis.followers, true)} />
+        <StatCard label="Avg. Likes" value={formatIgMetric(analytics.kpis.avgLikes, true)} />
+        <StatCard label="Avg. Comments" value={formatIgMetric(analytics.kpis.avgComments, true)} />
+        <StatCard label="Engagement" value={`${analytics.kpis.engagementRate}%`} />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Recent Post Performance">
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={chartData}>
+              <CartesianGrid stroke="#1e1e1e" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8 }} />
+              <Line type="monotone" dataKey="likes" stroke="#e50914" strokeWidth={2} dot={{ fill: "#e50914", r: 3 }} />
+              <Line type="monotone" dataKey="comments" stroke="#ffffff" strokeWidth={2} dot={{ fill: "#ffffff", r: 2 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Panel>
+        <Panel title="Top Posts">
+          {analytics.topPosts.map((post) => (
+            <a
+              key={post.id}
+              href={post.permalink}
+              target="_blank"
+              rel="noreferrer"
+              className="mb-3 block"
+            >
+              <div className="mb-1 flex justify-between text-sm">
+                <span className="line-clamp-1 pr-3">{captionPreview(post.caption, 40)}</span>
+                <span>{formatIgMetric(post.likes)} likes</span>
+              </div>
+              <div className="h-2 rounded-full bg-dt-border">
+                <div
+                  className="h-full rounded-full bg-pink-500"
+                  style={{
+                    width: `${Math.max(8, Math.round((post.likes / Math.max(analytics.topPosts[0]?.likes ?? 1, 1)) * 100))}%`,
+                  }}
+                />
+              </div>
+            </a>
+          ))}
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
 function OverviewTrafficPage() {
   return (
     <div className="space-y-4">
@@ -119,15 +184,17 @@ function OverviewTrafficPage() {
 
 export function TrafficOverviewPage() {
   return (
-    <DametimePageGate mock={<OverviewTrafficPage />}>
-      {(analytics) => <DametimeTrafficOverview analytics={analytics} />}
-    </DametimePageGate>
+    <AnalyticsPageGate
+      mock={<OverviewTrafficPage />}
+      dametime={(analytics) => <DametimeTrafficOverview analytics={analytics} />}
+      instagram={(analytics) => <InstagramTrafficOverview analytics={analytics} />}
+    />
   );
 }
 
 export function ConversionFunnelPage() {
   return (
-    <DametimePageGate
+    <AnalyticsPageGate
       mock={
         <Panel title="Conversion Funnel">
           <div className="space-y-3">
@@ -158,8 +225,7 @@ export function ConversionFunnelPage() {
           </div>
         </Panel>
       }
-    >
-      {(analytics) => (
+      dametime={(analytics) => (
         <Panel title="Conversion Funnel">
           <div className="space-y-3">
             {[
@@ -189,7 +255,34 @@ export function ConversionFunnelPage() {
           </div>
         </Panel>
       )}
-    </DametimePageGate>
+      instagram={(analytics) => (
+        <Panel title="Post Performance Funnel">
+          <div className="space-y-3">
+            {analytics.topPosts.slice(0, 5).map((post, _index, arr) => {
+              const pct = arr[0]?.likes ? Math.round((post.likes / arr[0].likes) * 100) : 0;
+              return (
+                <div key={post.id}>
+                  <div className="mb-1 flex justify-between text-sm">
+                    <span className="font-medium line-clamp-1 pr-3">{captionPreview(post.caption, 40)}</span>
+                    <span>
+                      {formatIgMetric(post.likes)} likes ({pct}%)
+                    </span>
+                  </div>
+                  <div className="h-8 overflow-hidden rounded-md bg-dt-border">
+                    <div
+                      className="flex h-full items-center rounded-md bg-pink-500 px-3 text-xs font-medium"
+                      style={{ width: `${Math.max(pct, 8)}%` }}
+                    >
+                      {pct}%
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Panel>
+      )}
+    />
   );
 }
 
