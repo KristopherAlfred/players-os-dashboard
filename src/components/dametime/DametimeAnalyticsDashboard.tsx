@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Users,
   UserCheck,
@@ -23,28 +22,20 @@ import {
 import { Card } from "../ui/Card";
 import { useTheme } from "../../theme/ThemeContext";
 import {
-  fetchDametimeAnalytics,
   formatMetric,
   formatRelativeTime,
   initialsFromName,
   type DametimeAnalytics,
 } from "../../lib/dametimeAnalyticsApi";
+import { useAnalyticsView } from "../../hooks/useAnalyticsView";
+import { DametimeError, DametimeLoading } from "./DametimeAnalyticsStates";
 
 function LoadingState({ message }: { message: string }) {
-  return (
-    <div className="dt-surface flex min-h-[280px] items-center justify-center rounded-lg border border-dt-border bg-dt-card p-6">
-      <p className="text-sm text-dt-muted">{message}</p>
-    </div>
-  );
+  return <DametimeLoading message={message} />;
 }
 
 function ErrorState({ message }: { message: string }) {
-  return (
-    <div className="dt-surface rounded-lg border border-dt-red/40 bg-dt-card p-6">
-      <p className="text-sm font-medium text-white">Could not load Dametime analytics</p>
-      <p className="mt-2 text-sm text-dt-muted">{message}</p>
-    </div>
-  );
+  return <DametimeError message={message} />;
 }
 
 function KpiGrid({ analytics }: { analytics: DametimeAnalytics }) {
@@ -303,51 +294,7 @@ function GeoSummary({ analytics }: { analytics: DametimeAnalytics }) {
 }
 
 export function DametimeAnalyticsDashboard() {
-  const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      setError(null);
-
-      const secret = import.meta.env.VITE_ADMIN_EXPORT_SECRET?.trim();
-      if (!secret) {
-        if (!cancelled) {
-          setAnalytics(null);
-          setError("Set VITE_ADMIN_EXPORT_SECRET in the dashboard environment to load live analytics.");
-          setLoading(false);
-        }
-        return;
-      }
-
-      const data = await fetchDametimeAnalytics();
-      if (cancelled) return;
-
-      if (!data) {
-        setAnalytics(null);
-        setError("Analytics request failed. Check VITE_DAME_BIO_API_URL and ADMIN_EXPORT_SECRET on the DameTime app.");
-        setLoading(false);
-        return;
-      }
-
-      setAnalytics(data);
-      setLoading(false);
-    }
-
-    void load();
-    const interval = window.setInterval(() => {
-      void load();
-    }, 60_000);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, []);
+  const { analytics, loading, error } = useAnalyticsView();
 
   if (loading) return <LoadingState message="Loading Dametime analytics…" />;
   if (error) return <ErrorState message={error} />;
@@ -355,12 +302,6 @@ export function DametimeAnalyticsDashboard() {
 
   return (
     <div className="space-y-3 pb-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-dt-muted">
-          Live from DameTime app · synced {new Date(analytics.syncedAt).toLocaleString()}
-        </p>
-      </div>
-
       <KpiGrid analytics={analytics} />
 
       <div className="grid grid-cols-12 items-stretch gap-3">
