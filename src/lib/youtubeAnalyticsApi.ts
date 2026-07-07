@@ -36,12 +36,24 @@ function getApiBase() {
 }
 
 export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> {
+  const base = getApiBase();
+
   try {
-    const response = await fetch(`${getApiBase()}/api/youtube/analytics`);
+    const response = await fetch(`${base}/api/youtube/analytics`);
+    if (response.ok) {
+      const data = (await response.json()) as YouTubeAnalytics & { ok?: boolean };
+      if (data?.kpis) return data;
+    }
+  } catch {
+    // fall through to static cache
+  }
+
+  try {
+    const response = await fetch(`${base}/data/youtube-analytics.json`);
     if (!response.ok) return null;
-    const data = (await response.json()) as YouTubeAnalytics & { ok?: boolean };
+    const data = (await response.json()) as YouTubeAnalytics;
     if (!data?.kpis) return null;
-    return data;
+    return { ...data, source: "cache" };
   } catch {
     return null;
   }
