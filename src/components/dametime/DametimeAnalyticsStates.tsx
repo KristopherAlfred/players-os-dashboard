@@ -3,6 +3,7 @@ import { useAnalyticsView } from "../../hooks/useAnalyticsView";
 import type { DametimeAnalytics } from "../../lib/dametimeAnalyticsApi";
 import type { InstagramAnalytics } from "../../lib/instagramAnalyticsApi";
 import type { YouTubeAnalytics } from "../../lib/youtubeAnalyticsApi";
+import type { FacebookAnalytics } from "../../lib/facebookAnalyticsApi";
 
 export function SourceLoading({ message = "Loading analytics…" }: { message?: string }) {
   return (
@@ -36,7 +37,7 @@ export function DametimeError({ message }: { message: string }) {
 }
 
 export function SourceBanner() {
-  const { isDametime, isInstagram, isYoutube, analytics, loading, instagram, youtube } =
+  const { isDametime, isInstagram, isYoutube, isFacebook, analytics, loading, instagram, youtube, facebook } =
     useAnalyticsView();
 
   if (isDametime) {
@@ -80,6 +81,22 @@ export function SourceBanner() {
         {!youtube.loading && youtube.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
             Last synced {new Date(youtube.analytics.syncedAt).toLocaleString()}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (isFacebook) {
+    return (
+      <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
+        <p className="text-xs font-medium text-white">
+          Facebook filter active — showing{" "}
+          {facebook.analytics?.source === "cache" ? "cached" : "live"} analytics for @DamianLillard.
+        </p>
+        {!facebook.loading && facebook.analytics && (
+          <p className="mt-0.5 text-[11px] text-dt-muted">
+            Last synced {new Date(facebook.analytics.syncedAt).toLocaleString()}
           </p>
         )}
       </div>
@@ -132,11 +149,13 @@ export function AnalyticsPageGate({
   dametime,
   instagram,
   youtube,
+  facebook,
 }: {
   mock: ReactNode;
   dametime?: (analytics: DametimeAnalytics) => ReactNode;
   instagram?: (analytics: InstagramAnalytics) => ReactNode;
   youtube?: (analytics: YouTubeAnalytics) => ReactNode;
+  facebook?: (analytics: FacebookAnalytics) => ReactNode;
 }) {
   const view = useAnalyticsView();
 
@@ -167,6 +186,17 @@ export function AnalyticsPageGate({
       return <SourceError title="Could not load YouTube analytics" message="No data available." />;
     }
     return <>{youtube(view.youtube.analytics)}</>;
+  }
+
+  if (view.isFacebook && facebook) {
+    if (view.facebook.loading) return <SourceLoading message="Loading Facebook analytics…" />;
+    if (view.facebook.error) {
+      return <SourceError title="Could not load Facebook analytics" message={view.facebook.error} />;
+    }
+    if (!view.facebook.analytics) {
+      return <SourceError title="Could not load Facebook analytics" message="No data available." />;
+    }
+    return <>{facebook(view.facebook.analytics)}</>;
   }
 
   return mock;

@@ -18,6 +18,11 @@ import {
   titlePreview,
   type YouTubeAnalytics,
 } from "../lib/youtubeAnalyticsApi";
+import {
+  formatMetric as formatFbMetric,
+  textPreview,
+  type FacebookAnalytics,
+} from "../lib/facebookAnalyticsApi";
 import { liveActivity } from "../data/mockData";
 
 const comments = [
@@ -195,6 +200,57 @@ function YouTubeEngagementOverview({ analytics }: { analytics: YouTubeAnalytics 
   );
 }
 
+function FacebookEngagementOverview({ analytics }: { analytics: FacebookAnalytics }) {
+  const totalEngagement = analytics.recentPosts.reduce(
+    (sum, post) => sum + post.likes + post.comments + post.shares,
+    0,
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Followers" value={formatFbMetric(analytics.kpis.followers, true)} />
+        <StatCard label="Avg. Likes" value={formatFbMetric(analytics.kpis.avgLikes, true)} />
+        <StatCard label="Avg. Comments" value={formatFbMetric(analytics.kpis.avgComments, true)} />
+        <StatCard label="Recent Engagement" value={formatFbMetric(totalEngagement, true)} />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Performance Mix">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Talking about this</span>
+              <span className="font-medium">{formatFbMetric(analytics.page.talkingAbout)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Posts tracked</span>
+              <span className="font-medium">{formatFbMetric(analytics.kpis.totalPosts)}</span>
+            </div>
+            <div className="h-2 rounded-full bg-dt-border">
+              <div className="h-full rounded-full bg-dt-red" style={{ width: "72%" }} />
+            </div>
+          </div>
+        </Panel>
+        <Panel title="Recent Posts">
+          {analytics.recentPosts.slice(0, 6).map((post) => (
+            <a
+              key={post.id}
+              href={post.permalink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between border-b border-dt-border/50 py-2 last:border-0 hover:text-dt-red"
+            >
+              <p className="line-clamp-1 flex-1 pr-3 text-sm text-white">{textPreview(post.text, 60)}</p>
+              <p className="shrink-0 text-xs text-dt-muted">
+                {formatFbMetric(post.likes)} likes · {formatFbMetric(post.comments)} comments
+              </p>
+            </a>
+          ))}
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
 function OverviewEngagementPage() {
   return (
     <div className="space-y-4">
@@ -245,6 +301,7 @@ export function EngagementOverviewPage() {
       dametime={(analytics) => <DametimeEngagementOverview analytics={analytics} />}
       instagram={(analytics) => <InstagramEngagementOverview analytics={analytics} />}
       youtube={(analytics) => <YouTubeEngagementOverview analytics={analytics} />}
+      facebook={(analytics) => <FacebookEngagementOverview analytics={analytics} />}
     />
   );
 }
@@ -362,6 +419,29 @@ export function CommentsPage() {
           </div>
         </Panel>
       )}
+      facebook={(analytics) => (
+        <Panel title="Top Posts by Engagement">
+          <div className="space-y-2">
+            {analytics.topPosts.map((post, index) => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-dt-red">{index + 1}</span>
+                  <span className="line-clamp-1 text-sm font-medium">{textPreview(post.text, 50)}</span>
+                </div>
+                <span className="shrink-0 text-sm text-dt-muted">
+                  {formatFbMetric(post.likes + post.comments + post.shares)} interactions
+                </span>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
     />
   );
 }
@@ -464,6 +544,26 @@ export function MessagesPage() {
                 <p className="line-clamp-2 flex-1 pr-3 text-sm text-white">{titlePreview(video.title, 80)}</p>
                 <p className="shrink-0 text-xs text-dt-muted">
                   {formatYtMetric(video.viewCount)} views · {formatYtMetric(video.likeCount)} likes
+                </p>
+              </a>
+            ))}
+          </div>
+        </Panel>
+      )}
+      facebook={(analytics) => (
+        <Panel title="Recent Facebook Posts">
+          <div className="space-y-2">
+            {analytics.recentPosts.map((post) => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0 hover:text-dt-red"
+              >
+                <p className="line-clamp-2 flex-1 pr-3 text-sm text-white">{textPreview(post.text, 80)}</p>
+                <p className="shrink-0 text-xs text-dt-muted">
+                  {formatFbMetric(post.likes)} likes · {formatFbMetric(post.comments)} comments
                 </p>
               </a>
             ))}

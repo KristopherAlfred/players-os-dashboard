@@ -23,6 +23,11 @@ import {
   titlePreview,
   type YouTubeAnalytics,
 } from "../lib/youtubeAnalyticsApi";
+import {
+  formatMetric as formatFbMetric,
+  textPreview,
+  type FacebookAnalytics,
+} from "../lib/facebookAnalyticsApi";
 import { trafficOverTime, trafficSources } from "../data/mockData";
 
 const campaigns = [
@@ -244,6 +249,89 @@ function YouTubeTrafficOverview({ analytics }: { analytics: YouTubeAnalytics }) 
   );
 }
 
+function postEngagement(post: { likes: number; comments: number; shares: number }) {
+  return post.likes + post.comments + post.shares;
+}
+
+function FacebookTrafficOverview({ analytics }: { analytics: FacebookAnalytics }) {
+  const lineData = [...analytics.recentPosts]
+    .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt))
+    .map((post) => ({
+      label: new Date(post.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      likes: post.likes,
+      comments: post.comments,
+    }));
+
+  const barData = analytics.topPosts.slice(0, 6).map((post, index) => ({
+    label: `#${index + 1}`,
+    likes: post.likes,
+    comments: post.comments,
+  }));
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Followers" value={formatFbMetric(analytics.kpis.followers, true)} />
+        <StatCard label="Total Posts" value={formatFbMetric(analytics.kpis.totalPosts, true)} />
+        <StatCard label="Talking About" value={formatFbMetric(analytics.page.talkingAbout, true)} />
+        <StatCard label="Engagement" value={`${analytics.kpis.engagementRate}%`} />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Panel title="Post Engagement Over Time">
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={lineData}>
+              <CartesianGrid stroke="#1e1e1e" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line type="monotone" dataKey="likes" name="Likes" stroke="#e50914" strokeWidth={2} dot={{ fill: "#e50914", r: 3 }} />
+              <Line type="monotone" dataKey="comments" name="Comments" stroke="#22c55e" strokeWidth={2} dot={{ fill: "#22c55e", r: 2 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Panel>
+        <Panel title="Top Posts by Engagement">
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={barData}>
+              <CartesianGrid stroke="#1e1e1e" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: "#6b6b6b", fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#6b6b6b", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="likes" name="Likes" fill="#e50914" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="comments" name="Comments" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Panel>
+      </div>
+      <Panel title="Top Posts">
+        {analytics.topPosts.map((post) => (
+          <a
+            key={post.id}
+            href={post.permalink}
+            target="_blank"
+            rel="noreferrer"
+            className="mb-3 block"
+          >
+            <div className="mb-1 flex justify-between text-sm">
+              <span className="line-clamp-1 pr-3">{textPreview(post.text, 40)}</span>
+              <span>{formatFbMetric(postEngagement(post))} engagement</span>
+            </div>
+            <div className="h-2 rounded-full bg-dt-border">
+              <div
+                className="h-full rounded-full bg-dt-red"
+                style={{
+                  width: `${Math.max(8, Math.round((postEngagement(post) / Math.max(postEngagement(analytics.topPosts[0] ?? post), 1)) * 100))}%`,
+                }}
+              />
+            </div>
+          </a>
+        ))}
+      </Panel>
+    </div>
+  );
+}
+
 function OverviewTrafficPage() {
   return (
     <div className="space-y-4">
@@ -295,6 +383,7 @@ export function TrafficOverviewPage() {
       dametime={(analytics) => <DametimeTrafficOverview analytics={analytics} />}
       instagram={(analytics) => <InstagramTrafficOverview analytics={analytics} />}
       youtube={(analytics) => <YouTubeTrafficOverview analytics={analytics} />}
+      facebook={(analytics) => <FacebookTrafficOverview analytics={analytics} />}
     />
   );
 }
@@ -400,6 +489,35 @@ export function ConversionFunnelPage() {
                     <span className="line-clamp-1 pr-3 font-medium">{titlePreview(video.title, 40)}</span>
                     <span>
                       {formatYtMetric(video.viewCount)} views ({pct}%)
+                    </span>
+                  </div>
+                  <div className="h-8 overflow-hidden rounded-md bg-dt-border">
+                    <div
+                      className="flex h-full items-center rounded-md bg-dt-red px-3 text-xs font-medium"
+                      style={{ width: `${Math.max(pct, 8)}%` }}
+                    >
+                      {pct}%
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Panel>
+      )}
+      facebook={(analytics) => (
+        <Panel title="Post Performance Funnel">
+          <div className="space-y-3">
+            {analytics.topPosts.slice(0, 5).map((post, _index, arr) => {
+              const engagement = postEngagement(post);
+              const topEngagement = arr[0] ? postEngagement(arr[0]) : 1;
+              const pct = topEngagement ? Math.round((engagement / topEngagement) * 100) : 0;
+              return (
+                <div key={post.id}>
+                  <div className="mb-1 flex justify-between text-sm">
+                    <span className="line-clamp-1 pr-3 font-medium">{textPreview(post.text, 40)}</span>
+                    <span>
+                      {formatFbMetric(engagement)} engagement ({pct}%)
                     </span>
                   </div>
                   <div className="h-8 overflow-hidden rounded-md bg-dt-border">

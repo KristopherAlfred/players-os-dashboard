@@ -13,6 +13,7 @@ import { Footer } from "../components/Footer";
 import { DametimeAnalyticsDashboard } from "../components/dametime/DametimeAnalyticsDashboard";
 import { InstagramAnalyticsDashboard } from "../components/instagram/InstagramAnalyticsDashboard";
 import { YouTubeAnalyticsDashboard } from "../components/youtube/YouTubeAnalyticsDashboard";
+import { FacebookAnalyticsDashboard } from "../components/facebook/FacebookAnalyticsDashboard";
 import { useDashboardSource } from "../contexts/DashboardSourceContext";
 
 function OverviewDashboard() {
@@ -80,6 +81,10 @@ export function DashboardPage() {
 
   if (source === "youtube") {
     return <YouTubeAnalyticsDashboard />;
+  }
+
+  if (source === "facebook") {
+    return <FacebookAnalyticsDashboard />;
   }
 
   return <OverviewDashboard />;
