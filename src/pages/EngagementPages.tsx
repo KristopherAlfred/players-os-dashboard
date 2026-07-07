@@ -11,6 +11,7 @@ import {
 import {
   captionPreview,
   formatMetric as formatIgMetric,
+  instagramPostImage,
   type InstagramAnalytics,
 } from "../lib/instagramAnalyticsApi";
 import { liveActivity } from "../data/mockData";
@@ -127,7 +128,7 @@ function InstagramEngagementOverview({ analytics }: { analytics: InstagramAnalyt
               rel="noreferrer"
               className="flex gap-3 border-b border-dt-border/50 py-2 last:border-0"
             >
-              <img src={post.thumbnailUrl} alt="" className="h-10 w-10 rounded object-cover" />
+              <img src={instagramPostImage(post)} alt="" className="h-10 w-10 rounded object-cover" />
               <div>
                 <p className="line-clamp-1 text-sm text-white">{captionPreview(post.caption, 60)}</p>
                 <p className="text-xs text-dt-muted">
@@ -364,7 +365,7 @@ export function MessagesPage() {
                 rel="noreferrer"
                 className="flex gap-3 border-b border-dt-border/50 py-3 last:border-0"
               >
-                <img src={post.thumbnailUrl} alt="" className="h-12 w-12 rounded object-cover" />
+                <img src={instagramPostImage(post)} alt="" className="h-12 w-12 rounded object-cover" />
                 <div>
                   <p className="line-clamp-2 text-sm text-white">{captionPreview(post.caption, 80)}</p>
                   <p className="text-xs text-dt-muted">

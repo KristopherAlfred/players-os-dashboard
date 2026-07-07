@@ -6,6 +6,7 @@ export type InstagramPostAnalytics = {
   comments: number;
   mediaType: "image" | "video" | "carousel" | "unknown";
   thumbnailUrl: string;
+  image?: string;
   permalink: string;
   takenAt: string;
 };
@@ -18,6 +19,7 @@ export type InstagramAnalytics = {
     fullName: string;
     biography: string;
     profilePicUrl: string;
+    profilePicImage?: string;
     followers: number;
     following: number;
     posts: number;
@@ -39,6 +41,29 @@ export type InstagramAnalytics = {
 
 function getApiBase() {
   return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://dametime-app.vercel.app").replace(/\/$/, "");
+}
+
+function proxiedCdnUrl(url: string) {
+  return `${getApiBase()}/api/instagram/image?url=${encodeURIComponent(url)}`;
+}
+
+export function instagramPostImage(post: InstagramPostAnalytics) {
+  if (post.image) return `${getApiBase()}${post.image}`;
+  if (post.thumbnailUrl.includes("cdninstagram.com") || post.thumbnailUrl.includes("fbcdn.net")) {
+    return proxiedCdnUrl(post.thumbnailUrl);
+  }
+  return post.thumbnailUrl;
+}
+
+export function instagramProfileImage(profile: InstagramAnalytics["profile"]) {
+  if (profile.profilePicImage) return `${getApiBase()}${profile.profilePicImage}`;
+  if (
+    profile.profilePicUrl.includes("cdninstagram.com") ||
+    profile.profilePicUrl.includes("fbcdn.net")
+  ) {
+    return proxiedCdnUrl(profile.profilePicUrl);
+  }
+  return profile.profilePicUrl;
 }
 
 export async function fetchInstagramAnalytics(): Promise<InstagramAnalytics | null> {
@@ -83,8 +108,21 @@ export function formatRelativeTime(iso: string) {
   return `${months}mo ago`;
 }
 
+export function formatPostDate(iso: string) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 export function captionPreview(caption: string, max = 80) {
   const trimmed = caption.trim().replace(/\s+/g, " ");
   if (!trimmed) return "No caption";
   return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed;
+}
+
+export function mediaTypeLabel(type: InstagramPostAnalytics["mediaType"]) {
+  if (type === "video") return "Reel";
+  if (type === "carousel") return "Album";
+  if (type === "image") return "Photo";
+  return "Post";
 }
