@@ -57,11 +57,18 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
     }
   }
 
-  try {
-    const data = await fetchJsonAnalytics(`${base}/data/youtube-analytics.json`);
-    if (data) return { ...data, source: "cache" };
-  } catch {
-    // fall through to video feed
+  const cacheUrls = [
+    "/data/youtube-analytics.json",
+    `${base}/data/youtube-analytics.json`,
+  ];
+
+  for (const url of cacheUrls) {
+    try {
+      const data = await fetchJsonAnalytics(url);
+      if (data) return { ...data, source: "cache" };
+    } catch {
+      // try next source
+    }
   }
 
   try {
@@ -86,10 +93,42 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
       }>;
       syncedAt?: string;
     };
-    return buildYouTubeAnalyticsFromFeed(feed);
+    const built = buildYouTubeAnalyticsFromFeed(feed);
+    if (!built) return null;
+    return enrichSubscriberStats(built);
   } catch {
     return null;
   }
+}
+
+async function enrichSubscriberStats(analytics: YouTubeAnalytics): Promise<YouTubeAnalytics> {
+  if (analytics.kpis.subscribers > 0) return analytics;
+
+  const base = getApiBase();
+  const cacheUrls = ["/data/youtube-analytics.json", `${base}/data/youtube-analytics.json`];
+
+  for (const url of cacheUrls) {
+    try {
+      const cached = await fetchJsonAnalytics(url);
+      if (!cached?.kpis.subscribers) continue;
+      return {
+        ...analytics,
+        channel: {
+          ...analytics.channel,
+          subscribers: cached.channel.subscribers,
+          subscribersLabel: cached.channel.subscribersLabel,
+        },
+        kpis: {
+          ...analytics.kpis,
+          subscribers: cached.kpis.subscribers,
+        },
+      };
+    } catch {
+      // try next
+    }
+  }
+
+  return analytics;
 }
 
 function buildYouTubeAnalyticsFromFeed(feed: {

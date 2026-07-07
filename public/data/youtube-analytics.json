@@ -1,0 +1,204 @@
+{
+  "syncedAt": "2026-07-07T19:12:32.391Z",
+  "source": "cache",
+  "channel": {
+    "id": "UCIhTfcMzbR5wyNeh57ju0ug",
+    "name": "Damian Lillard",
+    "handle": "@DamianLillard",
+    "permalink": "https://www.youtube.com/@DamianLillard",
+    "subscribers": 2470000,
+    "subscribersLabel": "2.47M subscribers"
+  },
+  "kpis": {
+    "subscribers": 2470000,
+    "totalVideos": 30,
+    "totalViews": 1904413,
+    "avgViews": 63480,
+    "avgLikes": 1374,
+    "engagementRate": 2.16
+  },
+  "recentVideos": [
+    {
+      "id": "iF1S4ggCAOI",
+      "title": "Dame Recovery Mode - Drop 10",
+      "viewCount": 16352,
+      "likeCount": 670,
+      "publishedAt": "2025-11-19T16:31:11-08:00",
+      "permalink": "https://www.youtube.com/watch?v=iF1S4ggCAOI",
+      "durationSeconds": 185
+    },
+    {
+      "id": "oaK1isIleIw",
+      "title": "Dame D.O.L.L.A. - Gimme Some Love",
+      "viewCount": 169929,
+      "likeCount": 8840,
+      "publishedAt": "2025-11-15T07:45:07-08:00",
+      "permalink": "https://www.youtube.com/watch?v=oaK1isIleIw",
+      "durationSeconds": 137
+    },
+    {
+      "id": "PT5otS84FtY",
+      "title": "Dame D.O.L.L.A. - Gimme Some Love Trailer",
+      "viewCount": 2049,
+      "likeCount": 145,
+      "publishedAt": "2025-11-14T19:42:51-08:00",
+      "permalink": "https://www.youtube.com/watch?v=PT5otS84FtY",
+      "durationSeconds": 22
+    },
+    {
+      "id": "cQtmAbWeH38",
+      "title": "Dame D.O.L.L.A. - Riq Havoc",
+      "viewCount": 1099323,
+      "likeCount": 11407,
+      "publishedAt": "2025-10-23T08:00:06-07:00",
+      "permalink": "https://www.youtube.com/watch?v=cQtmAbWeH38",
+      "durationSeconds": 116
+    },
+    {
+      "id": "GqygIg_0D2g",
+      "title": "Dame D.O.L.L.A. Riq Havoc Trailer",
+      "viewCount": 4151,
+      "likeCount": 181,
+      "publishedAt": "2025-10-22T22:03:05-07:00",
+      "permalink": "https://www.youtube.com/watch?v=GqygIg_0D2g",
+      "durationSeconds": 35
+    },
+    {
+      "id": "9drEtuG4gRw",
+      "title": "License to Lillard 2025 - Ep. 2: The Birth of Logo Lillard",
+      "viewCount": 28515,
+      "likeCount": 1218,
+      "publishedAt": "2025-10-10T08:00:08-07:00",
+      "permalink": "https://www.youtube.com/watch?v=9drEtuG4gRw",
+      "durationSeconds": 1277
+    },
+    {
+      "id": "R8h8Kw38t5I",
+      "title": "License to Lillard 2025 - Ep. 2 Trailer",
+      "viewCount": 3463,
+      "likeCount": 132,
+      "publishedAt": "2025-10-09T14:08:17-07:00",
+      "permalink": "https://www.youtube.com/watch?v=R8h8Kw38t5I",
+      "durationSeconds": 34
+    },
+    {
+      "id": "IJP2QmSC3zY",
+      "title": "Dame Recovery Mode - Drop 9",
+      "viewCount": 15861,
+      "likeCount": 529,
+      "publishedAt": "2025-10-08T17:47:56-07:00",
+      "permalink": "https://www.youtube.com/watch?v=IJP2QmSC3zY",
+      "durationSeconds": 172
+    },
+    {
+      "id": "PmCBPvH5P1I",
+      "title": "Dame D.O.L.L.A. -  Pat Bev",
+      "viewCount": 104672,
+      "likeCount": 5083,
+      "publishedAt": "2025-10-02T21:19:39-07:00",
+      "permalink": "https://www.youtube.com/watch?v=PmCBPvH5P1I",
+      "durationSeconds": 179
+    },
+    {
+      "id": "2LnWPpPPNPw",
+      "title": "Dame D.O.L.L.A. -  Riq Havoc",
+      "viewCount": 4613,
+      "likeCount": 193,
+      "publishedAt": "2025-10-02T21:18:04-07:00",
+      "permalink": "https://www.youtube.com/watch?v=2LnWPpPPNPw",
+      "durationSeconds": 117
+    },
+    {
+      "id": "wAXMQ_pHv-I",
+      "title": "Dame D.O.L.L.A. - My Daddy's Son Pt.  2",
+      "viewCount": 3246,
+      "likeCount": 144,
+      "publishedAt": "2025-10-02T21:16:52-07:00",
+      "permalink": "https://www.youtube.com/watch?v=wAXMQ_pHv-I",
+      "durationSeconds": 128
+    },
+    {
+      "id": "1FRIRmI8gbo",
+      "title": "Dame D.O.L.L.A. -  DOLLA Season ft. Ivory Scott",
+      "viewCount": 5532,
+      "likeCount": 170,
+      "publishedAt": "2025-10-02T21:04:49-07:00",
+      "permalink": "https://www.youtube.com/watch?v=1FRIRmI8gbo",
+      "durationSeconds": 131
+    }
+  ],
+  "topVideos": [
+    {
+      "id": "cQtmAbWeH38",
+      "title": "Dame D.O.L.L.A. - Riq Havoc",
+      "viewCount": 1099323,
+      "likeCount": 11407,
+      "publishedAt": "2025-10-23T08:00:06-07:00",
+      "permalink": "https://www.youtube.com/watch?v=cQtmAbWeH38",
+      "durationSeconds": 116
+    },
+    {
+      "id": "oaK1isIleIw",
+      "title": "Dame D.O.L.L.A. - Gimme Some Love",
+      "viewCount": 169929,
+      "likeCount": 8840,
+      "publishedAt": "2025-11-15T07:45:07-08:00",
+      "permalink": "https://www.youtube.com/watch?v=oaK1isIleIw",
+      "durationSeconds": 137
+    },
+    {
+      "id": "Ipxz3feeOeQ",
+      "title": "Dame Summer 2025 Recovery Mode - Drop 2",
+      "viewCount": 135838,
+      "likeCount": 3051,
+      "publishedAt": "2025-08-04T13:07:03-07:00",
+      "permalink": "https://www.youtube.com/watch?v=Ipxz3feeOeQ",
+      "durationSeconds": 119
+    },
+    {
+      "id": "PmCBPvH5P1I",
+      "title": "Dame D.O.L.L.A. -  Pat Bev",
+      "viewCount": 104672,
+      "likeCount": 5083,
+      "publishedAt": "2025-10-02T21:19:39-07:00",
+      "permalink": "https://www.youtube.com/watch?v=PmCBPvH5P1I",
+      "durationSeconds": 179
+    },
+    {
+      "id": "s66EWh6zdlI",
+      "title": "Dame Summer 2025 Recovery Mode - Drop 1",
+      "viewCount": 80918,
+      "likeCount": 1559,
+      "publishedAt": "2025-08-01T08:28:00-07:00",
+      "permalink": "https://www.youtube.com/watch?v=s66EWh6zdlI",
+      "durationSeconds": 38
+    },
+    {
+      "id": "L0UTt73E9qg",
+      "title": "Dame Summer 2025 Recovery Mode - Drop 3",
+      "viewCount": 42755,
+      "likeCount": 1210,
+      "publishedAt": "2025-08-18T21:02:56-07:00",
+      "permalink": "https://www.youtube.com/watch?v=L0UTt73E9qg",
+      "durationSeconds": 178
+    },
+    {
+      "id": "E97GN62Yfr0",
+      "title": "Dame Summer 2025 Recovery Mode - Drop 4",
+      "viewCount": 40879,
+      "likeCount": 930,
+      "publishedAt": "2025-08-26T13:47:58-07:00",
+      "permalink": "https://www.youtube.com/watch?v=E97GN62Yfr0",
+      "durationSeconds": 169
+    },
+    {
+      "id": "2X0kBM61hyg",
+      "title": "License To Lillard 2025 - Episode 1: First Series Win in 14 Years",
+      "viewCount": 29683,
+      "likeCount": 1487,
+      "publishedAt": "2025-09-19T13:00:07-07:00",
+      "permalink": "https://www.youtube.com/watch?v=2X0kBM61hyg",
+      "durationSeconds": 992
+    }
+  ]
+}
