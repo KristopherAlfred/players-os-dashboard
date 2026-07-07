@@ -50,13 +50,104 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
 
   try {
     const response = await fetch(`${base}/data/youtube-analytics.json`);
+    if (response.ok) {
+      const data = (await response.json()) as YouTubeAnalytics;
+      if (data?.kpis) return { ...data, source: "cache" };
+    }
+  } catch {
+    // fall through to video feed
+  }
+
+  try {
+    const response = await fetch(`${base}/data/youtube-videos.json`);
     if (!response.ok) return null;
-    const data = (await response.json()) as YouTubeAnalytics;
-    if (!data?.kpis) return null;
-    return { ...data, source: "cache" };
+    const feed = (await response.json()) as {
+      channel?: {
+        id?: string;
+        name?: string;
+        handle?: string;
+        subscribers?: number;
+        subscribersLabel?: string;
+      };
+      videos?: Array<{
+        id: string;
+        title: string;
+        viewCount?: number;
+        likeCount?: number;
+        publishedAt?: string;
+        permalink?: string;
+        durationSeconds?: number;
+      }>;
+      syncedAt?: string;
+    };
+    return buildYouTubeAnalyticsFromFeed(feed);
   } catch {
     return null;
   }
+}
+
+function buildYouTubeAnalyticsFromFeed(feed: {
+  channel?: {
+    id?: string;
+    name?: string;
+    handle?: string;
+    subscribers?: number;
+    subscribersLabel?: string;
+  };
+  videos?: Array<{
+    id: string;
+    title: string;
+    viewCount?: number;
+    likeCount?: number;
+    publishedAt?: string;
+    permalink?: string;
+    durationSeconds?: number;
+  }>;
+  syncedAt?: string;
+}): YouTubeAnalytics | null {
+  const videos = (feed.videos ?? []).map((video) => ({
+    id: video.id,
+    title: video.title,
+    viewCount: Number(video.viewCount ?? 0),
+    likeCount: Number(video.likeCount ?? 0),
+    publishedAt: video.publishedAt || new Date().toISOString(),
+    permalink: video.permalink || `https://www.youtube.com/watch?v=${video.id}`,
+    durationSeconds: Number(video.durationSeconds ?? 0),
+  }));
+
+  if (!videos.length) return null;
+
+  const recentVideos = videos.slice(0, 12);
+  const topVideos = [...videos].sort((a, b) => b.viewCount - a.viewCount).slice(0, 8);
+  const totalViews = videos.reduce((sum, video) => sum + video.viewCount, 0);
+  const totalLikes = videos.reduce((sum, video) => sum + video.likeCount, 0);
+  const avgViews = Math.round(totalViews / videos.length);
+  const avgLikes = Math.round(totalLikes / videos.length);
+  const subscribers = Number(feed.channel?.subscribers ?? 0);
+  const handle = feed.channel?.handle ?? "@DamianLillard";
+
+  return {
+    syncedAt: feed.syncedAt || new Date().toISOString(),
+    source: "cache",
+    channel: {
+      id: feed.channel?.id ?? "UCIhTfcMzbR5wyNeh57ju0ug",
+      name: feed.channel?.name ?? "Damian Lillard",
+      handle,
+      permalink: `https://www.youtube.com/${handle.replace(/^@/, "@")}`,
+      subscribers,
+      subscribersLabel: feed.channel?.subscribersLabel ?? (subscribers ? `${formatMetric(subscribers, true)} subscribers` : "Subscribers unavailable"),
+    },
+    kpis: {
+      subscribers,
+      totalVideos: videos.length,
+      totalViews,
+      avgViews,
+      avgLikes,
+      engagementRate: avgViews > 0 ? Math.round((avgLikes / avgViews) * 10_000) / 100 : 0,
+    },
+    recentVideos,
+    topVideos,
+  };
 }
 
 export function formatMetric(value: number, compact = false) {
