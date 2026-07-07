@@ -35,25 +35,31 @@ function getApiBase() {
   return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://dametime-app.vercel.app").replace(/\/$/, "");
 }
 
+async function fetchJsonAnalytics(url: string): Promise<YouTubeAnalytics | null> {
+  const response = await fetch(url);
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!response.ok || !contentType.includes("application/json")) return null;
+  const data = (await response.json()) as YouTubeAnalytics & { ok?: boolean };
+  if (!data?.kpis) return null;
+  return data;
+}
+
 export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> {
   const base = getApiBase();
+  const apiUrls = [`${base}/api/youtube/analytics`, `${base}/api/youtube-analytics`];
 
-  try {
-    const response = await fetch(`${base}/api/youtube/analytics`);
-    if (response.ok) {
-      const data = (await response.json()) as YouTubeAnalytics & { ok?: boolean };
-      if (data?.kpis) return data;
+  for (const url of apiUrls) {
+    try {
+      const data = await fetchJsonAnalytics(url);
+      if (data) return data;
+    } catch {
+      // try next source
     }
-  } catch {
-    // fall through to static cache
   }
 
   try {
-    const response = await fetch(`${base}/data/youtube-analytics.json`);
-    if (response.ok) {
-      const data = (await response.json()) as YouTubeAnalytics;
-      if (data?.kpis) return { ...data, source: "cache" };
-    }
+    const data = await fetchJsonAnalytics(`${base}/data/youtube-analytics.json`);
+    if (data) return { ...data, source: "cache" };
   } catch {
     // fall through to video feed
   }
