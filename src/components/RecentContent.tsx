@@ -4,12 +4,12 @@ import { Card } from "./ui/Card";
 import { ContentThumb } from "./ContentThumb";
 import { recentContent } from "../data/mockData";
 
-const tabs = ["All Content", "Videos", "Images", "Newsletters"] as const;
+const tabs = ["All Content", "Videos", "Giveaways", "Newsletters"] as const;
 type ContentTab = (typeof tabs)[number];
 
 const tabTypeMap: Record<Exclude<ContentTab, "All Content">, string> = {
   Videos: "Video",
-  Images: "Image",
+  Giveaways: "Giveaway",
   Newsletters: "Newsletter",
 };
 

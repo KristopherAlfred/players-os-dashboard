@@ -73,7 +73,7 @@ export const recentContent = [
   },
   {
     title: "YAGI Mixtape — #DameDOLLA",
-    type: "Image",
+    type: "Giveaway",
     status: "Published",
     published: "Sep 23",
     views: "362",
@@ -109,7 +109,7 @@ export const recentContent = [
   },
   {
     title: "adidas Eurocamp — Move Game Day insoles",
-    type: "Image",
+    type: "Giveaway",
     status: "Published",
     published: "Jun 26",
     views: "784",
