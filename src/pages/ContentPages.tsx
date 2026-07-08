@@ -14,6 +14,7 @@ import {
 const typeIcons: Record<string, typeof Play> = {
   Video: Play,
   Image: Image,
+  Newsletter: FileText,
   Article: FileText,
   Audio: Music,
   Story: Image,
@@ -114,7 +115,7 @@ export function NewsContentPage() {
       title="News"
       items={newsContent}
       stats={[
-        { label: "Articles", value: "18" },
+        { label: "Newsletters", value: "18" },
         { label: "Drafts", value: "4" },
         { label: "Total reads", value: "412K", hint: "Last 30 days" },
       ]}
