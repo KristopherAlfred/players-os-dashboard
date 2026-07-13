@@ -55,6 +55,7 @@ export function LivePage() {
   const [messages, setMessages] = useState<LiveChatMessage[]>([]);
   const [fullscreen, setFullscreen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [confirmGoLive, setConfirmGoLive] = useState(false);
 
   const isLive = status === "live";
   const { viewerCount, error: hostError } = useLiveHost(isLive, localStream, session?.id ?? null);
@@ -406,7 +407,7 @@ export function LivePage() {
               <button
                 type="button"
                 disabled={busy || !title.trim()}
-                onClick={() => void handleGoLive()}
+                onClick={() => setConfirmGoLive(true)}
                 className="go-live-pulse flex w-full items-center justify-center gap-3 rounded-2xl bg-dt-red px-5 py-5 text-lg font-bold tracking-wide text-white disabled:opacity-40 disabled:[animation:none]"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
@@ -455,6 +456,55 @@ export function LivePage() {
           </div>
         </div>
       </div>
+
+      {confirmGoLive && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="go-live-confirm-title"
+            className="w-full max-w-md overflow-hidden rounded-2xl border border-dt-border bg-dt-card shadow-2xl shadow-black/50"
+          >
+            <div className="border-b border-dt-border bg-gradient-to-br from-dt-red/20 to-transparent px-5 py-4">
+              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-dt-red/20 text-dt-red">
+                <Radio size={20} />
+              </div>
+              <h3 id="go-live-confirm-title" className="text-lg font-semibold text-white">
+                Are you sure you want to go live?
+              </h3>
+            </div>
+            <div className="space-y-3 px-5 py-4 text-sm leading-relaxed text-white/70">
+              <p>
+                If you hit <span className="font-semibold text-white">Yes</span>, your camera will start broadcasting on DameTime right away.
+              </p>
+              <p>
+                Fans will see <span className="font-semibold text-dt-green">DAME LIVE NOW</span> on the home screen and can join your live video and chat.
+              </p>
+            </div>
+            <div className="flex gap-3 border-t border-dt-border px-5 py-4">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setConfirmGoLive(false)}
+                className="flex-1 rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white hover:bg-white/[0.05] disabled:opacity-40"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setConfirmGoLive(false);
+                  void handleGoLive();
+                }}
+                className="flex-1 rounded-xl bg-dt-red px-4 py-3 text-sm font-bold text-white hover:brightness-110 disabled:opacity-40"
+              >
+                Yes, go live
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
