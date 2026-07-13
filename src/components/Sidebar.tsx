@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Zap,
   Trophy,
+  Radio,
   X,
 } from "lucide-react";
 import {
@@ -34,6 +35,7 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
   "dollar-sign": DollarSign,
   settings: Settings,
   trophy: Trophy,
+  radio: Radio,
 };
 
 const sectionGlowStyle = {

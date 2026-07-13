@@ -60,6 +60,12 @@ export const navSections: NavSection[] = [
     ],
   },
   {
+    label: "LIVE",
+    icon: "radio",
+    items: [],
+    directPath: "/live",
+  },
+  {
     label: "FANS & DATA",
     icon: "users",
     items: [
@@ -134,6 +140,10 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/athletes/hub": {
     title: "Athlete Hub",
     subtitle: "Athletes and representatives sign in to upload and manage content.",
+  },
+  "/live": {
+    title: "Live",
+    subtitle: "Go live from Dame’s studio to Instagram, Facebook, YouTube, and X.",
   },
   "/content/upload": {
     title: "Upload Content",
