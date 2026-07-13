@@ -143,7 +143,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/live": {
     title: "Live",
-    subtitle: "Go live from Dame’s studio to Instagram, Facebook, YouTube, and X.",
+    subtitle: "Go live on DameTime for fans watching in the app and on the site.",
   },
   "/content/upload": {
     title: "Upload Content",
