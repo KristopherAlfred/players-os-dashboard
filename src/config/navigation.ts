@@ -163,7 +163,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/settings": {
     title: "Settings",
-    subtitle: "Team, integrations, account preferences, and dashboard appearance.",
+    subtitle: "Integrations, account preferences, and dashboard appearance.",
   },
   "/fans/audience": {
     title: "Audience Overview",

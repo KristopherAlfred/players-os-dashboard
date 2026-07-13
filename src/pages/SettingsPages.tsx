@@ -6,13 +6,6 @@ import { saveDashboardSession } from "../lib/dashboardAuth";
 import { useTheme } from "../theme/ThemeContext";
 import type { ThemeTemplate } from "../theme/themes";
 
-const team = [
-  { name: "Demetri W.", role: "Admin", email: "demetri@dametime.com", status: "Active" },
-  { name: "Sarah K.", role: "Editor", email: "sarah@dametime.com", status: "Active" },
-  { name: "Mike T.", role: "Analyst", email: "mike@dametime.com", status: "Active" },
-  { name: "Guest", role: "Viewer", email: "guest@partner.com", status: "Pending" },
-];
-
 const integrations = [
   { name: "Instagram", connected: true, last: "Synced 5m ago" },
   { name: "TikTok", connected: true, last: "Synced 12m ago" },
@@ -28,25 +21,6 @@ const permissions = [
   { role: "Analyst", publish: false, export: true, monetize: false, settings: false },
   { role: "Viewer", publish: false, export: false, monetize: false, settings: false },
 ];
-
-export function TeamPage() {
-  return (
-    <Panel title="Team Members">
-      <div className="mb-4 flex justify-end"><button type="button" className="rounded-md bg-dt-red px-4 py-2 text-sm font-semibold">+ Invite Member</button></div>
-      <table className="w-full text-left text-sm">
-        <thead><tr className="border-b border-dt-border text-xs text-dt-muted"><th className="pb-2">Name</th><th className="pb-2">Role</th><th className="pb-2">Email</th><th className="pb-2">Status</th></tr></thead>
-        <tbody>
-          {team.map((m) => (
-            <tr key={m.email} className="border-b border-dt-border/50">
-              <td className="py-3 font-medium">{m.name}</td><td className="py-3">{m.role}</td><td className="py-3 text-dt-muted">{m.email}</td>
-              <td className="py-3"><span className={`rounded px-2 py-0.5 text-xs ${m.status === "Active" ? "bg-green-500/15 text-dt-green" : "bg-orange-500/15 text-dt-orange"}`}>{m.status}</span></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Panel>
-  );
-}
 
 export function RolesPage() {
   return (
@@ -170,7 +144,6 @@ export function SettingsPage() {
           Sign out of AMX Dashboard
         </button>
       </div>
-      <TeamPage />
       <RolesPage />
       <IntegrationsPage />
       <AccountPage />
