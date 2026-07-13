@@ -8,11 +8,10 @@ import type { ThemeTemplate } from "../theme/themes";
 
 const integrations = [
   { name: "Instagram", connected: true, last: "Synced 5m ago" },
-  { name: "TikTok", connected: true, last: "Synced 12m ago" },
-  { name: "Mailchimp", connected: true, last: "Synced 1h ago" },
-  { name: "Twilio SMS", connected: true, last: "Synced 30m ago" },
-  { name: "Google Analytics", connected: false, last: "Not connected" },
-  { name: "Shopify", connected: false, last: "Not connected" },
+  { name: "X", connected: true, last: "Synced 8m ago" },
+  { name: "Facebook", connected: true, last: "Synced 12m ago" },
+  { name: "YouTube", connected: true, last: "Synced 15m ago" },
+  { name: "TikTok", connected: true, last: "Synced 20m ago" },
 ];
 
 const permissions = [
