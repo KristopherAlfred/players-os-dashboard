@@ -5,11 +5,12 @@ import { Panel, StatCard } from "../components/PageShell";
 import {
   eventsContent,
   musicContent,
-  newsContent,
   socialContent,
   videoContent,
   type ContentItem,
 } from "../data/contentCategories";
+
+export { NewsContentPage } from "./NewsContentPage";
 
 const typeIcons: Record<string, typeof Play> = {
   Video: Play,
@@ -104,20 +105,6 @@ export function SocialContentPage() {
         { label: "Posts (7d)", value: "24", hint: "Across all channels" },
         { label: "Scheduled", value: "6" },
         { label: "Avg. engagement", value: "14.2%", hint: "+3.1% vs last week" },
-      ]}
-    />
-  );
-}
-
-export function NewsContentPage() {
-  return (
-    <ContentCategoryPage
-      title="News"
-      items={newsContent}
-      stats={[
-        { label: "Newsletters", value: "18" },
-        { label: "Drafts", value: "4" },
-        { label: "Total reads", value: "412K", hint: "Last 30 days" },
       ]}
     />
   );

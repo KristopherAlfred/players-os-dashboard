@@ -28,6 +28,7 @@ import {
 import { SettingsPage } from "./pages/SettingsPages";
 import { AthleteHubPage } from "./pages/AthletePages";
 import { LivePage } from "./pages/LivePage";
+import { ExperiencePage } from "./pages/ExperiencePage";
 import { LandingPage } from "./pages/LandingPage";
 import { MarketingLandingPage } from "./pages/MarketingLandingPage";
 import { RequireAuth, PublicOnly } from "./components/RequireAuth";
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="content/upload" element={<Navigate to="/athletes/hub" replace />} />
           <Route path="athletes/hub" element={<AthleteHubPage />} />
           <Route path="live" element={<LivePage />} />
+          <Route path="experience" element={<ExperiencePage />} />
           <Route path="content/calendar" element={<ContentCalendarPage />} />
           <Route path="engagement/overview" element={<EngagementOverviewPage />} />
           <Route path="engagement/comments" element={<CommentsPage />} />

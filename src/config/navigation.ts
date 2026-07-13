@@ -66,6 +66,12 @@ export const navSections: NavSection[] = [
     directPath: "/live",
   },
   {
+    label: "EXPERIENCE",
+    icon: "sparkles",
+    items: [],
+    directPath: "/experience",
+  },
+  {
     label: "FANS & DATA",
     icon: "users",
     items: [
@@ -119,7 +125,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/news": {
     title: "News",
-    subtitle: "Articles, press releases, and features for fans and media.",
+    subtitle: "Write newsletters and insights that publish straight to the DameTime app.",
   },
   "/content/videos": {
     title: "Videos",
@@ -144,6 +150,10 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/live": {
     title: "Live",
     subtitle: "Go live on DameTime for fans watching in the app and on the site.",
+  },
+  "/experience": {
+    title: "Experience",
+    subtitle: "Drag, style, and publish the DameTime app home screen.",
   },
   "/content/upload": {
     title: "Upload Content",

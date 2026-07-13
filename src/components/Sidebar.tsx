@@ -13,6 +13,7 @@ import {
   Zap,
   Trophy,
   Radio,
+  Sparkles,
   X,
 } from "lucide-react";
 import {
@@ -36,6 +37,7 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
   settings: Settings,
   trophy: Trophy,
   radio: Radio,
+  sparkles: Sparkles,
 };
 
 const sectionGlowStyle = {
