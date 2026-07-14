@@ -11,6 +11,7 @@ export { NewsContentPage } from "./NewsContentPage";
 export { VideosContentPage } from "./VideosContentPage";
 export { EventsGiveawaysPage } from "./EventsGiveawaysPage";
 export { MusicContentPage } from "./MusicContentPage";
+export { ContentCalendarPage } from "./ContentCalendarPage";
 
 const typeIcons: Record<string, typeof Play> = {
   Video: Play,
@@ -107,54 +108,5 @@ export function SocialContentPage() {
         { label: "Avg. engagement", value: "14.2%", hint: "+3.1% vs last week" },
       ]}
     />
-  );
-}
-
-const calendarEvents = [
-  { date: "May 20", title: "Tour Announcement Teaser", type: "Video" },
-  { date: "May 22", title: "Inner Circle Live Stream", type: "Event" },
-  { date: "May 24", title: "Signed jersey giveaway", type: "Giveaway" },
-  { date: "May 26", title: "Email Blast — Flash Drop", type: "Social" },
-];
-
-export function ContentCalendarPage() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div className="col-span-1 lg:col-span-2">
-        <Panel title="June 2026">
-          <div className="grid grid-cols-7 gap-1 text-center text-xs">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-              <div key={d} className="py-2 text-dt-muted">
-                {d}
-              </div>
-            ))}
-            {Array.from({ length: 35 }, (_, i) => (
-              <div
-                key={i}
-                className={`min-h-[72px] rounded-md border border-dt-border/50 p-1 ${
-                  i >= 12 && i <= 19 ? "border-dt-red/30 bg-dt-red/5" : "bg-dt-bg/40"
-                }`}
-              >
-                <span className="text-[10px] text-dt-muted">{(i % 31) + 1}</span>
-                {i === 20 && (
-                  <p className="mt-1 truncate rounded bg-dt-red/20 px-1 text-[9px] text-dt-red">Teaser</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </Panel>
-      </div>
-      <Panel title="Upcoming">
-        <ul className="space-y-3">
-          {calendarEvents.map((e) => (
-            <li key={e.title} className="rounded-md border border-dt-border bg-dt-bg/50 p-3">
-              <p className="text-xs text-dt-red">{e.date}</p>
-              <p className="mt-1 text-sm font-medium">{e.title}</p>
-              <p className="text-xs text-dt-muted">{e.type}</p>
-            </li>
-          ))}
-        </ul>
-      </Panel>
-    </div>
   );
 }

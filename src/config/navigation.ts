@@ -132,7 +132,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/calendar": {
     title: "Content Calendar",
-    subtitle: "Plan drops, schedule posts, and coordinate your release cadence.",
+    subtitle: "Live posts from DameTime and social — exact date, time, and what went live.",
   },
   "/live": {
     title: "Live",
