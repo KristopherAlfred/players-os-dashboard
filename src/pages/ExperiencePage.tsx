@@ -1,12 +1,21 @@
 import { useEffect, useMemo, useState, type DragEvent } from "react";
 import {
+  CalendarDays,
+  Eye,
+  EyeOff,
+  Film,
+  Gift,
   GripVertical,
   ImagePlus,
   Loader2,
+  Music2,
+  Newspaper,
   Plus,
   Sparkles,
+  Ticket,
   Trash2,
   Upload,
+  LayoutTemplate,
 } from "lucide-react";
 import {
   createWidget,
@@ -19,24 +28,43 @@ import {
   type HomeWidgetType,
 } from "../lib/homeLayoutApi";
 
-const ADD_TYPES: { type: HomeWidgetType; label: string }[] = [
-  { type: "tickets", label: "DameTime Tickets" },
-  { type: "custom", label: "Custom box" },
-  { type: "videos", label: "Videos" },
-  { type: "news", label: "News" },
-  { type: "events", label: "Events" },
-  { type: "music", label: "Music" },
+const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: typeof Ticket }[] = [
+  { type: "tickets", label: "DameTime Tickets", hint: "Ticket drops", Icon: Ticket },
+  { type: "custom", label: "Custom box", hint: "Any link + art", Icon: LayoutTemplate },
+  { type: "videos", label: "Videos", hint: "Exclusive clips", Icon: Film },
+  { type: "news", label: "News", hint: "Newsletters", Icon: Newspaper },
+  { type: "events", label: "Events", hint: "Giveaways", Icon: Gift },
+  { type: "music", label: "Music", hint: "D.O.L.L.A", Icon: Music2 },
 ];
+
+const typeMeta: Record<HomeWidgetType, { label: string; Icon: typeof Ticket }> = {
+  tickets: { label: "Tickets", Icon: Ticket },
+  custom: { label: "Custom", Icon: LayoutTemplate },
+  videos: { label: "Videos", Icon: Film },
+  news: { label: "News", Icon: Newspaper },
+  events: { label: "Events", Icon: CalendarDays },
+  music: { label: "Music", Icon: Music2 },
+};
 
 function titleLines(title: string) {
   return title.split("\n");
 }
 
-function PreviewCard({ widget }: { widget: HomeWidget }) {
+function fieldClass() {
+  return "w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25";
+}
+
+function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boolean }) {
   const lines = titleLines(widget.title);
   const fit = widget.imageFit || "half";
   return (
-    <div className="relative flex h-full min-h-[88px] overflow-hidden rounded-xl border border-white/10 bg-black/60">
+    <div
+      className={`relative flex h-full min-h-[112px] overflow-hidden rounded-2xl border transition ${
+        selected
+          ? "border-dt-red shadow-[0_0_0_1px_rgba(229,9,20,0.45),0_8px_24px_rgba(229,9,20,0.18)]"
+          : "border-white/10 hover:border-white/25"
+      } bg-gradient-to-br from-white/[0.06] to-black/80`}
+    >
       {fit === "full" ? (
         <>
           <img
@@ -44,9 +72,9 @@ function PreviewCard({ widget }: { widget: HomeWidget }) {
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/45 to-transparent" />
-          <div className="relative z-10 flex h-full flex-col justify-between p-2.5">
-            <p className="text-[11px] font-black leading-tight text-white uppercase">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/50 to-transparent" />
+          <div className="relative z-10 flex h-full flex-col justify-between p-3">
+            <p className="font-display text-[12px] font-extrabold uppercase leading-[1.05] tracking-[0.06em] text-white">
               {lines.map((line, i) => (
                 <span key={`${widget.id}-t-${i}`}>
                   {line}
@@ -58,8 +86,8 @@ function PreviewCard({ widget }: { widget: HomeWidget }) {
         </>
       ) : (
         <div className="flex h-full w-full">
-          <div className="flex min-w-0 flex-1 flex-col justify-between p-2.5">
-            <p className="text-[11px] font-black leading-tight text-white uppercase">
+          <div className="flex min-w-0 flex-1 flex-col justify-between p-3">
+            <p className="font-display text-[12px] font-extrabold uppercase leading-[1.05] tracking-[0.06em] text-white">
               {lines.map((line, i) => (
                 <span key={`${widget.id}-t-${i}`}>
                   {line}
@@ -68,18 +96,20 @@ function PreviewCard({ widget }: { widget: HomeWidget }) {
               ))}
             </p>
           </div>
-          <div className="relative h-full w-[48%] shrink-0">
+          <div className="relative h-full w-[52%] shrink-0">
             <img
               src={resolveAssetUrl(widget.imageSrc)}
               alt=""
-              className="h-full w-full object-contain object-bottom object-right"
+              className="h-full w-full object-contain object-bottom object-right drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
             />
           </div>
         </div>
       )}
       {!widget.enabled ? (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/55 text-[10px] font-semibold uppercase tracking-wide text-white/80">
-          Hidden
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/65 backdrop-blur-[1px]">
+          <span className="rounded-full border border-white/20 bg-black/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/80">
+            Hidden
+          </span>
         </div>
       ) : null}
     </div>
@@ -92,10 +122,12 @@ export function ExperiencePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState("Damian Lillard red jersey cutout transparent background");
+  const [aiPrompt, setAiPrompt] = useState("Damian Lillard red jersey cutout, transparent background, mobile app tile");
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     void fetchHomeLayout()
@@ -117,7 +149,10 @@ export function ExperiencePage() {
     [layout],
   );
 
+  const visibleCount = ordered.filter((w) => w.enabled).length;
+
   function updateWidgets(updater: (widgets: HomeWidget[]) => HomeWidget[]) {
+    setDirty(true);
     setLayout((prev) => {
       if (!prev) return prev;
       const widgets = updater([...prev.widgets]).map((w, index) => ({ ...w, order: index }));
@@ -134,8 +169,17 @@ export function ExperiencePage() {
     setDragId(id);
   }
 
+  function onDragOver(e: DragEvent, targetId: string) {
+    e.preventDefault();
+    if (dragId && dragId !== targetId) setDropTargetId(targetId);
+  }
+
   function onDrop(targetId: string) {
-    if (!dragId || dragId === targetId) return;
+    if (!dragId || dragId === targetId) {
+      setDragId(null);
+      setDropTargetId(null);
+      return;
+    }
     updateWidgets((widgets) => {
       const sorted = [...widgets].sort((a, b) => a.order - b.order);
       const from = sorted.findIndex((w) => w.id === dragId);
@@ -146,6 +190,8 @@ export function ExperiencePage() {
       return sorted;
     });
     setDragId(null);
+    setDropTargetId(null);
+    setStatus("Order updated — publish when ready");
   }
 
   function addWidget(type: HomeWidgetType) {
@@ -154,13 +200,14 @@ export function ExperiencePage() {
       setSelectedId(next.id);
       return [...widgets, next];
     });
-    setStatus(`Added ${type} box`);
+    setStatus(`Added ${typeMeta[type].label} box`);
   }
 
   function removeSelected() {
     if (!selectedId) return;
     updateWidgets((widgets) => widgets.filter((w) => w.id !== selectedId));
     setSelectedId(null);
+    setStatus("Box removed");
   }
 
   async function onPublish() {
@@ -176,6 +223,7 @@ export function ExperiencePage() {
         widgets: layout.widgets.map((w, index) => ({ ...w, order: index })),
       });
       setLayout(published);
+      setDirty(false);
       setStatus("Published to DameTime app home");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Publish failed");
@@ -191,7 +239,11 @@ export function ExperiencePage() {
     try {
       const result = await generateHomeImage(aiPrompt);
       patchSelected({ imageSrc: result.imageSrc });
-      setStatus(result.source === "openai" ? "AI image applied" : "Placeholder art applied (set OPENAI_API_KEY for real gens)");
+      setStatus(
+        result.source === "openai"
+          ? "AI image applied to this box"
+          : "Placeholder art applied — set OPENAI_API_KEY on dame-bio for ChatGPT images",
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generate failed");
     } finally {
@@ -223,111 +275,222 @@ export function ExperiencePage() {
     return <div className="p-6 text-red-300">{error || "No layout found"}</div>;
   }
 
+  const SelectedIcon = selected ? typeMeta[selected.type].Icon : LayoutTemplate;
+
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-xl text-sm text-white/60">
-          Drag home tiles, swap art, add Tickets or custom boxes, then publish to the DameTime app.
-        </p>
-        <button
-          type="button"
-          onClick={() => void onPublish()}
-          disabled={saving}
-          className="inline-flex items-center gap-2 rounded-lg bg-dt-red px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
-        >
-          {saving ? <Loader2 size={16} className="animate-spin" /> : null}
-          Publish to app
-        </button>
+      <style>{`
+        @keyframes exp-phone-glow {
+          0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); }
+          50% { box-shadow: 0 0 0 1px rgba(229,9,20,0.25), 0 28px 70px rgba(229,9,20,0.12); }
+        }
+        .exp-phone-shell { animation: exp-phone-glow 4.5s ease-in-out infinite; }
+        @keyframes exp-spark {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.08); }
+        }
+        .exp-ai-spark { animation: exp-spark 2.2s ease-in-out infinite; }
+      `}</style>
+
+      {/* Header */}
+      <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
+                <Sparkles size={12} />
+                Experience builder
+              </div>
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                Design the DameTime home experience
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/65">
+                Drag tiles, swap art, drop in Tickets or custom boxes, generate AI cutouts, then publish straight to the fan app.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Boxes</p>
+                <p className="mt-1 text-lg font-bold text-white">{ordered.length}</p>
+              </div>
+              <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Visible</p>
+                <p className="mt-1 text-lg font-bold text-white">{visibleCount}</p>
+              </div>
+              <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Status</p>
+                <p className={`mt-1 text-lg font-bold ${dirty ? "text-dt-orange" : "text-dt-green"}`}>
+                  {dirty ? "Unsaved" : "Synced"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void onPublish()}
+                disabled={saving}
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+              >
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                Publish to app
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {(error || status) && (
+          <div className="space-y-2 border-b border-dt-border px-5 py-3">
+            {error ? (
+              <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
+            ) : null}
+            {status ? (
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
+                {status}
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
 
-      {error ? <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div> : null}
-      {status ? <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">{status}</div> : null}
-
-      <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)_340px]">
-        {/* Widget list */}
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">Home boxes</h2>
-            <label className="flex items-center gap-2 text-xs text-white/55">
+      <div className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_360px]">
+        {/* Left: boxes */}
+        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+          <div className="flex items-center justify-between border-b border-dt-border px-4 py-3">
+            <div>
+              <h3 className="font-display text-sm font-semibold tracking-wide text-white">Home boxes</h3>
+              <p className="text-[11px] text-white/40">Drag to reorder fan home</p>
+            </div>
+            <label className="flex items-center gap-2 rounded-full border border-white/10 bg-black/35 px-2.5 py-1 text-[11px] text-white/70">
               <input
                 type="checkbox"
                 checked={layout.heroEnabled}
-                onChange={(e) => setLayout({ ...layout, heroEnabled: e.target.checked })}
+                onChange={(e) => {
+                  setDirty(true);
+                  setLayout({ ...layout, heroEnabled: e.target.checked });
+                }}
+                className="accent-dt-red"
               />
-              Hero carousel
+              Hero
             </label>
           </div>
 
-          <ul className="space-y-2">
-            {ordered.map((widget) => (
-              <li
-                key={widget.id}
-                draggable
-                onDragStart={() => onDragStart(widget.id)}
-                onDragOver={(e: DragEvent) => e.preventDefault()}
-                onDrop={() => onDrop(widget.id)}
-                onClick={() => setSelectedId(widget.id)}
-                className={`flex cursor-grab items-center gap-2 rounded-xl border px-2.5 py-2 transition active:cursor-grabbing ${
-                  selectedId === widget.id
-                    ? "border-dt-red/70 bg-dt-red/15"
-                    : "border-white/10 bg-black/20 hover:border-white/25"
-                }`}
-              >
-                <GripVertical size={16} className="shrink-0 text-white/35" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-white">{widget.title.replace(/\n/g, " / ")}</p>
-                  <p className="truncate text-[11px] uppercase tracking-wide text-white/40">{widget.type}</p>
-                </div>
-              </li>
-            ))}
+          <ul className="space-y-2 p-3">
+            {ordered.map((widget, index) => {
+              const Meta = typeMeta[widget.type];
+              const isSelected = selectedId === widget.id;
+              const isDragging = dragId === widget.id;
+              const isDrop = dropTargetId === widget.id && dragId !== widget.id;
+              return (
+                <li
+                  key={widget.id}
+                  draggable
+                  onDragStart={() => onDragStart(widget.id)}
+                  onDragOver={(e) => onDragOver(e, widget.id)}
+                  onDragLeave={() => setDropTargetId((id) => (id === widget.id ? null : id))}
+                  onDrop={() => onDrop(widget.id)}
+                  onDragEnd={() => {
+                    setDragId(null);
+                    setDropTargetId(null);
+                  }}
+                  onClick={() => setSelectedId(widget.id)}
+                  className={`group flex cursor-grab items-center gap-2.5 rounded-xl border px-2.5 py-2.5 transition active:cursor-grabbing ${
+                    isSelected
+                      ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(229,9,20,0.2)]"
+                      : isDrop
+                        ? "border-dt-red/50 bg-dt-red/10"
+                        : "border-white/10 bg-black/25 hover:border-white/20 hover:bg-white/[0.04]"
+                  } ${isDragging ? "opacity-45" : ""}`}
+                >
+                  <div className="flex h-9 w-6 shrink-0 items-center justify-center rounded-md text-white/35 group-hover:text-white/55">
+                    <GripVertical size={16} />
+                  </div>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black/40 text-white/70">
+                    <Meta.Icon size={15} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-white">
+                      {widget.title.replace(/\n/g, " / ")}
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-white/40">
+                      <span>{Meta.label}</span>
+                      <span className="text-white/20">·</span>
+                      <span>#{index + 1}</span>
+                      {!widget.enabled ? (
+                        <>
+                          <span className="text-white/20">·</span>
+                          <span className="text-dt-orange">Hidden</span>
+                        </>
+                      ) : null}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
 
-          <div className="mt-4 space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Add box</p>
-            <div className="flex flex-wrap gap-2">
-              {ADD_TYPES.map((item) => (
+          <div className="border-t border-dt-border p-3">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">
+              Add fan experience
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {ADD_TYPES.map(({ type, label, hint, Icon }) => (
                 <button
-                  key={item.type}
+                  key={type}
                   type="button"
-                  onClick={() => addWidget(item.type)}
-                  className="inline-flex items-center gap-1 rounded-md border border-white/15 bg-white/[0.04] px-2.5 py-1.5 text-xs text-white/80 hover:bg-white/[0.08]"
+                  onClick={() => addWidget(type)}
+                  className="group flex items-start gap-2 rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent px-2.5 py-2.5 text-left transition hover:border-dt-red/40 hover:from-dt-red/10"
                 >
-                  <Plus size={12} />
-                  {item.label}
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black/40 text-white/70 group-hover:border-dt-red/40 group-hover:text-dt-red">
+                    <Icon size={14} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[12px] font-semibold text-white">{label}</span>
+                    <span className="block truncate text-[10px] text-white/40">{hint}</span>
+                  </span>
                 </button>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Phone preview */}
-        <section className="flex justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-[#1a1a1a] to-[#0b0b0b] p-4 md:p-6">
-          <div className="w-full max-w-[320px] overflow-hidden rounded-[2rem] border border-white/20 bg-black shadow-2xl shadow-black/50">
-            <div className="bg-[#111] px-4 py-3 text-center text-[11px] font-semibold tracking-[0.2em] text-white/70">
-              DAMETIME HOME
+        {/* Center: phone */}
+        <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
+          <div className="exp-phone-shell relative w-full max-w-[340px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
+            <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
+            <div className="border-b border-white/10 bg-[#0d0d0d] px-4 pb-3 pt-8 text-center">
+              <p className="text-[10px] font-semibold tracking-[0.28em] text-white/55">DAMETIME HOME</p>
             </div>
-            <div className="space-y-2 bg-[radial-gradient(circle_at_top,_#2a1518_0%,_#0a0a0a_55%)] p-3 pb-5">
+            <div className="space-y-2 bg-[radial-gradient(circle_at_top,_#321018_0%,_#0a0a0a_52%)] p-3 pb-6">
               {layout.heroEnabled ? (
-                <div className="flex h-28 items-end rounded-xl border border-white/10 bg-black/50 p-3">
-                  <div>
-                    <p className="text-[10px] font-bold tracking-[0.18em] text-white">
-                      DAME <span className="text-emerald-400">LIVE</span>
+                <div className="relative flex h-[118px] overflow-hidden rounded-2xl border border-white/10">
+                  <img
+                    src={resolveAssetUrl("/images/damecity.png")}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover opacity-80"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent" />
+                  <div className="relative z-10 flex h-full flex-col justify-end p-3.5">
+                    <p className="font-display text-lg font-extrabold tracking-[0.12em] text-white">
+                      DAME <span className="text-dt-green">LIVE</span>
                     </p>
-                    <p className="mt-1 text-[11px] text-white/55">Hero carousel stays live-aware</p>
+                    <p className="mt-0.5 text-[11px] text-white/60">Hero carousel stays live-aware</p>
                   </div>
                 </div>
               ) : null}
-              <div className="grid grid-cols-2 gap-1.5" style={{ minHeight: 280 }}>
+
+              <div
+                className="grid grid-cols-2 gap-2"
+                style={{ minHeight: ordered.length > 4 ? 300 : 268 }}
+              >
                 {ordered.map((widget) => (
                   <button
                     key={widget.id}
                     type="button"
                     onClick={() => setSelectedId(widget.id)}
-                    className={`min-h-[120px] text-left transition ${
-                      selectedId === widget.id ? "ring-2 ring-dt-red" : "ring-0"
-                    }`}
+                    className="min-h-[128px] text-left"
                   >
-                    <PreviewCard widget={widget} />
+                    <PreviewCard widget={widget} selected={selectedId === widget.id} />
                   </button>
                 ))}
               </div>
@@ -335,115 +498,156 @@ export function ExperiencePage() {
           </div>
         </section>
 
-        {/* Inspector */}
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        {/* Right: inspector */}
+        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
           {!selected ? (
-            <p className="text-sm text-white/50">Select a box to edit.</p>
+            <div className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-white/40">
+                <Plus size={22} />
+              </div>
+              <p className="text-sm text-white/55">Select a box to edit copy, art, and links.</p>
+            </div>
           ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">Edit box</h2>
+            <div className="flex max-h-[calc(100dvh-220px)] flex-col">
+              <div className="flex items-center justify-between gap-2 border-b border-dt-border px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-dt-red/30 bg-dt-red/15 text-dt-red">
+                    <SelectedIcon size={16} />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="font-display text-sm font-semibold tracking-wide text-white">Edit box</h3>
+                    <p className="truncate text-[11px] uppercase tracking-[0.12em] text-white/40">
+                      {typeMeta[selected.type].label}
+                    </p>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={removeSelected}
-                  className="inline-flex items-center gap-1 rounded-md border border-red-500/30 px-2 py-1 text-xs text-red-200 hover:bg-red-500/10"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-xs text-red-200 transition hover:bg-red-500/10"
                 >
                   <Trash2 size={12} /> Remove
                 </button>
               </div>
 
-              <label className="block space-y-1.5">
-                <span className="text-xs text-white/50">Title (use new lines)</span>
-                <textarea
-                  value={selected.title}
-                  onChange={(e) => patchSelected({ title: e.target.value })}
-                  rows={3}
-                  className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-dt-red/60"
-                />
-              </label>
-
-              <label className="block space-y-1.5">
-                <span className="text-xs text-white/50">Link (path or URL)</span>
-                <input
-                  value={selected.linkTo}
-                  onChange={(e) => patchSelected({ linkTo: e.target.value })}
-                  className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-dt-red/60"
-                />
-              </label>
-
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-4 overflow-y-auto p-4">
                 <label className="block space-y-1.5">
-                  <span className="text-xs text-white/50">Image fit</span>
-                  <select
-                    value={selected.imageFit || "half"}
-                    onChange={(e) => patchSelected({ imageFit: e.target.value as "half" | "full" })}
-                    className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none"
-                  >
-                    <option value="half">Half</option>
-                    <option value="full">Full bleed</option>
-                  </select>
-                </label>
-                <label className="flex items-end gap-2 pb-2 text-sm text-white/70">
-                  <input
-                    type="checkbox"
-                    checked={selected.enabled}
-                    onChange={(e) => patchSelected({ enabled: e.target.checked })}
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
+                    Title <span className="normal-case tracking-normal text-white/30">(new lines OK)</span>
+                  </span>
+                  <textarea
+                    value={selected.title}
+                    onChange={(e) => patchSelected({ title: e.target.value })}
+                    rows={3}
+                    className={fieldClass()}
                   />
-                  Visible
                 </label>
-              </div>
 
-              <div className="space-y-2 rounded-xl border border-white/10 bg-black/25 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Image</p>
-                <div className="overflow-hidden rounded-lg border border-white/10 bg-black/40">
-                  <img
-                    src={resolveAssetUrl(selected.imageSrc)}
-                    alt=""
-                    className="mx-auto h-36 w-full object-contain"
+                <label className="block space-y-1.5">
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
+                    Link (path or URL)
+                  </span>
+                  <input
+                    value={selected.linkTo}
+                    onChange={(e) => patchSelected({ linkTo: e.target.value })}
+                    className={fieldClass()}
                   />
+                </label>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Image fit</span>
+                    <select
+                      value={selected.imageFit || "half"}
+                      onChange={(e) => patchSelected({ imageFit: e.target.value as "half" | "full" })}
+                      className={fieldClass()}
+                    >
+                      <option value="half">Half</option>
+                      <option value="full">Full bleed</option>
+                    </select>
+                  </label>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => patchSelected({ enabled: !selected.enabled })}
+                      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition ${
+                        selected.enabled
+                          ? "border-dt-green/35 bg-dt-green/10 text-dt-green"
+                          : "border-white/15 bg-black/40 text-white/60"
+                      }`}
+                    >
+                      {selected.enabled ? <Eye size={15} /> : <EyeOff size={15} />}
+                      {selected.enabled ? "Visible" : "Hidden"}
+                    </button>
+                  </div>
                 </div>
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-white/15 bg-white/[0.04] px-3 py-2 text-xs text-white/80 hover:bg-white/[0.08]">
-                  <Upload size={14} />
-                  Upload image
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
-                  />
-                </label>
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-white/50">Or image URL / path</span>
-                  <input
-                    value={selected.imageSrc.startsWith("data:") ? "(uploaded data URL)" : selected.imageSrc}
-                    onChange={(e) => {
-                      if (!e.target.value.startsWith("(")) patchSelected({ imageSrc: e.target.value });
-                    }}
-                    className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-dt-red/60"
-                  />
-                </label>
-              </div>
 
-              <div className="space-y-2 rounded-xl border border-white/10 bg-black/25 p-3">
-                <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-white/45">
-                  <Sparkles size={12} /> AI art helper
-                </p>
-                <textarea
-                  value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
-                  rows={3}
-                  className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-dt-red/60"
-                  placeholder="Transparent cutout of Dame for Tickets box…"
-                />
-                <button
-                  type="button"
-                  onClick={() => void onGenerate()}
-                  disabled={generating}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-dt-red/40 bg-dt-red/20 px-3 py-2 text-sm font-medium text-white hover:bg-dt-red/30 disabled:opacity-60"
-                >
-                  {generating ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />}
-                  Generate for this box
-                </button>
+                <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-3.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">Image</p>
+                  <div className="overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(135deg,#141414,#0a0a0a)]">
+                    <img
+                      src={resolveAssetUrl(selected.imageSrc)}
+                      alt=""
+                      className="mx-auto h-40 w-full object-contain"
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/85 transition hover:bg-white/[0.08]">
+                      <Upload size={14} />
+                      Upload image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
+                      />
+                    </label>
+                  </div>
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] text-white/40">Or image URL / path</span>
+                    <input
+                      value={selected.imageSrc.startsWith("data:") ? "(uploaded data URL)" : selected.imageSrc}
+                      onChange={(e) => {
+                        if (!e.target.value.startsWith("(")) patchSelected({ imageSrc: e.target.value });
+                      }}
+                      className={fieldClass()}
+                    />
+                  </label>
+                </div>
+
+                {/* ChatGPT-style AI widget */}
+                <div className="overflow-hidden rounded-2xl border border-dt-red/25 bg-gradient-to-b from-dt-red/[0.12] to-black/40">
+                  <div className="flex items-center gap-2 border-b border-white/10 px-3.5 py-3">
+                    <span className="exp-ai-spark flex h-8 w-8 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
+                      <Sparkles size={15} />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-white">AI image studio</p>
+                      <p className="text-[11px] text-white/45">ChatGPT-powered cutouts for this tile</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3 p-3.5">
+                    <div className="rounded-xl border border-white/10 bg-black/35 px-3 py-2.5 text-[12px] leading-relaxed text-white/55">
+                      Describe the art you want — transparent backgrounds work best for home tiles.
+                    </div>
+                    <textarea
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      rows={3}
+                      className={fieldClass()}
+                      placeholder="Transparent cutout of Dame for Tickets box…"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void onGenerate()}
+                      disabled={generating || !aiPrompt.trim()}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-dt-red px-3 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-55"
+                    >
+                      {generating ? <Loader2 size={15} className="animate-spin" /> : <ImagePlus size={15} />}
+                      {generating ? "Generating…" : "Generate for this box"}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
