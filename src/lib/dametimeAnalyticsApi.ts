@@ -15,6 +15,8 @@ export type DametimeAnalyticsEventPoint = {
   label: string;
   events: number;
   pageViews: number;
+  clicks?: number;
+  navClicks?: number;
 };
 
 export type DametimeAnalyticsEventType = {

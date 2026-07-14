@@ -1,0 +1,515 @@
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  Activity,
+  Eye,
+  Loader2,
+  MousePointerClick,
+  Navigation,
+  RefreshCw,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  fetchDametimeAnalytics,
+  formatMetric,
+  formatRelativeTime,
+  initialsFromName,
+  type DametimeAnalytics,
+} from "../lib/dametimeAnalyticsApi";
+
+const POLL_MS = 30_000;
+const CHART_COLORS = ["#e50914", "#ffffff", "#f87171", "#94a3b8", "#fb7185", "#64748b"];
+
+function tooltipStyle() {
+  return {
+    background: "#0c0c0c",
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 12,
+    fontSize: 12,
+    boxShadow: "0 12px 40px rgba(0,0,0,0.45)",
+  };
+}
+
+function eventCount(analytics: DametimeAnalytics, type: string) {
+  return analytics.eventTypes.find((item) => item.type === type)?.count ?? 0;
+}
+
+function Surface({
+  title,
+  subtitle,
+  action,
+  children,
+  className = "",
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`overflow-hidden rounded-2xl border border-dt-border bg-dt-card ${className}`}>
+      <div className="flex items-start justify-between gap-3 border-b border-dt-border px-4 py-3">
+        <div>
+          <h3 className="font-display text-sm font-semibold tracking-wide text-white">{title}</h3>
+          {subtitle ? <p className="mt-0.5 text-[11px] text-white/40">{subtitle}</p> : null}
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+export function TrafficOverviewPage() {
+  const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
+
+  const load = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    setError(null);
+    try {
+      const data = await fetchDametimeAnalytics();
+      if (!data) {
+        throw new Error(
+          "Could not load live analytics. Set VITE_ADMIN_EXPORT_SECRET and confirm DameTime admin analytics is available.",
+        );
+      }
+      setAnalytics(data);
+      setStatus(
+        isRefresh
+          ? `Refreshed from Supabase · ${new Date(data.syncedAt).toLocaleString()}`
+          : `Live from DameTime fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load traffic analytics");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+    const interval = window.setInterval(() => {
+      void load(true);
+    }, POLL_MS);
+    return () => window.clearInterval(interval);
+  }, [load]);
+
+  const derived = useMemo(() => {
+    if (!analytics) return null;
+    const navClicks = eventCount(analytics, "nav_click");
+    const cardClicks = eventCount(analytics, "card_click");
+    const externalLinks = eventCount(analytics, "external_link");
+    const pie = analytics.eventTypes.slice(0, 6).map((item) => ({
+      name: item.label,
+      value: item.count,
+      type: item.type,
+    }));
+    const timeline = analytics.eventsOverTime.map((point) => ({
+      ...point,
+      clicks: point.clicks ?? 0,
+      navClicks: point.navClicks ?? 0,
+    }));
+    return { navClicks, cardClicks, externalLinks, pie, timeline };
+  }, [analytics]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center text-white/70">
+        <Loader2 className="mr-2 animate-spin" size={18} /> Loading live app traffic…
+      </div>
+    );
+  }
+
+  if (!analytics || !derived) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error || "No traffic analytics available."}
+        </div>
+        <button
+          type="button"
+          onClick={() => void load(true)}
+          className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white"
+        >
+          <RefreshCw size={14} /> Retry
+        </button>
+      </div>
+    );
+  }
+
+  const maxTarget = Math.max(...analytics.topTargets.map((item) => item.count), 1);
+
+  return (
+    <div className="space-y-5">
+      <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
+                <Activity size={12} />
+                Live app traffic
+                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-emerald-300">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                  AUTO 30s
+                </span>
+              </div>
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                Clicks, page views & nav from DameTime
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/65">
+                Pulled from Supabase `fan_events` — page views, navigation clicks, card taps, buy now, and more refresh as fans use the app.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="min-w-[92px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Page views</p>
+                <p className="mt-1 text-lg font-bold text-white">{formatMetric(analytics.kpis.pageViews)}</p>
+              </div>
+              <div className="min-w-[92px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Clicks</p>
+                <p className="mt-1 text-lg font-bold text-white">{formatMetric(analytics.kpis.totalClicks)}</p>
+              </div>
+              <div className="min-w-[92px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Nav</p>
+                <p className="mt-1 text-lg font-bold text-white">{formatMetric(derived.navClicks)}</p>
+              </div>
+              <div className="min-w-[92px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Events</p>
+                <p className="mt-1 text-lg font-bold text-white">{formatMetric(analytics.kpis.totalEvents)}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void load(true)}
+                disabled={refreshing}
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+              >
+                {refreshing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {(error || status) && (
+          <div className="space-y-2 border-b border-dt-border px-5 py-3">
+            {error ? (
+              <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
+            ) : null}
+            {status && !error ? (
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
+                {status}
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+        {[
+          { label: "Page views", value: formatMetric(analytics.kpis.pageViews), Icon: Eye },
+          { label: "Total clicks", value: formatMetric(analytics.kpis.totalClicks), Icon: MousePointerClick },
+          { label: "Nav clicks", value: formatMetric(derived.navClicks), Icon: Navigation },
+          { label: "Card clicks", value: formatMetric(derived.cardClicks), Icon: MousePointerClick },
+          { label: "Active fans (7d)", value: formatMetric(analytics.kpis.activeFans7d), Icon: Users },
+          { label: "Engagement", value: `${analytics.kpis.engagementRate}%`, Icon: TrendingUp },
+        ].map(({ label, value, Icon }) => (
+          <div
+            key={label}
+            className="relative overflow-hidden rounded-2xl border border-dt-border bg-dt-card p-4"
+          >
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(229,9,20,0.18),transparent_55%)]" />
+            <div className="relative flex items-start justify-between gap-2">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">{label}</p>
+                <p className="mt-2 text-2xl font-bold text-white">{value}</p>
+              </div>
+              <Icon size={18} className="mt-0.5 text-dt-red" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <Surface title="Activity over time" subtitle="Events, page views, clicks & nav — last 14 days">
+          <div className="h-[320px] px-2 py-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={derived.timeline}>
+                <defs>
+                  <linearGradient id="trafficEvents" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#e50914" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="#e50914" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="trafficViews" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity={0.28} />
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle()} labelStyle={{ color: "#fff" }} />
+                <Legend wrapperStyle={{ fontSize: 12, color: "#fff" }} />
+                <Area
+                  type="monotone"
+                  dataKey="events"
+                  name="Events"
+                  stroke="#e50914"
+                  fill="url(#trafficEvents)"
+                  strokeWidth={2.5}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="pageViews"
+                  name="Page views"
+                  stroke="#ffffff"
+                  fill="url(#trafficViews)"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="clicks"
+                  name="Clicks"
+                  stroke="#f87171"
+                  fill="transparent"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="navClicks"
+                  name="Nav clicks"
+                  stroke="#94a3b8"
+                  fill="transparent"
+                  strokeWidth={2}
+                  strokeDasharray="4 4"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </Surface>
+
+        <Surface title="Event mix" subtitle="Breakdown of logged fan_events">
+          <div className="grid h-[320px] grid-cols-1 gap-2 p-3 sm:grid-cols-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={derived.pie}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={52}
+                  outerRadius={86}
+                  paddingAngle={3}
+                >
+                  {derived.pie.map((entry, index) => (
+                    <Cell key={entry.type} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle()} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-2 overflow-y-auto pr-1">
+              {analytics.eventTypes.map((item, index) => {
+                const total = analytics.kpis.totalEvents || 1;
+                const pct = Math.round((item.count / total) * 1000) / 10;
+                return (
+                  <div key={item.type} className="rounded-xl border border-white/8 bg-black/30 px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2 text-sm text-white">
+                        <span
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{ background: CHART_COLORS[index % CHART_COLORS.length] }}
+                        />
+                        {item.label}
+                      </span>
+                      <span className="text-sm font-semibold text-white">{formatMetric(item.count)}</span>
+                    </div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full bg-dt-red"
+                        style={{ width: `${Math.min(pct, 100)}%` }}
+                      />
+                    </div>
+                    <p className="mt-1 text-[10px] text-white/40">{pct}% of events</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Surface>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Surface title="Event types" subtitle="Counts by interaction type">
+          <div className="h-[300px] px-2 py-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={analytics.eventTypes} layout="vertical" margin={{ left: 12, right: 12 }}>
+                <CartesianGrid stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                <XAxis type="number" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <YAxis
+                  type="category"
+                  dataKey="label"
+                  width={120}
+                  tick={{ fill: "#e5e7eb", fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip contentStyle={tooltipStyle()} />
+                <Bar dataKey="count" name="Count" fill="#e50914" radius={[0, 8, 8, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Surface>
+
+        <Surface
+          title="Live activity"
+          subtitle="Recent fan_events from the app"
+          action={
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              Live
+            </span>
+          }
+        >
+          <div className="max-h-[300px] overflow-y-auto px-3 py-2">
+            {analytics.recentActivity.length === 0 ? (
+              <p className="py-10 text-center text-sm text-white/40">No activity logged yet.</p>
+            ) : (
+              analytics.recentActivity.map((item) => (
+                <div
+                  key={`${item.email}-${item.at}-${item.eventType}-${item.target ?? ""}`}
+                  className="flex items-start gap-3 border-b border-white/[0.05] py-3 last:border-0"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-dt-red/30 bg-dt-red/15 text-[10px] font-bold text-dt-red">
+                    {initialsFromName(item.displayName)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-white">
+                      <span className="font-semibold">{item.displayName}</span>
+                      <span className="text-white/70"> — {item.action}</span>
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-white/40">
+                      {item.eventType.replace(/_/g, " ")} · {formatRelativeTime(item.at)}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Surface>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Surface title="Top pages & click targets" subtitle="Most tapped destinations in the app">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[480px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-dt-border text-[11px] uppercase tracking-wide text-white/40">
+                  <th className="px-4 py-3 font-semibold">#</th>
+                  <th className="px-4 py-3 font-semibold">Target</th>
+                  <th className="px-4 py-3 font-semibold">Clicks</th>
+                  <th className="px-4 py-3 font-semibold">Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                {analytics.topTargets.map((target, index) => {
+                  const pct = Math.round((target.count / maxTarget) * 100);
+                  return (
+                    <tr key={target.target} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
+                      <td className="px-4 py-3 text-white/40">{index + 1}</td>
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-white">{target.label}</p>
+                        <p className="truncate text-[11px] text-white/35">{target.target}</p>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-dt-red">{formatMetric(target.count)}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10">
+                            <div className="h-full rounded-full bg-dt-red" style={{ width: `${pct}%` }} />
+                          </div>
+                          <span className="text-xs text-white/45">{pct}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!analytics.topTargets.length ? (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-white/40">
+                      No click targets yet
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </Surface>
+
+        <Surface title="Most active fans" subtitle="Top engagers from fan_events">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[480px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-dt-border text-[11px] uppercase tracking-wide text-white/40">
+                  <th className="px-4 py-3 font-semibold">Fan</th>
+                  <th className="px-4 py-3 font-semibold">Events</th>
+                  <th className="px-4 py-3 font-semibold">Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                {analytics.topUsers.map((user) => (
+                  <tr key={user.email} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px] font-bold text-white/70">
+                          {initialsFromName(
+                            user.name || (user.username ? `@${user.username}` : user.email.split("@")[0]),
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-white">
+                            {user.name || (user.username ? `@${user.username}` : user.email.split("@")[0])}
+                          </p>
+                          <p className="truncate text-[11px] text-white/40">{user.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-white">{formatMetric(user.eventCount)}</td>
+                    <td className="px-4 py-3 text-white/80">{formatMetric(user.points)}</td>
+                  </tr>
+                ))}
+                {!analytics.topUsers.length ? (
+                  <tr>
+                    <td colSpan={3} className="px-4 py-10 text-center text-sm text-white/40">
+                      No fan activity yet
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </Surface>
+      </div>
+    </div>
+  );
+}

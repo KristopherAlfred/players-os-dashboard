@@ -180,7 +180,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/performance/traffic": {
     title: "Traffic Overview",
-    subtitle: "Sessions, sources, and landing performance over time.",
+    subtitle: "Live DameTime page views, clicks, and navigation from Supabase fan_events.",
   },
   "/monetization/partners": {
     title: "Partners & DSPs",

@@ -19,7 +19,7 @@ import {
   AudienceOverviewPage,
 } from "./pages/FansPages";
 import { SubscribersPage } from "./pages/SubscribersPage";
-import { TrafficOverviewPage } from "./pages/PerformancePages";
+import { TrafficOverviewPage } from "./pages/TrafficOverviewPage";
 import {
   PartnersPage,
   RevenuePage,
