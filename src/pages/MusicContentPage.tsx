@@ -411,15 +411,15 @@ export function MusicContentPage() {
         )}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_360px]">
-        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-          <div className="border-b border-dt-border px-4 py-3">
+      <div className="grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)_360px] xl:items-stretch">
+        <section className="flex min-h-[640px] flex-col overflow-hidden rounded-2xl border border-dt-border bg-dt-card xl:min-h-0">
+          <div className="shrink-0 border-b border-dt-border px-4 py-3">
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Library</h3>
             <p className="text-[11px] text-white/40">Dame D.O.L.L.A catalog + custom uploads</p>
           </div>
 
-          <div className="space-y-3 p-3">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
+            <div className="grid shrink-0 grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => void syncSpotify()}
@@ -442,12 +442,12 @@ export function MusicContentPage() {
               type="button"
               onClick={() => void importAllSpotify()}
               disabled={saving || !spotifyTracks.length}
-              className="w-full rounded-xl border border-dt-red/35 bg-dt-red/10 px-3 py-2 text-[11px] font-semibold text-dt-red transition hover:bg-dt-red/15 disabled:opacity-50"
+              className="w-full shrink-0 rounded-xl border border-dt-red/35 bg-dt-red/10 px-3 py-2 text-[11px] font-semibold text-dt-red transition hover:bg-dt-red/15 disabled:opacity-50"
             >
               Import all Spotify tracks to feed
             </button>
 
-            <div className="flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
+            <div className="flex shrink-0 gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
               {(
                 [
                   ["all", "All"],
@@ -473,10 +473,10 @@ export function MusicContentPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search tracks…"
-              className={fieldClass()}
+              className={`${fieldClass()} shrink-0`}
             />
 
-            <ul className="max-h-[52vh] space-y-1.5 overflow-y-auto pr-1">
+            <ul className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1">
               {library.map((item) => {
                 const selected = selectedId === item.id;
                 const thumb = resolveMusicAssetUrl(item.thumbnail);
