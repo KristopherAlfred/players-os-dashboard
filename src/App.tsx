@@ -10,9 +10,7 @@ import {
   EventsGiveawaysPage,
   ContentCalendarPage,
 } from "./pages/ContentPages";
-import {
-  AudienceOverviewPage,
-} from "./pages/FansPages";
+import { AudienceOverviewPage } from "./pages/AudienceOverviewPage";
 import { SubscribersPage } from "./pages/SubscribersPage";
 import { TrafficOverviewPage } from "./pages/TrafficOverviewPage";
 import { FanActivityPage } from "./pages/FanActivityPage";

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Calendar, SlidersHorizontal, Bell, Menu, Check } from "lucide-react";
+import { SlidersHorizontal, Bell, Menu, Check } from "lucide-react";
 import {
   useDashboardSource,
   type DashboardSource,
@@ -61,15 +61,6 @@ export function Header({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-3">
-          <button
-            type="button"
-            className="hidden items-center gap-2 rounded-md border border-dt-border bg-dt-card px-2.5 py-2 text-sm text-[#d4d4d4] md:flex lg:px-3"
-            aria-label="Date range June 26 — July 4, 2026"
-          >
-            <Calendar size={14} className="shrink-0 text-dt-muted" />
-            <span className="hidden xl:inline">June 26 — July 4, 2026</span>
-          </button>
-
           <div className="relative" ref={filtersRef}>
             <button
               type="button"

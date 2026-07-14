@@ -160,7 +160,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/fans/audience": {
     title: "Audience Overview",
-    subtitle: "Growth, retention, and composition across your fan base.",
+    subtitle: "Live DameTime fan composition, geo, and engagement from Supabase.",
   },
   "/fans/subscribers": {
     title: "Email / SMS List",
