@@ -137,7 +137,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/events": {
     title: "Events & Giveaways",
-    subtitle: "Meet & greets, listening parties, merch drops, and fan contests.",
+    subtitle: "Create and publish events and giveaways fans see in the DameTime app.",
   },
   "/content/calendar": {
     title: "Content Calendar",

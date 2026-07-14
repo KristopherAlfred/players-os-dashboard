@@ -3,7 +3,6 @@ import { Search, Filter, Grid, List, Play, Image, FileText, Music, Gift, Calenda
 import { ContentThumb } from "../components/ContentThumb";
 import { Panel, StatCard } from "../components/PageShell";
 import {
-  eventsContent,
   musicContent,
   socialContent,
   type ContentItem,
@@ -11,6 +10,7 @@ import {
 
 export { NewsContentPage } from "./NewsContentPage";
 export { VideosContentPage } from "./VideosContentPage";
+export { EventsGiveawaysPage } from "./EventsGiveawaysPage";
 
 const typeIcons: Record<string, typeof Play> = {
   Video: Play,
@@ -119,20 +119,6 @@ export function MusicContentPage() {
         { label: "Tracks & playlists", value: "31" },
         { label: "Streams", value: "892K", hint: "Last 30 days" },
         { label: "Scheduled", value: "2" },
-      ]}
-    />
-  );
-}
-
-export function EventsGiveawaysPage() {
-  return (
-    <ContentCategoryPage
-      title="Events & Giveaways"
-      items={eventsContent}
-      stats={[
-        { label: "Active", value: "3" },
-        { label: "Upcoming events", value: "2" },
-        { label: "Giveaway entries", value: "49.2K", hint: "This month" },
       ]}
     />
   );
