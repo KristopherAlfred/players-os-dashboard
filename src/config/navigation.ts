@@ -88,8 +88,8 @@ export const navSections: NavSection[] = [
     label: "ENGAGEMENT",
     icon: "message-circle",
     items: [
-      { label: "Overview", path: "/engagement/overview" },
-      { label: "Messages", path: "/engagement/messages" },
+      { label: "Fan Activity", path: "/engagement/activity" },
+      { label: "Support Inbox", path: "/engagement/support" },
     ],
   },
   {
@@ -146,17 +146,13 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Notifications",
     subtitle: "Schedule in-app toasts with the same look as the points earned popup.",
   },
-  "/engagement/overview": {
-    title: "Engagement Overview",
-    subtitle: "Comments, reactions, shares, and fan interaction at a glance.",
+  "/engagement/activity": {
+    title: "Fan Activity",
+    subtitle: "Live DameTime app clicks, page views, and fan interactions from Supabase.",
   },
-  "/engagement/comments": {
-    title: "Comments",
-    subtitle: "Moderate fan conversations across every channel.",
-  },
-  "/engagement/messages": {
-    title: "Messages",
-    subtitle: "Direct fan messages and Inner Circle conversations.",
+  "/engagement/support": {
+    title: "Support Inbox",
+    subtitle: "Help & Support reports submitted by fans in the DameTime app.",
   },
   "/settings": {
     title: "Settings",

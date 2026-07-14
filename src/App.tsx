@@ -11,15 +11,12 @@ import {
   ContentCalendarPage,
 } from "./pages/ContentPages";
 import {
-  EngagementOverviewPage,
-  CommentsPage,
-  MessagesPage,
-} from "./pages/EngagementPages";
-import {
   AudienceOverviewPage,
 } from "./pages/FansPages";
 import { SubscribersPage } from "./pages/SubscribersPage";
 import { TrafficOverviewPage } from "./pages/TrafficOverviewPage";
+import { FanActivityPage } from "./pages/FanActivityPage";
+import { SupportInboxPage } from "./pages/SupportInboxPage";
 import { SettingsPage } from "./pages/SettingsPages";
 import { LivePage } from "./pages/LivePage";
 import { ExperiencePage } from "./pages/ExperiencePage";
@@ -66,10 +63,12 @@ export default function App() {
           <Route path="experience" element={<ExperiencePage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="content/calendar" element={<ContentCalendarPage />} />
-          <Route path="engagement/overview" element={<EngagementOverviewPage />} />
-          <Route path="engagement/comments" element={<CommentsPage />} />
-          <Route path="engagement/messages" element={<MessagesPage />} />
-          <Route path="engagement/polls" element={<Navigate to="/engagement/overview" replace />} />
+          <Route path="engagement/activity" element={<FanActivityPage />} />
+          <Route path="engagement/support" element={<SupportInboxPage />} />
+          <Route path="engagement/overview" element={<Navigate to="/engagement/activity" replace />} />
+          <Route path="engagement/comments" element={<Navigate to="/engagement/activity" replace />} />
+          <Route path="engagement/messages" element={<Navigate to="/engagement/support" replace />} />
+          <Route path="engagement/polls" element={<Navigate to="/engagement/activity" replace />} />
           <Route path="fans/audience" element={<AudienceOverviewPage />} />
           <Route path="fans/profiles" element={<Navigate to="/fans/audience" replace />} />
           <Route path="fans/segments" element={<Navigate to="/fans/audience" replace />} />
