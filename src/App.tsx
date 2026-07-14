@@ -28,6 +28,7 @@ import {
 import { SettingsPage } from "./pages/SettingsPages";
 import { LivePage } from "./pages/LivePage";
 import { ExperiencePage } from "./pages/ExperiencePage";
+import { NotificationsPage } from "./pages/NotificationsPage";
 import { LandingPage } from "./pages/LandingPage";
 import { MarketingLandingPage } from "./pages/MarketingLandingPage";
 import { RequireAuth, PublicOnly } from "./components/RequireAuth";
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="athletes/hub" element={<Navigate to="/experience" replace />} />
           <Route path="live" element={<LivePage />} />
           <Route path="experience" element={<ExperiencePage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
           <Route path="content/calendar" element={<ContentCalendarPage />} />
           <Route path="engagement/overview" element={<EngagementOverviewPage />} />
           <Route path="engagement/comments" element={<CommentsPage />} />

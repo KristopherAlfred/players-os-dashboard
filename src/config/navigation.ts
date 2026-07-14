@@ -66,6 +66,12 @@ export const navSections: NavSection[] = [
     directPath: "/experience",
   },
   {
+    label: "NOTIFICATIONS",
+    icon: "bell",
+    items: [],
+    directPath: "/notifications",
+  },
+  {
     label: "FANS & DATA",
     icon: "users",
     items: [
@@ -144,6 +150,10 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/experience": {
     title: "Experience",
     subtitle: "Drag, style, and publish the DameTime app home screen.",
+  },
+  "/notifications": {
+    title: "Notifications",
+    subtitle: "Schedule in-app toasts with the same look as the points earned popup.",
   },
   "/engagement/overview": {
     title: "Engagement Overview",
