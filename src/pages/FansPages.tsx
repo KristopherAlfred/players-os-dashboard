@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Search, Mail, Smartphone } from "lucide-react";
+import { Mail, Smartphone } from "lucide-react";
 import { Panel, StatCard } from "../components/PageShell";
 import { SignupHeatmap } from "../components/SignupHeatmap";
 import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
@@ -7,35 +6,24 @@ import { formatMetric, type DametimeAnalytics } from "../lib/dametimeAnalyticsAp
 import {
   captionPreview,
   formatMetric as formatIgMetric,
-  formatRelativeTime,
   type InstagramAnalytics,
 } from "../lib/instagramAnalyticsApi";
 import {
   formatMetric as formatYtMetric,
-  formatRelativeTime as formatYtRelativeTime,
   titlePreview,
   type YouTubeAnalytics,
 } from "../lib/youtubeAnalyticsApi";
 import {
   formatMetric as formatFbMetric,
-  formatRelativeTime as formatFbRelativeTime,
   textPreview,
   type FacebookAnalytics,
 } from "../lib/facebookAnalyticsApi";
 import {
   formatMetric as formatTwMetric,
-  formatPostDate as formatTwPostDate,
   textPreview as twTextPreview,
   type TwitterAnalytics,
 } from "../lib/twitterAnalyticsApi";
 import { ageDemographics, topCountries, audienceSnapshot } from "../data/mockData";
-
-const fans = [
-  { name: "Jordan K.", tier: "Inner Circle", city: "Portland, OR", joined: "2022", ltv: "$284" },
-  { name: "Maya R.", tier: "Superfan", city: "Atlanta, GA", joined: "2023", ltv: "$142" },
-  { name: "Alex T.", tier: "VIP", city: "Toronto, ON", joined: "2021", ltv: "$398" },
-  { name: "Sam P.", tier: "Fan", city: "Chicago, IL", joined: "2024", ltv: "$48" },
-];
 
 const segments = [
   { name: "Inner Circle Members", size: "48.2K", match: "Tier = Inner Circle" },
@@ -460,282 +448,6 @@ export function AudienceOverviewPage() {
       youtube={(analytics) => <YouTubeAudienceOverview analytics={analytics} />}
       facebook={(analytics) => <FacebookAudienceOverview analytics={analytics} />}
       twitter={(analytics) => <TwitterAudienceOverview analytics={analytics} />}
-    />
-  );
-}
-
-function DametimeFanProfiles({ analytics }: { analytics: DametimeAnalytics }) {
-  const [query, setQuery] = useState("");
-  const filtered = analytics.topUsers.filter((fan) => {
-    const label = fan.name || fan.username || fan.email;
-    return label.toLowerCase().includes(query.toLowerCase()) || fan.email.includes(query.toLowerCase());
-  });
-
-  return (
-    <Panel title="Fan Profiles">
-      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
-        <Search size={14} className="text-dt-muted" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name or email..."
-          className="flex-1 bg-transparent text-sm outline-none"
-        />
-      </div>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-dt-border text-xs text-dt-muted">
-            <th className="pb-2">Fan</th>
-            <th className="pb-2">Events</th>
-            <th className="pb-2">Points</th>
-            <th className="pb-2">Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((fan) => (
-            <tr key={fan.email} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
-              <td className="py-3 font-medium">
-                {fan.name || (fan.username ? `@${fan.username}` : fan.email.split("@")[0])}
-              </td>
-              <td className="py-3">{formatMetric(fan.eventCount)}</td>
-              <td className="py-3">{formatMetric(fan.points)}</td>
-              <td className="py-3 text-dt-muted">{fan.email}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Panel>
-  );
-}
-
-function InstagramFanProfiles({ analytics }: { analytics: InstagramAnalytics }) {
-  const [query, setQuery] = useState("");
-  const filtered = analytics.recentPosts.filter((post) =>
-    post.caption.toLowerCase().includes(query.toLowerCase()),
-  );
-
-  return (
-    <Panel title="Recent Instagram Posts">
-      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
-        <Search size={14} className="text-dt-muted" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search captions..."
-          className="flex-1 bg-transparent text-sm outline-none"
-        />
-      </div>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-dt-border text-xs text-dt-muted">
-            <th className="pb-2">Post</th>
-            <th className="pb-2">Likes</th>
-            <th className="pb-2">Comments</th>
-            <th className="pb-2">Posted</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((post) => (
-            <tr key={post.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
-              <td className="py-3">
-                <a href={post.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-dt-red">
-                  {captionPreview(post.caption, 50)}
-                </a>
-              </td>
-              <td className="py-3">{formatIgMetric(post.likes)}</td>
-              <td className="py-3">{formatIgMetric(post.comments)}</td>
-              <td className="py-3 text-dt-muted">{formatRelativeTime(post.takenAt)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Panel>
-  );
-}
-
-function YouTubeFanProfiles({ analytics }: { analytics: YouTubeAnalytics }) {
-  const [query, setQuery] = useState("");
-  const filtered = analytics.recentVideos.filter((video) =>
-    video.title.toLowerCase().includes(query.toLowerCase()),
-  );
-
-  return (
-    <Panel title="Recent YouTube Videos">
-      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
-        <Search size={14} className="text-dt-muted" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search titles..."
-          className="flex-1 bg-transparent text-sm outline-none"
-        />
-      </div>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-dt-border text-xs text-dt-muted">
-            <th className="pb-2">Video</th>
-            <th className="pb-2">Views</th>
-            <th className="pb-2">Likes</th>
-            <th className="pb-2">Posted</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((video) => (
-            <tr key={video.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
-              <td className="py-3">
-                <a href={video.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-dt-red">
-                  {titlePreview(video.title, 50)}
-                </a>
-              </td>
-              <td className="py-3">{formatYtMetric(video.viewCount)}</td>
-              <td className="py-3">{formatYtMetric(video.likeCount)}</td>
-              <td className="py-3 text-dt-muted">{formatYtRelativeTime(video.publishedAt)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Panel>
-  );
-}
-
-function FacebookFanProfiles({ analytics }: { analytics: FacebookAnalytics }) {
-  const [query, setQuery] = useState("");
-  const filtered = analytics.recentPosts.filter((post) =>
-    post.text.toLowerCase().includes(query.toLowerCase()),
-  );
-
-  return (
-    <Panel title="Recent Facebook Posts">
-      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
-        <Search size={14} className="text-dt-muted" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search posts..."
-          className="flex-1 bg-transparent text-sm outline-none"
-        />
-      </div>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-dt-border text-xs text-dt-muted">
-            <th className="pb-2">Post</th>
-            <th className="pb-2">Likes</th>
-            <th className="pb-2">Comments</th>
-            <th className="pb-2">Posted</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((post) => (
-            <tr key={post.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
-              <td className="py-3">
-                <a href={post.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-dt-red">
-                  {textPreview(post.text, 50)}
-                </a>
-              </td>
-              <td className="py-3">{formatFbMetric(post.likes)}</td>
-              <td className="py-3">{formatFbMetric(post.comments)}</td>
-              <td className="py-3 text-dt-muted">{formatFbRelativeTime(post.createdAt)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Panel>
-  );
-}
-
-function TwitterFanProfiles({ analytics }: { analytics: TwitterAnalytics }) {
-  const [query, setQuery] = useState("");
-  const filtered = analytics.recentPosts.filter((post) =>
-    post.text.toLowerCase().includes(query.toLowerCase()),
-  );
-
-  return (
-    <Panel title="Recent X Posts">
-      <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
-        <Search size={14} className="text-dt-muted" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search posts..."
-          className="flex-1 bg-transparent text-sm outline-none"
-        />
-      </div>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-dt-border text-xs text-dt-muted">
-            <th className="pb-2">Post</th>
-            <th className="pb-2">Likes</th>
-            <th className="pb-2">Replies</th>
-            <th className="pb-2">Posted</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((post) => (
-            <tr key={post.id} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
-              <td className="py-3">
-                <a href={post.permalink} target="_blank" rel="noreferrer" className="font-medium hover:text-dt-red">
-                  {twTextPreview(post.text, 50)}
-                </a>
-              </td>
-              <td className="py-3">{formatTwMetric(post.likes)}</td>
-              <td className="py-3">{formatTwMetric(post.replies)}</td>
-              <td className="py-3 text-dt-muted">{formatTwPostDate(post.createdAt)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Panel>
-  );
-}
-
-export function FanProfilesPage() {
-  const [query, setQuery] = useState("");
-  const filtered = fans.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()));
-
-  return (
-    <AnalyticsPageGate
-      mock={
-        <Panel title="Fan Profiles">
-          <div className="mb-4 flex items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-2">
-            <Search size={14} className="text-dt-muted" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name, city, tier..."
-              className="flex-1 bg-transparent text-sm outline-none"
-            />
-          </div>
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-dt-border text-xs text-dt-muted">
-                <th className="pb-2">Fan</th>
-                <th className="pb-2">Tier</th>
-                <th className="pb-2">Location</th>
-                <th className="pb-2">Since</th>
-                <th className="pb-2">LTV</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((f) => (
-                <tr key={f.name} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
-                  <td className="py-3 font-medium">{f.name}</td>
-                  <td className="py-3">
-                    <span className="rounded bg-dt-red/15 px-2 py-0.5 text-xs text-dt-red">{f.tier}</span>
-                  </td>
-                  <td className="py-3 text-dt-muted">{f.city}</td>
-                  <td className="py-3 text-dt-muted">{f.joined}</td>
-                  <td className="py-3">{f.ltv}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Panel>
-      }
-      dametime={(analytics) => <DametimeFanProfiles analytics={analytics} />}
-      instagram={(analytics) => <InstagramFanProfiles analytics={analytics} />}
-      youtube={(analytics) => <YouTubeFanProfiles analytics={analytics} />}
-      facebook={(analytics) => <FacebookFanProfiles analytics={analytics} />}
-      twitter={(analytics) => <TwitterFanProfiles analytics={analytics} />}
     />
   );
 }

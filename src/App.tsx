@@ -17,7 +17,6 @@ import {
 } from "./pages/EngagementPages";
 import {
   AudienceOverviewPage,
-  FanProfilesPage,
   SubscribersPage,
 } from "./pages/FansPages";
 import { TrafficOverviewPage } from "./pages/PerformancePages";
@@ -76,7 +75,7 @@ export default function App() {
           <Route path="engagement/messages" element={<MessagesPage />} />
           <Route path="engagement/polls" element={<Navigate to="/engagement/overview" replace />} />
           <Route path="fans/audience" element={<AudienceOverviewPage />} />
-          <Route path="fans/profiles" element={<FanProfilesPage />} />
+          <Route path="fans/profiles" element={<Navigate to="/fans/audience" replace />} />
           <Route path="fans/segments" element={<Navigate to="/fans/audience" replace />} />
           <Route path="fans/subscribers" element={<SubscribersPage />} />
           <Route path="fans/behavior" element={<Navigate to="/fans/audience" replace />} />

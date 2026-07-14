@@ -76,7 +76,6 @@ export const navSections: NavSection[] = [
     icon: "users",
     items: [
       { label: "Audience Overview", path: "/fans/audience" },
-      { label: "Fan Profiles", path: "/fans/profiles" },
       { label: "Email/SMS List", path: "/fans/subscribers" },
     ],
   },
@@ -174,10 +173,6 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/fans/audience": {
     title: "Audience Overview",
     subtitle: "Growth, retention, and composition across your fan base.",
-  },
-  "/fans/profiles": {
-    title: "Fan Profiles",
-    subtitle: "Search and explore individual fan journeys and loyalty tiers.",
   },
   "/fans/subscribers": {
     title: "Email / SMS List",
