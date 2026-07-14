@@ -45,6 +45,7 @@ function findFeedItem(feed: MusicFeed | null, trackId: string) {
 export function MusicContentPage() {
   const [feed, setFeed] = useState<MusicFeed | null>(null);
   const [spotifyTracks, setSpotifyTracks] = useState<SpotifyCatalogTrack[]>([]);
+  const [catalogSource, setCatalogSource] = useState<"spotify" | "dame-dolla-catalog" | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<AppMusicItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,23 +56,59 @@ export function MusicContentPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "spotify" | "custom" | "featured">("all");
 
+  function applyCatalog(
+    tracks: SpotifyCatalogTrack[],
+    source: "spotify" | "dame-dolla-catalog",
+    warning?: string,
+    nextFeed?: MusicFeed | null,
+  ) {
+    const feedRef = nextFeed ?? feed;
+    setSpotifyTracks(tracks);
+    setCatalogSource(source);
+    if (warning) {
+      setStatus(
+        source === "spotify"
+          ? warning
+          : `Loaded ${tracks.length} Dame D.O.L.L.A tracks. ${warning}`,
+      );
+    } else if (source === "spotify") {
+      setStatus(`Synced ${tracks.length} live tracks from Dame D.O.L.L.A on Spotify`);
+    } else {
+      setStatus(`Loaded ${tracks.length} Dame D.O.L.L.A tracks (built-in catalog)`);
+    }
+
+    if (!draft && tracks[0]) {
+      const item = musicItemFromSpotify(tracks[0], findFeedItem(feedRef, tracks[0].id));
+      setSelectedId(item.id);
+      setDraft(item);
+    }
+  }
+
   useEffect(() => {
     void (async () => {
       try {
-        const [nextFeed, tracks] = await Promise.all([
+        const [nextFeed, catalog] = await Promise.all([
           fetchMusicFeed(),
-          fetchSpotifyCatalog().catch(() => [] as SpotifyCatalogTrack[]),
+          fetchSpotifyCatalog().catch(() => null),
         ]);
         setFeed(nextFeed);
-        setSpotifyTracks(tracks);
 
-        const first =
-          tracks[0] != null
-            ? musicItemFromSpotify(tracks[0], findFeedItem(nextFeed, tracks[0].id))
-            : nextFeed.items[0] ?? null;
-        if (first) {
+        if (catalog?.tracks.length) {
+          setSpotifyTracks(catalog.tracks);
+          setCatalogSource(catalog.source);
+          if (catalog.warning) setStatus(catalog.warning);
+          const first = musicItemFromSpotify(
+            catalog.tracks[0],
+            findFeedItem(nextFeed, catalog.tracks[0].id),
+          );
           setSelectedId(first.id);
-          setDraft({ ...first });
+          setDraft(first);
+        } else {
+          const first = nextFeed.items[0] ?? null;
+          if (first) {
+            setSelectedId(first.id);
+            setDraft({ ...first });
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load music");
@@ -161,16 +198,10 @@ export function MusicContentPage() {
     setSyncing(true);
     setError(null);
     try {
-      const tracks = await fetchSpotifyCatalog(true);
-      setSpotifyTracks(tracks);
-      setStatus(`Loaded ${tracks.length} Dame D.O.L.L.A tracks from Spotify`);
-      if (!draft && tracks[0]) {
-        const item = musicItemFromSpotify(tracks[0], findFeedItem(feed, tracks[0].id));
-        setSelectedId(item.id);
-        setDraft(item);
-      }
+      const catalog = await fetchSpotifyCatalog(true);
+      applyCatalog(catalog.tracks, catalog.source, catalog.warning);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Spotify sync failed");
+      setError(err instanceof Error ? err.message : "Dame D.O.L.L.A sync failed");
     } finally {
       setSyncing(false);
     }
@@ -334,13 +365,13 @@ export function MusicContentPage() {
                 Curate Spotify tracks fans hear in the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Full Dame D.O.L.L.A Spotify catalog loads here. Swap thumbnails, add song or video links, feature cuts for Top songs, then publish.
+                Sync the Dame D.O.L.L.A catalog, swap thumbnails, add song or video links, feature cuts for Top songs, then publish. No Spotify login needed for Dame — tracks come from his public catalog.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Spotify</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Tracks</p>
                 <p className="mt-1 text-lg font-bold text-white">{stats.spotify}</p>
               </div>
               <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
@@ -348,8 +379,10 @@ export function MusicContentPage() {
                 <p className="mt-1 text-lg font-bold text-white">{stats.featured}</p>
               </div>
               <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Live</p>
-                <p className="mt-1 text-lg font-bold text-dt-green">{stats.published}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Source</p>
+                <p className="mt-1 text-sm font-bold text-white">
+                  {catalogSource === "spotify" ? "Live" : catalogSource ? "Catalog" : "—"}
+                </p>
               </div>
               <button
                 type="button"
@@ -382,7 +415,7 @@ export function MusicContentPage() {
         <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
           <div className="border-b border-dt-border px-4 py-3">
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Library</h3>
-            <p className="text-[11px] text-white/40">Spotify discography + custom uploads</p>
+            <p className="text-[11px] text-white/40">Dame D.O.L.L.A catalog + custom uploads</p>
           </div>
 
           <div className="space-y-3 p-3">
@@ -394,7 +427,7 @@ export function MusicContentPage() {
                 className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold text-white/85 hover:border-dt-red/40 disabled:opacity-60"
               >
                 {syncing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-                Sync Spotify
+                Sync Dame D.O.L.L.A
               </button>
               <button
                 type="button"
@@ -485,7 +518,7 @@ export function MusicContentPage() {
               })}
               {!library.length ? (
                 <li className="rounded-xl border border-dashed border-white/10 px-3 py-8 text-center text-xs text-white/40">
-                  Sync Spotify or add a custom track to get started
+                  Click Sync Dame D.O.L.L.A or add a custom track
                 </li>
               ) : null}
             </ul>

@@ -94,17 +94,34 @@ export async function deleteMusicItem(id: string): Promise<MusicFeed> {
   return data.feed;
 }
 
-export async function fetchSpotifyCatalog(refresh = false): Promise<SpotifyCatalogTrack[]> {
+export type SpotifyCatalogResult = {
+  tracks: SpotifyCatalogTrack[];
+  source: "spotify" | "dame-dolla-catalog";
+  warning?: string;
+  count: number;
+};
+
+export async function fetchSpotifyCatalog(refresh = false): Promise<SpotifyCatalogResult> {
   const url = `${getApiBase()}/api/spotify/artist-tracks${refresh ? "?refresh=1" : ""}`;
   const response = await fetch(url);
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error((data as { error?: string }).error || `Spotify catalog failed (${response.status})`);
-  }
   const tracks = Array.isArray((data as { tracks?: SpotifyCatalogTrack[] }).tracks)
     ? (data as { tracks: SpotifyCatalogTrack[] }).tracks
     : [];
-  return tracks;
+
+  if (!response.ok && !tracks.length) {
+    throw new Error((data as { error?: string }).error || `Spotify catalog failed (${response.status})`);
+  }
+
+  return {
+    tracks,
+    source: (data as { source?: string }).source === "spotify" ? "spotify" : "dame-dolla-catalog",
+    warning:
+      typeof (data as { warning?: string }).warning === "string"
+        ? (data as { warning: string }).warning
+        : undefined,
+    count: tracks.length || Number((data as { count?: number }).count) || 0,
+  };
 }
 
 export function createEmptyMusicItem(): AppMusicItem {
