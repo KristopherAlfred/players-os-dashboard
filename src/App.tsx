@@ -17,8 +17,8 @@ import {
 } from "./pages/EngagementPages";
 import {
   AudienceOverviewPage,
-  SubscribersPage,
 } from "./pages/FansPages";
+import { SubscribersPage } from "./pages/SubscribersPage";
 import { TrafficOverviewPage } from "./pages/PerformancePages";
 import {
   PartnersPage,

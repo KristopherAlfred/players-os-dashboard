@@ -176,7 +176,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/fans/subscribers": {
     title: "Email / SMS List",
-    subtitle: "Manage opt-ins, deliverability, and subscriber health.",
+    subtitle: "Live DameTime fan emails, phones, and SMS opt-ins from Supabase.",
   },
   "/performance/traffic": {
     title: "Traffic Overview",
