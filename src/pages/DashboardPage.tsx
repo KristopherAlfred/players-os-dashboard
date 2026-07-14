@@ -7,7 +7,6 @@ import { RecentContent } from "../components/RecentContent";
 import { UploadWidget } from "../components/UploadWidget";
 import { AudienceDemographics } from "../components/AudienceDemographics";
 import { DeviceBreakdown } from "../components/DeviceBreakdown";
-import { MonetizationOverview } from "../components/MonetizationOverview";
 import { TopPerformingContent } from "../components/TopPerformingContent";
 import { Footer } from "../components/Footer";
 import { DametimeAnalyticsDashboard } from "../components/dametime/DametimeAnalyticsDashboard";
@@ -65,10 +64,7 @@ function OverviewDashboardContent() {
       </div>
 
       <div className="grid grid-cols-12 items-stretch gap-3">
-        <div className="col-span-12 flex lg:col-span-8">
-          <MonetizationOverview />
-        </div>
-        <div className="col-span-12 flex lg:col-span-4">
+        <div className="col-span-12">
           <TopPerformingContent />
         </div>
       </div>

@@ -20,10 +20,6 @@ import {
 } from "./pages/FansPages";
 import { SubscribersPage } from "./pages/SubscribersPage";
 import { TrafficOverviewPage } from "./pages/TrafficOverviewPage";
-import {
-  PartnersPage,
-  RevenuePage,
-} from "./pages/MonetizationPages";
 import { SettingsPage } from "./pages/SettingsPages";
 import { LivePage } from "./pages/LivePage";
 import { ExperiencePage } from "./pages/ExperiencePage";
@@ -83,9 +79,9 @@ export default function App() {
           <Route path="performance/funnel" element={<Navigate to="/performance/traffic" replace />} />
           <Route path="performance/campaigns" element={<Navigate to="/performance/traffic" replace />} />
           <Route path="performance/reports" element={<Navigate to="/performance/traffic" replace />} />
-          <Route path="monetization/partners" element={<PartnersPage />} />
-          <Route path="monetization/audiences" element={<Navigate to="/monetization/partners" replace />} />
-          <Route path="monetization/revenue" element={<RevenuePage />} />
+          <Route path="monetization/partners" element={<Navigate to="/" replace />} />
+          <Route path="monetization/audiences" element={<Navigate to="/" replace />} />
+          <Route path="monetization/revenue" element={<Navigate to="/" replace />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="settings/team" element={<Navigate to="/settings" replace />} />
           <Route path="settings/roles" element={<Navigate to="/settings" replace />} />

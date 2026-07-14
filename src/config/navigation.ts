@@ -85,14 +85,6 @@ export const navSections: NavSection[] = [
     items: [{ label: "Traffic Overview", path: "/performance/traffic" }],
   },
   {
-    label: "MONETIZATION",
-    icon: "dollar-sign",
-    items: [
-      { label: "Partners & DSPs", path: "/monetization/partners" },
-      { label: "Revenue", path: "/monetization/revenue" },
-    ],
-  },
-  {
     label: "ENGAGEMENT",
     icon: "message-circle",
     items: [
@@ -181,13 +173,5 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/performance/traffic": {
     title: "Traffic Overview",
     subtitle: "Live DameTime page views, clicks, and navigation from Supabase fan_events.",
-  },
-  "/monetization/partners": {
-    title: "Partners & DSPs",
-    subtitle: "LiveRamp, Trade Desk, DV360, and partner sync status.",
-  },
-  "/monetization/revenue": {
-    title: "Revenue",
-    subtitle: "MTD earnings, partner splits, and segment-level yield.",
   },
 };
