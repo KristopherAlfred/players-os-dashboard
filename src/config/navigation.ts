@@ -133,7 +133,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/music": {
     title: "Music",
-    subtitle: "Tracks, playlists, snippets, and audio exclusives.",
+    subtitle: "Dame D.O.L.L.A Spotify catalog — thumbnails, song links, and videos for the app.",
   },
   "/content/events": {
     title: "Events & Giveaways",
