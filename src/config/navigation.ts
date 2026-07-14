@@ -123,7 +123,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/videos": {
     title: "Videos",
-    subtitle: "Exclusive drops, BTS footage, and long-form video content.",
+    subtitle: "Upload exclusive videos with title, thumbnail, and link — they appear in the DameTime app.",
   },
   "/content/music": {
     title: "Music",

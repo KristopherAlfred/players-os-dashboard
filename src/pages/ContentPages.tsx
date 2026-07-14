@@ -6,11 +6,11 @@ import {
   eventsContent,
   musicContent,
   socialContent,
-  videoContent,
   type ContentItem,
 } from "../data/contentCategories";
 
 export { NewsContentPage } from "./NewsContentPage";
+export { VideosContentPage } from "./VideosContentPage";
 
 const typeIcons: Record<string, typeof Play> = {
   Video: Play,
@@ -105,20 +105,6 @@ export function SocialContentPage() {
         { label: "Posts (7d)", value: "24", hint: "Across all channels" },
         { label: "Scheduled", value: "6" },
         { label: "Avg. engagement", value: "14.2%", hint: "+3.1% vs last week" },
-      ]}
-    />
-  );
-}
-
-export function VideosContentPage() {
-  return (
-    <ContentCategoryPage
-      title="Videos"
-      items={videoContent}
-      stats={[
-        { label: "Videos", value: "42", hint: "+3 this week" },
-        { label: "Total views", value: "1.8M" },
-        { label: "Avg. engagement", value: "38.4%" },
       ]}
     />
   );
