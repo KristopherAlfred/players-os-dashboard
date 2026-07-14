@@ -122,7 +122,7 @@ export function ExperiencePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState("Damian Lillard red jersey cutout, transparent background, mobile app tile");
+  const [aiPrompt, setAiPrompt] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -498,160 +498,163 @@ export function ExperiencePage() {
           </div>
         </section>
 
-        {/* Right: inspector */}
-        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-          {!selected ? (
-            <div className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-white/40">
-                <Plus size={22} />
-              </div>
-              <p className="text-sm text-white/55">Select a box to edit copy, art, and links.</p>
-            </div>
-          ) : (
-            <div className="flex max-h-[calc(100dvh-220px)] flex-col">
-              <div className="flex items-center justify-between gap-2 border-b border-dt-border px-4 py-3">
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-dt-red/30 bg-dt-red/15 text-dt-red">
-                    <SelectedIcon size={16} />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="font-display text-sm font-semibold tracking-wide text-white">Edit box</h3>
-                    <p className="truncate text-[11px] uppercase tracking-[0.12em] text-white/40">
-                      {typeMeta[selected.type].label}
-                    </p>
-                  </div>
+        {/* Right: edit + AI as separate boxes */}
+        <div className="flex min-w-0 flex-col gap-4">
+          <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+            {!selected ? (
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 px-6 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-white/40">
+                  <Plus size={22} />
                 </div>
-                <button
-                  type="button"
-                  onClick={removeSelected}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-xs text-red-200 transition hover:bg-red-500/10"
-                >
-                  <Trash2 size={12} /> Remove
-                </button>
+                <p className="text-sm text-white/55">Select a box to edit copy, art, and links.</p>
               </div>
+            ) : (
+              <div className="flex max-h-[calc(100dvh-420px)] min-h-[280px] flex-col">
+                <div className="flex items-center justify-between gap-2 border-b border-dt-border px-4 py-3">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-dt-red/30 bg-dt-red/15 text-dt-red">
+                      <SelectedIcon size={16} />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="font-display text-sm font-semibold tracking-wide text-white">Edit box</h3>
+                      <p className="truncate text-[11px] uppercase tracking-[0.12em] text-white/40">
+                        {typeMeta[selected.type].label}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeSelected}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-xs text-red-200 transition hover:bg-red-500/10"
+                  >
+                    <Trash2 size={12} /> Remove
+                  </button>
+                </div>
 
-              <div className="space-y-4 overflow-y-auto p-4">
-                <label className="block space-y-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
-                    Title <span className="normal-case tracking-normal text-white/30">(new lines OK)</span>
-                  </span>
-                  <textarea
-                    value={selected.title}
-                    onChange={(e) => patchSelected({ title: e.target.value })}
-                    rows={3}
-                    className={fieldClass()}
-                  />
-                </label>
-
-                <label className="block space-y-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
-                    Link (path or URL)
-                  </span>
-                  <input
-                    value={selected.linkTo}
-                    onChange={(e) => patchSelected({ linkTo: e.target.value })}
-                    className={fieldClass()}
-                  />
-                </label>
-
-                <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-4 overflow-y-auto p-4">
                   <label className="block space-y-1.5">
-                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Image fit</span>
-                    <select
-                      value={selected.imageFit || "half"}
-                      onChange={(e) => patchSelected({ imageFit: e.target.value as "half" | "full" })}
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
+                      Title <span className="normal-case tracking-normal text-white/30">(new lines OK)</span>
+                    </span>
+                    <textarea
+                      value={selected.title}
+                      onChange={(e) => patchSelected({ title: e.target.value })}
+                      rows={3}
                       className={fieldClass()}
-                    >
-                      <option value="half">Half</option>
-                      <option value="full">Full bleed</option>
-                    </select>
-                  </label>
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={() => patchSelected({ enabled: !selected.enabled })}
-                      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition ${
-                        selected.enabled
-                          ? "border-dt-green/35 bg-dt-green/10 text-dt-green"
-                          : "border-white/15 bg-black/40 text-white/60"
-                      }`}
-                    >
-                      {selected.enabled ? <Eye size={15} /> : <EyeOff size={15} />}
-                      {selected.enabled ? "Visible" : "Hidden"}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-3.5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">Image</p>
-                  <div className="overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(135deg,#141414,#0a0a0a)]">
-                    <img
-                      src={resolveAssetUrl(selected.imageSrc)}
-                      alt=""
-                      className="mx-auto h-40 w-full object-contain"
                     />
+                  </label>
+
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
+                      Link (path or URL)
+                    </span>
+                    <input
+                      value={selected.linkTo}
+                      onChange={(e) => patchSelected({ linkTo: e.target.value })}
+                      className={fieldClass()}
+                    />
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="block space-y-1.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Image fit</span>
+                      <select
+                        value={selected.imageFit || "half"}
+                        onChange={(e) => patchSelected({ imageFit: e.target.value as "half" | "full" })}
+                        className={fieldClass()}
+                      >
+                        <option value="half">Half</option>
+                        <option value="full">Full bleed</option>
+                      </select>
+                    </label>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => patchSelected({ enabled: !selected.enabled })}
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition ${
+                          selected.enabled
+                            ? "border-dt-green/35 bg-dt-green/10 text-dt-green"
+                            : "border-white/15 bg-black/40 text-white/60"
+                        }`}
+                      >
+                        {selected.enabled ? <Eye size={15} /> : <EyeOff size={15} />}
+                        {selected.enabled ? "Visible" : "Hidden"}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/85 transition hover:bg-white/[0.08]">
-                      <Upload size={14} />
-                      Upload image
+
+                  <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-3.5">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">Image</p>
+                    <div className="overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(135deg,#141414,#0a0a0a)]">
+                      <img
+                        src={resolveAssetUrl(selected.imageSrc)}
+                        alt=""
+                        className="mx-auto h-40 w-full object-contain"
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/85 transition hover:bg-white/[0.08]">
+                        <Upload size={14} />
+                        Upload image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
+                        />
+                      </label>
+                    </div>
+                    <label className="block space-y-1.5">
+                      <span className="text-[11px] text-white/40">Or image URL / path</span>
                       <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
+                        value={selected.imageSrc.startsWith("data:") ? "(uploaded data URL)" : selected.imageSrc}
+                        onChange={(e) => {
+                          if (!e.target.value.startsWith("(")) patchSelected({ imageSrc: e.target.value });
+                        }}
+                        className={fieldClass()}
                       />
                     </label>
                   </div>
-                  <label className="block space-y-1.5">
-                    <span className="text-[11px] text-white/40">Or image URL / path</span>
-                    <input
-                      value={selected.imageSrc.startsWith("data:") ? "(uploaded data URL)" : selected.imageSrc}
-                      onChange={(e) => {
-                        if (!e.target.value.startsWith("(")) patchSelected({ imageSrc: e.target.value });
-                      }}
-                      className={fieldClass()}
-                    />
-                  </label>
-                </div>
-
-                {/* ChatGPT-style AI widget */}
-                <div className="overflow-hidden rounded-2xl border border-dt-red/25 bg-gradient-to-b from-dt-red/[0.12] to-black/40">
-                  <div className="flex items-center gap-2 border-b border-white/10 px-3.5 py-3">
-                    <span className="exp-ai-spark flex h-8 w-8 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
-                      <Sparkles size={15} />
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-white">AI image studio</p>
-                      <p className="text-[11px] text-white/45">ChatGPT-powered cutouts for this tile</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3 p-3.5">
-                    <div className="rounded-xl border border-white/10 bg-black/35 px-3 py-2.5 text-[12px] leading-relaxed text-white/55">
-                      Describe the art you want — transparent backgrounds work best for home tiles.
-                    </div>
-                    <textarea
-                      value={aiPrompt}
-                      onChange={(e) => setAiPrompt(e.target.value)}
-                      rows={3}
-                      className={fieldClass()}
-                      placeholder="Transparent cutout of Dame for Tickets box…"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => void onGenerate()}
-                      disabled={generating || !aiPrompt.trim()}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-dt-red px-3 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-55"
-                    >
-                      {generating ? <Loader2 size={15} className="animate-spin" /> : <ImagePlus size={15} />}
-                      {generating ? "Generating…" : "Generate for this box"}
-                    </button>
-                  </div>
                 </div>
               </div>
+            )}
+          </section>
+
+          <section className="overflow-hidden rounded-2xl border border-dt-red/30 bg-dt-card shadow-[0_0_40px_rgba(229,9,20,0.06)]">
+            <div className="flex items-center gap-2.5 border-b border-white/10 bg-gradient-to-r from-dt-red/15 to-transparent px-4 py-3.5">
+              <span className="exp-ai-spark flex h-9 w-9 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
+                <Sparkles size={16} />
+              </span>
+              <div>
+                <h3 className="font-display text-sm font-semibold tracking-wide text-white">AI image studio</h3>
+                <p className="text-[11px] text-white/45">ChatGPT-powered cutouts for the selected tile</p>
+              </div>
             </div>
-          )}
-        </section>
+            <div className="space-y-3 p-4">
+              <div className="rounded-xl border border-white/10 bg-black/35 px-3 py-2.5 text-[12px] leading-relaxed text-white/55">
+                {selected
+                  ? `Generating for “${selected.title.replace(/\n/g, " ")}”. Transparent backgrounds work best for home tiles.`
+                  : "Select a home box first, then describe the art you want."}
+              </div>
+              <textarea
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                rows={3}
+                className={fieldClass()}
+                placeholder="Example: Damian Lillard red jersey cutout, transparent background, mobile app tile"
+              />
+              <button
+                type="button"
+                onClick={() => void onGenerate()}
+                disabled={generating || !aiPrompt.trim() || !selectedId}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-dt-red px-3 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-55"
+              >
+                {generating ? <Loader2 size={15} className="animate-spin" /> : <ImagePlus size={15} />}
+                {generating ? "Generating…" : "Generate for this box"}
+              </button>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );
