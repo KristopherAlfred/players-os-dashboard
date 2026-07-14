@@ -26,7 +26,6 @@ import {
   RevenuePage,
 } from "./pages/MonetizationPages";
 import { SettingsPage } from "./pages/SettingsPages";
-import { AthleteHubPage } from "./pages/AthletePages";
 import { LivePage } from "./pages/LivePage";
 import { ExperiencePage } from "./pages/ExperiencePage";
 import { LandingPage } from "./pages/LandingPage";
@@ -65,8 +64,8 @@ export default function App() {
           <Route path="content/all" element={<Navigate to="/content/social" replace />} />
           <Route path="content/media" element={<Navigate to="/content/videos" replace />} />
           <Route path="content/playlists" element={<Navigate to="/content/music" replace />} />
-          <Route path="content/upload" element={<Navigate to="/athletes/hub" replace />} />
-          <Route path="athletes/hub" element={<AthleteHubPage />} />
+          <Route path="content/upload" element={<Navigate to="/experience" replace />} />
+          <Route path="athletes/hub" element={<Navigate to="/experience" replace />} />
           <Route path="live" element={<LivePage />} />
           <Route path="experience" element={<ExperiencePage />} />
           <Route path="content/calendar" element={<ContentCalendarPage />} />

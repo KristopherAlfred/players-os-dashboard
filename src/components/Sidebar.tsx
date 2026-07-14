@@ -11,7 +11,6 @@ import {
   ChevronDown,
   ExternalLink,
   Zap,
-  Trophy,
   Radio,
   Sparkles,
   X,
@@ -35,7 +34,6 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
   "bar-chart-2": BarChart2,
   "dollar-sign": DollarSign,
   settings: Settings,
-  trophy: Trophy,
   radio: Radio,
   sparkles: Sparkles,
 };

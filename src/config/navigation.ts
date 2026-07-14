@@ -42,21 +42,15 @@ export const navSections: NavSection[] = [
     items: [{ label: "Dashboard", path: "/" }],
   },
   {
-    label: "ATHLETE HUB",
-    icon: "trophy",
-    items: [{ label: "Athlete Hub", path: "/athletes/hub" }],
-    groups: [
-      {
-        label: "Content",
-        items: [
-          { label: "Social", path: "/content/social" },
-          { label: "News", path: "/content/news" },
-          { label: "Videos", path: "/content/videos" },
-          { label: "Music", path: "/content/music" },
-          { label: "Events & Giveaways", path: "/content/events" },
-          { label: "Content Calendar", path: "/content/calendar" },
-        ],
-      },
+    label: "CONTENT",
+    icon: "film",
+    items: [
+      { label: "Social", path: "/content/social" },
+      { label: "News", path: "/content/news" },
+      { label: "Videos", path: "/content/videos" },
+      { label: "Music", path: "/content/music" },
+      { label: "Events & Giveaways", path: "/content/events" },
+      { label: "Content Calendar", path: "/content/calendar" },
     ],
   },
   {
@@ -143,10 +137,6 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Content Calendar",
     subtitle: "Plan drops, schedule posts, and coordinate your release cadence.",
   },
-  "/athletes/hub": {
-    title: "Athlete Hub",
-    subtitle: "Athletes and representatives sign in to upload and manage content.",
-  },
   "/live": {
     title: "Live",
     subtitle: "Go live on DameTime for fans watching in the app and on the site.",
@@ -154,10 +144,6 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/experience": {
     title: "Experience",
     subtitle: "Drag, style, and publish the DameTime app home screen.",
-  },
-  "/content/upload": {
-    title: "Upload Content",
-    subtitle: "Publish videos, images, articles, and audio to your fans.",
   },
   "/engagement/overview": {
     title: "Engagement Overview",
