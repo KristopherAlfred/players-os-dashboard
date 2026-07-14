@@ -74,12 +74,16 @@ function getAdminSecret() {
   return import.meta.env.VITE_ADMIN_EXPORT_SECRET?.trim() ?? "";
 }
 
-export async function fetchDametimeAnalytics(): Promise<DametimeAnalytics | null> {
+export async function fetchDametimeAnalytics(fanEmail?: string): Promise<DametimeAnalytics | null> {
   const secret = getAdminSecret();
   if (!secret) return null;
 
   try {
-    const response = await fetch(`${getApiBase()}/api/admin/analytics`, {
+    const params = new URLSearchParams();
+    const fan = fanEmail?.trim().toLowerCase();
+    if (fan) params.set("fan", fan);
+    const query = params.toString();
+    const response = await fetch(`${getApiBase()}/api/admin/analytics${query ? `?${query}` : ""}`, {
       headers: { "x-admin-secret": secret },
     });
     if (!response.ok) return null;

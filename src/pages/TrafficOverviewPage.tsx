@@ -6,8 +6,10 @@ import {
   MousePointerClick,
   Navigation,
   RefreshCw,
+  Search,
   TrendingUp,
   Users,
+  X,
 } from "lucide-react";
 import {
   Area,
@@ -31,6 +33,7 @@ import {
   initialsFromName,
   type DametimeAnalytics,
 } from "../lib/dametimeAnalyticsApi";
+import { fanDisplayName, fetchFansList, type FanContact } from "../lib/fansApi";
 
 const POLL_MS = 30_000;
 const CHART_COLORS = ["#e50914", "#ffffff", "#f87171", "#94a3b8", "#fb7185", "#64748b"];
@@ -78,42 +81,80 @@ function Surface({
 
 export function TrafficOverviewPage() {
   const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
+  const [fans, setFans] = useState<FanContact[]>([]);
+  const [fanEmail, setFanEmail] = useState("");
+  const [fanQuery, setFanQuery] = useState("");
+  const [fanMenuOpen, setFanMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
 
-  const load = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    setError(null);
-    try {
-      const data = await fetchDametimeAnalytics();
-      if (!data) {
-        throw new Error(
-          "Could not load live analytics. Set VITE_ADMIN_EXPORT_SECRET and confirm DameTime admin analytics is available.",
+  const load = useCallback(
+    async (isRefresh = false, email = fanEmail) => {
+      if (isRefresh) setRefreshing(true);
+      setError(null);
+      try {
+        const data = await fetchDametimeAnalytics(email || undefined);
+        if (!data) {
+          throw new Error(
+            "Could not load live analytics. Set VITE_ADMIN_EXPORT_SECRET and confirm DameTime admin analytics is available.",
+          );
+        }
+        setAnalytics(data);
+        const fanLabel = email
+          ? fans.find((fan) => fan.email === email)
+            ? fanDisplayName(fans.find((fan) => fan.email === email)!)
+            : email
+          : null;
+        setStatus(
+          fanLabel
+            ? `Filtered to ${fanLabel} · synced ${new Date(data.syncedAt).toLocaleString()}`
+            : isRefresh
+              ? `Refreshed from Supabase · ${new Date(data.syncedAt).toLocaleString()}`
+              : `Live from DameTime fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
         );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load traffic analytics");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-      setAnalytics(data);
-      setStatus(
-        isRefresh
-          ? `Refreshed from Supabase · ${new Date(data.syncedAt).toLocaleString()}`
-          : `Live from DameTime fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load traffic analytics");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+    },
+    [fanEmail, fans],
+  );
+
+  useEffect(() => {
+    void fetchFansList()
+      .then((data) => setFans(data.fans))
+      .catch(() => setFans([]));
   }, []);
 
   useEffect(() => {
-    void load();
+    void load(false, fanEmail);
     const interval = window.setInterval(() => {
-      void load(true);
+      void load(true, fanEmail);
     }, POLL_MS);
     return () => window.clearInterval(interval);
-  }, [load]);
+  }, [fanEmail, load]);
+
+  const selectedFan = useMemo(
+    () => fans.find((fan) => fan.email === fanEmail) ?? null,
+    [fans, fanEmail],
+  );
+
+  const fanOptions = useMemo(() => {
+    const q = fanQuery.trim().toLowerCase();
+    const list = !q
+      ? fans
+      : fans.filter((fan) => {
+          const haystack = [fan.email, fan.name ?? "", fan.username ?? "", fan.phone ?? ""]
+            .join(" ")
+            .toLowerCase();
+          return haystack.includes(q);
+        });
+    return list.slice(0, 40);
+  }, [fans, fanQuery]);
 
   const derived = useMemo(() => {
     if (!analytics) return null;
@@ -133,7 +174,21 @@ export function TrafficOverviewPage() {
     return { navClicks, cardClicks, externalLinks, pie, timeline };
   }, [analytics]);
 
-  if (loading) {
+  function selectFan(email: string) {
+    setFanEmail(email);
+    setFanQuery("");
+    setFanMenuOpen(false);
+    setLoading(true);
+  }
+
+  function clearFanFilter() {
+    setFanEmail("");
+    setFanQuery("");
+    setFanMenuOpen(false);
+    setLoading(true);
+  }
+
+  if (loading && !analytics) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-white/70">
         <Loader2 className="mr-2 animate-spin" size={18} /> Loading live app traffic…
@@ -179,7 +234,7 @@ export function TrafficOverviewPage() {
                 Clicks, page views & nav from DameTime
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Pulled from Supabase `fan_events` — page views, navigation clicks, card taps, buy now, and more refresh as fans use the app.
+                Pulled from Supabase fan_events — filter by fan to inspect one member’s page views, clicks, and navigation.
               </p>
             </div>
 
@@ -211,6 +266,86 @@ export function TrafficOverviewPage() {
               </button>
             </div>
           </div>
+        </div>
+
+        <div className="relative border-b border-dt-border px-5 py-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Filter by fan</p>
+              <p className="mt-0.5 text-xs text-white/40">
+                {selectedFan
+                  ? `Showing traffic for ${fanDisplayName(selectedFan)}`
+                  : "All fans — search email, name, or username"}
+              </p>
+            </div>
+            <div className="flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="relative min-w-0 flex-1">
+                <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
+                <input
+                  value={fanMenuOpen || !selectedFan ? fanQuery : fanDisplayName(selectedFan)}
+                  onChange={(e) => {
+                    setFanQuery(e.target.value);
+                    setFanMenuOpen(true);
+                  }}
+                  onFocus={() => {
+                    setFanMenuOpen(true);
+                    if (selectedFan) setFanQuery("");
+                  }}
+                  placeholder="Search fans…"
+                  className="w-full rounded-xl border border-dt-border bg-black/50 py-2.5 pl-9 pr-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
+                />
+                {fanMenuOpen ? (
+                  <div className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-dt-border bg-[#0c0c0c] shadow-2xl">
+                    <button
+                      type="button"
+                      onClick={clearFanFilter}
+                      className="flex w-full items-center gap-2 border-b border-white/8 px-3 py-2.5 text-left text-sm text-white/70 hover:bg-white/[0.04]"
+                    >
+                      <Users size={14} /> All fans
+                    </button>
+                    {fanOptions.map((fan) => (
+                      <button
+                        key={fan.email}
+                        type="button"
+                        onClick={() => selectFan(fan.email)}
+                        className={`flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/[0.04] ${
+                          fan.email === fanEmail ? "bg-dt-red/10" : ""
+                        }`}
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px] font-bold text-white/70">
+                          {initialsFromName(fanDisplayName(fan))}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-white">{fanDisplayName(fan)}</p>
+                          <p className="truncate text-[11px] text-white/40">{fan.email}</p>
+                        </div>
+                      </button>
+                    ))}
+                    {!fanOptions.length ? (
+                      <p className="px-3 py-6 text-center text-xs text-white/40">No fans match that search</p>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+              {fanEmail ? (
+                <button
+                  type="button"
+                  onClick={clearFanFilter}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/15 px-3 py-2.5 text-xs font-semibold text-white/75 hover:border-dt-red/40"
+                >
+                  <X size={13} /> Clear
+                </button>
+              ) : null}
+            </div>
+          </div>
+          {fanMenuOpen ? (
+            <button
+              type="button"
+              aria-label="Close fan menu"
+              className="fixed inset-0 z-20 cursor-default"
+              onClick={() => setFanMenuOpen(false)}
+            />
+          ) : null}
         </div>
 
         {(error || status) && (
@@ -466,7 +601,7 @@ export function TrafficOverviewPage() {
           </div>
         </Surface>
 
-        <Surface title="Most active fans" subtitle="Top engagers from fan_events">
+        <Surface title="Most active fans" subtitle="Click a fan to filter traffic">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[480px] text-left text-sm">
               <thead>
@@ -478,7 +613,13 @@ export function TrafficOverviewPage() {
               </thead>
               <tbody>
                 {analytics.topUsers.map((user) => (
-                  <tr key={user.email} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
+                  <tr
+                    key={user.email}
+                    className={`cursor-pointer border-b border-white/[0.04] hover:bg-white/[0.02] ${
+                      fanEmail === user.email ? "bg-dt-red/10" : ""
+                    }`}
+                    onClick={() => selectFan(user.email)}
+                  >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px] font-bold text-white/70">
