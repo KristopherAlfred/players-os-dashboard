@@ -10,6 +10,7 @@ import { YouTubeAnalyticsProvider } from "../contexts/YouTubeAnalyticsContext";
 import { FacebookAnalyticsProvider } from "../contexts/FacebookAnalyticsContext";
 import { TwitterAnalyticsProvider } from "../contexts/TwitterAnalyticsContext";
 import { SourceBanner } from "../components/dametime/DametimeAnalyticsStates";
+import { ContentSourceGuard } from "../components/ContentSourceGuard";
 
 export function AppLayout() {
   const { pathname } = useLocation();
@@ -37,6 +38,7 @@ export function AppLayout() {
           <YouTubeAnalyticsProvider>
             <FacebookAnalyticsProvider>
             <TwitterAnalyticsProvider>
+            <ContentSourceGuard />
             <div className="flex h-[100dvh] overflow-hidden bg-dt-bg">
             <Sidebar
               mobileOpen={mobileNavOpen}

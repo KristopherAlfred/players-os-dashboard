@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { SlidersHorizontal, Bell, Menu, Check } from "lucide-react";
 import {
+  ALL_DASHBOARD_SOURCES,
+  CONTENT_ALLOWED_SOURCES,
+  isContentRoute,
   useDashboardSource,
   type DashboardSource,
 } from "../contexts/DashboardSourceContext";
@@ -23,9 +27,12 @@ export function Header({
   subtitle: string;
   onMenuClick?: () => void;
 }) {
-  const { source, setSource, sourceLabel } = useDashboardSource();
+  const { pathname } = useLocation();
+  const { source, setSource, sourceLabel, filterPulse } = useDashboardSource();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
+  const onContent = isContentRoute(pathname);
+  const allowed = onContent ? CONTENT_ALLOWED_SOURCES : ALL_DASHBOARD_SOURCES;
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -67,9 +74,16 @@ export function Header({
               aria-haspopup="listbox"
               aria-expanded={filtersOpen}
               onClick={() => setFiltersOpen((open) => !open)}
-              className="flex items-center gap-2 rounded-md border border-dt-border bg-dt-card px-2.5 py-2 text-sm text-[#d4d4d4] lg:px-3"
+              className={`flex items-center gap-2 rounded-md border bg-dt-card px-2.5 py-2 text-sm lg:px-3 ${
+                filterPulse
+                  ? "animate-filter-pulse border-dt-red text-white"
+                  : "border-dt-border text-[#d4d4d4]"
+              }`}
             >
-              <SlidersHorizontal size={14} className="shrink-0 text-dt-muted" />
+              <SlidersHorizontal
+                size={14}
+                className={`shrink-0 ${filterPulse ? "text-dt-red" : "text-dt-muted"}`}
+              />
               <span className="hidden sm:inline">{sourceLabel}</span>
               <span className="sm:hidden">Filter</span>
             </button>
@@ -78,26 +92,40 @@ export function Header({
               <div
                 role="listbox"
                 aria-label="Dashboard data source"
-                className="absolute right-0 z-50 mt-2 min-w-[180px] overflow-hidden rounded-md border border-dt-border bg-[#111111] shadow-xl"
+                className="absolute right-0 z-50 mt-2 min-w-[200px] overflow-hidden rounded-md border border-dt-border bg-[#111111] shadow-xl"
               >
+                {onContent ? (
+                  <p className="border-b border-dt-border px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-white/40">
+                    Content pages: Overview or Dametime only
+                  </p>
+                ) : null}
                 {filterOptions.map((option) => {
                   const active = source === option.id;
+                  const enabled = allowed.includes(option.id);
                   return (
                     <button
                       key={option.id}
                       type="button"
                       role="option"
                       aria-selected={active}
+                      disabled={!enabled}
                       onClick={() => {
+                        if (!enabled) return;
                         setSource(option.id);
                         setFiltersOpen(false);
                       }}
-                      className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition hover:bg-white/5 ${
-                        active ? "bg-dt-red/10 text-white" : "text-[#d4d4d4]"
+                      className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition ${
+                        !enabled
+                          ? "cursor-not-allowed text-white/25"
+                          : active
+                            ? "bg-dt-red/10 text-white hover:bg-white/5"
+                            : "text-[#d4d4d4] hover:bg-white/5"
                       }`}
                     >
                       <span>{option.label}</span>
-                      {active && <Check size={14} className="shrink-0 text-dt-red" />}
+                      {active && enabled ? (
+                        <Check size={14} className="shrink-0 text-dt-red" />
+                      ) : null}
                     </button>
                   );
                 })}
