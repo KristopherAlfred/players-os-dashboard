@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Gift, Loader2, Plus, Trash2, Upload } from "lucide-react";
-import { Panel, StatCard } from "../components/PageShell";
+import {
+  CalendarDays,
+  Eye,
+  EyeOff,
+  Gift,
+  Link2,
+  Loader2,
+  MapPin,
+  Plus,
+  Sparkles,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import {
   createEmptyEventItem,
   deleteEventItem,
@@ -17,6 +28,62 @@ import {
   type EventsFeed,
 } from "../lib/eventsApi";
 
+function fieldClass() {
+  return "w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25";
+}
+
+function PosterPreview({
+  item,
+  selected,
+  onClick,
+}: {
+  item: AppEventItem;
+  selected?: boolean;
+  onClick?: () => void;
+}) {
+  const meta = item.deadlineDisplay || item.dateLabel || item.location;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative aspect-[3/4] w-full overflow-hidden rounded-xl border text-left transition ${
+        selected
+          ? "border-dt-red shadow-[0_0_0_1px_rgba(229,9,20,0.45),0_8px_24px_rgba(229,9,20,0.18)]"
+          : "border-white/10 hover:border-white/25"
+      }`}
+    >
+      <img
+        src={resolveEventAssetUrl(item.thumbnail)}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+      <div className="relative z-10 flex h-full flex-col justify-end p-2.5">
+        {item.type === "giveaway" ? (
+          <span className="mb-1 w-fit rounded bg-dt-red px-1.5 py-0.5 font-display text-[0.5rem] font-extrabold tracking-[0.1em] text-white">
+            GIVEAWAY
+          </span>
+        ) : null}
+        <p className="line-clamp-3 font-display text-[11px] font-extrabold leading-tight tracking-[0.05em] text-white">
+          {item.title || "Untitled"}
+        </p>
+        {meta ? (
+          <p className="mt-1 font-display text-[9px] font-extrabold uppercase tracking-[0.1em] text-white/65">
+            {meta}
+          </p>
+        ) : null}
+      </div>
+      {!item.enabled ? (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60">
+          <span className="rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white/80">
+            Hidden
+          </span>
+        </div>
+      ) : null}
+    </button>
+  );
+}
+
 export function EventsGiveawaysPage() {
   const [feed, setFeed] = useState<EventsFeed | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -27,6 +94,7 @@ export function EventsGiveawaysPage() {
   const [status, setStatus] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | EventKind>("all");
+  const [previewTab, setPreviewTab] = useState<"upcoming" | "giveaways">("upcoming");
 
   useEffect(() => {
     void fetchEventsFeed()
@@ -36,6 +104,7 @@ export function EventsGiveawaysPage() {
         if (first) {
           setSelectedId(first.id);
           setDraft({ ...first });
+          setPreviewTab(first.type === "giveaway" ? "giveaways" : "upcoming");
         }
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load events"))
@@ -64,9 +133,30 @@ export function EventsGiveawaysPage() {
     };
   }, [feed]);
 
+  const previewItems = useMemo(() => {
+    const all = (feed?.items ?? []).filter((i) => i.status === "published" && i.enabled);
+    const filtered =
+      previewTab === "giveaways"
+        ? all.filter((i) => i.type === "giveaway")
+        : all.filter((i) => i.type === "event");
+
+    // If drafting a matching type, show draft in preview as override of same id
+    if (draft && draft.enabled) {
+      const draftMatches =
+        (previewTab === "giveaways" && draft.type === "giveaway") ||
+        (previewTab === "upcoming" && draft.type === "event");
+      if (draftMatches) {
+        const without = filtered.filter((i) => i.id !== draft.id);
+        return [draft, ...without].slice(0, 4);
+      }
+    }
+    return filtered.slice(0, 4);
+  }, [feed, previewTab, draft]);
+
   function selectItem(item: AppEventItem) {
     setSelectedId(item.id);
     setDraft({ ...item });
+    setPreviewTab(item.type === "giveaway" ? "giveaways" : "upcoming");
     setStatus(null);
     setError(null);
   }
@@ -75,12 +165,18 @@ export function EventsGiveawaysPage() {
     const item = createEmptyEventItem(type);
     setSelectedId(item.id);
     setDraft(item);
+    setPreviewTab(type === "giveaway" ? "giveaways" : "upcoming");
     setStatus(`New ${type} — fill details, then Publish to App`);
     setError(null);
   }
 
   function patchDraft(patch: Partial<AppEventItem>) {
-    setDraft((prev) => (prev ? { ...prev, ...patch } : prev));
+    setDraft((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      if (patch.type) setPreviewTab(patch.type === "giveaway" ? "giveaways" : "upcoming");
+      return next;
+    });
   }
 
   async function saveDraft(nextStatus?: EventStatus) {
@@ -174,289 +270,463 @@ export function EventsGiveawaysPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center text-white/60">
+      <div className="flex min-h-[50vh] items-center justify-center text-white/70">
         <Loader2 className="mr-2 animate-spin" size={18} /> Loading events…
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <StatCard label="Events" value={String(stats.events)} />
-        <StatCard label="Giveaways" value={String(stats.giveaways)} />
-        <StatCard label="Published" value={String(stats.published)} />
+    <div className="space-y-5">
+      <style>{`
+        @keyframes events-phone-glow {
+          0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); }
+          50% { box-shadow: 0 0 0 1px rgba(229,9,20,0.28), 0 28px 70px rgba(229,9,20,0.14); }
+        }
+        .events-phone-shell { animation: events-phone-glow 4.5s ease-in-out infinite; }
+      `}</style>
+
+      {/* Header */}
+      <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
+                <Gift size={12} />
+                Events & giveaways
+              </div>
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                Publish posters fans unlock in the app
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/65">
+                Create Upcoming events or Giveaways with thumbnail, deadline, description, and link — they appear in the DameTime events grid after publish.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Events</p>
+                <p className="mt-1 text-lg font-bold text-white">{stats.events}</p>
+              </div>
+              <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Giveaways</p>
+                <p className="mt-1 text-lg font-bold text-white">{stats.giveaways}</p>
+              </div>
+              <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Live</p>
+                <p className="mt-1 text-lg font-bold text-dt-green">{stats.published}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void (draft ? saveDraft("published") : startNew("event"))}
+                disabled={saving}
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+              >
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                {draft ? "Publish to app" : "New event"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {(error || status) && (
+          <div className="space-y-2 border-b border-dt-border px-5 py-3">
+            {error ? (
+              <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
+            ) : null}
+            {status ? (
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
+                {status}
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
 
-      {error ? (
-        <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
-      ) : null}
-      {status ? (
-        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
-          {status}
-        </div>
-      ) : null}
+      <div className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_360px]">
+        {/* Library */}
+        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+          <div className="border-b border-dt-border px-4 py-3">
+            <h3 className="font-display text-sm font-semibold tracking-wide text-white">Library</h3>
+            <p className="text-[11px] text-white/40">Events & giveaways queue</p>
+          </div>
 
-      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
-        <Panel title="Library">
-          <div className="mb-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => startNew("event")}
-              className="inline-flex items-center gap-1 rounded-md bg-dt-red px-3 py-2 text-xs font-semibold text-white"
-            >
-              <Plus size={13} /> New event
-            </button>
-            <button
-              type="button"
-              onClick={() => startNew("giveaway")}
-              className="inline-flex items-center gap-1 rounded-md border border-dt-border px-3 py-2 text-xs text-white/80"
-            >
-              <Plus size={13} /> New giveaway
-            </button>
+          <div className="space-y-3 p-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => startNew("event")}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-dt-red px-3 py-2.5 text-xs font-semibold text-white"
+              >
+                <Plus size={13} /> Event
+              </button>
+              <button
+                type="button"
+                onClick={() => startNew("giveaway")}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold text-white/85 hover:border-dt-red/40"
+              >
+                <Plus size={13} /> Giveaway
+              </button>
+            </div>
+
+            <div className="flex gap-1.5 rounded-xl border border-white/10 bg-black/30 p-1">
+              {([
+                ["all", "All"],
+                ["event", "Events"],
+                ["giveaway", "Giveaways"],
+              ] as const).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setTypeFilter(id)}
+                  className={`flex-1 rounded-lg px-2 py-1.5 text-[11px] font-semibold transition ${
+                    typeFilter === id ? "bg-dt-red text-white" : "text-white/55 hover:text-white/80"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search titles…"
+              className={fieldClass()}
+            />
+
+            <ul className="max-h-[48vh] space-y-2 overflow-y-auto pr-1">
+              {items.length === 0 ? (
+                <li className="rounded-xl border border-dashed border-white/15 px-3 py-10 text-center text-sm text-white/45">
+                  No items yet. Create an event or giveaway.
+                </li>
+              ) : (
+                items.map((item) => {
+                  const live = item.status === "published" && item.enabled;
+                  const Icon = item.type === "giveaway" ? Gift : CalendarDays;
+                  return (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        onClick={() => selectItem(item)}
+                        className={`flex w-full gap-3 rounded-xl border p-2.5 text-left transition ${
+                          selectedId === item.id
+                            ? "border-dt-red/70 bg-dt-red/15"
+                            : "border-white/10 bg-black/25 hover:border-white/20"
+                        }`}
+                      >
+                        <img
+                          src={resolveEventAssetUrl(item.thumbnail)}
+                          alt=""
+                          className="h-16 w-12 shrink-0 rounded-lg object-cover"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-white">{item.title || "Untitled"}</p>
+                          <p className="mt-1 flex items-center gap-1 text-[11px] text-white/45">
+                            <Icon size={11} />
+                            {item.type === "giveaway" ? "Giveaway" : "Event"}
+                          </p>
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                                live
+                                  ? "bg-dt-green/15 text-dt-green"
+                                  : item.status === "draft"
+                                    ? "bg-white/10 text-white/55"
+                                    : "bg-dt-orange/15 text-dt-orange"
+                              }`}
+                            >
+                              {live ? "Live" : item.enabled ? item.status : "Hidden"}
+                            </span>
+                            <span className="text-[10px] text-white/35">
+                              {item.deadlineDisplay || item.dateLabel || "No deadline"}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+
             <button
               type="button"
               onClick={() => void republishAll()}
-              disabled={saving}
-              className="inline-flex items-center gap-1 rounded-md border border-dt-border px-3 py-2 text-xs text-white/70 disabled:opacity-50"
+              disabled={saving || !(feed?.items.length)}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-white/70 transition hover:bg-white/[0.06] disabled:opacity-50"
             >
-              Republish all
+              Republish all to app
             </button>
           </div>
+        </section>
 
-          <div className="mb-3 flex gap-2">
-            {([
-              ["all", "All"],
-              ["event", "Events"],
-              ["giveaway", "Giveaways"],
-            ] as const).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setTypeFilter(id)}
-                className={`rounded-md px-2.5 py-1.5 text-xs ${
-                  typeFilter === id ? "bg-dt-red text-white" : "border border-dt-border text-white/70"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search titles…"
-            className="mb-3 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-          />
-
-          <ul className="max-h-[58vh] space-y-2 overflow-y-auto pr-1">
-            {items.length === 0 ? (
-              <li className="rounded-md border border-dashed border-dt-border px-3 py-6 text-center text-sm text-dt-muted">
-                No items yet. Create an event or giveaway for the app.
-              </li>
-            ) : (
-              items.map((item) => (
-                <li key={item.id}>
+        {/* Phone preview */}
+        <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
+          <div className="events-phone-shell relative w-full max-w-[320px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
+            <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
+            <div className="border-b border-white/10 bg-[#0d0d0d] px-4 pb-3 pt-8 text-center">
+              <p className="text-[10px] font-semibold tracking-[0.28em] text-white/55">DAME EVENTS</p>
+            </div>
+            <div className="space-y-2 bg-[radial-gradient(circle_at_top,_#321018_0%,_#0a0a0a_52%)] p-3 pb-5">
+              <div className="flex rounded-full border border-white/10 bg-black/40 p-1">
+                {(["upcoming", "giveaways"] as const).map((tab) => (
                   <button
+                    key={tab}
                     type="button"
-                    onClick={() => selectItem(item)}
-                    className={`flex w-full gap-3 rounded-lg border p-2.5 text-left transition ${
-                      selectedId === item.id
-                        ? "border-dt-red/60 bg-dt-red/10"
-                        : "border-dt-border bg-dt-bg/50 hover:border-dt-red/30"
+                    onClick={() => setPreviewTab(tab)}
+                    className={`flex-1 rounded-full py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] transition ${
+                      previewTab === tab ? "bg-dt-red text-white" : "text-white/50"
                     }`}
                   >
-                    <img
-                      src={resolveEventAssetUrl(item.thumbnail)}
-                      alt=""
-                      className="h-16 w-12 shrink-0 rounded object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-white">{item.title || "Untitled"}</p>
-                      <p className="mt-1 flex items-center gap-1 text-[11px] text-dt-muted">
-                        {item.type === "giveaway" ? <Gift size={11} /> : <CalendarDays size={11} />}
-                        {item.type === "giveaway" ? "Giveaway" : "Event"} · {item.status}
-                      </p>
-                      <p className="text-[10px] text-dt-muted">
-                        {item.deadlineDisplay || item.dateLabel || "No deadline"}
-                      </p>
-                    </div>
+                    {tab}
                   </button>
-                </li>
-              ))
-            )}
-          </ul>
-        </Panel>
-
-        <Panel title={draft ? "Compose" : "Editor"}>
-          {!draft ? (
-            <p className="text-sm text-dt-muted">Select an item or create a new event / giveaway.</p>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void saveDraft("draft")}
-                  className="rounded-md border border-dt-border px-3 py-2 text-sm text-white/80 disabled:opacity-50"
-                >
-                  Save draft
-                </button>
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void saveDraft("published")}
-                  className="inline-flex items-center gap-2 rounded-md bg-dt-red px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                >
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : null}
-                  Publish to app
-                </button>
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void removeItem()}
-                  className="ml-auto inline-flex items-center gap-1 rounded-md border border-red-500/30 px-3 py-2 text-sm text-red-200"
-                >
-                  <Trash2 size={14} /> Delete
-                </button>
+                ))}
               </div>
 
-              <label className="block space-y-1.5">
-                <span className="text-xs text-dt-muted">Title</span>
-                <input
-                  value={draft.title}
-                  onChange={(e) => patchDraft({ title: e.target.value })}
-                  className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="Meet & Greet — Milwaukee"
-                />
-              </label>
-
-              <label className="block space-y-1.5">
-                <span className="text-xs text-dt-muted">Description</span>
-                <textarea
-                  value={draft.description}
-                  onChange={(e) => patchDraft({ description: e.target.value })}
-                  rows={3}
-                  className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="What fans need to know"
-                />
-              </label>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-dt-muted">Type</span>
-                  <select
-                    value={draft.type}
-                    onChange={(e) => patchDraft({ type: e.target.value as EventKind })}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-                  >
-                    <option value="event">Event (Upcoming tab)</option>
-                    <option value="giveaway">Giveaway</option>
-                  </select>
-                </label>
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-dt-muted">Status</span>
-                  <select
-                    value={draft.status}
-                    onChange={(e) => patchDraft({ status: e.target.value as EventStatus })}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-dt-muted">Deadline</span>
-                  <input
-                    type="datetime-local"
-                    value={toLocalInputValue(draft.deadline)}
-                    onChange={(e) => {
-                      const iso = fromLocalInputValue(e.target.value);
-                      patchDraft({
-                        deadline: iso,
-                        deadlineDisplay: formatDeadlineDisplay(iso),
-                      });
-                    }}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  />
-                </label>
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-dt-muted">Date label (optional)</span>
-                  <input
-                    value={draft.dateLabel}
-                    onChange={(e) => patchDraft({ dateLabel: e.target.value })}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                    placeholder="Jul 20 · 7PM CT"
-                  />
-                </label>
-              </div>
-
-              <label className="block space-y-1.5">
-                <span className="text-xs text-dt-muted">Location (optional)</span>
-                <input
-                  value={draft.location}
-                  onChange={(e) => patchDraft({ location: e.target.value })}
-                  className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="Fiserv Forum"
-                />
-              </label>
-
-              <label className="block space-y-1.5">
-                <span className="text-xs text-dt-muted">Link (ticket / entry URL)</span>
-                <input
-                  value={draft.href}
-                  onChange={(e) => patchDraft({ href: e.target.value })}
-                  className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="https://…"
-                />
-              </label>
-
-              <div className="space-y-2 rounded-lg border border-dt-border bg-dt-bg/40 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-dt-muted">Thumbnail</p>
-                <div className="mx-auto w-40 overflow-hidden rounded-lg border border-white/10">
-                  <img
-                    src={resolveEventAssetUrl(draft.thumbnail)}
-                    alt=""
-                    className="aspect-[3/4] w-full object-cover"
-                  />
+              {previewItems.length === 0 ? (
+                <div className="grid grid-cols-2 gap-1.5">
+                  {Array.from({ length: 4 }, (_, i) => (
+                    <div
+                      key={i}
+                      className="flex aspect-[3/4] items-center justify-center rounded-xl border border-white/10 bg-black/40 px-2 text-center text-[10px] font-semibold text-white/45"
+                    >
+                      {previewTab === "giveaways" ? "DAME Giveaways soon!" : "No events now"}
+                    </div>
+                  ))}
                 </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-1.5">
+                  {previewItems.map((item) => (
+                    <PosterPreview
+                      key={item.id}
+                      item={item}
+                      selected={selectedId === item.id}
+                      onClick={() => selectItem(item)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Editor */}
+        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+          {!draft ? (
+            <div className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-white/40">
+                <CalendarDays size={22} />
+              </div>
+              <p className="text-sm text-white/55">Select an item or create a new event / giveaway.</p>
+              <div className="mt-1 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => startNew("event")}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-dt-red px-4 py-2 text-sm font-semibold text-white"
+                >
+                  <Plus size={14} /> Event
+                </button>
+                <button
+                  type="button"
+                  onClick={() => startNew("giveaway")}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-white/85"
+                >
+                  <Plus size={14} /> Giveaway
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex max-h-[calc(100dvh-220px)] flex-col">
+              <div className="flex items-center justify-between gap-2 border-b border-dt-border px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-dt-red/30 bg-dt-red/15 text-dt-red">
+                    {draft.type === "giveaway" ? <Gift size={16} /> : <CalendarDays size={16} />}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="font-display text-sm font-semibold tracking-wide text-white">
+                      Edit {draft.type === "giveaway" ? "giveaway" : "event"}
+                    </h3>
+                    <p className="truncate text-[11px] uppercase tracking-[0.12em] text-white/40">
+                      {draft.status} · {draft.enabled ? "visible" : "hidden"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void removeItem()}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-xs text-red-200 transition hover:bg-red-500/10"
+                >
+                  <Trash2 size={12} /> Remove
+                </button>
+              </div>
+
+              <div className="space-y-4 overflow-y-auto p-4">
                 <div className="flex flex-wrap gap-2">
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dt-border px-3 py-2 text-xs text-white/80">
-                    <Upload size={13} /> Upload thumbnail
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void saveDraft("draft")}
+                    className="rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-sm text-white/80 disabled:opacity-50"
+                  >
+                    Save draft
+                  </button>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void saveDraft("published")}
+                    className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  >
+                    {saving ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                    Publish to app
+                  </button>
+                </div>
+
+                <label className="block space-y-1.5">
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Title</span>
+                  <input
+                    value={draft.title}
+                    onChange={(e) => patchDraft({ title: e.target.value })}
+                    className={fieldClass()}
+                    placeholder="Meet & Greet — Milwaukee"
+                  />
+                </label>
+
+                <label className="block space-y-1.5">
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Description</span>
+                  <textarea
+                    value={draft.description}
+                    onChange={(e) => patchDraft({ description: e.target.value })}
+                    rows={3}
+                    className={fieldClass()}
+                    placeholder="What fans need to know"
+                  />
+                </label>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Type</span>
+                    <select
+                      value={draft.type}
+                      onChange={(e) => patchDraft({ type: e.target.value as EventKind })}
+                      className={fieldClass()}
+                    >
+                      <option value="event">Event (Upcoming)</option>
+                      <option value="giveaway">Giveaway</option>
+                    </select>
+                  </label>
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Status</span>
+                    <select
+                      value={draft.status}
+                      onChange={(e) => patchDraft({ status: e.target.value as EventStatus })}
+                      className={fieldClass()}
+                    >
+                      <option value="draft">Draft</option>
+                      <option value="published">Published</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Deadline</span>
                     <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => onUploadThumbnail(e.target.files?.[0] ?? null)}
+                      type="datetime-local"
+                      value={toLocalInputValue(draft.deadline)}
+                      onChange={(e) => {
+                        const iso = fromLocalInputValue(e.target.value);
+                        patchDraft({
+                          deadline: iso,
+                          deadlineDisplay: formatDeadlineDisplay(iso),
+                        });
+                      }}
+                      className={fieldClass()}
                     />
                   </label>
-                  <input
-                    value={draft.thumbnail.startsWith("data:") ? "(uploaded image)" : draft.thumbnail}
-                    onChange={(e) => {
-                      if (!e.target.value.startsWith("(")) patchDraft({ thumbnail: e.target.value });
-                    }}
-                    className="min-w-[220px] flex-1 rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-xs outline-none"
-                    placeholder="Thumbnail URL or /images/..."
-                  />
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Date label</span>
+                    <input
+                      value={draft.dateLabel}
+                      onChange={(e) => patchDraft({ dateLabel: e.target.value })}
+                      className={fieldClass()}
+                      placeholder="Jul 20 · 7PM CT"
+                    />
+                  </label>
                 </div>
-              </div>
 
-              <label className="flex items-center gap-2 text-sm text-white/75">
-                <input
-                  type="checkbox"
-                  checked={draft.enabled}
-                  onChange={(e) => patchDraft({ enabled: e.target.checked })}
-                  className="accent-dt-red"
-                />
-                Enabled (hidden in app if off)
-              </label>
+                <label className="block space-y-1.5">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-white/45">
+                    <MapPin size={11} /> Location
+                  </span>
+                  <input
+                    value={draft.location}
+                    onChange={(e) => patchDraft({ location: e.target.value })}
+                    className={fieldClass()}
+                    placeholder="Fiserv Forum"
+                  />
+                </label>
+
+                <label className="block space-y-1.5">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-white/45">
+                    <Link2 size={11} /> Link
+                  </span>
+                  <input
+                    value={draft.href}
+                    onChange={(e) => patchDraft({ href: e.target.value })}
+                    className={fieldClass()}
+                    placeholder="https://…"
+                  />
+                </label>
+
+                <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-3.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">Thumbnail</p>
+                  <div className="mx-auto w-36 overflow-hidden rounded-xl border border-white/10">
+                    <img
+                      src={resolveEventAssetUrl(draft.thumbnail)}
+                      alt=""
+                      className="aspect-[3/4] w-full object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/85 hover:bg-white/[0.08]">
+                      <Upload size={13} /> Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => onUploadThumbnail(e.target.files?.[0] ?? null)}
+                      />
+                    </label>
+                    <input
+                      value={draft.thumbnail.startsWith("data:") ? "(uploaded image)" : draft.thumbnail}
+                      onChange={(e) => {
+                        if (!e.target.value.startsWith("(")) patchDraft({ thumbnail: e.target.value });
+                      }}
+                      className={`min-w-[180px] flex-1 ${fieldClass()}`}
+                      placeholder="URL or /images/..."
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => patchDraft({ enabled: !draft.enabled })}
+                  className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition ${
+                    draft.enabled
+                      ? "border-dt-green/35 bg-dt-green/10 text-dt-green"
+                      : "border-white/15 bg-black/40 text-white/60"
+                  }`}
+                >
+                  {draft.enabled ? <Eye size={15} /> : <EyeOff size={15} />}
+                  {draft.enabled ? "Visible in app" : "Hidden in app"}
+                </button>
+              </div>
             </div>
           )}
-        </Panel>
+        </section>
       </div>
     </div>
   );
