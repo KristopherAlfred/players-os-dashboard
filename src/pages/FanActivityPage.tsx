@@ -34,11 +34,6 @@ export function FanActivityPage() {
     setError(null);
     try {
       const data = await fetchDametimeAnalytics();
-      if (!data) {
-        throw new Error(
-          "Could not load live engagement. Set VITE_ADMIN_EXPORT_SECRET and confirm DameTime analytics is available.",
-        );
-      }
       setAnalytics(data);
       setStatus(
         isRefresh

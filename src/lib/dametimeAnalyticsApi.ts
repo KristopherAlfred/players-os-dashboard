@@ -77,39 +77,48 @@ function getAdminSecret() {
   return import.meta.env.VITE_ADMIN_EXPORT_SECRET?.trim() ?? "";
 }
 
-export async function fetchDametimeAnalytics(fanEmail?: string): Promise<DametimeAnalytics | null> {
+export async function fetchDametimeAnalytics(fanEmail?: string): Promise<DametimeAnalytics> {
   const secret = getAdminSecret();
-  if (!secret) return null;
-
-  try {
-    const params = new URLSearchParams();
-    const fan = fanEmail?.trim().toLowerCase();
-    if (fan) params.set("fan", fan);
-    // Bust intermediary caches so loyalty points stay current on each poll.
-    params.set("_", String(Date.now()));
-    const query = params.toString();
-    const response = await fetch(`${getApiBase()}/api/admin/analytics${query ? `?${query}` : ""}`, {
-      headers: {
-        "x-admin-secret": secret,
-        "cache-control": "no-cache",
-      },
-      cache: "no-store",
-    });
-    if (!response.ok) return null;
-    const data = (await response.json()) as DametimeAnalytics & { ok?: boolean };
-    if (!data?.kpis) return null;
-    return {
-      ...data,
-      kpis: {
-        ...data.kpis,
-        totalPoints: Number(data.kpis.totalPoints) || 0,
-        avgPoints: Number(data.kpis.avgPoints) || 0,
-      },
-      topByPoints: Array.isArray(data.topByPoints) ? data.topByPoints : data.topUsers,
-    };
-  } catch {
-    return null;
+  if (!secret) {
+    throw new Error(
+      "Set VITE_ADMIN_EXPORT_SECRET on the dashboard (must match DameTime ADMIN_EXPORT_SECRET), then redeploy.",
+    );
   }
+
+  const params = new URLSearchParams();
+  const fan = fanEmail?.trim().toLowerCase();
+  if (fan) params.set("fan", fan);
+  // Bust intermediary caches so loyalty points stay current on each poll.
+  params.set("_", String(Date.now()));
+  const query = params.toString();
+  const response = await fetch(`${getApiBase()}/api/admin/analytics${query ? `?${query}` : ""}`, {
+    headers: {
+      "x-admin-secret": secret,
+      "cache-control": "no-cache",
+    },
+    cache: "no-store",
+  });
+  if (response.status === 401) {
+    throw new Error(
+      "Unauthorized — dashboard VITE_ADMIN_EXPORT_SECRET does not match DameTime ADMIN_EXPORT_SECRET (redeploy after updating).",
+    );
+  }
+  if (!response.ok) {
+    throw new Error(`DameTime analytics unavailable (${response.status}).`);
+  }
+  const data = (await response.json()) as DametimeAnalytics & { ok?: boolean };
+  if (!data?.kpis) {
+    throw new Error("DameTime analytics returned an unexpected payload.");
+  }
+  return {
+    ...data,
+    kpis: {
+      ...data.kpis,
+      totalPoints: Number(data.kpis.totalPoints) || 0,
+      avgPoints: Number(data.kpis.avgPoints) || 0,
+    },
+    topByPoints: Array.isArray(data.topByPoints) ? data.topByPoints : data.topUsers,
+  };
 }
 
 export function formatMetric(value: number, compact = false) {

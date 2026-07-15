@@ -22,24 +22,15 @@ type DametimeAnalyticsContextValue = {
 const DametimeAnalyticsContext = createContext<DametimeAnalyticsContextValue | null>(null);
 
 async function loadDametimeAnalytics() {
-  const secret = import.meta.env.VITE_ADMIN_EXPORT_SECRET?.trim();
-  if (!secret) {
+  try {
+    const data = await fetchDametimeAnalytics();
+    return { analytics: data, error: null as string | null };
+  } catch (err) {
     return {
       analytics: null,
-      error: "Set VITE_ADMIN_EXPORT_SECRET in the dashboard environment to load live analytics.",
+      error: err instanceof Error ? err.message : "Failed to load DameTime analytics.",
     };
   }
-
-  const data = await fetchDametimeAnalytics();
-  if (!data) {
-    return {
-      analytics: null,
-      error:
-        "Analytics request failed. Check VITE_DAME_BIO_API_URL and ADMIN_EXPORT_SECRET on the DameTime app.",
-    };
-  }
-
-  return { analytics: data, error: null };
 }
 
 export function DametimeAnalyticsProvider({ children }: { children: ReactNode }) {

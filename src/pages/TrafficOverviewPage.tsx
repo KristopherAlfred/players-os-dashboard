@@ -96,11 +96,6 @@ export function TrafficOverviewPage() {
       setError(null);
       try {
         const data = await fetchDametimeAnalytics(email || undefined);
-        if (!data) {
-          throw new Error(
-            "Could not load live analytics. Set VITE_ADMIN_EXPORT_SECRET and confirm DameTime admin analytics is available.",
-          );
-        }
         setAnalytics(data);
         const fanLabel = email
           ? fans.find((fan) => fan.email === email)

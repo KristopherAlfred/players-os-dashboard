@@ -35,11 +35,6 @@ export function AudienceOverviewPage() {
     setError(null);
     try {
       const data = await fetchDametimeAnalytics();
-      if (!data) {
-        throw new Error(
-          "Could not load live audience data. Set VITE_ADMIN_EXPORT_SECRET and confirm DameTime analytics is available.",
-        );
-      }
       setAnalytics(data);
       setStatus(
         isRefresh
