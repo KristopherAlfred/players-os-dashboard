@@ -2,15 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ExternalLink,
+  Film,
   Loader2,
   Radio,
   RefreshCw,
   Share2,
-  TrendingUp,
   Users,
 } from "lucide-react";
 import { InstagramAnalyticsView } from "../components/instagram/InstagramAnalyticsDashboard";
-import { YouTubeAnalyticsView } from "../components/youtube/YouTubeAnalyticsDashboard";
 import { FacebookAnalyticsView } from "../components/facebook/FacebookAnalyticsDashboard";
 import { TwitterAnalyticsView } from "../components/twitter/TwitterAnalyticsDashboard";
 import { SourceError, SourceLoading } from "../components/dametime/DametimeAnalyticsStates";
@@ -22,11 +21,6 @@ import {
   type InstagramAnalytics,
 } from "../lib/instagramAnalyticsApi";
 import {
-  fetchYouTubeAnalytics,
-  formatMetric as formatYtMetric,
-  type YouTubeAnalytics,
-} from "../lib/youtubeAnalyticsApi";
-import {
   fetchFacebookAnalytics,
   formatMetric as formatFbMetric,
   type FacebookAnalytics,
@@ -37,20 +31,18 @@ import {
   type TwitterAnalytics,
 } from "../lib/twitterAnalyticsApi";
 
-type SocialTab = "instagram" | "x" | "facebook" | "youtube";
+type SocialTab = "instagram" | "x" | "facebook";
 
 const TABS: { id: SocialTab; label: string }[] = [
   { id: "instagram", label: "INSTAGRAM" },
   { id: "x", label: "X" },
   { id: "facebook", label: "FACEBOOK" },
-  { id: "youtube", label: "YOUTUBE" },
 ];
 
 const POLL_MS = 5 * 60_000;
 
 type Bundle = {
   instagram: InstagramAnalytics | null;
-  youtube: YouTubeAnalytics | null;
   facebook: FacebookAnalytics | null;
   twitter: TwitterAnalytics | null;
 };
@@ -59,7 +51,6 @@ export function SocialContentPage() {
   const [tab, setTab] = useState<SocialTab>("instagram");
   const [bundle, setBundle] = useState<Bundle>({
     instagram: null,
-    youtube: null,
     facebook: null,
     twitter: null,
   });
@@ -73,14 +64,13 @@ export function SocialContentPage() {
     else setLoading(true);
     setError(null);
     try {
-      const [instagram, youtube, facebook, twitter] = await Promise.all([
+      const [instagram, facebook, twitter] = await Promise.all([
         fetchInstagramAnalytics(),
-        fetchYouTubeAnalytics(),
         fetchFacebookAnalytics(),
         fetchTwitterAnalytics(),
       ]);
-      setBundle({ instagram, youtube, facebook, twitter });
-      const synced = [instagram?.syncedAt, youtube?.syncedAt, facebook?.syncedAt, twitter?.syncedAt]
+      setBundle({ instagram, facebook, twitter });
+      const synced = [instagram?.syncedAt, facebook?.syncedAt, twitter?.syncedAt]
         .filter(Boolean)
         .map((iso) => Date.parse(iso as string))
         .filter((n) => Number.isFinite(n));
@@ -90,7 +80,7 @@ export function SocialContentPage() {
           ? `Refreshed social analytics · ${latest}`
           : `Live DameTime social analytics · synced ${latest}`,
       );
-      if (!instagram && !youtube && !facebook && !twitter) {
+      if (!instagram && !facebook && !twitter) {
         setError("Could not load social analytics from DameTime.");
       }
     } catch (err) {
@@ -111,12 +101,10 @@ export function SocialContentPage() {
     const igFollowers = bundle.instagram?.kpis.followers ?? 0;
     const fbFollowers = bundle.facebook?.kpis.followers ?? 0;
     const twFollowers = bundle.twitter?.kpis.followers ?? 0;
-    const ytSubs = bundle.youtube?.kpis.subscribers ?? 0;
     const engRates = [
       bundle.instagram?.kpis.engagementRate,
       bundle.facebook?.kpis.engagementRate,
       bundle.twitter?.kpis.engagementRate,
-      bundle.youtube?.kpis.engagementRate,
     ].filter((n): n is number => typeof n === "number" && Number.isFinite(n));
     const avgEng =
       engRates.length > 0
@@ -125,12 +113,10 @@ export function SocialContentPage() {
     const posts =
       (bundle.instagram?.recentPosts.length ?? 0) +
       (bundle.facebook?.recentPosts.length ?? 0) +
-      (bundle.twitter?.recentPosts.length ?? 0) +
-      (bundle.youtube?.recentVideos.length ?? 0);
+      (bundle.twitter?.recentPosts.length ?? 0);
 
     return {
       socialReach: igFollowers + fbFollowers + twFollowers,
-      ytSubs,
       posts,
       avgEng,
     };
@@ -138,7 +124,7 @@ export function SocialContentPage() {
 
   const activeIndex = TABS.findIndex((item) => item.id === tab);
 
-  if (loading && !bundle.instagram && !bundle.youtube && !bundle.facebook && !bundle.twitter) {
+  if (loading && !bundle.instagram && !bundle.facebook && !bundle.twitter) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-white/70">
         <Loader2 className="mr-2 animate-spin" size={18} /> Loading live social analytics…
@@ -165,8 +151,7 @@ export function SocialContentPage() {
                 Same feeds fans see in DameTime
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Live Instagram, X, Facebook, and YouTube analytics from the DameTime app — KPIs, charts,
-                and top posts per platform.
+                Live Instagram, X, and Facebook analytics from the DameTime app — YouTube lives under Videos.
               </p>
             </div>
 
@@ -176,8 +161,8 @@ export function SocialContentPage() {
                 <p className="mt-1 text-lg font-bold text-white">{formatIgMetric(summary.socialReach, true)}</p>
               </div>
               <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">YT subs</p>
-                <p className="mt-1 text-lg font-bold text-white">{formatYtMetric(summary.ytSubs, true)}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Posts</p>
+                <p className="mt-1 text-lg font-bold text-white">{summary.posts}</p>
               </div>
               <div className="min-w-[96px] rounded-xl border border-white/10 bg-black/40 px-4 py-3">
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Avg eng.</p>
@@ -213,10 +198,10 @@ export function SocialContentPage() {
           <div
             role="tablist"
             aria-label="Social platforms"
-            className="relative grid grid-cols-4 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1"
+            className="relative grid grid-cols-3 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1"
           >
             <div
-              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/4)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(229,9,20,0.35)] transition-transform duration-300 ease-out"
+              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/3)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(229,9,20,0.35)] transition-transform duration-300 ease-out"
               style={{ transform: `translateX(${activeIndex * 100}%)` }}
               aria-hidden
             />
@@ -241,7 +226,7 @@ export function SocialContentPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[
           {
             label: "Instagram",
@@ -260,12 +245,6 @@ export function SocialContentPage() {
             value: formatFbMetric(bundle.facebook?.kpis.followers ?? 0, true),
             hint: `${formatFbMetric(bundle.facebook?.kpis.totalPosts ?? 0)} posts`,
             Icon: Users,
-          },
-          {
-            label: "YouTube",
-            value: formatYtMetric(bundle.youtube?.kpis.subscribers ?? 0, true),
-            hint: `${formatYtMetric(bundle.youtube?.kpis.totalViews ?? 0, true)} views`,
-            Icon: TrendingUp,
           },
         ].map(({ label, value, hint, Icon }) => (
           <div key={label} className="relative overflow-hidden rounded-2xl border border-dt-border bg-dt-card p-4">
@@ -303,17 +282,18 @@ export function SocialContentPage() {
           <SourceError title="Could not load Facebook analytics" message="No data available." />
         )
       ) : null}
-      {tab === "youtube" ? (
-        bundle.youtube ? (
-          <YouTubeAnalyticsView analytics={bundle.youtube} />
-        ) : loading ? (
-          <SourceLoading message="Loading YouTube analytics…" />
-        ) : (
-          <SourceError title="Could not load YouTube analytics" message="No data available." />
-        )
-      ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
+        <Link
+          to="/content/videos"
+          className="group rounded-2xl border border-dt-border bg-dt-card p-4 transition hover:border-dt-red/40"
+        >
+          <div className="mb-2 inline-flex rounded-lg border border-dt-red/25 bg-dt-red/10 p-2 text-dt-red">
+            <Film size={16} />
+          </div>
+          <p className="text-sm font-semibold text-white group-hover:text-dt-red">Videos</p>
+          <p className="mt-1 text-xs text-white/45">YouTube analytics and Exclusive uploads live here</p>
+        </Link>
         <Link
           to="/live"
           className="group rounded-2xl border border-dt-border bg-dt-card p-4 transition hover:border-dt-red/40"
@@ -323,16 +303,6 @@ export function SocialContentPage() {
           </div>
           <p className="text-sm font-semibold text-white group-hover:text-dt-red">Go Live</p>
           <p className="mt-1 text-xs text-white/45">Same LIVE destination fans open from the app Social tab</p>
-        </Link>
-        <Link
-          to="/content/calendar"
-          className="group rounded-2xl border border-dt-border bg-dt-card p-4 transition hover:border-dt-red/40"
-        >
-          <div className="mb-2 inline-flex rounded-lg border border-dt-red/25 bg-dt-red/10 p-2 text-dt-red">
-            <Share2 size={16} />
-          </div>
-          <p className="text-sm font-semibold text-white group-hover:text-dt-red">Content calendar</p>
-          <p className="mt-1 text-xs text-white/45">See exact post dates and times across platforms</p>
         </Link>
       </div>
     </div>

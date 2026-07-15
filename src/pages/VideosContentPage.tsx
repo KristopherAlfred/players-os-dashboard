@@ -1,6 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
-import { Film, Loader2, Plus, Trash2, Upload, Video } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Eye,
+  Film,
+  Loader2,
+  Plus,
+  RefreshCw,
+  Trash2,
+  Upload,
+  Video,
+} from "lucide-react";
 import { Panel, StatCard } from "../components/PageShell";
+import { YouTubeAnalyticsView } from "../components/youtube/YouTubeAnalyticsDashboard";
+import { SourceError, SourceLoading } from "../components/dametime/DametimeAnalyticsStates";
+import {
+  fetchDametimeAnalytics,
+  formatMetric,
+  formatRelativeTime,
+  type DametimeAnalytics,
+} from "../lib/dametimeAnalyticsApi";
+import {
+  fetchYouTubeAnalytics,
+  formatMetric as formatYtMetric,
+  type YouTubeAnalytics,
+} from "../lib/youtubeAnalyticsApi";
 import {
   createEmptyVideoItem,
   deleteVideoItem,
@@ -14,10 +36,161 @@ import {
   type VideoStatus,
 } from "../lib/videosApi";
 
-const MAX_VIDEO_UPLOAD_BYTES = 12 * 1024 * 1024; // ~12MB soft limit for data URL publishes
+const MAX_VIDEO_UPLOAD_BYTES = 12 * 1024 * 1024;
+type VideosTab = "youtube" | "exclusive";
+
+const TABS: { id: VideosTab; label: string }[] = [
+  { id: "youtube", label: "YOUTUBE" },
+  { id: "exclusive", label: "EXCLUSIVE" },
+];
+
+function matchesExclusiveTarget(target: string | null | undefined, videoId: string) {
+  if (!target) return false;
+  const t = target.toLowerCase();
+  const id = videoId.toLowerCase();
+  return t === id || t.includes(`/access/videos/${id}`) || t.includes(id);
+}
 
 export function VideosContentPage() {
+  const [tab, setTab] = useState<VideosTab>("youtube");
+  const activeIndex = TABS.findIndex((item) => item.id === tab);
+
+  return (
+    <div className="space-y-5">
+      <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+          <div className="relative max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
+              <Film size={12} />
+              Videos
+              <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-emerald-300">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                LIVE
+              </span>
+            </div>
+            <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              YouTube analytics & Exclusive uploads
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/65">
+              Same tabs fans use in DameTime — switch to Exclusive to upload clips and track opens once they go live.
+            </p>
+          </div>
+        </div>
+
+        <div className="px-4 py-3 sm:px-5">
+          <div
+            role="tablist"
+            aria-label="Video categories"
+            className="relative grid grid-cols-2 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1"
+          >
+            <div
+              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/2)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(229,9,20,0.35)] transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(${activeIndex * 100}%)` }}
+              aria-hidden
+            />
+            {TABS.map((item) => {
+              const active = tab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setTab(item.id)}
+                  className={`relative z-10 truncate px-2 py-2.5 text-[11px] font-bold tracking-[0.12em] transition sm:text-xs ${
+                    active ? "text-white" : "text-white/45 hover:text-white/75"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {tab === "youtube" ? <YouTubeVideosPanel /> : <ExclusiveVideosPanel />}
+    </div>
+  );
+}
+
+function YouTubeVideosPanel() {
+  const [analytics, setAnalytics] = useState<YouTubeAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchYouTubeAnalytics();
+      if (!data) throw new Error("Could not load YouTube analytics from DameTime.");
+      setAnalytics(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load YouTube");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading && !analytics) {
+    return <SourceLoading message="Loading YouTube analytics…" />;
+  }
+
+  if (!analytics) {
+    return (
+      <div className="space-y-3">
+        <SourceError title="Could not load YouTube analytics" message={error || "No data available."} />
+        <button
+          type="button"
+          onClick={() => void load(true)}
+          className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white"
+        >
+          <RefreshCw size={14} /> Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-white">Public YouTube channel</p>
+          <p className="text-[11px] text-white/40">
+            Synced {new Date(analytics.syncedAt).toLocaleString()} · {formatYtMetric(analytics.kpis.subscribers, true)}{" "}
+            subscribers
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void load(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-dt-red/40 disabled:opacity-60"
+        >
+          {refreshing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+          Refresh
+        </button>
+      </div>
+      {error ? (
+        <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
+      ) : null}
+      <YouTubeAnalyticsView analytics={analytics} />
+    </div>
+  );
+}
+
+function ExclusiveVideosPanel() {
   const [feed, setFeed] = useState<ExclusiveVideoFeed | null>(null);
+  const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<ExclusiveVideoItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,20 +198,38 @@ export function VideosContentPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [studioMode, setStudioMode] = useState<"analytics" | "upload">("analytics");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [nextFeed, nextAnalytics] = await Promise.all([
+        fetchVideoFeed(),
+        fetchDametimeAnalytics().catch(() => null),
+      ]);
+      setFeed(nextFeed);
+      setAnalytics(nextAnalytics);
+      const first = nextFeed.items[0];
+      if (first) {
+        setSelectedId(first.id);
+        setDraft({ ...first });
+        setStudioMode("upload");
+      } else {
+        setSelectedId(null);
+        setDraft(null);
+        setStudioMode("analytics");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load exclusive videos");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    void fetchVideoFeed()
-      .then((next) => {
-        setFeed(next);
-        const first = next.items[0];
-        if (first) {
-          setSelectedId(first.id);
-          setDraft({ ...first });
-        }
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load videos"))
-      .finally(() => setLoading(false));
-  }, []);
+    void load();
+  }, [load]);
 
   const items = useMemo(() => {
     const list = feed?.items ?? [];
@@ -61,9 +252,40 @@ export function VideosContentPage() {
     };
   }, [feed]);
 
+  const videoPerformance = useMemo(() => {
+    const published = (feed?.items ?? []).filter((item) => item.status === "published");
+    return published
+      .map((video) => {
+        const opens =
+          (analytics?.topTargets ?? [])
+            .filter((row) => matchesExclusiveTarget(row.target, video.id))
+            .reduce((sum, row) => sum + row.count, 0) ||
+          (analytics?.recentActivity ?? []).filter((row) => matchesExclusiveTarget(row.target, video.id))
+            .length;
+        return { video, opens };
+      })
+      .sort((a, b) => b.opens - a.opens);
+  }, [feed, analytics]);
+
+  const totalOpens = useMemo(
+    () => videoPerformance.reduce((sum, row) => sum + row.opens, 0),
+    [videoPerformance],
+  );
+
+  const recentExclusiveActivity = useMemo(() => {
+    const publishedIds = new Set(
+      (feed?.items ?? []).filter((item) => item.status === "published").map((item) => item.id),
+    );
+    if (!publishedIds.size || !analytics) return [];
+    return analytics.recentActivity
+      .filter((row) => [...publishedIds].some((id) => matchesExclusiveTarget(row.target, id)))
+      .slice(0, 8);
+  }, [feed, analytics]);
+
   function selectItem(item: ExclusiveVideoItem) {
     setSelectedId(item.id);
     setDraft({ ...item });
+    setStudioMode("upload");
     setStatus(null);
     setError(null);
   }
@@ -72,6 +294,7 @@ export function VideosContentPage() {
     const item = createEmptyVideoItem();
     setSelectedId(item.id);
     setDraft(item);
+    setStudioMode("upload");
     setStatus("New exclusive video — add title, video, thumbnail, then Publish to App");
     setError(null);
   }
@@ -156,6 +379,7 @@ export function VideosContentPage() {
       setSelectedId(next?.id ?? null);
       setDraft(next ? { ...next } : null);
       setStatus("Deleted");
+      if (!next) setStudioMode("analytics");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
     } finally {
@@ -213,17 +437,48 @@ export function VideosContentPage() {
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center text-white/60">
-        <Loader2 className="mr-2 animate-spin" size={18} /> Loading videos…
+        <Loader2 className="mr-2 animate-spin" size={18} /> Loading exclusive videos…
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex rounded-xl border border-white/10 bg-black/30 p-1">
+          <button
+            type="button"
+            onClick={() => setStudioMode("analytics")}
+            className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+              studioMode === "analytics" ? "bg-dt-red text-white" : "text-white/55 hover:text-white"
+            }`}
+          >
+            Analytics
+          </button>
+          <button
+            type="button"
+            onClick={() => setStudioMode("upload")}
+            className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+              studioMode === "upload" ? "bg-dt-red text-white" : "text-white/55 hover:text-white"
+            }`}
+          >
+            Upload
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={startNew}
+          className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)]"
+        >
+          <Plus size={14} /> New exclusive video
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Exclusive videos" value={String(stats.total)} />
         <StatCard label="Published" value={String(stats.published)} />
         <StatCard label="Drafts" value={String(stats.drafts)} />
+        <StatCard label="App opens" value={formatMetric(totalOpens)} hint="From DameTime fan_events" />
       </div>
 
       {error ? (
@@ -235,206 +490,294 @@ export function VideosContentPage() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
-        <Panel title="Exclusive library">
-          <div className="mb-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={startNew}
-              className="inline-flex items-center gap-1 rounded-md bg-dt-red px-3 py-2 text-xs font-semibold text-white"
-            >
-              <Plus size={13} /> New video
-            </button>
-            <button
-              type="button"
-              onClick={() => void republishAll()}
-              disabled={saving}
-              className="inline-flex items-center gap-1 rounded-md border border-dt-border px-3 py-2 text-xs text-white/70 disabled:opacity-50"
-            >
-              Republish all
-            </button>
-          </div>
-
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search titles…"
-            className="mb-3 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-          />
-
-          <ul className="max-h-[58vh] space-y-2 overflow-y-auto pr-1">
-            {items.length === 0 ? (
-              <li className="rounded-md border border-dashed border-dt-border px-3 py-6 text-center text-sm text-dt-muted">
-                No exclusive videos yet. Upload one for the app.
-              </li>
+      {studioMode === "analytics" ? (
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+            <div className="border-b border-dt-border px-4 py-3.5">
+              <h3 className="font-display text-sm font-semibold tracking-wide text-white">Exclusive performance</h3>
+              <p className="text-[11px] text-white/40">
+                Opens of each exclusive video detail page in the DameTime app
+              </p>
+            </div>
+            {stats.published === 0 ? (
+              <div className="px-4 py-14 text-center">
+                <Eye size={22} className="mx-auto text-dt-red" />
+                <p className="mt-3 text-sm font-semibold text-white">No exclusive videos yet</p>
+                <p className="mt-1 text-xs text-white/45">
+                  Same as the app Exclusive tab — publish a video to start tracking analytics here.
+                </p>
+                <button
+                  type="button"
+                  onClick={startNew}
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white"
+                >
+                  <Plus size={14} /> Upload exclusive
+                </button>
+              </div>
             ) : (
-              items.map((item) => (
-                <li key={item.id}>
+              <div className="divide-y divide-dt-border">
+                {videoPerformance.map(({ video, opens }, index) => (
                   <button
+                    key={video.id}
                     type="button"
-                    onClick={() => selectItem(item)}
-                    className={`flex w-full gap-3 rounded-lg border p-2.5 text-left transition ${
-                      selectedId === item.id
-                        ? "border-dt-red/60 bg-dt-red/10"
-                        : "border-dt-border bg-dt-bg/50 hover:border-dt-red/30"
-                    }`}
+                    onClick={() => selectItem(video)}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.03]"
                   >
+                    <span className="w-5 shrink-0 text-center text-xs font-bold text-white/35">{index + 1}</span>
                     <img
-                      src={resolveVideoAssetUrl(item.thumbnail)}
+                      src={resolveVideoAssetUrl(video.thumbnail)}
                       alt=""
-                      className="h-14 w-20 shrink-0 rounded object-cover"
+                      className="h-12 w-20 shrink-0 rounded-md object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-white">{item.title || "Untitled"}</p>
-                      <p className="mt-1 flex items-center gap-1 text-[11px] text-dt-muted">
-                        <Film size={11} />
-                        Exclusive · {item.status}
+                      <p className="truncate text-sm font-medium text-white">{video.title}</p>
+                      <p className="text-[11px] text-white/40">
+                        {video.duration || "Exclusive"} · {video.date}
                       </p>
-                      <p className="text-[10px] text-dt-muted">{item.date}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-sm font-semibold tabular-nums text-white">{formatMetric(opens)}</p>
+                      <p className="text-[10px] text-white/40">opens</p>
                     </div>
                   </button>
-                </li>
-              ))
+                ))}
+              </div>
             )}
-          </ul>
-        </Panel>
+          </section>
 
-        <Panel title={draft ? "Compose video" : "Editor"}>
-          {!draft ? (
-            <p className="text-sm text-dt-muted">Select a video or create a new exclusive upload.</p>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void saveDraft("draft")}
-                  className="rounded-md border border-dt-border px-3 py-2 text-sm text-white/80 disabled:opacity-50"
-                >
-                  Save draft
-                </button>
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void saveDraft("published")}
-                  className="inline-flex items-center gap-2 rounded-md bg-dt-red px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                >
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : null}
-                  Publish to app
-                </button>
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void removeItem()}
-                  className="ml-auto inline-flex items-center gap-1 rounded-md border border-red-500/30 px-3 py-2 text-sm text-red-200"
-                >
-                  <Trash2 size={14} /> Delete
-                </button>
+          <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+            <div className="border-b border-dt-border px-4 py-3.5">
+              <h3 className="font-display text-sm font-semibold tracking-wide text-white">Recent exclusive activity</h3>
+              <p className="text-[11px] text-white/40">Live fan opens tied to exclusive video IDs</p>
+            </div>
+            {recentExclusiveActivity.length === 0 ? (
+              <p className="px-4 py-12 text-center text-sm text-white/40">
+                {stats.published
+                  ? "Waiting for fans to open exclusive videos in the app…"
+                  : "Publish an exclusive video to start collecting opens."}
+              </p>
+            ) : (
+              <div className="divide-y divide-dt-border">
+                {recentExclusiveActivity.map((item, idx) => (
+                  <div key={`${item.at}-${item.email}-${idx}`} className="px-4 py-3">
+                    <p className="text-sm text-white">
+                      <span className="font-medium">{item.displayName || item.email}</span>
+                      <span className="text-white/45"> · {item.action}</span>
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-white/40">
+                      {formatRelativeTime(item.at)}
+                      {item.target ? ` · ${item.target}` : ""}
+                    </p>
+                  </div>
+                ))}
               </div>
+            )}
+          </section>
+        </div>
+      ) : null}
 
-              <label className="block space-y-1.5">
-                <span className="text-xs text-dt-muted">Title</span>
-                <input
-                  value={draft.title}
-                  onChange={(e) => patchDraft({ title: e.target.value })}
-                  className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="EXCLUSIVE WORKOUT SESSION"
-                />
-              </label>
+      {studioMode === "upload" ? (
+        <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+          <Panel title="Exclusive library">
+            <div className="mb-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={startNew}
+                className="inline-flex items-center gap-1 rounded-md bg-dt-red px-3 py-2 text-xs font-semibold text-white"
+              >
+                <Plus size={13} /> New video
+              </button>
+              <button
+                type="button"
+                onClick={() => void republishAll()}
+                disabled={saving}
+                className="inline-flex items-center gap-1 rounded-md border border-dt-border px-3 py-2 text-xs text-white/70 disabled:opacity-50"
+              >
+                Republish all
+              </button>
+            </div>
 
-              <label className="block space-y-1.5">
-                <span className="text-xs text-dt-muted">Description</span>
-                <textarea
-                  value={draft.description}
-                  onChange={(e) => patchDraft({ description: e.target.value })}
-                  rows={3}
-                  className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="What fans will see under the title"
-                />
-              </label>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search titles…"
+              className="mb-3 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
+            />
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-dt-muted">Duration label</span>
-                  <input
-                    value={draft.duration}
-                    onChange={(e) => patchDraft({ duration: e.target.value })}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                    placeholder="8:24"
-                  />
-                </label>
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-dt-muted">Status</span>
-                  <select
-                    value={draft.status}
-                    onChange={(e) => patchDraft({ status: e.target.value as VideoStatus })}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                  </select>
-                </label>
-              </div>
+            <ul className="max-h-[58vh] space-y-2 overflow-y-auto pr-1">
+              {items.length === 0 ? (
+                <li className="rounded-md border border-dashed border-dt-border px-3 py-6 text-center text-sm text-dt-muted">
+                  No exclusive videos yet. Upload one for the app.
+                </li>
+              ) : (
+                items.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => selectItem(item)}
+                      className={`flex w-full gap-3 rounded-lg border p-2.5 text-left transition ${
+                        selectedId === item.id
+                          ? "border-dt-red/60 bg-dt-red/10"
+                          : "border-dt-border bg-dt-bg/50 hover:border-dt-red/30"
+                      }`}
+                    >
+                      <img
+                        src={resolveVideoAssetUrl(item.thumbnail)}
+                        alt=""
+                        className="h-14 w-20 shrink-0 rounded object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-white">{item.title || "Untitled"}</p>
+                        <p className="mt-1 flex items-center gap-1 text-[11px] text-dt-muted">
+                          <Film size={11} />
+                          Exclusive · {item.status}
+                        </p>
+                        <p className="text-[10px] text-dt-muted">{item.date}</p>
+                      </div>
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>
+          </Panel>
 
-              <div className="space-y-2 rounded-lg border border-dt-border bg-dt-bg/40 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-dt-muted">Video</p>
-                <label className="block space-y-1.5">
-                  <span className="text-xs text-dt-muted">YouTube / mp4 URL</span>
-                  <input
-                    value={draft.videoUrl.startsWith("data:") ? "(uploaded video file)" : draft.videoUrl}
-                    onChange={(e) => {
-                      if (!e.target.value.startsWith("(")) applyVideoUrl(e.target.value);
-                    }}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                    placeholder="https://youtube.com/watch?v=… or https://….mp4"
-                  />
-                </label>
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dt-border px-3 py-2 text-xs text-white/80 hover:border-dt-red/40">
-                  <Video size={13} />
-                  Upload video file
-                  <input
-                    type="file"
-                    accept="video/*"
-                    className="hidden"
-                    onChange={(e) => onUploadVideo(e.target.files?.[0] ?? null)}
-                  />
-                </label>
-                <p className="text-[11px] leading-relaxed text-dt-muted">
-                  Best for YouTube links or hosted mp4 URLs. Direct uploads work for short clips (~12MB max).
-                </p>
-              </div>
-
-              <div className="space-y-2 rounded-lg border border-dt-border bg-dt-bg/40 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-dt-muted">Thumbnail</p>
-                <img
-                  src={resolveVideoAssetUrl(draft.thumbnail)}
-                  alt=""
-                  className="h-36 w-full rounded-md object-cover"
-                />
+          <Panel title={draft ? "Compose exclusive video" : "Editor"}>
+            {!draft ? (
+              <p className="text-sm text-dt-muted">Select a video or create a new exclusive upload.</p>
+            ) : (
+              <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dt-border px-3 py-2 text-xs text-white/80">
-                    <Upload size={13} /> Upload thumbnail
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void saveDraft("draft")}
+                    className="rounded-md border border-dt-border px-3 py-2 text-sm text-white/80 disabled:opacity-50"
+                  >
+                    Save draft
+                  </button>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void saveDraft("published")}
+                    className="inline-flex items-center gap-2 rounded-md bg-dt-red px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  >
+                    {saving ? <Loader2 size={14} className="animate-spin" /> : null}
+                    Publish to app
+                  </button>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void removeItem()}
+                    className="ml-auto inline-flex items-center gap-1 rounded-md border border-red-500/30 px-3 py-2 text-sm text-red-200"
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+
+                <label className="block space-y-1.5">
+                  <span className="text-xs text-dt-muted">Title</span>
+                  <input
+                    value={draft.title}
+                    onChange={(e) => patchDraft({ title: e.target.value })}
+                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
+                    placeholder="EXCLUSIVE WORKOUT SESSION"
+                  />
+                </label>
+
+                <label className="block space-y-1.5">
+                  <span className="text-xs text-dt-muted">Description</span>
+                  <textarea
+                    value={draft.description}
+                    onChange={(e) => patchDraft({ description: e.target.value })}
+                    rows={3}
+                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
+                    placeholder="What fans will see under the title"
+                  />
+                </label>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block space-y-1.5">
+                    <span className="text-xs text-dt-muted">Duration label</span>
                     <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => onUploadThumbnail(e.target.files?.[0] ?? null)}
+                      value={draft.duration}
+                      onChange={(e) => patchDraft({ duration: e.target.value })}
+                      className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
+                      placeholder="8:24"
                     />
                   </label>
-                  <input
-                    value={draft.thumbnail.startsWith("data:") ? "(uploaded image)" : draft.thumbnail}
-                    onChange={(e) => {
-                      if (!e.target.value.startsWith("(")) patchDraft({ thumbnail: e.target.value });
-                    }}
-                    className="min-w-[220px] flex-1 rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-xs outline-none"
-                    placeholder="Thumbnail URL or /images/..."
+                  <label className="block space-y-1.5">
+                    <span className="text-xs text-dt-muted">Status</span>
+                    <select
+                      value={draft.status}
+                      onChange={(e) => patchDraft({ status: e.target.value as VideoStatus })}
+                      className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
+                    >
+                      <option value="draft">Draft</option>
+                      <option value="published">Published</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div className="space-y-2 rounded-lg border border-dt-border bg-dt-bg/40 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dt-muted">Video</p>
+                  <label className="block space-y-1.5">
+                    <span className="text-xs text-dt-muted">YouTube / mp4 URL</span>
+                    <input
+                      value={draft.videoUrl.startsWith("data:") ? "(uploaded video file)" : draft.videoUrl}
+                      onChange={(e) => {
+                        if (!e.target.value.startsWith("(")) applyVideoUrl(e.target.value);
+                      }}
+                      className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
+                      placeholder="https://youtube.com/watch?v=… or https://….mp4"
+                    />
+                  </label>
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dt-border px-3 py-2 text-xs text-white/80 hover:border-dt-red/40">
+                    <Video size={13} />
+                    Upload video file
+                    <input
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={(e) => onUploadVideo(e.target.files?.[0] ?? null)}
+                    />
+                  </label>
+                  <p className="text-[11px] leading-relaxed text-dt-muted">
+                    Best for YouTube links or hosted mp4 URLs. Direct uploads work for short clips (~12MB max).
+                  </p>
+                </div>
+
+                <div className="space-y-2 rounded-lg border border-dt-border bg-dt-bg/40 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dt-muted">Thumbnail</p>
+                  <img
+                    src={resolveVideoAssetUrl(draft.thumbnail)}
+                    alt=""
+                    className="h-36 w-full rounded-md object-cover"
                   />
+                  <div className="flex flex-wrap gap-2">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dt-border px-3 py-2 text-xs text-white/80">
+                      <Upload size={13} /> Upload thumbnail
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => onUploadThumbnail(e.target.files?.[0] ?? null)}
+                      />
+                    </label>
+                    <input
+                      value={draft.thumbnail.startsWith("data:") ? "(uploaded image)" : draft.thumbnail}
+                      onChange={(e) => {
+                        if (!e.target.value.startsWith("(")) patchDraft({ thumbnail: e.target.value });
+                      }}
+                      className="min-w-[220px] flex-1 rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-xs outline-none"
+                      placeholder="Thumbnail URL or /images/..."
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </Panel>
-      </div>
+            )}
+          </Panel>
+        </div>
+      ) : null}
     </div>
   );
 }

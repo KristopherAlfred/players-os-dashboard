@@ -112,7 +112,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/social": {
     title: "Social",
-    subtitle: "Live Instagram, X, Facebook, and YouTube analytics from DameTime.",
+    subtitle: "Live Instagram, X, and Facebook analytics from DameTime.",
   },
   "/content/news": {
     title: "News",
@@ -120,7 +120,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/videos": {
     title: "Videos",
-    subtitle: "Upload exclusive videos with title, thumbnail, and link — they appear in the DameTime app.",
+    subtitle: "YouTube analytics plus Exclusive uploads — same tabs fans use in DameTime.",
   },
   "/content/music": {
     title: "Music",
