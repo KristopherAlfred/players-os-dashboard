@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -13,6 +14,7 @@ import { useDashboardSource } from "./DashboardSourceContext";
 type DametimeAnalyticsContextValue = {
   analytics: DametimeAnalytics | null;
   loading: boolean;
+  refreshing: boolean;
   error: string | null;
   refresh: () => Promise<void>;
 };
@@ -44,41 +46,54 @@ export function DametimeAnalyticsProvider({ children }: { children: ReactNode })
   const { source } = useDashboardSource();
   const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasDataRef = useRef(false);
 
   const refresh = useCallback(async () => {
-    setLoading(true);
+    if (hasDataRef.current) setRefreshing(true);
+    else setLoading(true);
     setError(null);
     const result = await loadDametimeAnalytics();
     setAnalytics(result.analytics);
+    hasDataRef.current = Boolean(result.analytics);
     setError(result.error);
     setLoading(false);
+    setRefreshing(false);
   }, []);
 
   useEffect(() => {
     if (source !== "dametime") {
       setAnalytics(null);
+      hasDataRef.current = false;
       setLoading(false);
+      setRefreshing(false);
       setError(null);
       return;
     }
 
     let cancelled = false;
 
-    async function load() {
-      setLoading(true);
+    async function load(quiet: boolean) {
+      if (!quiet) {
+        if (hasDataRef.current) setRefreshing(true);
+        else setLoading(true);
+      }
       setError(null);
       const result = await loadDametimeAnalytics();
       if (cancelled) return;
       setAnalytics(result.analytics);
+      hasDataRef.current = Boolean(result.analytics);
       setError(result.error);
       setLoading(false);
+      setRefreshing(false);
     }
 
-    void load();
+    void load(false);
+    // Poll often enough that daily login points show up without a full remount.
     const interval = window.setInterval(() => {
-      void load();
-    }, 60_000);
+      void load(true);
+    }, 20_000);
 
     return () => {
       cancelled = true;
@@ -90,10 +105,11 @@ export function DametimeAnalyticsProvider({ children }: { children: ReactNode })
     () => ({
       analytics,
       loading,
+      refreshing,
       error,
       refresh,
     }),
-    [analytics, loading, error, refresh],
+    [analytics, loading, refreshing, error, refresh],
   );
 
   return (

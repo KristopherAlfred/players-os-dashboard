@@ -8,6 +8,8 @@ export type DametimeAnalyticsKpis = {
   signups: number;
   activeFans7d: number;
   engagementRate: number;
+  totalPoints: number;
+  avgPoints: number;
 };
 
 export type DametimeAnalyticsEventPoint = {
@@ -61,6 +63,7 @@ export type DametimeAnalytics = {
   eventsOverTime: DametimeAnalyticsEventPoint[];
   eventTypes: DametimeAnalyticsEventType[];
   topUsers: DametimeAnalyticsTopUser[];
+  topByPoints?: DametimeAnalyticsTopUser[];
   topTargets: DametimeAnalyticsTopTarget[];
   recentActivity: DametimeAnalyticsActivity[];
   geo: DametimeAnalyticsGeo;
@@ -82,14 +85,28 @@ export async function fetchDametimeAnalytics(fanEmail?: string): Promise<Dametim
     const params = new URLSearchParams();
     const fan = fanEmail?.trim().toLowerCase();
     if (fan) params.set("fan", fan);
+    // Bust intermediary caches so loyalty points stay current on each poll.
+    params.set("_", String(Date.now()));
     const query = params.toString();
     const response = await fetch(`${getApiBase()}/api/admin/analytics${query ? `?${query}` : ""}`, {
-      headers: { "x-admin-secret": secret },
+      headers: {
+        "x-admin-secret": secret,
+        "cache-control": "no-cache",
+      },
+      cache: "no-store",
     });
     if (!response.ok) return null;
     const data = (await response.json()) as DametimeAnalytics & { ok?: boolean };
     if (!data?.kpis) return null;
-    return data;
+    return {
+      ...data,
+      kpis: {
+        ...data.kpis,
+        totalPoints: Number(data.kpis.totalPoints) || 0,
+        avgPoints: Number(data.kpis.avgPoints) || 0,
+      },
+      topByPoints: Array.isArray(data.topByPoints) ? data.topByPoints : data.topUsers,
+    };
   } catch {
     return null;
   }

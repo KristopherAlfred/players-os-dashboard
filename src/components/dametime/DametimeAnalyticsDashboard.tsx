@@ -7,6 +7,8 @@ import {
   TrendingUp,
   Smartphone,
   Activity,
+  Crown,
+  RefreshCw,
 } from "lucide-react";
 import {
   LineChart,
@@ -41,17 +43,18 @@ function ErrorState({ message }: { message: string }) {
 function KpiGrid({ analytics }: { analytics: DametimeAnalytics }) {
   const cards = [
     { label: "Total Fans", value: formatMetric(analytics.kpis.totalFans, true), icon: Users },
+    { label: "Total Points", value: formatMetric(analytics.kpis.totalPoints || 0, true), icon: Crown },
+    { label: "Avg Points", value: formatMetric(analytics.kpis.avgPoints || 0, true), icon: TrendingUp },
     { label: "Email Captures", value: formatMetric(analytics.kpis.emailCaptures, true), icon: Mail },
     { label: "SMS Opt-ins", value: formatMetric(analytics.kpis.smsOptIns, true), icon: Smartphone },
     { label: "Total Clicks", value: formatMetric(analytics.kpis.totalClicks, true), icon: MousePointerClick },
     { label: "Page Views", value: formatMetric(analytics.kpis.pageViews, true), icon: Eye },
-    { label: "Engagement (7d)", value: `${analytics.kpis.engagementRate}%`, icon: TrendingUp },
     { label: "Active Fans (7d)", value: formatMetric(analytics.kpis.activeFans7d, true), icon: UserCheck },
-    { label: "Total Events", value: formatMetric(analytics.kpis.totalEvents, true), icon: Activity },
+    { label: "Engagement (7d)", value: `${analytics.kpis.engagementRate}%`, icon: Activity },
   ];
 
   return (
-    <div className="grid w-full min-w-0 grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
+    <div className="grid w-full min-w-0 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-9">
       {cards.map((card) => {
         const Icon = card.icon;
         return (
@@ -193,31 +196,56 @@ function LiveActivity({ analytics }: { analytics: DametimeAnalytics }) {
   );
 }
 
-function TopUsersTable({ analytics }: { analytics: DametimeAnalytics }) {
+function TopUsersTable({
+  analytics,
+  title = "Top Users",
+  mode = "events",
+}: {
+  analytics: DametimeAnalytics;
+  title?: string;
+  mode?: "events" | "points";
+}) {
+  const rows =
+    mode === "points"
+      ? analytics.topByPoints ?? [...analytics.topUsers].sort((a, b) => b.points - a.points)
+      : analytics.topUsers;
+
   return (
-    <Card title="Top Users" className="min-h-[280px]">
+    <Card title={title} className="min-h-[280px]">
       <div className="overflow-x-auto px-3 py-2">
         <table className="w-full min-w-[320px] text-left text-sm">
           <thead>
             <tr className="border-b border-dt-border text-xs text-dt-muted">
               <th className="pb-2 pr-3">Fan</th>
-              <th className="pb-2 pr-3">Events</th>
-              <th className="pb-2">Points</th>
+              <th className="pb-2 pr-3">{mode === "points" ? "Points" : "Events"}</th>
+              <th className="pb-2">{mode === "points" ? "Events" : "Points"}</th>
             </tr>
           </thead>
           <tbody>
-            {analytics.topUsers.map((user) => (
-              <tr key={user.email} className="border-b border-dt-border/50 last:border-0">
-                <td className="py-2.5 pr-3">
-                  <p className="font-medium text-white">
-                    {user.name || (user.username ? `@${user.username}` : user.email.split("@")[0])}
-                  </p>
-                  <p className="truncate text-xs text-dt-muted">{user.email}</p>
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="py-8 text-center text-sm text-dt-muted">
+                  No fan points yet.
                 </td>
-                <td className="py-2.5 pr-3 text-white">{formatMetric(user.eventCount)}</td>
-                <td className="py-2.5 text-white">{formatMetric(user.points)}</td>
               </tr>
-            ))}
+            ) : (
+              rows.map((user) => (
+                <tr key={`${mode}-${user.email}`} className="border-b border-dt-border/50 last:border-0">
+                  <td className="py-2.5 pr-3">
+                    <p className="font-medium text-white">
+                      {user.name || (user.username ? `@${user.username}` : user.email.split("@")[0])}
+                    </p>
+                    <p className="truncate text-xs text-dt-muted">{user.email}</p>
+                  </td>
+                  <td className="py-2.5 pr-3 text-white">
+                    {formatMetric(mode === "points" ? user.points : user.eventCount)}
+                  </td>
+                  <td className="py-2.5 text-white">
+                    {formatMetric(mode === "points" ? user.eventCount : user.points)}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -249,16 +277,17 @@ function TopClicksTable({ analytics }: { analytics: DametimeAnalytics }) {
 function AudienceSnapshot({ analytics }: { analytics: DametimeAnalytics }) {
   const rows = [
     { label: "Total Fans", value: formatMetric(analytics.kpis.totalFans) },
+    { label: "Total Points", value: formatMetric(analytics.kpis.totalPoints || 0) },
+    { label: "Avg Points / Fan", value: formatMetric(analytics.kpis.avgPoints || 0) },
     { label: "Email Captures", value: formatMetric(analytics.kpis.emailCaptures) },
     { label: "SMS Subscribers", value: formatMetric(analytics.kpis.smsOptIns) },
-    { label: "Sign-ups Tracked", value: formatMetric(analytics.kpis.signups) },
     { label: "Active Fans (7d)", value: formatMetric(analytics.kpis.activeFans7d) },
     { label: "Engagement Rate", value: `${analytics.kpis.engagementRate}%` },
   ];
 
   return (
     <Card title="Audience Snapshot" className="h-[280px]">
-      <div className="space-y-2 px-3 py-2">
+      <div className="space-y-2 overflow-y-auto px-3 py-2">
         {rows.map((row) => (
           <div key={row.label} className="flex items-center justify-between border-b border-dt-border/50 py-2 last:border-0">
             <span className="text-sm text-dt-muted">{row.label}</span>
@@ -294,14 +323,30 @@ function GeoSummary({ analytics }: { analytics: DametimeAnalytics }) {
 }
 
 export function DametimeAnalyticsDashboard() {
-  const { analytics, loading, error } = useAnalyticsView();
+  const { analytics, loading, error, refreshing, refresh } = useAnalyticsView();
 
-  if (loading) return <LoadingState message="Loading Dametime analytics…" />;
-  if (error) return <ErrorState message={error} />;
+  if (loading && !analytics) return <LoadingState message="Loading Dametime analytics…" />;
+  if (error && !analytics) return <ErrorState message={error} />;
   if (!analytics) return <ErrorState message="No analytics data available." />;
 
   return (
     <div className="space-y-3 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[11px] text-white/40">
+          Live loyalty points · synced {new Date(analytics.syncedAt).toLocaleString()}
+          {refreshing ? " · refreshing…" : ""}
+        </p>
+        <button
+          type="button"
+          onClick={() => void refresh()}
+          disabled={refreshing}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-white/80 transition hover:border-dt-red/40 disabled:opacity-60"
+        >
+          <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
+          Refresh points
+        </button>
+      </div>
+
       <KpiGrid analytics={analytics} />
 
       <div className="grid grid-cols-12 items-stretch gap-3">
@@ -321,15 +366,18 @@ export function DametimeAnalyticsDashboard() {
           <AudienceSnapshot analytics={analytics} />
         </div>
         <div className="col-span-12 lg:col-span-4">
-          <TopUsersTable analytics={analytics} />
+          <TopUsersTable analytics={analytics} title="Top by activity" mode="events" />
         </div>
         <div className="col-span-12 lg:col-span-4">
-          <TopClicksTable analytics={analytics} />
+          <TopUsersTable analytics={analytics} title="Top by points" mode="points" />
         </div>
       </div>
 
       <div className="grid grid-cols-12 items-stretch gap-3">
-        <div className="col-span-12">
+        <div className="col-span-12 lg:col-span-8">
+          <TopClicksTable analytics={analytics} />
+        </div>
+        <div className="col-span-12 lg:col-span-4">
           <GeoSummary analytics={analytics} />
         </div>
       </div>
