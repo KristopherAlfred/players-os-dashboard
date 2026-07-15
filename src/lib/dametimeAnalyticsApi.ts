@@ -91,13 +91,20 @@ export async function fetchDametimeAnalytics(fanEmail?: string): Promise<Dametim
   // Bust intermediary caches so loyalty points stay current on each poll.
   params.set("_", String(Date.now()));
   const query = params.toString();
-  const response = await fetch(`${getApiBase()}/api/admin/analytics${query ? `?${query}` : ""}`, {
-    headers: {
-      "x-admin-secret": secret,
-      "cache-control": "no-cache",
-    },
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    // Only send x-admin-secret — extra headers like cache-control fail CORS preflight.
+    response = await fetch(`${getApiBase()}/api/admin/analytics${query ? `?${query}` : ""}`, {
+      headers: {
+        "x-admin-secret": secret,
+      },
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error(
+      `Failed to reach DameTime API (${getApiBase()}). Check VITE_DAME_BIO_API_URL and CORS.`,
+    );
+  }
   if (response.status === 401) {
     throw new Error(
       "Unauthorized — dashboard VITE_ADMIN_EXPORT_SECRET does not match DameTime ADMIN_EXPORT_SECRET (redeploy after updating).",
