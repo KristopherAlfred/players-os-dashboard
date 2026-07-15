@@ -1,4 +1,4 @@
-export type ThemeTemplate = "default" | "team" | "athlete";
+export type ThemeTemplate = "default" | "team" | "athlete" | "ocean" | "hotpink";
 
 export interface ThemePalette {
   bg: string;
@@ -24,6 +24,16 @@ function lighten(hex: string, amount: number): string {
   const g = Math.min(255, parseInt(n.slice(2, 4), 16) + Math.round(255 * amount));
   const b = Math.min(255, parseInt(n.slice(4, 6), 16) + Math.round(255 * amount));
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const n = hex.replace("#", "").trim();
+  if (n.length !== 6) return null;
+  const r = Number.parseInt(n.slice(0, 2), 16);
+  const g = Number.parseInt(n.slice(2, 4), 16);
+  const b = Number.parseInt(n.slice(4, 6), 16);
+  if ([r, g, b].some((v) => Number.isNaN(v))) return null;
+  return { r, g, b };
 }
 
 const defaultPalette: ThemePalette = {
@@ -68,31 +78,85 @@ const athletePalette: ThemePalette = {
   trafficShades: shades("#a855f7"),
 };
 
+/** Gradient blue, white, and black */
+const oceanPalette: ThemePalette = {
+  bg: "#000000",
+  panel: "#05080f",
+  card: "#0a1220",
+  border: "#1a2a44",
+  muted: "#9eb0c8",
+  text: "#ffffff",
+  accent: "#2f7cf6",
+  accentHover: "#6aa4ff",
+  chartSecondary: "#1d4ed8",
+  chartTertiary: "#0b2a66",
+  trafficShades: shades("#2f7cf6"),
+};
+
+/** Hot pink, black, and white */
+const hotpinkPalette: ThemePalette = {
+  bg: "#000000",
+  panel: "#0c060a",
+  card: "#140910",
+  border: "#3a1528",
+  muted: "#c9a0b4",
+  text: "#ffffff",
+  accent: "#ff1493",
+  accentHover: "#ff5eb3",
+  chartSecondary: "#db2777",
+  chartTertiary: "#831843",
+  trafficShades: shades("#ff1493"),
+};
+
 export const themeTemplates: {
   id: ThemeTemplate;
   name: string;
   description: string;
   swatches: string[];
+  preview: string;
 }[] = [
   {
-    id: "team",
-    name: "Team Template",
-    description: "Rip City red & black — Portland Trail Blazers palette",
-    swatches: ["#e03a3e", "#111111", "#000000"],
+    id: "default",
+    name: "DameTime Classic",
+    description: "Classic DameTime red & black",
+    swatches: ["#e50914", "#f0f0f0", "#080808"],
+    preview: "linear-gradient(135deg, #080808 0%, #1a0505 45%, #e50914 100%)",
   },
   {
-    id: "default",
-    name: "Default Template",
-    description: "Classic DameTime red & black",
-    swatches: ["#e50914", "#121212", "#080808"],
+    id: "team",
+    name: "Rip City",
+    description: "Portland Trail Blazers red & black",
+    swatches: ["#e03a3e", "#f0f0f0", "#000000"],
+    preview: "linear-gradient(135deg, #000000 0%, #1a0808 45%, #e03a3e 100%)",
   },
   {
     id: "athlete",
     name: "Athlete Vibe",
-    description: "Electric purple & midnight — premium athlete aesthetic",
-    swatches: ["#a855f7", "#14b8a6", "#0a0b14"],
+    description: "Electric purple & midnight premium",
+    swatches: ["#a855f7", "#eef0f8", "#0a0b14"],
+    preview: "linear-gradient(135deg, #0a0b14 0%, #1a1030 45%, #a855f7 100%)",
+  },
+  {
+    id: "ocean",
+    name: "Blue Gradient",
+    description: "Gradient blue, white, and black",
+    swatches: ["#2f7cf6", "#ffffff", "#000000"],
+    preview: "linear-gradient(135deg, #000000 0%, #0a2048 42%, #2f7cf6 78%, #ffffff 100%)",
+  },
+  {
+    id: "hotpink",
+    name: "Hot Pink",
+    description: "Hot pink, black, and white",
+    swatches: ["#ff1493", "#ffffff", "#000000"],
+    preview: "linear-gradient(135deg, #000000 0%, #2a0618 42%, #ff1493 78%, #ffffff 100%)",
   },
 ];
+
+const ALL_TEMPLATES: ThemeTemplate[] = ["default", "team", "athlete", "ocean", "hotpink"];
+
+export function isThemeTemplate(value: string | null | undefined): value is ThemeTemplate {
+  return Boolean(value && ALL_TEMPLATES.includes(value as ThemeTemplate));
+}
 
 export function getPalette(template: ThemeTemplate): ThemePalette {
   switch (template) {
@@ -100,6 +164,10 @@ export function getPalette(template: ThemeTemplate): ThemePalette {
       return teamPalette;
     case "athlete":
       return athletePalette;
+    case "ocean":
+      return oceanPalette;
+    case "hotpink":
+      return hotpinkPalette;
     default:
       return defaultPalette;
   }
@@ -120,6 +188,39 @@ export function applyPalette(palette: ThemePalette) {
   palette.trafficShades.forEach((color, i) => {
     root.style.setProperty(`--theme-traffic-${i}`, color);
   });
+
+  const rgb = hexToRgb(palette.accent);
+  if (rgb) {
+    const { r, g, b } = rgb;
+    root.style.setProperty(
+      "--gradient-bg",
+      `radial-gradient(ellipse 80% 50% at 50% -10%, rgba(${r}, ${g}, ${b}, 0.08) 0%, transparent 50%), linear-gradient(180deg, ${palette.bg} 0%, ${palette.panel} 40%, ${palette.bg} 100%)`,
+    );
+    root.style.setProperty(
+      "--gradient-panel",
+      `radial-gradient(ellipse 70% 45% at 0% 0%, rgba(${r}, ${g}, ${b}, 0.06) 0%, transparent 50%), linear-gradient(180deg, ${palette.panel} 0%, ${palette.bg} 100%)`,
+    );
+    root.style.setProperty(
+      "--gradient-card",
+      `radial-gradient(ellipse 100% 65% at 8% -15%, rgba(${r}, ${g}, ${b}, 0.1) 0%, transparent 48%), linear-gradient(152deg, ${palette.card} 0%, ${palette.panel} 50%, ${palette.bg} 100%)`,
+    );
+    root.style.setProperty(
+      "--gradient-inset",
+      `linear-gradient(140deg, ${palette.bg} 0%, ${palette.panel} 45%, ${palette.bg} 100%)`,
+    );
+    root.style.setProperty(
+      "--gradient-header",
+      `linear-gradient(90deg, rgba(${r}, ${g}, ${b}, 0.16) 0%, rgba(0, 0, 0, 0.7) 40%, transparent 100%)`,
+    );
+    root.style.setProperty(
+      "--gradient-input",
+      `linear-gradient(168deg, ${palette.bg} 0%, ${palette.panel} 50%, ${palette.bg} 100%)`,
+    );
+    root.style.setProperty(
+      "--gradient-main",
+      `radial-gradient(ellipse 80% 45% at 50% 0%, rgba(${r}, ${g}, ${b}, 0.08) 0%, transparent 45%), linear-gradient(180deg, ${palette.bg} 0%, ${palette.panel} 50%, ${palette.bg} 100%)`,
+    );
+  }
 }
 
 export const STORAGE_KEY = "dametime-theme-template";

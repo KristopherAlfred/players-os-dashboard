@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, LogOut } from "lucide-react";
-import { Panel } from "../components/PageShell";
+import {
+  Bell,
+  Check,
+  Link2,
+  LogOut,
+  Palette,
+  Settings2,
+  Shield,
+  UserRound,
+} from "lucide-react";
 import { saveDashboardSession } from "../lib/dashboardAuth";
 import { useTheme } from "../theme/ThemeContext";
 import type { ThemeTemplate } from "../theme/themes";
@@ -21,132 +29,295 @@ const permissions = [
   { role: "Viewer", publish: false, export: false, monetize: false, settings: false },
 ];
 
-export function RolesPage() {
-  return (
-    <Panel title="Roles & Permissions">
-      <table className="w-full text-left text-sm">
-        <thead><tr className="border-b border-dt-border text-xs text-dt-muted"><th className="pb-2">Role</th><th className="pb-2">Publish</th><th className="pb-2">Export Data</th><th className="pb-2">Monetize</th><th className="pb-2">Settings</th></tr></thead>
-        <tbody>
-          {permissions.map((p) => (
-            <tr key={p.role} className="border-b border-dt-border/50">
-              <td className="py-3 font-medium">{p.role}</td>
-              {[p.publish, p.export, p.monetize, p.settings].map((v, i) => (
-                <td key={i} className="py-3">{v ? <span className="text-dt-green">✓</span> : <span className="text-dt-muted">—</span>}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Panel>
-  );
-}
-
-export function IntegrationsPage() {
-  return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {integrations.map((i) => (
-        <div key={i.name} className="rounded-lg border border-dt-border bg-dt-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="font-medium">{i.name}</p>
-            <span className={`h-2 w-2 rounded-full ${i.connected ? "bg-dt-green" : "bg-dt-muted"}`} />
-          </div>
-          <p className="mt-2 text-xs text-dt-muted">{i.last}</p>
-          <button type="button" className="mt-3 text-xs text-dt-red hover:underline">{i.connected ? "Configure" : "Connect"}</button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export function AccountPage() {
-  const [notifications, setNotifications] = useState(true);
-  const { template, setTemplate, templates } = useTheme();
-
-  return (
-    <div className="space-y-4">
-      <Panel title="Color Template">
-        <p className="mb-4 text-sm text-dt-muted">
-          Switch the dashboard color palette. Branding and copy stay the same.
-        </p>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          {templates.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTemplate(t.id as ThemeTemplate)}
-              className={`relative rounded-lg border p-4 text-left transition-colors ${
-                template === t.id
-                  ? "border-dt-red bg-dt-red/10"
-                  : "border-dt-border bg-dt-bg/50 hover:border-dt-muted"
-              }`}
-            >
-              {template === t.id && (
-                <span className="absolute right-3 top-3 text-dt-red">
-                  <Check size={16} />
-                </span>
-              )}
-              <div className="mb-3 flex gap-1.5">
-                {t.swatches.map((color) => (
-                  <span
-                    key={color}
-                    className="h-6 w-6 rounded-full border border-white/10"
-                    style={{ background: color }}
-                  />
-                ))}
-              </div>
-              <p className="text-sm font-semibold text-white">{t.name}</p>
-              <p className="mt-1 text-xs text-dt-muted">{t.description}</p>
-            </button>
-          ))}
-        </div>
-      </Panel>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <Panel title="Profile">
-        <form className="space-y-3 text-sm">
-          <label className="block"><span className="text-dt-muted">Display Name</span><input defaultValue="Dame Time Admin" className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2" /></label>
-          <label className="block"><span className="text-dt-muted">Email</span><input defaultValue="admin@dametime.com" className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2" /></label>
-          <label className="block"><span className="text-dt-muted">Timezone</span><select className="mt-1 w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2"><option>Pacific Time (PT)</option></select></label>
-          <button type="button" className="rounded-md bg-dt-red px-4 py-2 font-semibold">Save Changes</button>
-        </form>
-      </Panel>
-      <Panel title="Preferences">
-        <label className="flex items-center justify-between py-2 text-sm">
-          <span>Email notifications</span>
-          <input type="checkbox" checked={notifications} onChange={(e) => setNotifications(e.target.checked)} className="accent-dt-red" />
-        </label>
-        <label className="flex items-center justify-between py-2 text-sm"><span>SMS alerts for live drops</span><input type="checkbox" defaultChecked className="accent-dt-red" /></label>
-        <label className="flex items-center justify-between py-2 text-sm"><span>Weekly digest</span><input type="checkbox" defaultChecked className="accent-dt-red" /></label>
-      </Panel>
-      </div>
-    </div>
-  );
-}
-
 export function SettingsPage() {
   const navigate = useNavigate();
+  const { template, setTemplate, templates, palette } = useTheme();
+  const [notifications, setNotifications] = useState(true);
+  const [smsAlerts, setSmsAlerts] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [savedFlash, setSavedFlash] = useState<string | null>(null);
 
   function handleSignOut() {
     saveDashboardSession(null);
     navigate("/login", { replace: true });
   }
 
+  function flash(message: string) {
+    setSavedFlash(message);
+    window.setTimeout(() => setSavedFlash(null), 2200);
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="flex items-center gap-2 rounded-md border border-dt-red/50 bg-dt-red px-4 py-2 text-sm font-semibold text-white hover:bg-dt-red-hover"
-        >
-          <LogOut size={15} />
-          Sign out of AMX Dashboard
-        </button>
+    <div className="space-y-5">
+      <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-90"
+            style={{
+              background: `radial-gradient(ellipse at 12% 0%, color-mix(in srgb, ${palette.accent} 28%, transparent), transparent 52%)`,
+            }}
+          />
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
+                <Settings2 size={12} />
+                Settings
+              </div>
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                Appearance, account & access
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/65">
+                Pick a color template, manage preferences, and see how connected platforms sync into DameTime.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-dt-red/40 bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.28)] transition hover:brightness-110"
+            >
+              <LogOut size={15} />
+              Sign out
+            </button>
+          </div>
+        </div>
+
+        {savedFlash ? (
+          <div className="border-b border-dt-border px-5 py-3">
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
+              {savedFlash}
+            </div>
+          </div>
+        ) : null}
       </div>
-      <RolesPage />
-      <IntegrationsPage />
-      <AccountPage />
+
+      <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="border-b border-dt-border px-5 py-4">
+          <div className="flex items-center gap-2 text-dt-red">
+            <Palette size={16} />
+            <h3 className="font-display text-sm font-semibold tracking-wide text-white">Color templates</h3>
+          </div>
+          <p className="mt-1 text-[11px] text-white/40">
+            Switch the dashboard palette instantly. Branding and copy stay the same.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+          {templates.map((t) => {
+            const active = template === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => {
+                  setTemplate(t.id as ThemeTemplate);
+                  flash(`Theme switched to ${t.name}`);
+                }}
+                className={`group relative overflow-hidden rounded-2xl border p-3 text-left transition ${
+                  active
+                    ? "border-dt-red bg-dt-red/10 ring-1 ring-dt-red/40"
+                    : "border-dt-border bg-black/25 hover:border-white/20"
+                }`}
+              >
+                <div
+                  className="mb-3 h-20 w-full rounded-xl border border-white/10"
+                  style={{ background: t.preview }}
+                />
+                <div className="mb-2 flex gap-1.5">
+                  {t.swatches.map((color) => (
+                    <span
+                      key={`${t.id}-${color}`}
+                      className="h-5 w-5 rounded-full border border-white/15 shadow-inner"
+                      style={{ background: color }}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-white">{t.name}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-white/45">{t.description}</p>
+                  </div>
+                  {active ? (
+                    <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-dt-red text-white">
+                      <Check size={13} />
+                    </span>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+          <div className="border-b border-dt-border px-5 py-4">
+            <div className="flex items-center gap-2 text-dt-red">
+              <UserRound size={16} />
+              <h3 className="font-display text-sm font-semibold tracking-wide text-white">Profile</h3>
+            </div>
+            <p className="mt-1 text-[11px] text-white/40">Display details for this dashboard admin session</p>
+          </div>
+          <form
+            className="space-y-3 p-5 text-sm"
+            onSubmit={(e) => {
+              e.preventDefault();
+              flash("Profile preferences saved for this session");
+            }}
+          >
+            <label className="block">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Display name</span>
+              <input
+                defaultValue="Dame Time Admin"
+                className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
+              />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Email</span>
+              <input
+                defaultValue="admin@dametime.com"
+                className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
+              />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Timezone</span>
+              <select className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55">
+                <option>Pacific Time (PT)</option>
+                <option>Mountain Time (MT)</option>
+                <option>Central Time (CT)</option>
+                <option>Eastern Time (ET)</option>
+              </select>
+            </label>
+            <button
+              type="submit"
+              className="rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+            >
+              Save changes
+            </button>
+          </form>
+        </section>
+
+        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+          <div className="border-b border-dt-border px-5 py-4">
+            <div className="flex items-center gap-2 text-dt-red">
+              <Bell size={16} />
+              <h3 className="font-display text-sm font-semibold tracking-wide text-white">Preferences</h3>
+            </div>
+            <p className="mt-1 text-[11px] text-white/40">Notification toggles for ops alerts</p>
+          </div>
+          <div className="space-y-2 p-5">
+            {[
+              {
+                label: "Email notifications",
+                hint: "Digest of publish activity and sync errors",
+                checked: notifications,
+                onChange: setNotifications,
+              },
+              {
+                label: "SMS alerts for live drops",
+                hint: "When Dame goes live or posts exclusive content",
+                checked: smsAlerts,
+                onChange: setSmsAlerts,
+              },
+              {
+                label: "Weekly digest",
+                hint: "Monday wrap of fan + content performance",
+                checked: weeklyDigest,
+                onChange: setWeeklyDigest,
+              },
+            ].map((item) => (
+              <label
+                key={item.label}
+                className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-white/5 bg-black/25 px-3.5 py-3"
+              >
+                <div>
+                  <p className="text-sm font-medium text-white">{item.label}</p>
+                  <p className="text-[11px] text-white/40">{item.hint}</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={item.checked}
+                  onChange={(e) => {
+                    item.onChange(e.target.checked);
+                    flash("Preferences updated");
+                  }}
+                  className="h-4 w-4 accent-[var(--theme-accent)]"
+                />
+              </label>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="border-b border-dt-border px-5 py-4">
+          <div className="flex items-center gap-2 text-dt-red">
+            <Link2 size={16} />
+            <h3 className="font-display text-sm font-semibold tracking-wide text-white">Connected platforms</h3>
+          </div>
+          <p className="mt-1 text-[11px] text-white/40">Social sources powering Content and overview analytics</p>
+        </div>
+        <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {integrations.map((item) => (
+            <div
+              key={item.name}
+              className="rounded-2xl border border-dt-border bg-black/25 p-4 transition hover:border-white/15"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-white">{item.name}</p>
+                <span
+                  className={`h-2.5 w-2.5 rounded-full ${item.connected ? "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.55)]" : "bg-white/25"}`}
+                />
+              </div>
+              <p className="mt-2 text-[11px] text-white/40">{item.last}</p>
+              <button type="button" className="mt-3 text-xs font-semibold text-dt-red hover:brightness-125">
+                {item.connected ? "Configure" : "Connect"}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="border-b border-dt-border px-5 py-4">
+          <div className="flex items-center gap-2 text-dt-red">
+            <Shield size={16} />
+            <h3 className="font-display text-sm font-semibold tracking-wide text-white">Roles & permissions</h3>
+          </div>
+          <p className="mt-1 text-[11px] text-white/40">Reference matrix for DameTime dashboard access levels</p>
+        </div>
+        <div className="overflow-x-auto p-2 sm:p-4">
+          <table className="w-full min-w-[520px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-dt-border text-[11px] uppercase tracking-wide text-white/40">
+                <th className="px-3 pb-3 pt-1 font-semibold">Role</th>
+                <th className="pb-3 font-semibold">Publish</th>
+                <th className="pb-3 font-semibold">Export</th>
+                <th className="pb-3 font-semibold">Monetize</th>
+                <th className="pb-3 font-semibold">Settings</th>
+              </tr>
+            </thead>
+            <tbody>
+              {permissions.map((p) => (
+                <tr key={p.role} className="border-b border-dt-border/50 last:border-0">
+                  <td className="px-3 py-3.5 font-medium text-white">{p.role}</td>
+                  {[p.publish, p.export, p.monetize, p.settings].map((v, i) => (
+                    <td key={i} className="py-3.5">
+                      {v ? (
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/15 text-xs font-bold text-emerald-300">
+                          ✓
+                        </span>
+                      ) : (
+                        <span className="text-white/25">—</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }
-

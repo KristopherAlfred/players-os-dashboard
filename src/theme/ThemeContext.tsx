@@ -10,6 +10,7 @@ import {
 import {
   applyPalette,
   getPalette,
+  isThemeTemplate,
   STORAGE_KEY,
   themeTemplates,
   type ThemePalette,
@@ -27,9 +28,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function readStoredTemplate(): ThemeTemplate {
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === "default" || stored === "team" || stored === "athlete") {
-    return stored;
-  }
+  if (isThemeTemplate(stored)) return stored;
   return "default";
 }
 

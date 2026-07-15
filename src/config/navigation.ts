@@ -156,7 +156,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/settings": {
     title: "Settings",
-    subtitle: "Integrations, account preferences, and dashboard appearance.",
+    subtitle: "Themes, account preferences, integrations, and access roles.",
   },
   "/fans/audience": {
     title: "Audience Overview",
