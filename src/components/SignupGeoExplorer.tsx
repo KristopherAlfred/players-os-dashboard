@@ -1,22 +1,27 @@
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Globe } from "lucide-react";
-import { ComposableMap, Geographies, Geography } from "react-simple-maps";
+import { ChevronLeft, ChevronRight, Globe, MapPin } from "lucide-react";
+import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import {
-  countryOverview,
+  countryOverview as fallbackOverview,
+  countryCodesForView,
   countryGradientId,
   countryGradientStops,
   getRegionIntensity,
+  heatmapMapBackground,
   heatmapPaletteList,
   heatmapPalettes,
-  heatmapMapBackground,
   heatmapRegionStroke,
   intensityToColor,
   mapViewConfig,
   paletteGradientCss,
+  viewIdFromCountryCode,
+  viewIdFromCountryName,
+  worldCountryFromName,
   type CountryViewId,
   type HeatmapPaletteId,
-  worldCountryFromName,
 } from "../data/signupGeoData";
+import type { DametimeAnalyticsGeo } from "../lib/dametimeAnalyticsApi";
+import { formatMetric } from "../lib/dametimeAnalyticsApi";
 
 type GeoFeature = {
   rsmKey: string;
@@ -24,18 +29,33 @@ type GeoFeature = {
   properties?: { name?: string };
 };
 
+type GeoPoint = DametimeAnalyticsGeo["points"][number];
+
+type CountryRow = {
+  id: CountryViewId;
+  label: string;
+  flag: string;
+  pct: number;
+  count: number;
+};
+
 type SignupGeoExplorerProps = {
   className?: string;
+  geo?: DametimeAnalyticsGeo | null;
 };
+
+const FEATURED: { id: Exclude<CountryViewId, "world" | "Other">; label: string; flag: string }[] = [
+  { id: "USA", label: "USA", flag: "🇺🇸" },
+  { id: "Canada", label: "Canada", flag: "🇨🇦" },
+  { id: "UK", label: "UK", flag: "🇬🇧" },
+  { id: "Australia", label: "Australia", flag: "🇦🇺" },
+];
 
 function MapGradientBackground() {
   return (
     <>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#030303] to-black" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-black to-black" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.05),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.98),transparent_50%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.98),transparent_45%)]" />
     </>
   );
 }
@@ -55,7 +75,6 @@ function PalettePicker({
         <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Color palette</p>
         {heatmapPaletteList.map((palette) => {
           const active = palette.id === paletteId;
-          const gradient = paletteGradientCss(palette.id);
           return (
             <button
               key={palette.id}
@@ -68,7 +87,10 @@ function PalettePicker({
                   : "border-dt-border text-dt-muted hover:border-white/20 hover:text-white"
               }`}
             >
-              <span className="h-3 w-8 shrink-0 rounded-sm border border-white/10" style={{ background: gradient }} />
+              <span
+                className="h-3 w-8 shrink-0 rounded-sm border border-white/10"
+                style={{ background: paletteGradientCss(palette.id) }}
+              />
               <span className="text-[10px] font-medium">{palette.label}</span>
             </button>
           );
@@ -83,20 +105,21 @@ function PalettePicker({
       <div className="flex flex-wrap gap-1.5">
         {heatmapPaletteList.map((palette) => {
           const active = palette.id === paletteId;
-          const gradient = paletteGradientCss(palette.id);
           return (
             <button
               key={palette.id}
               type="button"
               title={palette.label}
-              aria-label={`${palette.label} color palette`}
               aria-pressed={active}
               onClick={() => onChange(palette.id)}
               className={`flex items-center gap-1.5 rounded-md border px-2 py-1 transition ${
                 active ? "border-dt-red bg-dt-red/10 ring-1 ring-dt-red/60" : "border-dt-border hover:border-white/30"
               }`}
             >
-              <span className="h-3 w-8 shrink-0 rounded-sm border border-white/10" style={{ background: gradient }} />
+              <span
+                className="h-3 w-8 shrink-0 rounded-sm border border-white/10"
+                style={{ background: paletteGradientCss(palette.id) }}
+              />
               <span className="text-[10px] font-medium text-dt-muted">{palette.label}</span>
             </button>
           );
@@ -113,7 +136,6 @@ function MapLegend({
   paletteId: HeatmapPaletteId;
   onPaletteChange: (id: HeatmapPaletteId) => void;
 }) {
-  const steps = heatmapPalettes[paletteId].steps;
   return (
     <div className="flex w-[148px] shrink-0 flex-col gap-2 border-r border-dt-border pr-4">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-muted">Signup density</p>
@@ -122,7 +144,7 @@ function MapLegend({
         style={{ background: paletteGradientCss(paletteId) }}
         aria-hidden
       />
-      {steps.map((step) => (
+      {heatmapPalettes[paletteId].steps.map((step) => (
         <div key={step.label} className="flex items-center gap-2">
           <span className="h-3 w-5 shrink-0 rounded-sm border border-white/10" style={{ backgroundColor: step.color }} />
           <span className="text-[10px] leading-tight text-dt-muted">{step.label}</span>
@@ -137,14 +159,91 @@ function isWorldMapView(view: CountryViewId) {
   return view === "world" || view === "Other";
 }
 
+function pointViewId(point: GeoPoint): CountryViewId | null {
+  return (
+    viewIdFromCountryCode(point.countryCode) ??
+    viewIdFromCountryName(point.countryName) ??
+    viewIdFromCountryName(point.label.split(",").at(-1)?.trim() ?? null)
+  );
+}
+
+function pointsForView(view: CountryViewId, points: GeoPoint[]): GeoPoint[] {
+  if (view === "world") return [];
+  if (view === "Other") return points.filter((point) => pointViewId(point) == null);
+  const codes = countryCodesForView(view)?.map((c) => c.toUpperCase()) ?? [];
+  return points.filter((point) => {
+    if (point.countryCode && codes.includes(point.countryCode.toUpperCase())) return true;
+    return pointViewId(point) === view;
+  });
+}
+
+function buildLiveCountryRows(geo?: DametimeAnalyticsGeo | null): CountryRow[] {
+  if (!geo?.countries?.length) {
+    return fallbackOverview.map((row) => ({ ...row, count: 0 }));
+  }
+
+  const rows: CountryRow[] = FEATURED.map((featured) => {
+    const hit = geo.countries.find((country) => {
+      const fromCode = viewIdFromCountryCode(country.countryCode);
+      const fromName = viewIdFromCountryName(country.country);
+      return fromCode === featured.id || fromName === featured.id;
+    });
+    return {
+      id: featured.id,
+      label: featured.label,
+      flag: hit?.flag ?? featured.flag,
+      pct: hit?.pct ?? 0,
+      count: hit?.count ?? 0,
+    };
+  });
+
+  const otherCount = geo.countries
+    .filter((country) => {
+      const view = viewIdFromCountryCode(country.countryCode) ?? viewIdFromCountryName(country.country);
+      return !view;
+    })
+    .reduce((sum, country) => sum + country.count, 0);
+
+  rows.push({
+    id: "Other",
+    label: "Other",
+    flag: "🌍",
+    pct: geo.totalFans > 0 ? Math.round((otherCount / geo.totalFans) * 1000) / 10 : 0,
+    count: otherCount,
+  });
+
+  const withFans = rows.filter((row) => row.count > 0);
+  return withFans.length ? withFans : rows;
+}
+
+function buildLiveIntensity(geo?: DametimeAnalyticsGeo | null): Record<string, number> | undefined {
+  if (!geo?.countries?.length) return undefined;
+  const max = Math.max(...geo.countries.map((c) => c.count), 1);
+  const live: Record<string, number> = {};
+  for (const country of geo.countries) {
+    const view = viewIdFromCountryCode(country.countryCode) ?? viewIdFromCountryName(country.country);
+    if (!view || view === "world" || view === "Other") continue;
+    live[view] = Math.max(0.22, Math.min(1, country.count / max));
+  }
+  return live;
+}
+
+function pinRadius(count: number, maxCount: number) {
+  return 5 + Math.round((maxCount > 0 ? count / maxCount : 0) * 10);
+}
+
 function ChoroplethMap({
   view,
   paletteId,
   onSelectCountry,
+  pins,
+  liveIntensity,
 }: {
   view: CountryViewId;
   paletteId: HeatmapPaletteId;
   onSelectCountry?: (id: CountryViewId) => void;
+  pins: GeoPoint[];
+  liveIntensity?: Record<string, number>;
 }) {
   const config = mapViewConfig[view];
   const worldView = isWorldMapView(view);
@@ -153,6 +252,8 @@ function ChoroplethMap({
     config.projection === "geoAlbersUsa"
       ? { scale: config.scale }
       : { scale: config.scale, center: config.center ?? [0, 0] };
+  const maxPin = Math.max(...pins.map((p) => p.count), 1);
+  const [hoverPin, setHoverPin] = useState<string | null>(null);
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden px-3 py-2">
@@ -182,10 +283,9 @@ function ChoroplethMap({
                 {geographies.map((geo) => {
                   const name = geo.properties?.name ?? "";
                   const id = String(geo.id ?? "");
-                  const intensity = getRegionIntensity(view, id, name);
+                  const intensity = getRegionIntensity(view, id, name, liveIntensity);
                   const gradId = countryGradientId(geo.rsmKey);
                   const stops = countryGradientStops(intensity, paletteId);
-
                   return (
                     <linearGradient
                       key={gradId}
@@ -204,72 +304,125 @@ function ChoroplethMap({
                 })}
               </defs>
               {geographies.map((geo) => {
-              const name = geo.properties?.name ?? "";
-              const id = String(geo.id ?? "");
-              const intensity = getRegionIntensity(view, id, name);
-              const gradId = countryGradientId(geo.rsmKey);
-              const fill = `url(#${gradId})`;
-              const hoverFill = intensityToColor(intensity, paletteId);
-              const target = worldCountryFromName(name);
-
-              return (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill={fill}
-                  stroke={heatmapRegionStroke}
-                  strokeWidth={worldView ? 0.35 : 0.55}
-                  style={{
-                    default: { outline: "none", opacity: 1 },
-                    hover: {
-                      fill: clickable && target ? "#e50914" : hoverFill,
-                      outline: "none",
-                      cursor: clickable && target ? "pointer" : "default",
-                      opacity: 1,
-                    },
-                    pressed: { outline: "none" },
-                  }}
-                  onClick={() => {
-                    if (clickable && target && onSelectCountry) onSelectCountry(target);
-                  }}
-                />
-              );
-            })}
+                const name = geo.properties?.name ?? "";
+                const id = String(geo.id ?? "");
+                const intensity = getRegionIntensity(view, id, name, liveIntensity);
+                const target = worldCountryFromName(name);
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={`url(#${countryGradientId(geo.rsmKey)})`}
+                    stroke={heatmapRegionStroke}
+                    strokeWidth={worldView ? 0.35 : 0.55}
+                    style={{
+                      default: { outline: "none", opacity: 1 },
+                      hover: {
+                        fill: clickable && target ? "#e50914" : intensityToColor(intensity, paletteId),
+                        outline: "none",
+                        cursor: clickable && target ? "pointer" : "default",
+                        opacity: 1,
+                      },
+                      pressed: { outline: "none" },
+                    }}
+                    onClick={() => {
+                      if (clickable && target && onSelectCountry) onSelectCountry(target);
+                    }}
+                  />
+                );
+              })}
             </>
           )}
         </Geographies>
+
+        {pins.map((pin) => {
+          const key = `${pin.lat}-${pin.lng}-${pin.label}`;
+          const r = pinRadius(pin.count, maxPin);
+          const active = hoverPin === key;
+          return (
+            <Marker key={key} coordinates={[pin.lng, pin.lat]}>
+              <g onMouseEnter={() => setHoverPin(key)} onMouseLeave={() => setHoverPin(null)}>
+                <circle r={r + 4} fill="rgba(229,9,20,0.18)" stroke="transparent" />
+                <circle
+                  r={r}
+                  fill="#e50914"
+                  stroke="#fff"
+                  strokeWidth={1.5}
+                  style={{ filter: active ? "drop-shadow(0 0 6px rgba(229,9,20,0.85))" : undefined }}
+                />
+                <text
+                  textAnchor="middle"
+                  y={-r - 8}
+                  style={{
+                    fontFamily: "inherit",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    fill: "#fff",
+                    paintOrder: "stroke",
+                    stroke: "rgba(0,0,0,0.75)",
+                    strokeWidth: 3,
+                  }}
+                >
+                  {pin.label.split(",")[0]?.trim() || "City"}
+                </text>
+                <text
+                  textAnchor="middle"
+                  y={r + 12}
+                  style={{
+                    fontFamily: "inherit",
+                    fontSize: 9,
+                    fontWeight: 600,
+                    fill: "rgba(255,255,255,0.8)",
+                  }}
+                >
+                  {formatMetric(pin.count)}
+                </text>
+              </g>
+            </Marker>
+          );
+        })}
       </ComposableMap>
+
+      {!worldView && pins.length === 0 ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[2] flex justify-center px-4">
+          <p className="rounded-full border border-white/10 bg-black/70 px-3 py-1.5 text-[11px] text-white/65">
+            No city-level pins for this country yet
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
+export function SignupGeoExplorer({ className = "", geo = null }: SignupGeoExplorerProps) {
   const [view, setView] = useState<CountryViewId>("world");
   const [paletteId, setPaletteId] = useState<HeatmapPaletteId>("ocean");
 
-  const countryIndex = useMemo(
-    () => countryOverview.findIndex((c) => c.id === view),
-    [view],
-  );
+  const rows = useMemo(() => buildLiveCountryRows(geo), [geo]);
+  const liveIntensity = useMemo(() => buildLiveIntensity(geo), [geo]);
+  const pins = useMemo(() => pointsForView(view, geo?.points ?? []), [geo?.points, view]);
+
+  const countryIndex = useMemo(() => rows.findIndex((c) => c.id === view), [rows, view]);
 
   function goPrev() {
-    if (view === "world") setView(countryOverview[countryOverview.length - 1].id);
+    if (view === "world") setView(rows[rows.length - 1]?.id ?? "USA");
     else if (countryIndex <= 0) setView("world");
-    else setView(countryOverview[countryIndex - 1].id);
+    else setView(rows[countryIndex - 1].id);
   }
 
   function goNext() {
-    if (view === "world") setView(countryOverview[0].id);
-    else if (countryIndex >= countryOverview.length - 1) setView("world");
-    else setView(countryOverview[countryIndex + 1].id);
+    if (view === "world") setView(rows[0]?.id ?? "USA");
+    else if (countryIndex >= rows.length - 1) setView("world");
+    else setView(rows[countryIndex + 1].id);
   }
 
+  const activeRow = rows.find((c) => c.id === view);
   const title =
     view === "world"
-      ? "World — fan signups by country"
+      ? "World — live fan signups by country"
       : view === "Other"
-        ? "Other regions — rest of world"
-        : `${countryOverview.find((c) => c.id === view)?.flag ?? ""} ${view} — regional signup heatmap`;
+        ? "Other regions — city pinpoints"
+        : `${activeRow?.flag ?? ""} ${view} — city signup pins`;
 
   return (
     <div className={className}>
@@ -315,26 +468,35 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
         </div>
 
         <div className="relative z-[1] h-[400px] w-full min-w-0 flex-1 overflow-hidden sm:h-[440px]">
-          <ChoroplethMap view={view} paletteId={paletteId} onSelectCountry={setView} />
+          <ChoroplethMap
+            view={view}
+            paletteId={paletteId}
+            onSelectCountry={setView}
+            pins={pins}
+            liveIntensity={liveIntensity}
+          />
         </div>
 
-        <div className="relative z-[1] flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-t border-dt-border bg-dt-bg/60 p-2 backdrop-blur-sm lg:w-[148px] lg:flex-col lg:overflow-x-visible lg:border-l lg:border-t-0 lg:p-3">
+        <div className="relative z-[1] flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-t border-dt-border bg-dt-bg/60 p-2 backdrop-blur-sm lg:w-[168px] lg:flex-col lg:overflow-x-visible lg:border-l lg:border-t-0 lg:p-3">
           <p className="mb-0 hidden text-[10px] font-semibold uppercase tracking-wide text-dt-muted lg:mb-2 lg:block">
             Countries
           </p>
-          {countryOverview.map((c) => (
+          {rows.map((c) => (
             <button
               key={c.id}
               type="button"
               onClick={() => setView(c.id)}
-              className={`shrink-0 rounded-md px-2 py-2 text-left text-xs transition lg:mb-1 lg:flex lg:w-full lg:items-center lg:justify-between ${
+              className={`shrink-0 rounded-md px-2 py-2 text-left text-xs transition lg:mb-1 lg:w-full ${
                 view === c.id ? "bg-dt-red/20 text-white ring-1 ring-dt-red/50" : "text-dt-muted hover:bg-white/5 hover:text-white"
               }`}
             >
-              <span>
-                {c.flag} {c.label}
-              </span>
-              <span className="ml-2 font-semibold tabular-nums lg:ml-0">{c.pct}%</span>
+              <div className="flex items-center justify-between gap-2">
+                <span>
+                  {c.flag} {c.label}
+                </span>
+                <span className="font-semibold tabular-nums">{c.pct}%</span>
+              </div>
+              <p className="mt-0.5 text-[10px] text-white/40">{formatMetric(c.count)} fans</p>
             </button>
           ))}
           <button
@@ -344,14 +506,20 @@ export function SignupGeoExplorer({ className = "" }: SignupGeoExplorerProps) {
               view === "world" ? "bg-dt-red/20 text-white" : "text-dt-muted hover:bg-white/5"
             }`}
           >
-            <Globe size={14} className="inline lg:mr-0" />
-            <span className="ml-1 lg:ml-0">All continents</span>
+            <Globe size={14} />
+            <span>All continents</span>
           </button>
+          {!isWorldMapView(view) ? (
+            <p className="mt-2 hidden items-center gap-1 text-[10px] text-white/45 lg:flex">
+              <MapPin size={10} className="text-dt-red" />
+              {pins.length} city pin{pins.length === 1 ? "" : "s"}
+            </p>
+          ) : null}
         </div>
       </div>
 
       <p className="mt-2 text-[10px] text-dt-muted lg:hidden">
-        Legend: lighter = fewer signups, brighter = most. Tap a country or use the list.
+        Live from DameTime · tap a country for city pins.
       </p>
     </div>
   );

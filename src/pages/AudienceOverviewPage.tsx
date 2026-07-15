@@ -256,7 +256,7 @@ export function AudienceOverviewPage() {
           </div>
         </div>
         <div className="p-3 sm:p-4">
-          <SignupHeatmap />
+          <SignupHeatmap geo={analytics.geo} />
         </div>
         {analytics.geo.points.length > 0 ? (
           <div className="border-t border-dt-border px-4 py-3">

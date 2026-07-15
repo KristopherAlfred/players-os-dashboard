@@ -3,12 +3,14 @@ export type SignupHeatmapPoint = {
   lng: number;
   count: number;
   label: string;
+  countryCode?: string | null;
+  countryName?: string | null;
 };
 
 export type SignupGeoStats = {
   totalFans: number;
   mappedFans: number;
-  countries: { country: string; flag: string; pct: number; count: number }[];
+  countries: { country: string; flag: string; pct: number; count: number; countryCode?: string }[];
   points: SignupHeatmapPoint[];
 };
 

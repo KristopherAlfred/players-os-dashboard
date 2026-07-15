@@ -28,4 +28,9 @@ declare module "react-simple-maps" {
   }): React.JSX.Element;
 
   export function Geography(props: GeographyProps): React.JSX.Element;
+
+  export function Marker(props: {
+    coordinates: [number, number];
+    children?: ReactNode;
+  }): React.JSX.Element;
 }

@@ -53,8 +53,21 @@ export type DametimeAnalyticsActivity = {
 export type DametimeAnalyticsGeo = {
   totalFans: number;
   mappedFans: number;
-  countries: { country: string; flag: string; pct: number; count: number }[];
-  points: { lat: number; lng: number; count: number; label: string }[];
+  countries: {
+    country: string;
+    flag: string;
+    pct: number;
+    count: number;
+    countryCode?: string;
+  }[];
+  points: {
+    lat: number;
+    lng: number;
+    count: number;
+    label: string;
+    countryCode?: string | null;
+    countryName?: string | null;
+  }[];
 };
 
 export type DametimeAnalytics = {

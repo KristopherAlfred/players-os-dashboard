@@ -233,43 +233,39 @@ export function countryGradientId(key: string) {
   return `country-grad-${key.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 }
 
-const usStateIntensity: Record<string, number> = {
-  "06": 0.92, "41": 0.9, "53": 0.82, "16": 0.78, "32": 0.85, "04": 0.8, "49": 0.76,
-  "30": 0.7, "56": 0.68, "08": 0.72, "35": 0.74, "48": 0.7, "40": 0.65,
-  "17": 0.42, "18": 0.38, "39": 0.4, "26": 0.35, "55": 0.32,
-  "13": 0.22, "01": 0.18, "12": 0.28, "37": 0.36, "45": 0.25, "47": 0.3,
-  "36": 0.55, "25": 0.58, "42": 0.48, "34": 0.52, "09": 0.5, "10": 0.45,
-  "24": 0.5, "51": 0.48, "54": 0.4, "29": 0.38, "05": 0.35, "22": 0.32,
-  "28": 0.3, "21": 0.28, "11": 0.62, "50": 0.55, "33": 0.5, "44": 0.48,
-  "23": 0.42, "19": 0.36, "31": 0.34, "20": 0.32, "46": 0.3, "38": 0.28,
-  "02": 0.25, "15": 0.4,
-};
-
-const canadaByName: Record<string, number> = {
-  Ontario: 0.72, "British Columbia": 0.68, Quebec: 0.58, Alberta: 0.62, Manitoba: 0.42,
-  Saskatchewan: 0.4, "Nova Scotia": 0.45, "New Brunswick": 0.38, Newfoundland: 0.35,
-  "Prince Edward Island": 0.32, Yukon: 0.28, "Northwest Territories": 0.25, Nunavut: 0.22,
-};
-
-const australiaByName: Record<string, number> = {
-  "New South Wales": 0.72, Victoria: 0.68, Queensland: 0.55, "Western Australia": 0.48,
-  "South Australia": 0.42, Tasmania: 0.35, "Northern Territory": 0.28, "Australian Capital Territory": 0.65,
-};
-
-const ukByName: Record<string, number> = {
-  England: 0.78, Scotland: 0.52, Wales: 0.45, "Northern Ireland": 0.4,
-  "East Midlands": 0.62, "West Midlands": 0.58, London: 0.85, "South East": 0.7,
-  "North West": 0.55, "North East": 0.48, "South West": 0.5, Yorkshire: 0.52,
-};
-
 const worldCountryMap: Record<string, CountryViewId> = {
   "United States of America": "USA",
+  "United States": "USA",
+  USA: "USA",
   Canada: "Canada",
   "United Kingdom": "UK",
+  UK: "UK",
+  "Great Britain": "UK",
   Australia: "Australia",
 };
 
-const mainCountries = new Set(["United States of America", "Canada", "United Kingdom", "Australia"]);
+const codeToView: Record<string, CountryViewId> = {
+  US: "USA",
+  CA: "Canada",
+  GB: "UK",
+  UK: "UK",
+  AU: "Australia",
+};
+
+const viewToCodes: Record<Exclude<CountryViewId, "world" | "Other">, string[]> = {
+  USA: ["US"],
+  Canada: ["CA"],
+  UK: ["GB", "UK"],
+  Australia: ["AU"],
+};
+
+const mainCountries = new Set([
+  "United States of America",
+  "United States",
+  "Canada",
+  "United Kingdom",
+  "Australia",
+]);
 
 function hashName(name: string) {
   let h = 0;
@@ -277,20 +273,45 @@ function hashName(name: string) {
   return h;
 }
 
-export function getRegionIntensity(view: CountryViewId, geoId: string, geoName?: string): number {
+export function viewIdFromCountryCode(code?: string | null): CountryViewId | null {
+  if (!code) return null;
+  return codeToView[code.toUpperCase()] ?? null;
+}
+
+export function viewIdFromCountryName(name?: string | null): CountryViewId | null {
+  if (!name) return null;
+  return worldCountryMap[name] ?? null;
+}
+
+export function countryCodesForView(view: CountryViewId): string[] | null {
+  if (view === "world" || view === "Other") return null;
+  return viewToCodes[view];
+}
+
+/** Live intensity 0–1 from country share; falls back to soft mock for unknown regions. */
+export function getRegionIntensity(
+  view: CountryViewId,
+  _geoId: string,
+  geoName?: string,
+  liveByCountry?: Record<string, number>,
+): number {
   const name = geoName ?? "";
 
-  if (view === "USA") return usStateIntensity[geoId] ?? 0.35 + (Number(geoId) % 7) * 0.08;
-  if (view === "Canada") return canadaByName[name] ?? 0.38;
-  if (view === "Australia") return australiaByName[name] ?? 0.38;
-  if (view === "UK") return ukByName[name] ?? 0.45;
+  if (view === "USA" || view === "Canada" || view === "Australia" || view === "UK") {
+    // Country drill-down is pin-led — keep regions quiet.
+    return 0.18;
+  }
 
   if (view === "world") {
     const mapped = worldCountryMap[name];
+    if (liveByCountry && mapped && liveByCountry[mapped] != null) {
+      return liveByCountry[mapped];
+    }
     if (mapped === "USA") return 0.85;
     if (mapped === "Canada") return 0.55;
     if (mapped === "UK") return 0.48;
     if (mapped === "Australia") return 0.42;
+    if (liveByCountry) return 0.08 + (hashName(name) % 3) * 0.03;
     return 0.12 + (hashName(name) % 6) * 0.04;
   }
 
