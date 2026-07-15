@@ -112,7 +112,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/content/social": {
     title: "Social",
-    subtitle: "Posts, stories, and reels across Instagram, TikTok, and X.",
+    subtitle: "Live Instagram, X, Facebook, and YouTube analytics from DameTime.",
   },
   "/content/news": {
     title: "News",

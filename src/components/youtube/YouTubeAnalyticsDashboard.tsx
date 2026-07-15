@@ -261,20 +261,7 @@ function RecentVideosTable({ videos }: { videos: YouTubeVideoAnalytics[] }) {
   );
 }
 
-export function YouTubeAnalyticsDashboard() {
-  const { isYoutube, youtube } = useAnalyticsView();
-
-  if (!isYoutube) return null;
-  if (youtube.loading) return <SourceLoading message="Loading YouTube analytics…" />;
-  if (youtube.error) {
-    return <SourceError title="Could not load YouTube analytics" message={youtube.error} />;
-  }
-  if (!youtube.analytics) {
-    return <SourceError title="Could not load YouTube analytics" message="No data available." />;
-  }
-
-  const analytics = youtube.analytics;
-
+export function YouTubeAnalyticsView({ analytics }: { analytics: YouTubeAnalytics }) {
   return (
     <div className="space-y-3 pb-4">
       <KpiGrid analytics={analytics} />
@@ -300,4 +287,19 @@ export function YouTubeAnalyticsDashboard() {
       <RecentVideosTable videos={analytics.recentVideos} />
     </div>
   );
+}
+
+export function YouTubeAnalyticsDashboard() {
+  const { isYoutube, youtube } = useAnalyticsView();
+
+  if (!isYoutube) return null;
+  if (youtube.loading) return <SourceLoading message="Loading YouTube analytics…" />;
+  if (youtube.error) {
+    return <SourceError title="Could not load YouTube analytics" message={youtube.error} />;
+  }
+  if (!youtube.analytics) {
+    return <SourceError title="Could not load YouTube analytics" message="No data available." />;
+  }
+
+  return <YouTubeAnalyticsView analytics={youtube.analytics} />;
 }

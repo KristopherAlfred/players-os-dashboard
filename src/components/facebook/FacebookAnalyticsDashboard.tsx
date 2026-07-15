@@ -264,20 +264,7 @@ function RecentPostsTable({ posts }: { posts: FacebookPostAnalytics[] }) {
   );
 }
 
-export function FacebookAnalyticsDashboard() {
-  const { isFacebook, facebook } = useAnalyticsView();
-
-  if (!isFacebook) return null;
-  if (facebook.loading) return <SourceLoading message="Loading Facebook analytics…" />;
-  if (facebook.error) {
-    return <SourceError title="Could not load Facebook analytics" message={facebook.error} />;
-  }
-  if (!facebook.analytics) {
-    return <SourceError title="Could not load Facebook analytics" message="No data available." />;
-  }
-
-  const analytics = facebook.analytics;
-
+export function FacebookAnalyticsView({ analytics }: { analytics: FacebookAnalytics }) {
   return (
     <div className="space-y-3 pb-4">
       <KpiGrid analytics={analytics} />
@@ -303,4 +290,19 @@ export function FacebookAnalyticsDashboard() {
       <RecentPostsTable posts={analytics.recentPosts} />
     </div>
   );
+}
+
+export function FacebookAnalyticsDashboard() {
+  const { isFacebook, facebook } = useAnalyticsView();
+
+  if (!isFacebook) return null;
+  if (facebook.loading) return <SourceLoading message="Loading Facebook analytics…" />;
+  if (facebook.error) {
+    return <SourceError title="Could not load Facebook analytics" message={facebook.error} />;
+  }
+  if (!facebook.analytics) {
+    return <SourceError title="Could not load Facebook analytics" message="No data available." />;
+  }
+
+  return <FacebookAnalyticsView analytics={facebook.analytics} />;
 }

@@ -243,20 +243,7 @@ function TopPostsTable({ posts }: { posts: InstagramPostAnalytics[] }) {
   );
 }
 
-export function InstagramAnalyticsDashboard() {
-  const { isInstagram, instagram } = useAnalyticsView();
-
-  if (!isInstagram) return null;
-  if (instagram.loading) return <SourceLoading message="Loading Instagram analytics…" />;
-  if (instagram.error) {
-    return <SourceError title="Could not load Instagram analytics" message={instagram.error} />;
-  }
-  if (!instagram.analytics) {
-    return <SourceError title="Could not load Instagram analytics" message="No data available." />;
-  }
-
-  const analytics = instagram.analytics;
-
+export function InstagramAnalyticsView({ analytics }: { analytics: InstagramAnalytics }) {
   return (
     <div className="space-y-3 pb-4">
       <KpiGrid analytics={analytics} />
@@ -280,4 +267,19 @@ export function InstagramAnalyticsDashboard() {
       </div>
     </div>
   );
+}
+
+export function InstagramAnalyticsDashboard() {
+  const { isInstagram, instagram } = useAnalyticsView();
+
+  if (!isInstagram) return null;
+  if (instagram.loading) return <SourceLoading message="Loading Instagram analytics…" />;
+  if (instagram.error) {
+    return <SourceError title="Could not load Instagram analytics" message={instagram.error} />;
+  }
+  if (!instagram.analytics) {
+    return <SourceError title="Could not load Instagram analytics" message="No data available." />;
+  }
+
+  return <InstagramAnalyticsView analytics={instagram.analytics} />;
 }

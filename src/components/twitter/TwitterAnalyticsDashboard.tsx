@@ -263,20 +263,7 @@ function RecentPostsTable({ posts }: { posts: TwitterPostAnalytics[] }) {
   );
 }
 
-export function TwitterAnalyticsDashboard() {
-  const { isTwitter, twitter } = useAnalyticsView();
-
-  if (!isTwitter) return null;
-  if (twitter.loading) return <SourceLoading message="Loading X analytics…" />;
-  if (twitter.error) {
-    return <SourceError title="Could not load X analytics" message={twitter.error} />;
-  }
-  if (!twitter.analytics) {
-    return <SourceError title="Could not load X analytics" message="No data available." />;
-  }
-
-  const analytics = twitter.analytics;
-
+export function TwitterAnalyticsView({ analytics }: { analytics: TwitterAnalytics }) {
   return (
     <div className="space-y-3 pb-4">
       <KpiGrid analytics={analytics} />
@@ -302,4 +289,19 @@ export function TwitterAnalyticsDashboard() {
       <RecentPostsTable posts={analytics.recentPosts} />
     </div>
   );
+}
+
+export function TwitterAnalyticsDashboard() {
+  const { isTwitter, twitter } = useAnalyticsView();
+
+  if (!isTwitter) return null;
+  if (twitter.loading) return <SourceLoading message="Loading X analytics…" />;
+  if (twitter.error) {
+    return <SourceError title="Could not load X analytics" message={twitter.error} />;
+  }
+  if (!twitter.analytics) {
+    return <SourceError title="Could not load X analytics" message="No data available." />;
+  }
+
+  return <TwitterAnalyticsView analytics={twitter.analytics} />;
 }
