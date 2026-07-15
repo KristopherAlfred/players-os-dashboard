@@ -228,8 +228,35 @@ function buildLiveIntensity(geo?: DametimeAnalyticsGeo | null): Record<string, n
   return live;
 }
 
-function pinRadius(count: number, maxCount: number) {
-  return 5 + Math.round((maxCount > 0 ? count / maxCount : 0) * 10);
+function pinScale(count: number, maxCount: number) {
+  return 0.85 + (maxCount > 0 ? count / maxCount : 0) * 0.55;
+}
+
+/** Classic map pin with tip at (0,0) so it anchors to the city coordinate. */
+function MapPinMarker({ active, scale }: { active: boolean; scale: number }) {
+  return (
+    <g
+      transform={`scale(${scale})`}
+      style={{
+        filter: active
+          ? "drop-shadow(0 2px 6px rgba(229,9,20,0.9))"
+          : "drop-shadow(0 2px 4px rgba(0,0,0,0.45))",
+      }}
+    >
+      <path
+        d="M0,0 C-7.5,-11 -14,-20 -14,-28 A14,14 0 1 1 14,-28 C14,-20 7.5,-11 0,0 Z"
+        fill="#e50914"
+        stroke="#fff"
+        strokeWidth={1.25}
+      />
+      <path
+        d="M0,0 C-7.5,-11 -14,-20 -14,-28 A14,14 0 1 1 14,-28 C14,-20 7.5,-11 0,0 Z"
+        fill="url(#map-pin-shine)"
+        opacity={0.35}
+      />
+      <circle cx="0" cy="-26" r="6.5" fill="#ffffff" />
+    </g>
+  );
 }
 
 function ChoroplethMap({
@@ -335,24 +362,26 @@ function ChoroplethMap({
           )}
         </Geographies>
 
+        <defs>
+          <linearGradient id="map-pin-shine" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
+            <stop offset="55%" stopColor="#e50914" stopOpacity="0" />
+            <stop offset="100%" stopColor="#7a0008" stopOpacity="0.45" />
+          </linearGradient>
+        </defs>
+
         {pins.map((pin) => {
           const key = `${pin.lat}-${pin.lng}-${pin.label}`;
-          const r = pinRadius(pin.count, maxPin);
+          const scale = pinScale(pin.count, maxPin);
           const active = hoverPin === key;
+          const labelY = -42 * scale;
           return (
             <Marker key={key} coordinates={[pin.lng, pin.lat]}>
               <g onMouseEnter={() => setHoverPin(key)} onMouseLeave={() => setHoverPin(null)}>
-                <circle r={r + 4} fill="rgba(229,9,20,0.18)" stroke="transparent" />
-                <circle
-                  r={r}
-                  fill="#e50914"
-                  stroke="#fff"
-                  strokeWidth={1.5}
-                  style={{ filter: active ? "drop-shadow(0 0 6px rgba(229,9,20,0.85))" : undefined }}
-                />
+                <MapPinMarker active={active} scale={scale} />
                 <text
                   textAnchor="middle"
-                  y={-r - 8}
+                  y={labelY}
                   style={{
                     fontFamily: "inherit",
                     fontSize: 10,
@@ -367,7 +396,7 @@ function ChoroplethMap({
                 </text>
                 <text
                   textAnchor="middle"
-                  y={r + 12}
+                  y={12}
                   style={{
                     fontFamily: "inherit",
                     fontSize: 9,
