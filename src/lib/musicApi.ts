@@ -33,6 +33,29 @@ export type SpotifyCatalogTrack = {
   spotifyUrl: string;
   albumName?: string;
   coverImage?: string;
+  previewUrl?: string | null;
+  trackNumber?: number;
+  albumId?: string;
+  releaseDate?: string;
+  explicit?: boolean;
+};
+
+export type SpotifyCatalogRelease = {
+  id: string;
+  title: string;
+  year: string;
+  type: "album" | "single";
+  explicit: boolean;
+  spotifyUrl: string;
+  coverImage: string;
+  tracks: SpotifyCatalogTrack[];
+  releaseDate?: string;
+};
+
+export type SpotifyCatalog = {
+  topTracks: SpotifyCatalogTrack[];
+  albums: SpotifyCatalogRelease[];
+  singles: SpotifyCatalogRelease[];
 };
 
 function getApiBase() {
@@ -96,8 +119,8 @@ export async function deleteMusicItem(id: string): Promise<MusicFeed> {
 
 export type SpotifyCatalogResult = {
   tracks: SpotifyCatalogTrack[];
+  catalog?: SpotifyCatalog;
   source: "spotify" | "dame-dolla-catalog";
-  warning?: string;
   count: number;
 };
 
@@ -108,6 +131,7 @@ export async function fetchSpotifyCatalog(refresh = false): Promise<SpotifyCatal
   const tracks = Array.isArray((data as { tracks?: SpotifyCatalogTrack[] }).tracks)
     ? (data as { tracks: SpotifyCatalogTrack[] }).tracks
     : [];
+  const catalog = (data as { catalog?: SpotifyCatalog }).catalog;
 
   if (!response.ok && !tracks.length) {
     throw new Error((data as { error?: string }).error || `Spotify catalog failed (${response.status})`);
@@ -115,11 +139,11 @@ export async function fetchSpotifyCatalog(refresh = false): Promise<SpotifyCatal
 
   return {
     tracks,
-    source: (data as { source?: string }).source === "spotify" ? "spotify" : "dame-dolla-catalog",
-    warning:
-      typeof (data as { warning?: string }).warning === "string"
-        ? (data as { warning: string }).warning
+    catalog:
+      catalog && Array.isArray(catalog.albums) && Array.isArray(catalog.singles)
+        ? catalog
         : undefined,
+    source: (data as { source?: string }).source === "spotify" ? "spotify" : "dame-dolla-catalog",
     count: tracks.length || Number((data as { count?: number }).count) || 0,
   };
 }

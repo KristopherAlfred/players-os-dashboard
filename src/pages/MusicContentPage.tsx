@@ -59,19 +59,12 @@ export function MusicContentPage() {
   function applyCatalog(
     tracks: SpotifyCatalogTrack[],
     source: "spotify" | "dame-dolla-catalog",
-    warning?: string,
     nextFeed?: MusicFeed | null,
   ) {
     const feedRef = nextFeed ?? feed;
     setSpotifyTracks(tracks);
     setCatalogSource(source);
-    if (warning) {
-      setStatus(
-        source === "spotify"
-          ? warning
-          : `Loaded ${tracks.length} Dame D.O.L.L.A tracks. ${warning}`,
-      );
-    } else if (source === "spotify") {
+    if (source === "spotify") {
       setStatus(`Synced ${tracks.length} live tracks from Dame D.O.L.L.A on Spotify`);
     } else {
       setStatus(`Loaded ${tracks.length} Dame D.O.L.L.A tracks (built-in catalog)`);
@@ -94,15 +87,7 @@ export function MusicContentPage() {
         setFeed(nextFeed);
 
         if (catalog?.tracks.length) {
-          setSpotifyTracks(catalog.tracks);
-          setCatalogSource(catalog.source);
-          if (catalog.warning) setStatus(catalog.warning);
-          const first = musicItemFromSpotify(
-            catalog.tracks[0],
-            findFeedItem(nextFeed, catalog.tracks[0].id),
-          );
-          setSelectedId(first.id);
-          setDraft(first);
+          applyCatalog(catalog.tracks, catalog.source, nextFeed);
         } else {
           const first = nextFeed.items[0] ?? null;
           if (first) {
@@ -199,7 +184,7 @@ export function MusicContentPage() {
     setError(null);
     try {
       const catalog = await fetchSpotifyCatalog(true);
-      applyCatalog(catalog.tracks, catalog.source, catalog.warning);
+      applyCatalog(catalog.tracks, catalog.source);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Dame D.O.L.L.A sync failed");
     } finally {
