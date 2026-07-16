@@ -5,14 +5,21 @@ import { Card } from "./ui/Card";
 import { fetchEventsFeed, resolveEventAssetUrl, type AppEventItem } from "../lib/eventsApi";
 import { fetchNewsFeed, resolveNewsAssetUrl, type NewsItem } from "../lib/newsApi";
 import { fetchVideoFeed, resolveVideoAssetUrl, type ExclusiveVideoItem } from "../lib/videosApi";
+import {
+  fetchYouTubeAnalytics,
+  formatDuration,
+  formatMetric,
+  type YouTubeVideoAnalytics,
+} from "../lib/youtubeAnalyticsApi";
 
 const tabs = ["All Content", "Videos", "Giveaways", "Newsletters"] as const;
 type ContentTab = (typeof tabs)[number];
+type VideoSourceFilter = "all" | "youtube" | "exclusive";
 
 type RecentRow = {
   id: string;
   title: string;
-  type: "Video" | "Giveaway" | "Newsletter" | "News" | "Event";
+  type: "YouTube" | "Exclusive" | "Giveaway" | "Newsletter" | "News" | "Event";
   status: "Published" | "Draft";
   published: string;
   publishedAt: number;
@@ -38,17 +45,33 @@ function statusLabel(status: string): "Published" | "Draft" {
   return String(status).toLowerCase() === "published" ? "Published" : "Draft";
 }
 
-function mapVideo(item: ExclusiveVideoItem): RecentRow {
+function mapExclusiveVideo(item: ExclusiveVideoItem): RecentRow {
   return {
-    id: `video-${item.id}`,
-    title: item.title || "Untitled video",
-    type: "Video",
+    id: `exclusive-${item.id}`,
+    title: item.title || "Untitled exclusive",
+    type: "Exclusive",
     status: statusLabel(item.status),
     published: formatPublished(item.publishedAt, item.date),
     publishedAt: new Date(item.publishedAt || item.date || 0).getTime() || 0,
     meta: item.duration || "Exclusive",
     detail: item.description?.trim() || "DameTime exclusive",
     thumbUrl: resolveVideoAssetUrl(item.thumbnail),
+    isVideo: true,
+    editPath: "/content/videos",
+  };
+}
+
+function mapYouTubeVideo(item: YouTubeVideoAnalytics): RecentRow {
+  return {
+    id: `youtube-${item.id}`,
+    title: item.title || "Untitled YouTube video",
+    type: "YouTube",
+    status: "Published",
+    published: formatPublished(item.publishedAt),
+    publishedAt: new Date(item.publishedAt || 0).getTime() || 0,
+    meta: formatMetric(item.viewCount, true),
+    detail: `${formatMetric(item.likeCount, true)} likes · ${formatDuration(item.durationSeconds)}`,
+    thumbUrl: `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`,
     isVideo: true,
     editPath: "/content/videos",
   };
@@ -93,9 +116,7 @@ function mapEvent(item: AppEventItem): RecentRow {
 function LiveThumb({ src, isVideo }: { src: string; isVideo: boolean }) {
   return (
     <div className="relative h-10 w-16 shrink-0 overflow-hidden rounded border border-dt-border bg-zinc-800">
-      {src ? (
-        <img src={src} alt="" className="h-full w-full object-cover object-center" />
-      ) : null}
+      {src ? <img src={src} alt="" className="h-full w-full object-cover object-center" /> : null}
       {isVideo ? (
         <div className="absolute inset-0 flex items-center justify-center bg-black/35">
           <Play size={14} className="fill-white text-white" />
@@ -107,6 +128,7 @@ function LiveThumb({ src, isVideo }: { src: string; isVideo: boolean }) {
 
 export function RecentContent() {
   const [activeTab, setActiveTab] = useState<ContentTab>("All Content");
+  const [videoSource, setVideoSource] = useState<VideoSourceFilter>("all");
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "Published" | "Draft">("all");
   const [typeFilter, setTypeFilter] = useState<"all" | RecentRow["type"]>("all");
@@ -121,16 +143,18 @@ export function RecentContent() {
       setLoading(true);
       setError(null);
       try {
-        const [news, videos, events] = await Promise.all([
+        const [news, exclusive, events, youtube] = await Promise.all([
           fetchNewsFeed().catch(() => ({ items: [] as NewsItem[] })),
           fetchVideoFeed().catch(() => ({ items: [] as ExclusiveVideoItem[] })),
           fetchEventsFeed().catch(() => ({ items: [] as AppEventItem[] })),
+          fetchYouTubeAnalytics().catch(() => null),
         ]);
 
         if (cancelled) return;
 
         const next = [
-          ...videos.items.map(mapVideo),
+          ...(youtube?.recentVideos ?? []).map(mapYouTubeVideo),
+          ...exclusive.items.map(mapExclusiveVideo),
           ...news.items.map(mapNews),
           ...events.items.map(mapEvent),
         ].sort((a, b) => b.publishedAt - a.publishedAt);
@@ -152,15 +176,31 @@ export function RecentContent() {
     };
   }, []);
 
+  useEffect(() => {
+    if (activeTab !== "Videos") setVideoSource("all");
+  }, [activeTab]);
+
+  const videoCounts = useMemo(() => {
+    const youtube = rows.filter((row) => row.type === "YouTube").length;
+    const exclusive = rows.filter((row) => row.type === "Exclusive").length;
+    return { youtube, exclusive, all: youtube + exclusive };
+  }, [rows]);
+
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return rows.filter((row) => {
       const matchesTab =
         activeTab === "All Content" ||
-        (activeTab === "Videos" && row.type === "Video") ||
+        (activeTab === "Videos" && (row.type === "YouTube" || row.type === "Exclusive")) ||
         (activeTab === "Giveaways" && (row.type === "Giveaway" || row.type === "Event")) ||
         (activeTab === "Newsletters" && (row.type === "Newsletter" || row.type === "News"));
+
+      const matchesVideoSource =
+        activeTab !== "Videos" ||
+        videoSource === "all" ||
+        (videoSource === "youtube" && row.type === "YouTube") ||
+        (videoSource === "exclusive" && row.type === "Exclusive");
 
       const matchesStatus = statusFilter === "all" || row.status === statusFilter;
       const matchesType = typeFilter === "all" || row.type === typeFilter;
@@ -169,9 +209,9 @@ export function RecentContent() {
         row.title.toLowerCase().includes(normalizedQuery) ||
         row.detail.toLowerCase().includes(normalizedQuery);
 
-      return matchesTab && matchesStatus && matchesType && matchesQuery;
+      return matchesTab && matchesVideoSource && matchesStatus && matchesType && matchesQuery;
     });
-  }, [activeTab, query, rows, statusFilter, typeFilter]);
+  }, [activeTab, query, rows, statusFilter, typeFilter, videoSource]);
 
   return (
     <Card className="flex h-full w-full flex-col">
@@ -179,7 +219,9 @@ export function RecentContent() {
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-white">Recent Content</h3>
-            <p className="mt-0.5 text-[11px] text-white/45">Live from DameTime news, videos, and events</p>
+            <p className="mt-0.5 text-[11px] text-white/45">
+              Live from DameTime — YouTube, exclusives, news, and events
+            </p>
           </div>
           {loading ? <Loader2 size={14} className="animate-spin text-dt-red" /> : null}
         </div>
@@ -199,6 +241,32 @@ export function RecentContent() {
             </button>
           ))}
         </div>
+
+        {activeTab === "Videos" ? (
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            {(
+              [
+                { id: "all", label: `All videos (${videoCounts.all})` },
+                { id: "youtube", label: `YouTube (${videoCounts.youtube})` },
+                { id: "exclusive", label: `Exclusive (${videoCounts.exclusive})` },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => setVideoSource(option.id)}
+                className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition ${
+                  videoSource === option.id
+                    ? "border-dt-red bg-dt-red/20 text-white"
+                    : "border-dt-border text-white/65 hover:border-white/25 hover:text-white"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         <div className="flex gap-2">
           <div className="flex flex-1 items-center gap-2 rounded-md border border-dt-border bg-dt-bg px-3 py-1.5">
             <Search size={14} className="text-white" />
@@ -225,7 +293,8 @@ export function RecentContent() {
             className="rounded-md border border-dt-border bg-dt-bg px-3 py-1.5 text-xs text-white"
           >
             <option value="all">Types</option>
-            <option value="Video">Video</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Exclusive">Exclusive</option>
             <option value="Newsletter">Newsletter</option>
             <option value="News">News</option>
             <option value="Giveaway">Giveaway</option>
@@ -261,7 +330,9 @@ export function RecentContent() {
             ) : filteredRows.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-sm text-dt-muted">
-                  No {activeTab === "All Content" ? "content" : activeTab.toLowerCase()} found in the app feeds.
+                  {activeTab === "Videos" && videoSource === "exclusive"
+                    ? "No exclusive videos published yet — add them under Content → Videos → Exclusive."
+                    : `No ${activeTab === "All Content" ? "content" : activeTab.toLowerCase()} found in the app feeds.`}
                 </td>
               </tr>
             ) : (
