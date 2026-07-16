@@ -36,12 +36,14 @@ export function KpiCards() {
             </p>
             <p
               className={`relative mt-1.5 text-xl font-bold text-white xl:mt-2 xl:text-2xl ${
-                loading ? "animate-pulse text-white/50" : ""
+                loading ? "animate-pulse text-white/40" : ""
               }`}
             >
-              {kpi.value}
+              {loading ? "—" : kpi.value}
             </p>
-            <p className="relative mt-1 text-xs font-medium text-dt-green">{kpi.change}</p>
+            <p className={`relative mt-1 text-xs font-medium ${loading ? "text-white/30" : "text-dt-green"}`}>
+              {loading ? "…" : kpi.change}
+            </p>
             <div className="pointer-events-none absolute right-2 hidden sm:block sm:right-3 top-1/2 -translate-y-1/2">
               <Icon
                 size={22}

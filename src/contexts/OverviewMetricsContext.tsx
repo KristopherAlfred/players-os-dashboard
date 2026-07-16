@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import {
   fallbackOverviewMetrics,
   fetchOverviewMetrics,
   type OverviewMetrics,
 } from "../lib/overviewAnalytics";
 
-const CACHE_KEY = "amx.overviewMetrics.v1";
+const CACHE_KEY = "amx.overviewMetrics.v2";
 
 type OverviewMetricsState = {
   metrics: OverviewMetrics;
@@ -38,16 +38,10 @@ const OverviewMetricsContext = createContext<OverviewMetricsState>({
 });
 
 export function OverviewMetricsProvider({ children }: { children: ReactNode }) {
-  const initialCache = useRef<OverviewMetrics | null | undefined>(undefined);
-  if (initialCache.current === undefined) {
-    initialCache.current = typeof window !== "undefined" ? readCachedMetrics() : null;
-  }
-
-  const [metrics, setMetrics] = useState<OverviewMetrics>(
-    () => initialCache.current ?? fallbackOverviewMetrics,
-  );
-  const [loading, setLoading] = useState(() => !initialCache.current);
-  const hadCacheRef = useRef(Boolean(initialCache.current));
+  // Never hydrate KPIs from session cache on refresh — that flashes a stale total
+  // (e.g. 20.31M) before live social counts arrive.
+  const [metrics, setMetrics] = useState<OverviewMetrics>(fallbackOverviewMetrics);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,11 +51,11 @@ export function OverviewMetricsProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         setMetrics(next);
         writeCachedMetrics(next);
-        hadCacheRef.current = true;
       })
       .catch(() => {
         if (cancelled) return;
-        if (!hadCacheRef.current) setMetrics(fallbackOverviewMetrics);
+        const cached = readCachedMetrics();
+        setMetrics(cached ?? fallbackOverviewMetrics);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
