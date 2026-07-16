@@ -173,7 +173,7 @@ export const topPerforming = [
   { rank: 1, title: "X — viral post", engagement: "303.8K likes", thumb: "drop" },
   { rank: 2, title: "Instagram — Dame X is here", engagement: "45.7K likes", thumb: "studio" },
   { rank: 3, title: "YouTube — Gimme Some Love", engagement: "8.8K likes", thumb: "audio" },
-  { rank: 4, title: "Facebook — adidas Eurocamp", engagement: "784 likes", thumb: "qa" },
-  { rank: 5, title: "X — Y.A.G.I. mixtape drop", engagement: "1.8K likes", thumb: "tour" },
+  { rank: 4, title: "X — Y.A.G.I. mixtape drop", engagement: "1.8K likes", thumb: "tour" },
+  { rank: 5, title: "Facebook — adidas Eurocamp", engagement: "784 likes", thumb: "qa" },
 ];
 
