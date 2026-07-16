@@ -12,7 +12,7 @@ import {
   type YouTubeVideoAnalytics,
 } from "../lib/youtubeAnalyticsApi";
 
-const tabs = ["All Content", "Videos", "Giveaways", "Newsletters"] as const;
+const tabs = ["All Content", "Videos", "Events", "Giveaways", "Newsletters"] as const;
 type ContentTab = (typeof tabs)[number];
 type VideoSourceFilter = "all" | "youtube" | "exclusive";
 
@@ -193,7 +193,8 @@ export function RecentContent() {
       const matchesTab =
         activeTab === "All Content" ||
         (activeTab === "Videos" && (row.type === "YouTube" || row.type === "Exclusive")) ||
-        (activeTab === "Giveaways" && (row.type === "Giveaway" || row.type === "Event")) ||
+        (activeTab === "Events" && row.type === "Event") ||
+        (activeTab === "Giveaways" && row.type === "Giveaway") ||
         (activeTab === "Newsletters" && (row.type === "Newsletter" || row.type === "News"));
 
       const matchesVideoSource =
