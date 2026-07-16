@@ -18,7 +18,7 @@ const iconMap: Record<string, typeof Users> = {
 };
 
 export function KpiCards() {
-  const { metrics } = useOverviewMetrics();
+  const { metrics, loading } = useOverviewMetrics();
 
   return (
     <div className="grid w-full min-w-0 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
@@ -34,7 +34,13 @@ export function KpiCards() {
             <p className="relative text-[10px] font-medium uppercase tracking-wide text-white xl:text-[11px]">
               {kpi.label}
             </p>
-            <p className="relative mt-1.5 text-xl font-bold text-white xl:mt-2 xl:text-2xl">{kpi.value}</p>
+            <p
+              className={`relative mt-1.5 text-xl font-bold text-white xl:mt-2 xl:text-2xl ${
+                loading ? "animate-pulse text-white/50" : ""
+              }`}
+            >
+              {kpi.value}
+            </p>
             <p className="relative mt-1 text-xs font-medium text-dt-green">{kpi.change}</p>
             <div className="pointer-events-none absolute right-2 hidden sm:block sm:right-3 top-1/2 -translate-y-1/2">
               <Icon

@@ -31,7 +31,7 @@ const FALLBACK_PLATFORMS = [
   { name: "Instagram", followers: 9_586_731 },
   { name: "Facebook", followers: 4_789_039 },
   { name: "X (Twitter)", followers: 3_464_190 },
-  { name: "YouTube", followers: 2_470_000 },
+  { name: "YouTube", followers: 2_660_000 },
 ];
 
 export function formatMetric(value: number, compact = false) {

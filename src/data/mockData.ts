@@ -1,9 +1,9 @@
 export const kpiMetrics = [
-  { label: "Overall Followers", value: "20.3M", change: "+2.4%", icon: "users" },
+  { label: "Overall Followers", value: "20.5M", change: "+2.4%", icon: "users" },
   { label: "Instagram", value: "9.59M", change: "+1.8%", icon: "users" },
   { label: "Facebook", value: "4.79M", change: "+1.2%", icon: "user-check" },
   { label: "X (Twitter)", value: "3.46M", change: "+1.5%", icon: "heart" },
-  { label: "YouTube", value: "2.47M", change: "+2.1%", icon: "eye" },
+  { label: "YouTube", value: "2.66M", change: "+2.1%", icon: "eye" },
   { label: "Avg. Likes / Post", value: "31.7K", change: "+6.3%", icon: "trending-up" },
 ];
 
@@ -29,7 +29,7 @@ export const audienceSnapshot = [
   { label: "Instagram Followers", value: "9,586,731" },
   { label: "Facebook Followers", value: "4,789,039" },
   { label: "X Followers", value: "3,464,190" },
-  { label: "YouTube Subscribers", value: "2,470,000" },
+  { label: "YouTube Subscribers", value: "2,660,000" },
   { label: "Total Posts", value: "31,435" },
   { label: "Platforms Tracked", value: "4" },
 ];
