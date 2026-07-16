@@ -157,7 +157,7 @@ export async function fetchFacebookAnalytics(): Promise<FacebookAnalytics | null
   for (const url of apiUrls) {
     try {
       const data = await fetchJsonAnalytics(url);
-      if (data) return data;
+      if (data) return enrichFollowerStats(data);
     } catch {
       // try next source
     }
@@ -168,7 +168,7 @@ export async function fetchFacebookAnalytics(): Promise<FacebookAnalytics | null
   for (const url of cacheUrls) {
     try {
       const data = await fetchJsonAnalytics(url);
-      if (data) return { ...data, source: "cache" };
+      if (data) return enrichFollowerStats({ ...data, source: "cache" });
     } catch {
       // try next source
     }

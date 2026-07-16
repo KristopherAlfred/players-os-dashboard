@@ -188,10 +188,24 @@ export async function fetchOverviewMetrics(): Promise<OverviewMetrics> {
     return fallbackOverviewMetrics;
   }
 
-  const igFollowers = ig?.kpis.followers ?? FALLBACK_PLATFORMS[0].followers;
-  const fbFollowers = fb?.kpis.followers ?? FALLBACK_PLATFORMS[1].followers;
-  const twFollowers = tw?.kpis.followers ?? FALLBACK_PLATFORMS[2].followers;
-  const ytFollowers = yt?.kpis.subscribers ?? FALLBACK_PLATFORMS[3].followers;
+  // Treat 0 as missing — live scrapes can succeed with followers: 0 when
+  // Facebook/X/IG page stats fail to parse, and `??` would keep that zero.
+  const igFollowers =
+    ig?.kpis.followers && ig.kpis.followers > 0
+      ? ig.kpis.followers
+      : FALLBACK_PLATFORMS[0].followers;
+  const fbFollowers =
+    fb?.kpis.followers && fb.kpis.followers > 0
+      ? fb.kpis.followers
+      : FALLBACK_PLATFORMS[1].followers;
+  const twFollowers =
+    tw?.kpis.followers && tw.kpis.followers > 0
+      ? tw.kpis.followers
+      : FALLBACK_PLATFORMS[2].followers;
+  const ytFollowers =
+    yt?.kpis.subscribers && yt.kpis.subscribers > 0
+      ? yt.kpis.subscribers
+      : FALLBACK_PLATFORMS[3].followers;
 
   const avgLikes = Math.round(
     ((ig?.kpis.avgLikes ?? 0) +
