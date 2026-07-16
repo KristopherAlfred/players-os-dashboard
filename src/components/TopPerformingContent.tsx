@@ -114,10 +114,41 @@ async function loadTopPerforming(): Promise<TopItem[]> {
     });
   }
 
-  return items
+  const ranked = items
     .filter((item) => Number.isFinite(item.likes) && item.likes > 0)
+    .sort((a, b) => b.likes - a.likes);
+
+  // Seed with the top item from each platform so X viral posts don't fill the whole list,
+  // then fill remaining slots by likes (cap 2 per platform).
+  const byPlatform = new Map<TopItem["platform"], TopItem[]>();
+  for (const item of ranked) {
+    const list = byPlatform.get(item.platform) ?? [];
+    list.push(item);
+    byPlatform.set(item.platform, list);
+  }
+
+  const selected: TopItem[] = [];
+  const selectedIds = new Set<string>();
+  const platformCount = new Map<TopItem["platform"], number>();
+
+  const take = (item: TopItem) => {
+    if (selectedIds.has(item.id) || selected.length >= 5) return;
+    const count = platformCount.get(item.platform) ?? 0;
+    if (count >= 2) return;
+    selected.push(item);
+    selectedIds.add(item.id);
+    platformCount.set(item.platform, count + 1);
+  };
+
+  for (const list of byPlatform.values()) {
+    if (list[0]) take(list[0]);
+  }
+  for (const item of ranked) {
+    take(item);
+  }
+
+  return selected
     .sort((a, b) => b.likes - a.likes)
-    .slice(0, 5)
     .map((item) => ({
       ...item,
       title: `${item.platform} — ${item.title}`,
