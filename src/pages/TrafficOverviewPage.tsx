@@ -212,8 +212,8 @@ export function TrafficOverviewPage() {
 
   return (
     <div className="space-y-5">
-      <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
+      <div className="relative z-20 rounded-2xl border border-dt-border bg-dt-card">
+        <div className="relative overflow-hidden rounded-t-2xl border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
@@ -263,7 +263,7 @@ export function TrafficOverviewPage() {
           </div>
         </div>
 
-        <div className="relative border-b border-dt-border px-5 py-4">
+        <div className="relative z-30 border-b border-dt-border px-5 py-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Filter by fan</p>
@@ -273,7 +273,7 @@ export function TrafficOverviewPage() {
                   : "All fans — search email, name, or username"}
               </p>
             </div>
-            <div className="flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative z-40 flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
               <div className="relative min-w-0 flex-1">
                 <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
                 <input
@@ -290,7 +290,7 @@ export function TrafficOverviewPage() {
                   className="w-full rounded-xl border border-dt-border bg-black/50 py-2.5 pl-9 pr-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
                 />
                 {fanMenuOpen ? (
-                  <div className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-dt-border bg-[#0c0c0c] shadow-2xl">
+                  <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-xl border border-dt-border bg-[#0c0c0c] shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
                     <button
                       type="button"
                       onClick={clearFanFilter}
@@ -337,7 +337,7 @@ export function TrafficOverviewPage() {
             <button
               type="button"
               aria-label="Close fan menu"
-              className="fixed inset-0 z-20 cursor-default"
+              className="fixed inset-0 z-40 cursor-default"
               onClick={() => setFanMenuOpen(false)}
             />
           ) : null}
