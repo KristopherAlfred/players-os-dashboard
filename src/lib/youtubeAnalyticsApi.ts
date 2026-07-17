@@ -46,7 +46,11 @@ async function fetchJsonAnalytics(url: string): Promise<YouTubeAnalytics | null>
 
 export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> {
   const base = getApiBase();
-  const apiUrls = [`${base}/api/social/analytics?source=youtube`, `${base}/api/youtube/analytics`, `${base}/api/youtube-analytics`];
+  const apiUrls = [
+    `${base}/api/social/analytics?source=youtube&refresh=1`,
+    `${base}/api/youtube/analytics?refresh=1`,
+    `${base}/api/youtube-analytics?refresh=1`,
+  ];
 
   for (const url of apiUrls) {
     try {
