@@ -117,6 +117,7 @@ export function VideosContentPage() {
 
 function YouTubeVideosPanel() {
   const [analytics, setAnalytics] = useState<YouTubeAnalytics | null>(null);
+  const [dameAnalytics, setDameAnalytics] = useState<DametimeAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -126,9 +127,13 @@ function YouTubeVideosPanel() {
     else setLoading(true);
     setError(null);
     try {
-      const data = await fetchYouTubeAnalytics();
+      const [data, dame] = await Promise.all([
+        fetchYouTubeAnalytics(),
+        fetchDametimeAnalytics().catch(() => null),
+      ]);
       if (!data) throw new Error("Could not load YouTube analytics from DameTime.");
       setAnalytics(data);
+      setDameAnalytics(dame);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load YouTube");
     } finally {
@@ -140,6 +145,41 @@ function YouTubeVideosPanel() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const youtubeAppClicks = useMemo(() => {
+    const fromApi = dameAnalytics?.youtubeClicks ?? [];
+    if (fromApi.length) {
+      const titleById = new Map(
+        [...(analytics?.recentVideos ?? []), ...(analytics?.topVideos ?? [])].map((video) => [
+          video.id,
+          video.title,
+        ]),
+      );
+      return fromApi.map((row) => ({
+        ...row,
+        title: titleById.get(row.videoId) || row.label,
+      }));
+    }
+
+    // Fallback if older analytics payload has no youtubeClicks field yet.
+    return (dameAnalytics?.topTargets ?? [])
+      .filter((row) => row.target.startsWith("youtube:"))
+      .map((row) => {
+        const videoId = row.target.slice("youtube:".length);
+        return {
+          target: row.target,
+          videoId,
+          label: row.label,
+          title: row.label,
+          count: row.count,
+        };
+      });
+  }, [dameAnalytics, analytics]);
+
+  const totalAppOpens = useMemo(
+    () => youtubeAppClicks.reduce((sum, row) => sum + row.count, 0),
+    [youtubeAppClicks],
+  );
 
   if (loading && !analytics) {
     return <SourceLoading message="Loading YouTube analytics…" />;
@@ -184,6 +224,49 @@ function YouTubeVideosPanel() {
       {error ? (
         <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
       ) : null}
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <StatCard label="In-app YouTube opens" value={formatMetric(totalAppOpens)} hint="From DameTime fan_events in Supabase" />
+        <StatCard label="Videos with clicks" value={String(youtubeAppClicks.length)} hint="youtube:{id} targets" />
+        <StatCard
+          label="Channel subscribers"
+          value={formatYtMetric(analytics.kpis.subscribers, true)}
+          hint="YouTube public stats"
+        />
+      </div>
+
+      <Panel title="In-app YouTube clicks">
+        <p className="mb-3 text-[11px] text-white/40">
+          Fans tapping Dame’s YouTube videos in the DameTime app — stored in Supabase `fan_events`
+        </p>
+        {youtubeAppClicks.length === 0 ? (
+          <p className="py-6 text-center text-sm text-dt-muted">
+            No in-app YouTube clicks yet. Opens appear here when fans tap videos in the app.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-dt-border text-[11px] uppercase tracking-wide text-dt-muted">
+                  <th className="px-2 py-2 font-medium">Video</th>
+                  <th className="px-2 py-2 font-medium">Target</th>
+                  <th className="px-2 py-2 text-right font-medium">Opens</th>
+                </tr>
+              </thead>
+              <tbody>
+                {youtubeAppClicks.map((row) => (
+                  <tr key={row.target} className="border-b border-dt-border/60 last:border-0">
+                    <td className="px-2 py-2.5 text-white">{row.title}</td>
+                    <td className="px-2 py-2.5 font-mono text-[11px] text-dt-muted">{row.target}</td>
+                    <td className="px-2 py-2.5 text-right font-semibold text-dt-red">{formatMetric(row.count)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
+
       <YouTubeAnalyticsView analytics={analytics} />
     </div>
   );

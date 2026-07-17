@@ -41,6 +41,13 @@ export type DametimeAnalyticsTopTarget = {
   count: number;
 };
 
+export type DametimeAnalyticsYoutubeClick = {
+  target: string;
+  videoId: string;
+  label: string;
+  count: number;
+};
+
 export type DametimeAnalyticsActivity = {
   email: string;
   displayName: string;
@@ -78,6 +85,7 @@ export type DametimeAnalytics = {
   topUsers: DametimeAnalyticsTopUser[];
   topByPoints?: DametimeAnalyticsTopUser[];
   topTargets: DametimeAnalyticsTopTarget[];
+  youtubeClicks?: DametimeAnalyticsYoutubeClick[];
   recentActivity: DametimeAnalyticsActivity[];
   geo: DametimeAnalyticsGeo;
 };
