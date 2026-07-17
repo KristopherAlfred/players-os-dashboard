@@ -93,10 +93,11 @@ export function TrafficOverviewPage() {
   const load = useCallback(
     async (isRefresh = false, email = fanEmail) => {
       if (isRefresh) setRefreshing(true);
-      setError(null);
+      if (!isRefresh) setError(null);
       try {
         const data = await fetchDametimeAnalytics(email || undefined);
         setAnalytics(data);
+        setError(null);
         const fanLabel = email
           ? fans.find((fan) => fan.email === email)
             ? fanDisplayName(fans.find((fan) => fan.email === email)!)
@@ -110,7 +111,13 @@ export function TrafficOverviewPage() {
               : `Live from DameTime fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
         );
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load traffic analytics");
+        const message = err instanceof Error ? err.message : "Failed to load traffic analytics";
+        // Keep last good snapshot on background refresh so a blip doesn't blank the page.
+        if (isRefresh) {
+          setStatus(`Refresh paused — ${message}`);
+        } else {
+          setError(message);
+        }
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -122,7 +129,14 @@ export function TrafficOverviewPage() {
   useEffect(() => {
     void fetchFansList()
       .then((data) => setFans(data.fans))
-      .catch(() => setFans([]));
+      .catch((err) => {
+        setFans([]);
+        setStatus(
+          err instanceof Error
+            ? `Fan search unavailable — ${err.message}`
+            : "Fan search unavailable — check admin secret",
+        );
+      });
   }, []);
 
   useEffect(() => {
@@ -173,6 +187,7 @@ export function TrafficOverviewPage() {
     setFanEmail(email);
     setFanQuery("");
     setFanMenuOpen(false);
+    setError(null);
     setLoading(true);
   }
 
@@ -180,6 +195,7 @@ export function TrafficOverviewPage() {
     setFanEmail("");
     setFanQuery("");
     setFanMenuOpen(false);
+    setError(null);
     setLoading(true);
   }
 
@@ -264,7 +280,18 @@ export function TrafficOverviewPage() {
         </div>
 
         <div className="relative z-30 border-b border-dt-border px-5 py-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          {fanMenuOpen ? (
+            <button
+              type="button"
+              aria-label="Close fan menu"
+              className="fixed inset-0 z-[80] cursor-default bg-transparent"
+              onMouseDown={(event) => {
+                event.preventDefault();
+                setFanMenuOpen(false);
+              }}
+            />
+          ) : null}
+          <div className="relative z-[90] flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Filter by fan</p>
               <p className="mt-0.5 text-xs text-white/40">
@@ -273,7 +300,7 @@ export function TrafficOverviewPage() {
                   : "All fans — search email, name, or username"}
               </p>
             </div>
-            <div className="relative z-40 flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
               <div className="relative min-w-0 flex-1">
                 <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
                 <input
@@ -290,10 +317,17 @@ export function TrafficOverviewPage() {
                   className="w-full rounded-xl border border-dt-border bg-black/50 py-2.5 pl-9 pr-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
                 />
                 {fanMenuOpen ? (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-xl border border-dt-border bg-[#0c0c0c] shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
+                  <div
+                    className="absolute left-0 right-0 top-full z-[100] mt-2 max-h-72 overflow-y-auto rounded-xl border border-dt-border bg-[#0c0c0c] shadow-[0_20px_50px_rgba(0,0,0,0.65)]"
+                    onMouseDown={(event) => event.stopPropagation()}
+                  >
                     <button
                       type="button"
-                      onClick={clearFanFilter}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        clearFanFilter();
+                      }}
                       className="flex w-full items-center gap-2 border-b border-white/8 px-3 py-2.5 text-left text-sm text-white/70 hover:bg-white/[0.04]"
                     >
                       <Users size={14} /> All fans
@@ -302,7 +336,11 @@ export function TrafficOverviewPage() {
                       <button
                         key={fan.email}
                         type="button"
-                        onClick={() => selectFan(fan.email)}
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          selectFan(fan.email);
+                        }}
                         className={`flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/[0.04] ${
                           fan.email === fanEmail ? "bg-dt-red/10" : ""
                         }`}
@@ -317,7 +355,11 @@ export function TrafficOverviewPage() {
                       </button>
                     ))}
                     {!fanOptions.length ? (
-                      <p className="px-3 py-6 text-center text-xs text-white/40">No fans match that search</p>
+                      <p className="px-3 py-6 text-center text-xs text-white/40">
+                        {fans.length
+                          ? "No fans match that search"
+                          : "Fan list unavailable — check VITE_ADMIN_EXPORT_SECRET"}
+                      </p>
                     ) : null}
                   </div>
                 ) : null}
@@ -333,14 +375,6 @@ export function TrafficOverviewPage() {
               ) : null}
             </div>
           </div>
-          {fanMenuOpen ? (
-            <button
-              type="button"
-              aria-label="Close fan menu"
-              className="fixed inset-0 z-40 cursor-default"
-              onClick={() => setFanMenuOpen(false)}
-            />
-          ) : null}
         </div>
 
         {(error || status) && (

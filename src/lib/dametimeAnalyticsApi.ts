@@ -121,9 +121,10 @@ export async function fetchDametimeAnalytics(fanEmail?: string): Promise<Dametim
       },
       cache: "no-store",
     });
-  } catch {
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : "network error";
     throw new Error(
-      `Failed to reach DameTime API (${getApiBase()}). Check VITE_DAME_BIO_API_URL and CORS.`,
+      `Failed to reach DameTime API (${getApiBase()}). ${detail}. If this keeps happening, confirm VITE_DAME_BIO_API_URL and that ADMIN_EXPORT_SECRET matches on both apps.`,
     );
   }
   if (response.status === 401) {
