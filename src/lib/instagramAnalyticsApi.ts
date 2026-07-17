@@ -69,8 +69,8 @@ export function instagramProfileImage(profile: InstagramAnalytics["profile"]) {
 export async function fetchInstagramAnalytics(): Promise<InstagramAnalytics | null> {
   const base = getApiBase();
   const apiUrls = [
-    `${base}/api/social/analytics?source=instagram&username=damianlillard`,
-    `${base}/api/instagram/analytics?username=damianlillard`,
+    `${base}/api/social/analytics?source=instagram&username=damianlillard&refresh=1`,
+    `${base}/api/instagram/analytics?username=damianlillard&refresh=1`,
   ];
 
   for (const url of apiUrls) {
