@@ -166,8 +166,9 @@ function YouTubeVideosPanel() {
         <div>
           <p className="text-sm font-semibold text-white">Public YouTube channel</p>
           <p className="text-[11px] text-white/40">
-            Synced {new Date(analytics.syncedAt).toLocaleString()} · {formatYtMetric(analytics.kpis.subscribers, true)}{" "}
-            subscribers
+            Live API · Synced {new Date(analytics.syncedAt).toLocaleString()} ·{" "}
+            {formatYtMetric(analytics.kpis.subscribers, true)} subscribers
+            {analytics.source ? ` · ${analytics.source}` : ""}
           </p>
         </div>
         <button

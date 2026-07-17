@@ -44,7 +44,97 @@ async function fetchJsonAnalytics(url: string): Promise<YouTubeAnalytics | null>
   return data;
 }
 
+export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
+  syncedAt: string;
+  source?: "live" | "cache";
+  channel: {
+    id: string;
+    name: string;
+    handle: string;
+    avatar?: string;
+    subscribers?: number;
+    subscribersLabel?: string;
+  };
+  videos: Array<{
+    id: string;
+    title: string;
+    viewCount?: number;
+    likeCount?: number;
+    publishedAt?: string;
+    permalink?: string;
+    durationSeconds?: number;
+  }>;
+} | null> {
+  const base = getApiBase();
+  const urls = [
+    `${base}/api/youtube/videos?refresh=1&limit=${limit}`,
+    `${base}/api/social/analytics?source=youtube&view=videos&refresh=1&limit=${limit}`,
+  ];
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      const contentType = response.headers.get("content-type") ?? "";
+      if (!response.ok || !contentType.includes("application/json")) continue;
+      const data = (await response.json()) as {
+        ok?: boolean;
+        syncedAt?: string;
+        source?: "live" | "cache";
+        channel?: {
+          id?: string;
+          name?: string;
+          handle?: string;
+          avatar?: string;
+          subscribers?: number;
+          subscribersLabel?: string;
+        };
+        videos?: Array<{
+          id: string;
+          title: string;
+          viewCount?: number;
+          likeCount?: number;
+          publishedAt?: string;
+          permalink?: string;
+          durationSeconds?: number;
+        }>;
+      };
+      if (!data?.videos?.length || !data.channel) continue;
+      return {
+        syncedAt: data.syncedAt || new Date().toISOString(),
+        source: data.source,
+        channel: {
+          id: data.channel.id || "UCIhTfcMzbR5wyNeh57ju0ug",
+          name: data.channel.name || "Damian Lillard",
+          handle: data.channel.handle || "@DamianLillard",
+          avatar: data.channel.avatar,
+          subscribers: data.channel.subscribers,
+          subscribersLabel: data.channel.subscribersLabel,
+        },
+        videos: data.videos,
+      };
+    } catch {
+      // try next
+    }
+  }
+
+  return null;
+}
+
 export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> {
+  // Prefer the live videos feed API so newest uploads (e.g. And Still) show on Videos.
+  const feed = await fetchYouTubeVideosFeed(48);
+  if (feed?.videos.length) {
+    const built = buildYouTubeAnalyticsFromFeed({
+      syncedAt: feed.syncedAt,
+      channel: feed.channel,
+      videos: feed.videos,
+    });
+    if (built) {
+      const withSource = { ...built, source: feed.source ?? "live" } as YouTubeAnalytics;
+      return enrichSubscriberStats(withSource);
+    }
+  }
+
   const base = getApiBase();
   const apiUrls = [
     `${base}/api/social/analytics?source=youtube&refresh=1`,
@@ -76,9 +166,9 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
   }
 
   try {
-    const response = await fetch(`${base}/data/youtube-videos.json`);
+    const response = await fetch(`${base}/data/youtube-videos.json`, { cache: "no-store" });
     if (!response.ok) return null;
-    const feed = (await response.json()) as {
+    const staticFeed = (await response.json()) as {
       channel?: {
         id?: string;
         name?: string;
@@ -97,7 +187,7 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
       }>;
       syncedAt?: string;
     };
-    const built = buildYouTubeAnalyticsFromFeed(feed);
+    const built = buildYouTubeAnalyticsFromFeed(staticFeed);
     if (!built) return null;
     return enrichSubscriberStats(built);
   } catch {
@@ -177,7 +267,7 @@ function buildYouTubeAnalyticsFromFeed(feed: {
 
   return {
     syncedAt: feed.syncedAt || new Date().toISOString(),
-    source: "cache",
+    source: "live",
     channel: {
       id: feed.channel?.id ?? "UCIhTfcMzbR5wyNeh57ju0ug",
       name: feed.channel?.name ?? "Damian Lillard",
