@@ -242,10 +242,14 @@ export function TrafficOverviewPage() {
                 </span>
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Clicks, page views & nav from DameTime
+                {selectedFan
+                  ? `Traffic for ${fanDisplayName(selectedFan)}`
+                  : "Clicks, page views & nav from DameTime"}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Pulled from Supabase fan_events — filter by fan to inspect one member’s page views, clicks, and navigation.
+                {selectedFan
+                  ? `Showing only ${selectedFan.email}'s page views, clicks, and navigation from Supabase fan_events.`
+                  : "Pulled from Supabase fan_events — filter by fan to inspect one member’s page views, clicks, and navigation."}
               </p>
             </div>
 
@@ -390,6 +394,34 @@ export function TrafficOverviewPage() {
           </div>
         )}
       </div>
+
+      {fanEmail ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dt-red/35 bg-gradient-to-r from-dt-red/20 via-[#1a0505] to-dt-card px-5 py-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-dt-red/40 bg-dt-red/20 text-sm font-bold text-white">
+              {initialsFromName(
+                selectedFan ? fanDisplayName(selectedFan) : fanEmail.split("@")[0] || fanEmail,
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
+                Viewing fan
+              </p>
+              <p className="truncate font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                {selectedFan ? fanDisplayName(selectedFan) : fanEmail.split("@")[0] || fanEmail}
+              </p>
+              <p className="truncate text-sm text-white/55">{selectedFan?.email || fanEmail}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={clearFanFilter}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/30 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-dt-red/50"
+          >
+            <X size={14} /> Clear filter
+          </button>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
         {[
