@@ -35,6 +35,8 @@ import {
   type ExclusiveVideoItem,
   type VideoStatus,
 } from "../lib/videosApi";
+import { TypographyControls } from "../components/TypographyControls";
+import { titleTypographyStyle } from "../lib/typography";
 
 const MAX_VIDEO_UPLOAD_BYTES = 12 * 1024 * 1024;
 type VideosTab = "youtube" | "exclusive";
@@ -765,8 +767,16 @@ function ExclusiveVideosPanel() {
                     onChange={(e) => patchDraft({ title: e.target.value })}
                     className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
                     placeholder="EXCLUSIVE WORKOUT SESSION"
+                    style={titleTypographyStyle(draft)}
                   />
                 </label>
+
+                <TypographyControls
+                  fontFamily={draft.titleFontFamily || "default"}
+                  fontSize={draft.titleFontSize || "md"}
+                  onFontFamilyChange={(titleFontFamily) => patchDraft({ titleFontFamily })}
+                  onFontSizeChange={(titleFontSize) => patchDraft({ titleFontSize })}
+                />
 
                 <label className="block space-y-1.5">
                   <span className="text-xs text-dt-muted">Description</span>

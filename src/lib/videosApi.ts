@@ -1,3 +1,5 @@
+import type { TitleFontFamily, TitleFontSize } from "./typography";
+
 export type VideoStatus = "draft" | "published";
 
 export type ExclusiveVideoItem = {
@@ -12,6 +14,8 @@ export type ExclusiveVideoItem = {
   status: VideoStatus;
   order: number;
   source: "manual";
+  titleFontFamily?: TitleFontFamily;
+  titleFontSize?: TitleFontSize;
 };
 
 export type ExclusiveVideoFeed = {

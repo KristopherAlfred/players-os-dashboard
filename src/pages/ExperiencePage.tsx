@@ -28,6 +28,8 @@ import {
   type HomeWidget,
   type HomeWidgetType,
 } from "../lib/homeLayoutApi";
+import { titleTypographyStyle } from "../lib/typography";
+import { TypographyControls } from "../components/TypographyControls";
 
 const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: typeof Ticket }[] = [
   { type: "tickets", label: "DameTime Tickets", hint: "Ticket drops", Icon: Ticket },
@@ -119,6 +121,7 @@ function fieldClass() {
 function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boolean }) {
   const lines = titleLines(widget.title);
   const fit = widget.imageFit || "half";
+  const titleStyle = titleTypographyStyle(widget);
   return (
     <div
       className={`relative flex h-full min-h-[112px] overflow-hidden rounded-2xl border transition ${
@@ -136,7 +139,10 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/50 to-transparent" />
           <div className="relative z-10 flex h-full flex-col justify-between p-3">
-            <p className="font-display text-[12px] font-extrabold uppercase leading-[1.05] tracking-[0.06em] text-white">
+            <p
+              className="font-display text-[12px] font-extrabold uppercase leading-[1.05] tracking-[0.06em] text-white"
+              style={titleStyle}
+            >
               {lines.map((line, i) => (
                 <span key={`${widget.id}-t-${i}`}>
                   {line}
@@ -149,7 +155,10 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
       ) : (
         <div className="flex h-full w-full">
           <div className="flex min-w-0 flex-1 flex-col justify-between p-3">
-            <p className="font-display text-[12px] font-extrabold uppercase leading-[1.05] tracking-[0.06em] text-white">
+            <p
+              className="font-display text-[12px] font-extrabold uppercase leading-[1.05] tracking-[0.06em] text-white"
+              style={titleStyle}
+            >
               {lines.map((line, i) => (
                 <span key={`${widget.id}-t-${i}`}>
                   {line}
@@ -451,8 +460,9 @@ export function ExperiencePage() {
         )}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_360px]">
-        {/* Left: boxes */}
+      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_minmax(400px,440px)]">
+        {/* Left: Home boxes + AI studio */}
+        <div className="flex min-w-0 flex-col gap-4">
         <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
           <div className="flex items-center justify-between border-b border-dt-border px-4 py-3">
             <div>
@@ -553,6 +563,44 @@ export function ExperiencePage() {
           </div>
         </section>
 
+          <section className="overflow-hidden rounded-2xl border border-dt-red/30 bg-dt-card shadow-[0_0_40px_rgba(229,9,20,0.06)]">
+            <div className="flex items-center gap-2.5 border-b border-white/10 bg-gradient-to-r from-dt-red/15 to-transparent px-4 py-3.5">
+              <span className="exp-ai-spark flex h-9 w-9 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
+                <Sparkles size={16} />
+              </span>
+              <div>
+                <h3 className="font-display text-sm font-semibold tracking-wide text-white">AI image studio</h3>
+                <p className="text-[11px] text-white/45">
+                  Needs OPENAI_API_KEY on dame-bio — otherwise Generate shows an error
+                </p>
+              </div>
+            </div>
+            <div className="space-y-3 p-4">
+              <div className="rounded-xl border border-white/10 bg-black/35 px-3 py-2.5 text-[12px] leading-relaxed text-white/55">
+                {selected
+                  ? `Generating for “${selected.title.replace(/\n/g, " ")}”. Transparent backgrounds work best for home tiles.`
+                  : "Select a home box first, then describe the art you want."}
+              </div>
+              <textarea
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                rows={3}
+                className={fieldClass()}
+                placeholder="Example: Damian Lillard red jersey cutout, transparent background, mobile app tile"
+              />
+              <button
+                type="button"
+                onClick={() => void onGenerate()}
+                disabled={generating || !aiPrompt.trim() || !selectedId}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-dt-red px-3 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-55"
+              >
+                {generating ? <Loader2 size={15} className="animate-spin" /> : <ImagePlus size={15} />}
+                {generating ? "Generating…" : "Generate for this box"}
+              </button>
+            </div>
+          </section>
+        </div>
+
         {/* Center: phone */}
         <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
@@ -598,18 +646,17 @@ export function ExperiencePage() {
           </div>
         </section>
 
-        {/* Right: edit + AI as separate boxes */}
-        <div className="flex min-w-0 flex-col gap-4">
-          <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        {/* Right: edit box (larger) */}
+        <section className="flex min-h-[640px] flex-col overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
             {!selected ? (
-              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 px-6 text-center">
+              <div className="flex min-h-[420px] flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-white/40">
                   <Plus size={22} />
                 </div>
                 <p className="text-sm text-white/55">Select a box to edit copy, art, and links.</p>
               </div>
             ) : (
-              <div className="flex max-h-[calc(100dvh-420px)] min-h-[280px] flex-col">
+              <div className="flex min-h-0 flex-1 flex-col">
                 <div className="flex items-center justify-between gap-2 border-b border-dt-border px-4 py-3">
                   <div className="flex min-w-0 items-center gap-2.5">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-dt-red/30 bg-dt-red/15 text-dt-red">
@@ -642,7 +689,7 @@ export function ExperiencePage() {
                   </div>
                 </div>
 
-                <div className="space-y-4 overflow-y-auto p-4">
+                <div className="space-y-4 overflow-y-auto p-5">
                   <label className="block space-y-1.5">
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
                       Title <span className="normal-case tracking-normal text-white/30">(new lines OK)</span>
@@ -653,10 +700,18 @@ export function ExperiencePage() {
                         setTitleFilter("as_typed");
                         patchSelected({ title: e.target.value });
                       }}
-                      rows={3}
-                      className={fieldClass()}
+                      rows={5}
+                      className={`${fieldClass()} min-h-[120px]`}
+                      style={titleTypographyStyle(selected)}
                     />
                   </label>
+
+                  <TypographyControls
+                    fontFamily={selected.titleFontFamily || "default"}
+                    fontSize={selected.titleFontSize || "md"}
+                    onFontFamilyChange={(titleFontFamily) => patchSelected({ titleFontFamily })}
+                    onFontSizeChange={(titleFontSize) => patchSelected({ titleFontSize })}
+                  />
 
                   <label className="block space-y-1.5">
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
@@ -723,7 +778,7 @@ export function ExperiencePage() {
                       <img
                         src={resolveAssetUrl(selected.imageSrc)}
                         alt=""
-                        className="mx-auto h-40 w-full object-contain"
+                        className="mx-auto h-48 w-full object-contain"
                       />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -753,44 +808,6 @@ export function ExperiencePage() {
               </div>
             )}
           </section>
-
-          <section className="overflow-hidden rounded-2xl border border-dt-red/30 bg-dt-card shadow-[0_0_40px_rgba(229,9,20,0.06)]">
-            <div className="flex items-center gap-2.5 border-b border-white/10 bg-gradient-to-r from-dt-red/15 to-transparent px-4 py-3.5">
-              <span className="exp-ai-spark flex h-9 w-9 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
-                <Sparkles size={16} />
-              </span>
-              <div>
-                <h3 className="font-display text-sm font-semibold tracking-wide text-white">AI image studio</h3>
-                <p className="text-[11px] text-white/45">
-                  Needs OPENAI_API_KEY on dame-bio — otherwise Generate shows an error
-                </p>
-              </div>
-            </div>
-            <div className="space-y-3 p-4">
-              <div className="rounded-xl border border-white/10 bg-black/35 px-3 py-2.5 text-[12px] leading-relaxed text-white/55">
-                {selected
-                  ? `Generating for “${selected.title.replace(/\n/g, " ")}”. Transparent backgrounds work best for home tiles.`
-                  : "Select a home box first, then describe the art you want."}
-              </div>
-              <textarea
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                rows={3}
-                className={fieldClass()}
-                placeholder="Example: Damian Lillard red jersey cutout, transparent background, mobile app tile"
-              />
-              <button
-                type="button"
-                onClick={() => void onGenerate()}
-                disabled={generating || !aiPrompt.trim() || !selectedId}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-dt-red px-3 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-55"
-              >
-                {generating ? <Loader2 size={15} className="animate-spin" /> : <ImagePlus size={15} />}
-                {generating ? "Generating…" : "Generate for this box"}
-              </button>
-            </div>
-          </section>
-        </div>
       </div>
     </div>
   );

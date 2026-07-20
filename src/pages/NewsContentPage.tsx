@@ -19,6 +19,8 @@ import {
   type NewsItem,
   type NewsStatus,
 } from "../lib/newsApi";
+import { TypographyControls } from "../components/TypographyControls";
+import { titleTypographyStyle } from "../lib/typography";
 
 function categoryLabel(category: NewsCategory) {
   if (category === "insights") return "Insight";
@@ -314,8 +316,16 @@ export function NewsContentPage() {
                   onChange={(e) => patchDraft({ title: e.target.value })}
                   className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
                   placeholder="Loyalty Over Everything"
+                  style={titleTypographyStyle(draft)}
                 />
               </label>
+
+              <TypographyControls
+                fontFamily={draft.titleFontFamily || "default"}
+                fontSize={draft.titleFontSize || "md"}
+                onFontFamilyChange={(titleFontFamily) => patchDraft({ titleFontFamily })}
+                onFontSizeChange={(titleFontSize) => patchDraft({ titleFontSize })}
+              />
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="block space-y-1.5">

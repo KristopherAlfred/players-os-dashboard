@@ -1,3 +1,5 @@
+import type { TitleFontFamily, TitleFontSize } from "./typography";
+
 export type EventKind = "event" | "giveaway";
 export type EventStatus = "draft" | "published";
 
@@ -17,6 +19,8 @@ export type AppEventItem = {
   order: number;
   publishedAt: string;
   source: "manual";
+  titleFontFamily?: TitleFontFamily;
+  titleFontSize?: TitleFontSize;
 };
 
 export type EventsFeed = {

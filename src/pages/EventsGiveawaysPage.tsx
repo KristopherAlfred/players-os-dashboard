@@ -27,6 +27,8 @@ import {
   type EventStatus,
   type EventsFeed,
 } from "../lib/eventsApi";
+import { TypographyControls } from "../components/TypographyControls";
+import { titleTypographyStyle } from "../lib/typography";
 
 function fieldClass() {
   return "w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25";
@@ -64,7 +66,10 @@ function PosterPreview({
             GIVEAWAY
           </span>
         ) : null}
-        <p className="line-clamp-3 font-display text-[11px] font-extrabold leading-tight tracking-[0.05em] text-white">
+        <p
+          className="line-clamp-3 font-display text-[11px] font-extrabold leading-tight tracking-[0.05em] text-white"
+          style={titleTypographyStyle(item)}
+        >
           {item.title || "Untitled"}
         </p>
         {meta ? (
@@ -591,8 +596,16 @@ export function EventsGiveawaysPage() {
                     onChange={(e) => patchDraft({ title: e.target.value })}
                     className={fieldClass()}
                     placeholder="Meet & Greet — Milwaukee"
+                    style={titleTypographyStyle(draft)}
                   />
                 </label>
+
+                <TypographyControls
+                  fontFamily={draft.titleFontFamily || "default"}
+                  fontSize={draft.titleFontSize || "md"}
+                  onFontFamilyChange={(titleFontFamily) => patchDraft({ titleFontFamily })}
+                  onFontSizeChange={(titleFontSize) => patchDraft({ titleFontSize })}
+                />
 
                 <label className="block space-y-1.5">
                   <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Description</span>

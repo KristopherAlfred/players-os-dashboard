@@ -1,3 +1,5 @@
+import type { TitleFontFamily, TitleFontSize } from "./typography";
+
 export type NewsCategory = "newsletters" | "insights" | "news";
 export type NewsStatus = "draft" | "published";
 
@@ -14,6 +16,8 @@ export type NewsItem = {
   status: NewsStatus;
   order: number;
   source: "manual" | "players_tribune";
+  titleFontFamily?: TitleFontFamily;
+  titleFontSize?: TitleFontSize;
 };
 
 export type NewsFeed = {

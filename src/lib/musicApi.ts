@@ -1,3 +1,5 @@
+import type { TitleFontFamily, TitleFontSize } from "./typography";
+
 export type MusicStatus = "draft" | "published";
 export type MusicSource = "spotify" | "manual";
 
@@ -17,6 +19,8 @@ export type AppMusicItem = {
   order: number;
   publishedAt: string;
   source: MusicSource;
+  titleFontFamily?: TitleFontFamily;
+  titleFontSize?: TitleFontSize;
 };
 
 export type MusicFeed = {

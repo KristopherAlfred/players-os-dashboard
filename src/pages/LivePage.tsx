@@ -21,6 +21,8 @@ import {
   type LiveChatMessage,
   type LiveSession,
 } from "../lib/liveApi";
+import { TypographyControls } from "../components/TypographyControls";
+import { titleTypographyStyle, type TitleFontFamily, type TitleFontSize } from "../lib/typography";
 
 type UiStatus = "idle" | "preview" | "live" | "ended";
 
@@ -44,6 +46,8 @@ export function LivePage() {
 
   const [status, setStatus] = useState<UiStatus>("idle");
   const [title, setTitle] = useState("Dame Time Live");
+  const [titleFontFamily, setTitleFontFamily] = useState<TitleFontFamily>("default");
+  const [titleFontSize, setTitleFontSize] = useState<TitleFontSize>("md");
   const [scheduleAt, setScheduleAt] = useState(() => toLocalInputValue(new Date(Date.now() + 60 * 60 * 1000)));
   const [session, setSession] = useState<LiveSession | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -356,8 +360,16 @@ export function LivePage() {
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isLive}
                 className="w-full rounded-xl border border-dt-border bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-dt-red/60 disabled:opacity-60"
+                style={titleTypographyStyle({ titleFontFamily, titleFontSize })}
               />
             </label>
+
+            <TypographyControls
+              fontFamily={titleFontFamily}
+              fontSize={titleFontSize}
+              onFontFamilyChange={setTitleFontFamily}
+              onFontSizeChange={setTitleFontSize}
+            />
 
             <div className="rounded-xl border border-dt-border bg-black/30 p-4">
               <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/45">

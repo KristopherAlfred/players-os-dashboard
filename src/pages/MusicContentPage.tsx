@@ -28,6 +28,8 @@ import {
   type MusicStatus,
   type SpotifyCatalogTrack,
 } from "../lib/musicApi";
+import { TypographyControls } from "../components/TypographyControls";
+import { titleTypographyStyle } from "../lib/typography";
 
 function fieldClass() {
   return "w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25";
@@ -601,8 +603,16 @@ export function MusicContentPage() {
                   onChange={(e) => patchDraft({ title: e.target.value })}
                   className={fieldClass()}
                   placeholder="Track title"
+                  style={titleTypographyStyle(draft)}
                 />
               </label>
+
+              <TypographyControls
+                fontFamily={draft.titleFontFamily || "default"}
+                fontSize={draft.titleFontSize || "md"}
+                onFontFamilyChange={(titleFontFamily) => patchDraft({ titleFontFamily })}
+                onFontSizeChange={(titleFontSize) => patchDraft({ titleFontSize })}
+              />
 
               <label className="block space-y-1.5">
                 <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Artist</span>

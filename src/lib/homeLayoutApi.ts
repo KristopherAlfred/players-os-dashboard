@@ -20,6 +20,8 @@ export type HomeWidget = {
   showLock?: boolean;
   showPlay?: boolean;
   showMusicBars?: boolean;
+  titleFontFamily?: import("./typography").TitleFontFamily;
+  titleFontSize?: import("./typography").TitleFontSize;
 };
 
 export type HomeLayout = {
