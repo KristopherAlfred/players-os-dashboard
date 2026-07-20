@@ -82,7 +82,7 @@ export async function deleteNotificationItem(id: string): Promise<NotificationFe
 export function createEmptyNotification(): AppNotification {
   return {
     id: `notice-${Date.now().toString(36)}`,
-    message: "+10 points! Login tomorrow to earn more 🔥",
+    message: "",
     status: "draft",
     enabled: true,
     frequencySeconds: 30,

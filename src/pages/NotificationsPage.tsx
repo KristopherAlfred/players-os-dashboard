@@ -216,7 +216,9 @@ export function NotificationsPage() {
       ? draft?.frequencySeconds ?? 30
       : -1;
 
-  const previewMessage = draft?.message || "+10 points! Login tomorrow to earn more 🔥";
+  const EXAMPLE_TOAST = "+10 points! Login tomorrow to earn more 🔥";
+  const showingExamplePreview = !draft?.message.trim();
+  const previewMessage = draft?.message.trim() || EXAMPLE_TOAST;
 
   return (
     <div className="space-y-5">
@@ -247,7 +249,10 @@ export function NotificationsPage() {
                 Schedule DameTime notifications
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Write messages that pop in the fan app with the same red-gradient toast as points earned — set frequency, duration, and schedule windows.
+                Write extra messages that pop in the fan app with the same red-gradient toast look — set frequency, duration, and schedule windows.
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-white/45">
+                The built-in “+10 points! Login tomorrow…” toast is separate. It always stays in the app for daily login rewards and is not listed here — creating or deleting items on this page will not remove it.
               </p>
             </div>
 
@@ -297,7 +302,7 @@ export function NotificationsPage() {
           <div className="flex items-center justify-between border-b border-dt-border px-4 py-3">
             <div>
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">Notifications</h3>
-              <p className="text-[11px] text-white/40">Queue that fans see in-app</p>
+              <p className="text-[11px] text-white/40">Scheduled toasts you publish</p>
             </div>
             <button
               type="button"
@@ -310,8 +315,11 @@ export function NotificationsPage() {
 
           <ul className="max-h-[62vh] space-y-2 overflow-y-auto p-3">
             {(feed?.items ?? []).length === 0 ? (
-              <li className="rounded-xl border border-dashed border-white/15 px-3 py-10 text-center text-sm text-white/45">
-                No notifications yet. Create a toast for the app.
+              <li className="rounded-xl border border-dashed border-white/15 px-3 py-8 text-center">
+                <p className="text-sm text-white/55">No scheduled notifications yet.</p>
+                <p className="mt-2 text-[11px] leading-relaxed text-white/40">
+                  The “+10 points” login reward toast is built into the app — it won’t appear in this list, and publishing here won’t replace or delete it.
+                </p>
               </li>
             ) : (
               (feed?.items ?? []).map((item) => {
@@ -369,8 +377,23 @@ export function NotificationsPage() {
         </section>
 
         {/* Phone preview */}
-        <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
+        <section className="relative flex min-h-[560px] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
+          {showingExamplePreview ? (
+            <div className="relative z-[1] max-w-[320px] rounded-xl border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-200">Example only</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-amber-100/80">
+                Preview of the built-in login-points toast. Not in the left queue — creating or deleting scheduled notifications will not remove it.
+              </p>
+            </div>
+          ) : (
+            <div className="relative z-[1] max-w-[320px] rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">Live draft preview</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-white/45">
+                This is your scheduled notification — not the built-in login-points toast.
+              </p>
+            </div>
+          )}
           <div className="notif-phone-shell relative w-full max-w-[320px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
             <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
             <div className="border-b border-white/10 bg-[#0d0d0d] px-4 pb-3 pt-8 text-center">
@@ -392,7 +415,7 @@ export function NotificationsPage() {
               </div>
 
               <p className="absolute inset-x-0 bottom-5 text-center text-[10px] uppercase tracking-[0.16em] text-white/35">
-                Exact points-toast look
+                {showingExamplePreview ? "Example look — not queued" : "Your toast preview"}
               </p>
             </div>
           </div>
@@ -465,8 +488,11 @@ export function NotificationsPage() {
                     onChange={(e) => patchDraft({ message: e.target.value })}
                     rows={3}
                     className={fieldClass()}
-                    placeholder="+10 points! Login tomorrow to earn more 🔥"
+                    placeholder="Write your toast message…"
                   />
+                  <span className="block text-[11px] leading-relaxed text-white/40">
+                    Placeholder style matches the login-points toast. Publishing this adds a separate scheduled notification — it does not replace or delete the built-in “+10 points” toast.
+                  </span>
                 </label>
 
                 <div className="grid gap-3 sm:grid-cols-2">
