@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type DragEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import {
   CalendarDays,
   Eye,
@@ -14,6 +14,7 @@ import {
   Sparkles,
   Ticket,
   Trash2,
+  Undo2,
   Upload,
   LayoutTemplate,
 } from "lucide-react";
@@ -46,8 +47,69 @@ const typeMeta: Record<HomeWidgetType, { label: string; Icon: typeof Ticket }> =
   music: { label: "Music", Icon: Music2 },
 };
 
+type TitleFilter =
+  | "as_typed"
+  | "uppercase"
+  | "title_case"
+  | "lowercase"
+  | "stacked"
+  | "single_line"
+  | "dame_style";
+
+const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
+  { id: "as_typed", label: "As typed", hint: "Keep your wording" },
+  { id: "uppercase", label: "ALL CAPS", hint: "EXCLUSIVE VIDEOS" },
+  { id: "title_case", label: "Title Case", hint: "Exclusive Videos" },
+  { id: "lowercase", label: "lowercase", hint: "exclusive videos" },
+  { id: "stacked", label: "Stacked words", hint: "One word per line" },
+  { id: "single_line", label: "Single line", hint: "No line breaks" },
+  { id: "dame_style", label: "Dame style", hint: "2–3 short caps lines" },
+];
+
 function titleLines(title: string) {
   return title.split("\n");
+}
+
+function toTitleCase(value: string) {
+  return value
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function applyTitleFilter(title: string, filter: TitleFilter) {
+  const flat = title.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+  if (!flat) return title;
+
+  switch (filter) {
+    case "as_typed":
+      return title;
+    case "uppercase":
+      return flat.toUpperCase();
+    case "title_case":
+      return toTitleCase(flat);
+    case "lowercase":
+      return flat.toLowerCase();
+    case "stacked":
+      return flat
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => word.toUpperCase())
+        .join("\n");
+    case "single_line":
+      return flat.toUpperCase();
+    case "dame_style": {
+      const words = flat.toUpperCase().split(/\s+/).filter(Boolean);
+      if (words.length <= 2) return words.join("\n");
+      if (words.length === 3) return `${words[0]}\n${words[1]}\n${words[2]}`;
+      const mid = Math.ceil(words.length / 2);
+      return `${words.slice(0, mid).join(" ")}\n${words.slice(mid).join(" ")}`;
+    }
+    default:
+      return title;
+  }
 }
 
 function fieldClass() {
@@ -128,16 +190,24 @@ export function ExperiencePage() {
   const [dragId, setDragId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [titleFilter, setTitleFilter] = useState<TitleFilter>("as_typed");
+  const [history, setHistory] = useState<HomeLayout[]>([]);
+  const skippingHistory = useRef(false);
 
   useEffect(() => {
     void fetchHomeLayout()
       .then((next) => {
         setLayout(next);
         setSelectedId(next.widgets[0]?.id ?? null);
+        setHistory([]);
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load layout"))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    setTitleFilter("as_typed");
+  }, [selectedId]);
 
   const selected = useMemo(
     () => layout?.widgets.find((w) => w.id === selectedId) ?? null,
@@ -150,19 +220,48 @@ export function ExperiencePage() {
   );
 
   const visibleCount = ordered.filter((w) => w.enabled).length;
+  const canUndo = history.length > 0;
 
   function updateWidgets(updater: (widgets: HomeWidget[]) => HomeWidget[]) {
+    if (!layout) return;
+    if (!skippingHistory.current) {
+      setHistory((prev) => [...prev.slice(-29), structuredClone(layout)]);
+    }
+    skippingHistory.current = false;
     setDirty(true);
-    setLayout((prev) => {
-      if (!prev) return prev;
-      const widgets = updater([...prev.widgets]).map((w, index) => ({ ...w, order: index }));
-      return { ...prev, widgets };
+    const widgets = updater([...layout.widgets]).map((w, index) => ({ ...w, order: index }));
+    setLayout({ ...layout, widgets });
+  }
+
+  function undoChange() {
+    setHistory((prev) => {
+      if (!prev.length) return prev;
+      const nextHistory = [...prev];
+      const snapshot = nextHistory.pop()!;
+      skippingHistory.current = true;
+      setLayout(snapshot);
+      setDirty(true);
+      setStatus("Reverted last change");
+      if (selectedId && !snapshot.widgets.some((w) => w.id === selectedId)) {
+        setSelectedId(snapshot.widgets[0]?.id ?? null);
+      }
+      return nextHistory;
     });
   }
 
   function patchSelected(patch: Partial<HomeWidget>) {
     if (!selectedId) return;
     updateWidgets((widgets) => widgets.map((w) => (w.id === selectedId ? { ...w, ...patch } : w)));
+  }
+
+  function applyFilter(filter: TitleFilter) {
+    setTitleFilter(filter);
+    if (!selected || filter === "as_typed") return;
+    const nextTitle = applyTitleFilter(selected.title, filter);
+    if (nextTitle !== selected.title) {
+      patchSelected({ title: nextTitle });
+      setStatus(`Applied “${TITLE_FILTERS.find((item) => item.id === filter)?.label}” to title`);
+    }
   }
 
   function onDragStart(id: string) {
@@ -365,6 +464,7 @@ export function ExperiencePage() {
                 type="checkbox"
                 checked={layout.heroEnabled}
                 onChange={(e) => {
+                  setHistory((prev) => [...prev.slice(-29), structuredClone(layout)]);
                   setDirty(true);
                   setLayout({ ...layout, heroEnabled: e.target.checked });
                 }}
@@ -522,13 +622,24 @@ export function ExperiencePage() {
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={removeSelected}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-xs text-red-200 transition hover:bg-red-500/10"
-                  >
-                    <Trash2 size={12} /> Remove
-                  </button>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={undoChange}
+                      disabled={!canUndo}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-2.5 py-1.5 text-xs text-white/80 transition hover:border-white/30 hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-35"
+                      title={canUndo ? "Undo last change" : "Nothing to undo"}
+                    >
+                      <Undo2 size={12} /> Undo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={removeSelected}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-xs text-red-200 transition hover:bg-red-500/10"
+                    >
+                      <Trash2 size={12} /> Remove
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-4 overflow-y-auto p-4">
@@ -538,10 +649,33 @@ export function ExperiencePage() {
                     </span>
                     <textarea
                       value={selected.title}
-                      onChange={(e) => patchSelected({ title: e.target.value })}
+                      onChange={(e) => {
+                        setTitleFilter("as_typed");
+                        patchSelected({ title: e.target.value });
+                      }}
                       rows={3}
                       className={fieldClass()}
                     />
+                  </label>
+
+                  <label className="block space-y-1.5">
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
+                      Title filter
+                    </span>
+                    <select
+                      value={titleFilter}
+                      onChange={(e) => applyFilter(e.target.value as TitleFilter)}
+                      className={fieldClass()}
+                    >
+                      {TITLE_FILTERS.map((filter) => (
+                        <option key={filter.id} value={filter.id}>
+                          {filter.label} — {filter.hint}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[11px] text-white/35">
+                      Instantly restyle the title wording. Use Undo if you want the previous version back.
+                    </p>
                   </label>
 
                   <label className="block space-y-1.5">
