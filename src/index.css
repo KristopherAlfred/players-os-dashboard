@@ -179,7 +179,7 @@ button {
   font-family: inherit;
 }
 
-/* Closed trigger matches dark inputs; open menu stays red → black */
+/* Closed trigger + open menu match dark form inputs */
 .dt-select-trigger {
   background: linear-gradient(168deg, #000000 0%, #030303 50%, #000000 100%);
   background-color: #000000;
@@ -201,8 +201,12 @@ button {
 }
 
 .dt-select-menu {
-  background: linear-gradient(165deg, #7a0610 0%, #c40812 22%, #1a0103 58%, #000000 100%);
-  border-color: rgba(229, 9, 20, 0.55);
+  background: linear-gradient(168deg, #000000 0%, #050505 45%, #000000 100%);
+  background-color: #000000;
+  border-color: rgba(229, 9, 20, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 18px 40px rgba(0, 0, 0, 0.65);
 }
 
 .dt-select-option {
@@ -210,11 +214,11 @@ button {
 }
 
 .dt-select-option:hover {
-  background: linear-gradient(90deg, rgba(229, 9, 20, 0.55) 0%, rgba(80, 4, 10, 0.85) 100%);
+  background: rgba(229, 9, 20, 0.18);
 }
 
 .dt-select-option--selected {
-  background: linear-gradient(90deg, #e50914 0%, #6b050c 55%, #1a0103 100%);
+  background: rgba(229, 9, 20, 0.28);
   color: #fff;
   font-weight: 600;
 }
