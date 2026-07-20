@@ -241,8 +241,8 @@ export function ExperiencePage() {
       patchSelected({ imageSrc: result.imageSrc });
       setStatus(
         result.source === "openai"
-          ? "AI image applied to this box"
-          : "Placeholder art applied — set OPENAI_API_KEY on dame-bio for ChatGPT images",
+          ? `AI image applied${result.model ? ` (${result.model})` : ""}`
+          : "Image applied",
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generate failed");
@@ -627,7 +627,9 @@ export function ExperiencePage() {
               </span>
               <div>
                 <h3 className="font-display text-sm font-semibold tracking-wide text-white">AI image studio</h3>
-                <p className="text-[11px] text-white/45">ChatGPT-powered cutouts for the selected tile</p>
+                <p className="text-[11px] text-white/45">
+                  Needs OPENAI_API_KEY on dame-bio — otherwise Generate shows an error
+                </p>
               </div>
             </div>
             <div className="space-y-3 p-4">

@@ -65,7 +65,9 @@ export async function publishHomeLayout(layout: HomeLayout): Promise<HomeLayout>
   return data.layout;
 }
 
-export async function generateHomeImage(prompt: string): Promise<{ imageSrc: string; source: string }> {
+export async function generateHomeImage(
+  prompt: string,
+): Promise<{ imageSrc: string; source: string; model?: string }> {
   const secret = getAdminSecret();
   if (!secret) throw new Error("Set VITE_ADMIN_EXPORT_SECRET to generate images");
   return layoutRequest({
@@ -75,7 +77,7 @@ export async function generateHomeImage(prompt: string): Promise<{ imageSrc: str
       "x-admin-secret": secret,
     },
     body: JSON.stringify({ action: "generate_image", prompt }),
-  }) as Promise<{ imageSrc: string; source: string }>;
+  }) as Promise<{ imageSrc: string; source: string; model?: string }>;
 }
 
 export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
