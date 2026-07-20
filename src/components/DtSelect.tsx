@@ -70,7 +70,7 @@ export function DtSelect({
         </span>
         <ChevronDown
           size={14}
-          className={`shrink-0 text-[#ffb4b8] transition ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-white/45 transition ${open ? "rotate-180 text-white/70" : ""}`}
           aria-hidden
         />
       </button>
