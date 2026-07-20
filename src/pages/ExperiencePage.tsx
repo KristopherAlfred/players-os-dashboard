@@ -345,16 +345,18 @@ export function ExperiencePage() {
     if (!selectedId) return;
     setGenerating(true);
     setError(null);
+    setStatus("Generating image… this can take up to a minute");
     try {
       const result = await generateHomeImage(aiPrompt);
       patchSelected({ imageSrc: result.imageSrc });
       setStatus(
         result.source === "openai"
-          ? `AI image applied${result.model ? ` (${result.model})` : ""}`
-          : "Image applied",
+          ? `AI image applied to the selected box${result.model ? ` (${result.model})` : ""} — publish when ready`
+          : "Image applied to the selected box — publish when ready",
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generate failed");
+      setStatus(null);
     } finally {
       setGenerating(false);
     }
@@ -447,12 +449,18 @@ export function ExperiencePage() {
           </div>
         </div>
 
-        {(error || status) && (
+        {(error || status || generating) && (
           <div className="space-y-2 border-b border-dt-border px-5 py-3">
+            {generating ? (
+              <div className="flex items-center gap-2 rounded-lg border border-dt-red/40 bg-dt-red/10 px-3 py-2 text-sm text-white">
+                <Loader2 size={15} className="animate-spin text-dt-red" />
+                Generating AI image for the selected box…
+              </div>
+            ) : null}
             {error ? (
               <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
             ) : null}
-            {status ? (
+            {status && !generating ? (
               <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
                 {status}
               </div>
@@ -564,31 +572,60 @@ export function ExperiencePage() {
           </div>
         </section>
 
-          <section className="overflow-hidden rounded-2xl border border-dt-red/30 bg-dt-card shadow-[0_0_40px_rgba(229,9,20,0.06)]">
+          <section className="relative overflow-hidden rounded-2xl border border-dt-red/30 bg-dt-card shadow-[0_0_40px_rgba(229,9,20,0.06)]">
             <div className="flex items-center gap-2.5 border-b border-white/10 bg-gradient-to-r from-dt-red/15 to-transparent px-4 py-3.5">
-              <span className="exp-ai-spark flex h-9 w-9 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
-                <Sparkles size={16} />
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
+                {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="exp-ai-spark" />}
               </span>
               <div>
                 <h3 className="font-display text-sm font-semibold tracking-wide text-white">AI image studio</h3>
                 <p className="text-[11px] text-white/45">
-                  Needs OPENAI_API_KEY on dame-bio — otherwise Generate shows an error
+                  {generating
+                    ? "Working… image will appear on the selected home box"
+                    : "Creates art for the selected home box (uses OPENAI_API_KEY on dame-bio)"}
                 </p>
               </div>
             </div>
-            <div className="space-y-3 p-4">
+            <div className="relative space-y-3 p-4">
+              {generating ? (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/70 px-4 backdrop-blur-[2px]">
+                  <Loader2 size={28} className="animate-spin text-dt-red" />
+                  <p className="text-sm font-semibold text-white">Generating…</p>
+                  <p className="text-center text-[11px] leading-relaxed text-white/55">
+                    OpenAI is creating the image. Keep this tab open — usually 15–60 seconds.
+                  </p>
+                </div>
+              ) : null}
               <div className="rounded-xl border border-white/10 bg-black/35 px-3 py-2.5 text-[12px] leading-relaxed text-white/55">
                 {selected
-                  ? `Generating for “${selected.title.replace(/\n/g, " ")}”. Transparent backgrounds work best for home tiles.`
+                  ? `Generating for “${selected.title.replace(/\n/g, " ")}”. The result replaces this box’s image in the phone preview.`
                   : "Select a home box first, then describe the art you want."}
               </div>
               <textarea
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
                 rows={3}
+                disabled={generating}
                 className={fieldClass()}
                 placeholder="Example: Damian Lillard red jersey cutout, transparent background, mobile app tile"
               />
+              {selected?.imageSrc ? (
+                <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
+                  <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
+                      Current box image
+                    </p>
+                    <p className="text-[10px] text-white/35">Also shown on phone →</p>
+                  </div>
+                  <div className="flex h-36 items-center justify-center bg-[radial-gradient(circle_at_center,#2a0a10,#0a0a0a)] p-3">
+                    <img
+                      src={resolveAssetUrl(selected.imageSrc)}
+                      alt=""
+                      className="max-h-full max-w-full object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
+                    />
+                  </div>
+                </div>
+              ) : null}
               <button
                 type="button"
                 onClick={() => void onGenerate()}
@@ -637,9 +674,17 @@ export function ExperiencePage() {
                     key={widget.id}
                     type="button"
                     onClick={() => setSelectedId(widget.id)}
-                    className="min-h-[128px] text-left"
+                    className="relative min-h-[128px] text-left"
                   >
                     <PreviewCard widget={widget} selected={selectedId === widget.id} />
+                    {generating && selectedId === widget.id ? (
+                      <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-black/70 backdrop-blur-[1px]">
+                        <Loader2 size={18} className="animate-spin text-dt-red" />
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-white">
+                          Generating…
+                        </span>
+                      </div>
+                    ) : null}
                   </button>
                 ))}
               </div>
