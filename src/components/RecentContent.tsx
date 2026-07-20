@@ -11,6 +11,7 @@ import {
   formatMetric,
   type YouTubeVideoAnalytics,
 } from "../lib/youtubeAnalyticsApi";
+import { DtSelect } from "./DtSelect";
 
 const tabs = ["All Content", "Videos", "Events", "Giveaways", "Newsletters"] as const;
 type ContentTab = (typeof tabs)[number];
@@ -279,28 +280,32 @@ export function RecentContent() {
               className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/50"
             />
           </div>
-          <select
+          <DtSelect
             value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}
-            className="rounded-md border border-dt-border bg-dt-bg px-3 py-1.5 text-xs text-white"
-          >
-            <option value="all">Status</option>
-            <option value="Published">Published</option>
-            <option value="Draft">Draft</option>
-          </select>
-          <select
+            aria-label="Status filter"
+            className="w-[120px]"
+            onChange={(value) => setStatusFilter(value as typeof statusFilter)}
+            options={[
+              { value: "all", label: "Status" },
+              { value: "Published", label: "Published" },
+              { value: "Draft", label: "Draft" },
+            ]}
+          />
+          <DtSelect
             value={typeFilter}
-            onChange={(event) => setTypeFilter(event.target.value as typeof typeFilter)}
-            className="rounded-md border border-dt-border bg-dt-bg px-3 py-1.5 text-xs text-white"
-          >
-            <option value="all">Types</option>
-            <option value="YouTube">YouTube</option>
-            <option value="Exclusive">Exclusive</option>
-            <option value="Newsletter">Newsletter</option>
-            <option value="News">News</option>
-            <option value="Giveaway">Giveaway</option>
-            <option value="Event">Event</option>
-          </select>
+            aria-label="Type filter"
+            className="w-[130px]"
+            onChange={(value) => setTypeFilter(value as typeof typeFilter)}
+            options={[
+              { value: "all", label: "Types" },
+              { value: "YouTube", label: "YouTube" },
+              { value: "Exclusive", label: "Exclusive" },
+              { value: "Newsletter", label: "Newsletter" },
+              { value: "News", label: "News" },
+              { value: "Giveaway", label: "Giveaway" },
+              { value: "Event", label: "Event" },
+            ]}
+          />
         </div>
       </div>
 

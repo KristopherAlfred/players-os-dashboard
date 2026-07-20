@@ -13,6 +13,14 @@ import {
 import { saveDashboardSession } from "../lib/dashboardAuth";
 import { useTheme } from "../theme/ThemeContext";
 import type { ThemeTemplate } from "../theme/themes";
+import { DtSelect } from "../components/DtSelect";
+
+const TIMEZONE_OPTIONS = [
+  { value: "pt", label: "Pacific Time (PT)" },
+  { value: "mt", label: "Mountain Time (MT)" },
+  { value: "ct", label: "Central Time (CT)" },
+  { value: "et", label: "Eastern Time (ET)" },
+];
 
 const integrations = [
   { name: "Instagram", connected: true, last: "Synced 5m ago" },
@@ -35,6 +43,7 @@ export function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
   const [smsAlerts, setSmsAlerts] = useState(true);
   const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [timezone, setTimezone] = useState("pt");
   const [savedFlash, setSavedFlash] = useState<string | null>(null);
 
   function handleSignOut() {
@@ -181,12 +190,14 @@ export function SettingsPage() {
             </label>
             <label className="block">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Timezone</span>
-              <select className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55">
-                <option>Pacific Time (PT)</option>
-                <option>Mountain Time (MT)</option>
-                <option>Central Time (CT)</option>
-                <option>Eastern Time (ET)</option>
-              </select>
+              <div className="mt-1.5">
+                <DtSelect
+                  value={timezone}
+                  aria-label="Timezone"
+                  onChange={setTimezone}
+                  options={TIMEZONE_OPTIONS}
+                />
+              </div>
             </label>
             <button
               type="submit"

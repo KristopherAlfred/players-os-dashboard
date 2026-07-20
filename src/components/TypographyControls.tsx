@@ -1,5 +1,6 @@
 import type { TitleFontFamily, TitleFontSize } from "../lib/typography";
 import { TITLE_FONT_OPTIONS, TITLE_SIZE_OPTIONS } from "../lib/typography";
+import { DtSelect } from "./DtSelect";
 
 type TypographyControlsProps = {
   fontFamily?: TitleFontFamily | string;
@@ -24,31 +25,28 @@ export function TypographyControls({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="block space-y-1.5">
           <span className="text-[11px] font-medium uppercase tracking-wide text-white/40">Font</span>
-          <select
+          <DtSelect
             value={fontFamily || "default"}
-            onChange={(e) => onFontFamilyChange(e.target.value as TitleFontFamily)}
-            className="dt-select w-full"
-          >
-            {TITLE_FONT_OPTIONS.map((option) => (
-              <option key={option.id} value={option.id} style={{ fontFamily: option.css }}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            aria-label="Font"
+            onChange={(value) => onFontFamilyChange(value as TitleFontFamily)}
+            options={TITLE_FONT_OPTIONS.map((option) => ({
+              value: option.id,
+              label: option.label,
+              style: { fontFamily: option.css },
+            }))}
+          />
         </label>
         <label className="block space-y-1.5">
           <span className="text-[11px] font-medium uppercase tracking-wide text-white/40">Size</span>
-          <select
+          <DtSelect
             value={fontSize || "md"}
-            onChange={(e) => onFontSizeChange(e.target.value as TitleFontSize)}
-            className="dt-select w-full"
-          >
-            {TITLE_SIZE_OPTIONS.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            aria-label="Size"
+            onChange={(value) => onFontSizeChange(value as TitleFontSize)}
+            options={TITLE_SIZE_OPTIONS.map((option) => ({
+              value: option.id,
+              label: option.label,
+            }))}
+          />
         </label>
       </div>
     </div>

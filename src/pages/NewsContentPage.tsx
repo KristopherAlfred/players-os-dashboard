@@ -20,6 +20,7 @@ import {
   type NewsStatus,
 } from "../lib/newsApi";
 import { TypographyControls } from "../components/TypographyControls";
+import { DtSelect } from "../components/DtSelect";
 import { titleTypographyStyle } from "../lib/typography";
 
 function categoryLabel(category: NewsCategory) {
@@ -330,26 +331,28 @@ export function NewsContentPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="block space-y-1.5">
                   <span className="text-xs text-dt-muted">Category</span>
-                  <select
+                  <DtSelect
                     value={draft.category}
-                    onChange={(e) => patchDraft({ category: e.target.value as NewsCategory })}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-                  >
-                    <option value="newsletters">Newsletter</option>
-                    <option value="insights">Insight</option>
-                    <option value="news">News</option>
-                  </select>
+                    aria-label="Category"
+                    onChange={(value) => patchDraft({ category: value as NewsCategory })}
+                    options={[
+                      { value: "newsletters", label: "Newsletter" },
+                      { value: "insights", label: "Insight" },
+                      { value: "news", label: "News" },
+                    ]}
+                  />
                 </label>
                 <label className="block space-y-1.5">
                   <span className="text-xs text-dt-muted">Status</span>
-                  <select
+                  <DtSelect
                     value={draft.status}
-                    onChange={(e) => patchDraft({ status: e.target.value as NewsStatus })}
-                    className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                  </select>
+                    aria-label="Status"
+                    onChange={(value) => patchDraft({ status: value as NewsStatus })}
+                    options={[
+                      { value: "draft", label: "Draft" },
+                      { value: "published", label: "Published" },
+                    ]}
+                  />
                 </label>
               </div>
 

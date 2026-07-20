@@ -28,6 +28,7 @@ import {
   type EventsFeed,
 } from "../lib/eventsApi";
 import { TypographyControls } from "../components/TypographyControls";
+import { DtSelect } from "../components/DtSelect";
 import { titleTypographyStyle } from "../lib/typography";
 
 function fieldClass() {
@@ -621,25 +622,27 @@ export function EventsGiveawaysPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label className="block space-y-1.5">
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Type</span>
-                    <select
+                    <DtSelect
                       value={draft.type}
-                      onChange={(e) => patchDraft({ type: e.target.value as EventKind })}
-                      className={fieldClass()}
-                    >
-                      <option value="event">Event (Upcoming)</option>
-                      <option value="giveaway">Giveaway</option>
-                    </select>
+                      aria-label="Type"
+                      onChange={(value) => patchDraft({ type: value as EventKind })}
+                      options={[
+                        { value: "event", label: "Event (Upcoming)" },
+                        { value: "giveaway", label: "Giveaway" },
+                      ]}
+                    />
                   </label>
                   <label className="block space-y-1.5">
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Status</span>
-                    <select
+                    <DtSelect
                       value={draft.status}
-                      onChange={(e) => patchDraft({ status: e.target.value as EventStatus })}
-                      className={fieldClass()}
-                    >
-                      <option value="draft">Draft</option>
-                      <option value="published">Published</option>
-                    </select>
+                      aria-label="Status"
+                      onChange={(value) => patchDraft({ status: value as EventStatus })}
+                      options={[
+                        { value: "draft", label: "Draft" },
+                        { value: "published", label: "Published" },
+                      ]}
+                    />
                   </label>
                 </div>
 

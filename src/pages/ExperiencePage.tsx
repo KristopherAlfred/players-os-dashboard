@@ -30,6 +30,7 @@ import {
 } from "../lib/homeLayoutApi";
 import { titleTypographyStyle } from "../lib/typography";
 import { TypographyControls } from "../components/TypographyControls";
+import { DtSelect } from "../components/DtSelect";
 
 const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: typeof Ticket }[] = [
   { type: "tickets", label: "DameTime Tickets", hint: "Ticket drops", Icon: Ticket },
@@ -717,17 +718,15 @@ export function ExperiencePage() {
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
                       Title filter
                     </span>
-                    <select
+                    <DtSelect
                       value={titleFilter}
-                      onChange={(e) => applyFilter(e.target.value as TitleFilter)}
-                      className={fieldClass()}
-                    >
-                      {TITLE_FILTERS.map((filter) => (
-                        <option key={filter.id} value={filter.id}>
-                          {filter.label} — {filter.hint}
-                        </option>
-                      ))}
-                    </select>
+                      aria-label="Title filter"
+                      onChange={(value) => applyFilter(value as TitleFilter)}
+                      options={TITLE_FILTERS.map((filter) => ({
+                        value: filter.id,
+                        label: `${filter.label} — ${filter.hint}`,
+                      }))}
+                    />
                     <p className="text-[11px] text-white/35">
                       Instantly restyle the title wording. Use Undo if you want the previous version back.
                     </p>
@@ -747,14 +746,15 @@ export function ExperiencePage() {
                   <div className="grid grid-cols-2 gap-3">
                     <label className="block space-y-1.5">
                       <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Image fit</span>
-                      <select
+                      <DtSelect
                         value={selected.imageFit || "half"}
-                        onChange={(e) => patchSelected({ imageFit: e.target.value as "half" | "full" })}
-                        className={fieldClass()}
-                      >
-                        <option value="half">Half</option>
-                        <option value="full">Full bleed</option>
-                      </select>
+                        aria-label="Image fit"
+                        onChange={(value) => patchSelected({ imageFit: value as "half" | "full" })}
+                        options={[
+                          { value: "half", label: "Half" },
+                          { value: "full", label: "Full bleed" },
+                        ]}
+                      />
                     </label>
                     <div className="flex items-end">
                       <button

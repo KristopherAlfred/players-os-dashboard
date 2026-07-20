@@ -36,6 +36,7 @@ import {
   type VideoStatus,
 } from "../lib/videosApi";
 import { TypographyControls } from "../components/TypographyControls";
+import { DtSelect } from "../components/DtSelect";
 import { titleTypographyStyle } from "../lib/typography";
 
 const MAX_VIDEO_UPLOAD_BYTES = 12 * 1024 * 1024;
@@ -801,14 +802,15 @@ function ExclusiveVideosPanel() {
                   </label>
                   <label className="block space-y-1.5">
                     <span className="text-xs text-dt-muted">Status</span>
-                    <select
+                    <DtSelect
                       value={draft.status}
-                      onChange={(e) => patchDraft({ status: e.target.value as VideoStatus })}
-                      className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-                    >
-                      <option value="draft">Draft</option>
-                      <option value="published">Published</option>
-                    </select>
+                      aria-label="Status"
+                      onChange={(value) => patchDraft({ status: value as VideoStatus })}
+                      options={[
+                        { value: "draft", label: "Draft" },
+                        { value: "published", label: "Published" },
+                      ]}
+                    />
                   </label>
                 </div>
 

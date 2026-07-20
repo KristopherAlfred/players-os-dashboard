@@ -25,6 +25,7 @@ import {
   type NotificationStatus,
   type NotificationSurface,
 } from "../lib/notificationsApi";
+import { DtSelect } from "../components/DtSelect";
 
 const FREQUENCY_PRESETS = [
   { label: "Every 15 seconds", value: 15 },
@@ -473,10 +474,11 @@ export function NotificationsPage() {
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-white/45">
                       <Timer size={11} /> Frequency
                     </span>
-                    <select
-                      value={frequencySelectValue}
-                      onChange={(e) => {
-                        const v = Number(e.target.value);
+                    <DtSelect
+                      value={String(frequencySelectValue)}
+                      aria-label="Frequency"
+                      onChange={(raw) => {
+                        const v = Number(raw);
                         if (v === -1) {
                           setCustomFrequency(true);
                           return;
@@ -484,14 +486,11 @@ export function NotificationsPage() {
                         setCustomFrequency(false);
                         patchDraft({ frequencySeconds: v });
                       }}
-                      className={fieldClass()}
-                    >
-                      {FREQUENCY_PRESETS.map((p) => (
-                        <option key={p.label} value={p.value}>
-                          {p.label}
-                        </option>
-                      ))}
-                    </select>
+                      options={FREQUENCY_PRESETS.map((p) => ({
+                        value: String(p.value),
+                        label: p.label,
+                      }))}
+                    />
                   </label>
 
                   {(customFrequency || frequencySelectValue === -1) && (
@@ -510,31 +509,33 @@ export function NotificationsPage() {
 
                   <label className="block space-y-1.5">
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">On-screen time</span>
-                    <select
-                      value={draft.displayDurationMs}
-                      onChange={(e) => patchDraft({ displayDurationMs: Number(e.target.value) })}
-                      className={fieldClass()}
-                    >
-                      <option value={2000}>2 seconds</option>
-                      <option value={3000}>3 seconds (points toast)</option>
-                      <option value={4000}>4 seconds</option>
-                      <option value={5000}>5 seconds</option>
-                      <option value={8000}>8 seconds</option>
-                    </select>
+                    <DtSelect
+                      value={String(draft.displayDurationMs)}
+                      aria-label="On-screen time"
+                      onChange={(value) => patchDraft({ displayDurationMs: Number(value) })}
+                      options={[
+                        { value: "2000", label: "2 seconds" },
+                        { value: "3000", label: "3 seconds (points toast)" },
+                        { value: "4000", label: "4 seconds" },
+                        { value: "5000", label: "5 seconds" },
+                        { value: "8000", label: "8 seconds" },
+                      ]}
+                    />
                   </label>
 
                   <label className="block space-y-1.5">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-white/45">
                       {draft.surface === "home" ? <Home size={11} /> : <LayoutGrid size={11} />} Show on
                     </span>
-                    <select
+                    <DtSelect
                       value={draft.surface}
-                      onChange={(e) => patchDraft({ surface: e.target.value as NotificationSurface })}
-                      className={fieldClass()}
-                    >
-                      <option value="all">All app screens</option>
-                      <option value="home">Home only</option>
-                    </select>
+                      aria-label="Show on"
+                      onChange={(value) => patchDraft({ surface: value as NotificationSurface })}
+                      options={[
+                        { value: "all", label: "All app screens" },
+                        { value: "home", label: "Home only" },
+                      ]}
+                    />
                   </label>
                 </div>
 
@@ -570,14 +571,15 @@ export function NotificationsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block space-y-1.5">
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Status</span>
-                    <select
+                    <DtSelect
                       value={draft.status}
-                      onChange={(e) => patchDraft({ status: e.target.value as NotificationStatus })}
-                      className={fieldClass()}
-                    >
-                      <option value="draft">Draft</option>
-                      <option value="published">Published</option>
-                    </select>
+                      aria-label="Status"
+                      onChange={(value) => patchDraft({ status: value as NotificationStatus })}
+                      options={[
+                        { value: "draft", label: "Draft" },
+                        { value: "published", label: "Published" },
+                      ]}
+                    />
                   </label>
                   <div className="flex items-end">
                     <button
