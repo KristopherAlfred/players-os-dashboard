@@ -28,6 +28,7 @@ import {
 import { DtSelect } from "../components/DtSelect";
 
 const FREQUENCY_PRESETS = [
+  { label: "Once a login", value: 0 },
   { label: "Every 15 seconds", value: 15 },
   { label: "Every 30 seconds", value: 30 },
   { label: "Every 1 minute", value: 60 },
@@ -42,9 +43,14 @@ function fieldClass() {
 }
 
 function formatFrequency(seconds: number) {
+  if (seconds === 0) return "Once a login";
   if (seconds < 60) return `Every ${seconds}s`;
   if (seconds % 60 === 0) return `Every ${seconds / 60}m`;
   return `Every ${seconds}s`;
+}
+
+function isFrequencyPreset(seconds: number) {
+  return FREQUENCY_PRESETS.some((p) => p.value === seconds);
 }
 
 function PreviewToast({ message, pulsing = false }: { message: string; pulsing?: boolean }) {
@@ -92,7 +98,7 @@ export function NotificationsPage() {
         if (first) {
           setSelectedId(first.id);
           setDraft({ ...first });
-          setCustomFrequency(!FREQUENCY_PRESETS.some((p) => p.value === first.frequencySeconds && p.value > 0));
+          setCustomFrequency(!isFrequencyPreset(first.frequencySeconds));
         }
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load notifications"))
@@ -112,7 +118,7 @@ export function NotificationsPage() {
   function selectItem(item: AppNotification) {
     setSelectedId(item.id);
     setDraft({ ...item });
-    setCustomFrequency(!FREQUENCY_PRESETS.some((p) => p.value === item.frequencySeconds && p.value > 0));
+    setCustomFrequency(!isFrequencyPreset(item.frequencySeconds));
     setStatus(null);
     setError(null);
   }
@@ -141,11 +147,13 @@ export function NotificationsPage() {
     setError(null);
     setStatus(null);
     try {
+      const freq = Math.round(draft.frequencySeconds || 0);
       const payload: AppNotification = {
         ...draft,
         message: draft.message.trim(),
         status: nextStatus ?? draft.status,
-        frequencySeconds: Math.min(3600, Math.max(5, Math.round(draft.frequencySeconds || 30))),
+        // 0 = once a login; otherwise clamp to 5–3600s
+        frequencySeconds: freq === 0 ? 0 : Math.min(3600, Math.max(5, freq || 30)),
         displayDurationMs: Math.min(15000, Math.max(1500, Math.round(draft.displayDurationMs || 3000))),
       };
       const nextFeed = await upsertNotificationItem(payload);
@@ -517,6 +525,11 @@ export function NotificationsPage() {
                         label: p.label,
                       }))}
                     />
+                    {draft.frequencySeconds === 0 && !customFrequency ? (
+                      <span className="block text-[11px] leading-relaxed text-white/40">
+                        Shows once per login session, then stays hidden until the fan signs in again.
+                      </span>
+                    ) : null}
                   </label>
 
                   {(customFrequency || frequencySelectValue === -1) && (
