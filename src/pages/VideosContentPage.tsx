@@ -229,8 +229,8 @@ function YouTubeVideosPanel() {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="In-app YouTube opens" value={formatMetric(totalAppOpens)} hint="From DameTime fan_events in Supabase" />
-        <StatCard label="Videos with clicks" value={String(youtubeAppClicks.length)} hint="youtube:{id} targets" />
+        <StatCard label="In-app YouTube opens" value={formatMetric(totalAppOpens)} />
+        <StatCard label="Videos with clicks" value={String(youtubeAppClicks.length)} />
         <StatCard
           label="Channel subscribers"
           value={formatYtMetric(analytics.kpis.subscribers, true)}
