@@ -28,13 +28,13 @@ import {
 import { DtSelect } from "../components/DtSelect";
 
 const FREQUENCY_PRESETS = [
-  { label: "Once a login", value: 0 },
   { label: "Every 15 seconds", value: 15 },
   { label: "Every 30 seconds", value: 30 },
   { label: "Every 1 minute", value: 60 },
   { label: "Every 2 minutes", value: 120 },
   { label: "Every 5 minutes", value: 300 },
   { label: "Every 10 minutes", value: 600 },
+  { label: "Once a login", value: 0 },
   { label: "Custom…", value: -1 },
 ];
 
