@@ -24,8 +24,11 @@ import {
   generateHomeImage,
   publishHomeLayout,
   resolveAssetUrl,
+  WIDGET_SIZES,
+  widgetSpan,
   type HomeLayout,
   type HomeWidget,
+  type HomeWidgetSize,
   type HomeWidgetType,
 } from "../lib/homeLayoutApi";
 import { titleTypographyStyle } from "../lib/typography";
@@ -40,6 +43,26 @@ const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: type
   { type: "events", label: "Events", hint: "Giveaways", Icon: Gift },
   { type: "music", label: "Music", hint: "D.O.L.L.A", Icon: Music2 },
 ];
+
+/** Mini glyph showing the box footprint inside a 2×2 grid. */
+function SizeGlyph({ size }: { size: HomeWidgetSize }) {
+  const span = widgetSpan(size);
+  return (
+    <span className="grid h-7 w-7 shrink-0 grid-cols-2 grid-rows-2 gap-[2px]" aria-hidden>
+      {[0, 1, 2, 3].map((cell) => {
+        const col = cell % 2;
+        const row = Math.floor(cell / 2);
+        const filled = col < span.cols && row < span.rows;
+        return (
+          <span
+            key={cell}
+            className={`rounded-[3px] ${filled ? "bg-dt-red" : "border border-white/15 bg-white/[0.04]"}`}
+          />
+        );
+      })}
+    </span>
+  );
+}
 
 const typeMeta: Record<HomeWidgetType, { label: string; Icon: typeof Ticket }> = {
   tickets: { label: "Tickets", Icon: Ticket },
@@ -199,6 +222,7 @@ export function ExperiencePage() {
   const [status, setStatus] = useState<string | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
+  const [addSize, setAddSize] = useState<HomeWidgetSize>("standard");
   const [dirty, setDirty] = useState(false);
   const [titleFilter, setTitleFilter] = useState<TitleFilter>("as_typed");
   const [history, setHistory] = useState<HomeLayout[]>([]);
@@ -305,11 +329,14 @@ export function ExperiencePage() {
 
   function addWidget(type: HomeWidgetType) {
     updateWidgets((widgets) => {
-      const next = createWidget(type, widgets.length);
+      const next = createWidget(type, widgets.length, addSize);
       setSelectedId(next.id);
       return [...widgets, next];
     });
-    setStatus(`Added ${typeMeta[type].label} box`);
+    const sizeMeta = WIDGET_SIZES.find((s) => s.id === addSize);
+    setStatus(
+      `Added ${typeMeta[type].label} box (${sizeMeta?.label ?? "Standard"}) — drag it on the phone to position it`,
+    );
   }
 
   function removeSelected() {
@@ -551,6 +578,32 @@ export function ExperiencePage() {
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">
               Add fan experience
             </p>
+            <p className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white/35">
+              1. Pick a format
+            </p>
+            <div className="mb-3 grid grid-cols-2 gap-2">
+              {WIDGET_SIZES.map((sizeOption) => (
+                <button
+                  key={sizeOption.id}
+                  type="button"
+                  onClick={() => setAddSize(sizeOption.id)}
+                  className={`flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition ${
+                    addSize === sizeOption.id
+                      ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(229,9,20,0.25)]"
+                      : "border-white/10 bg-black/25 hover:border-white/25 hover:bg-white/[0.04]"
+                  }`}
+                >
+                  <SizeGlyph size={sizeOption.id} />
+                  <span className="min-w-0">
+                    <span className="block truncate text-[12px] font-semibold text-white">{sizeOption.label}</span>
+                    <span className="block truncate text-[10px] text-white/40">{sizeOption.hint}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white/35">
+              2. Pick a box type
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {ADD_TYPES.map(({ type, label, hint, Icon }) => (
                 <button
@@ -667,27 +720,50 @@ export function ExperiencePage() {
 
               <div
                 className="grid grid-cols-2 gap-2"
-                style={{ minHeight: ordered.length > 4 ? 300 : 268 }}
+                style={{ minHeight: ordered.length > 4 ? 300 : 268, gridAutoFlow: "row dense" }}
               >
-                {ordered.map((widget) => (
-                  <button
-                    key={widget.id}
-                    type="button"
-                    onClick={() => setSelectedId(widget.id)}
-                    className="relative min-h-[128px] text-left"
-                  >
-                    <PreviewCard widget={widget} selected={selectedId === widget.id} />
-                    {generating && selectedId === widget.id ? (
-                      <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-black/70 backdrop-blur-[1px]">
-                        <Loader2 size={18} className="animate-spin text-dt-red" />
-                        <span className="text-[10px] font-semibold uppercase tracking-wide text-white">
-                          Generating…
-                        </span>
-                      </div>
-                    ) : null}
-                  </button>
-                ))}
+                {ordered.map((widget) => {
+                  const span = widgetSpan(widget.size);
+                  const isDrop = dropTargetId === widget.id && dragId !== widget.id;
+                  return (
+                    <button
+                      key={widget.id}
+                      type="button"
+                      draggable
+                      onDragStart={() => onDragStart(widget.id)}
+                      onDragOver={(e) => onDragOver(e, widget.id)}
+                      onDragLeave={() => setDropTargetId((id) => (id === widget.id ? null : id))}
+                      onDrop={() => onDrop(widget.id)}
+                      onDragEnd={() => {
+                        setDragId(null);
+                        setDropTargetId(null);
+                      }}
+                      onClick={() => setSelectedId(widget.id)}
+                      className={`relative min-h-[128px] cursor-grab text-left active:cursor-grabbing ${
+                        dragId === widget.id ? "opacity-45" : ""
+                      } ${isDrop ? "rounded-2xl ring-2 ring-dt-red/70" : ""}`}
+                      style={{
+                        gridColumn: `span ${span.cols} / span ${span.cols}`,
+                        gridRow: `span ${span.rows} / span ${span.rows}`,
+                        minHeight: span.rows > 1 ? 128 * span.rows + 8 : 128,
+                      }}
+                    >
+                      <PreviewCard widget={widget} selected={selectedId === widget.id} />
+                      {generating && selectedId === widget.id ? (
+                        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-black/70 backdrop-blur-[1px]">
+                          <Loader2 size={18} className="animate-spin text-dt-red" />
+                          <span className="text-[10px] font-semibold uppercase tracking-wide text-white">
+                            Generating…
+                          </span>
+                        </div>
+                      ) : null}
+                    </button>
+                  );
+                })}
               </div>
+              <p className="mt-2 text-center text-[10px] uppercase tracking-[0.14em] text-white/30">
+                Drag boxes to rearrange · tap to edit
+              </p>
             </div>
           </div>
         </section>
@@ -789,6 +865,18 @@ export function ExperiencePage() {
                   </label>
 
                   <div className="grid grid-cols-2 gap-3">
+                    <label className="block space-y-1.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Box size</span>
+                      <DtSelect
+                        value={selected.size || "standard"}
+                        aria-label="Box size"
+                        onChange={(value) => patchSelected({ size: value as HomeWidgetSize })}
+                        options={WIDGET_SIZES.map((s) => ({
+                          value: s.id,
+                          label: `${s.label} — ${s.hint}`,
+                        }))}
+                      />
+                    </label>
                     <label className="block space-y-1.5">
                       <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Image fit</span>
                       <DtSelect

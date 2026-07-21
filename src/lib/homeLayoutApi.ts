@@ -6,6 +6,8 @@ export type HomeWidgetType =
   | "tickets"
   | "custom";
 
+export type HomeWidgetSize = "standard" | "wide" | "tall" | "large";
+
 export type HomeWidget = {
   id: string;
   type: HomeWidgetType;
@@ -15,6 +17,8 @@ export type HomeWidget = {
   linkTo: string;
   enabled: boolean;
   order: number;
+  /** Grid footprint: standard 1×1, wide 2×1, tall 1×2, large 2×2 */
+  size?: HomeWidgetSize;
   imageFit?: "half" | "full";
   cardClassName?: string;
   showLock?: boolean;
@@ -82,7 +86,19 @@ export async function generateHomeImage(
   }) as Promise<{ imageSrc: string; source: string; model?: string }>;
 }
 
-export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
+export const WIDGET_SIZES: { id: HomeWidgetSize; label: string; hint: string; cols: number; rows: number }[] = [
+  { id: "standard", label: "Standard", hint: "1×1 — half width", cols: 1, rows: 1 },
+  { id: "wide", label: "Wide", hint: "2×1 — full width", cols: 2, rows: 1 },
+  { id: "tall", label: "Tall", hint: "1×2 — double height", cols: 1, rows: 2 },
+  { id: "large", label: "Large", hint: "2×2 — hero box", cols: 2, rows: 2 },
+];
+
+export function widgetSpan(size?: HomeWidgetSize): { cols: number; rows: number } {
+  const meta = WIDGET_SIZES.find((s) => s.id === size);
+  return meta ? { cols: meta.cols, rows: meta.rows } : { cols: 1, rows: 1 };
+}
+
+export function createWidget(type: HomeWidgetType, order: number, size: HomeWidgetSize = "standard"): HomeWidget {
   const id = `${type}-${Date.now().toString(36)}`;
   if (type === "tickets") {
     return {
@@ -93,6 +109,7 @@ export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
       linkTo: "https://www.ticketmaster.com",
       enabled: true,
       order,
+      size,
       imageFit: "half",
       cardClassName: "member-card-events-gradient",
     };
@@ -106,11 +123,17 @@ export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
       linkTo: "/access",
       enabled: true,
       order,
+      size,
       imageFit: "half",
       cardClassName: "member-card-ghost",
     };
   }
-  const presets: Record<Exclude<HomeWidgetType, "tickets" | "custom">, HomeWidget> = {
+  const presets: Record<Exclude<HomeWidgetType, "tickets" | "custom">, HomeWidget> = presetsFor(id, order, size);
+  return presets[type];
+}
+
+function presetsFor(id: string, order: number, size: HomeWidgetSize): Record<Exclude<HomeWidgetType, "tickets" | "custom">, HomeWidget> {
+  return {
     videos: {
       id,
       type: "videos",
@@ -119,6 +142,7 @@ export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
       linkTo: "/access/videos",
       enabled: true,
       order,
+      size,
       imageFit: "half",
       cardClassName: "member-card-videos-gradient",
       showPlay: true,
@@ -131,6 +155,7 @@ export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
       linkTo: "/access/latest-news",
       enabled: true,
       order,
+      size,
       imageFit: "half",
       cardClassName: "member-card-drops-gradient",
     },
@@ -142,6 +167,7 @@ export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
       linkTo: "/access/events",
       enabled: true,
       order,
+      size,
       imageFit: "full",
       cardClassName: "member-card-events-gradient",
       showLock: true,
@@ -154,12 +180,12 @@ export function createWidget(type: HomeWidgetType, order: number): HomeWidget {
       linkTo: "/access/music",
       enabled: true,
       order,
+      size,
       imageFit: "half",
       cardClassName: "member-card-music-gradient",
       showMusicBars: true,
     },
   };
-  return presets[type];
 }
 
 export function resolveAssetUrl(src: string) {
