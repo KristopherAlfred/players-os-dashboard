@@ -4,7 +4,6 @@ import Wheel from "@uiw/react-color-wheel";
 import ShadeSlider from "@uiw/react-color-shade-slider";
 import { hexToHsva, hsvaToHex, type HsvaColor } from "@uiw/color-convert";
 import {
-  DEFAULT_AVATAR_URL,
   getDashboardAvatar,
   getDashboardAvatarRing,
   isDefaultAvatar,
@@ -230,10 +229,6 @@ export function ProfilePage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-black/30 px-3.5 py-3 text-[12px] leading-relaxed text-white/50">
-              The default photo is Dame’s ESPN headshot ({DEFAULT_AVATAR_URL.replace("https://", "")}).
-              Changes apply instantly to the top-right avatar and are saved on this browser.
-            </div>
           </div>
         </section>
       </div>
