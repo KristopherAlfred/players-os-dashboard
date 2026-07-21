@@ -90,7 +90,7 @@ export function ProfilePage() {
           </h2>
           <p className="relative mt-2 max-w-2xl text-sm leading-relaxed text-white/65">
             This photo shows in the top-right corner of the dashboard. By default it uses Dame’s
-            ESPN headshot — upload your own or paste an image link to change it.
+            ESPN headshot. Upload your own or paste an image link to change it.
           </p>
         </div>
 
