@@ -114,7 +114,7 @@ export function ProfilePage() {
           <div className="border-b border-dt-border px-4 py-3">
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Current photo</h3>
             <p className="text-[11px] text-white/40">
-              {usingDefault ? "Default — ESPN headshot" : "Custom photo"}
+              Your current profile picture in the top right of your screen.
             </p>
           </div>
           <div className="flex flex-col items-center gap-4 p-6">
