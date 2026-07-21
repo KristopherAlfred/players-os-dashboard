@@ -198,7 +198,7 @@ export function ProfilePage() {
                     hsva={hsva}
                     onChange={(newShade) => applyRingHsva({ ...hsva, ...newShade })}
                   />
-                  <p className="text-[11px] leading-relaxed text-white/40">
+                  <p className="text-sm leading-relaxed text-white">
                     Drag on the wheel to pick the color, use the slider for brightness. Updates the
                     circle around the photo here and in the top-right corner instantly.
                   </p>
