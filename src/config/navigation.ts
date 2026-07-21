@@ -75,7 +75,7 @@ export const navSections: NavSection[] = [
     label: "FANS & DATA",
     icon: "users",
     items: [
-      { label: "Audience Overview", path: "/fans/audience" },
+      { label: "Fan Locations", path: "/fans/audience" },
       { label: "Email/SMS List", path: "/fans/subscribers" },
     ],
   },
@@ -163,7 +163,7 @@ export const routeMeta: Record<string, RouteMeta> = {
     subtitle: "Themes, account preferences, integrations, and access roles.",
   },
   "/fans/audience": {
-    title: "Audience Overview",
+    title: "Fan Locations",
     subtitle: "Live DameTime fan composition, geo, and engagement from Supabase.",
   },
   "/fans/subscribers": {

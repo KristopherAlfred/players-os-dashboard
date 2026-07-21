@@ -12,7 +12,6 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { SignupHeatmap } from "../components/SignupHeatmap";
 import {
   Area,
   AreaChart,
@@ -227,7 +226,6 @@ export function TrafficOverviewPage() {
   }
 
   const maxTarget = Math.max(...analytics.topTargets.map((item) => item.count), 1);
-  const maxCountry = Math.max(...analytics.geo.countries.map((c) => c.count), 1);
 
   return (
     <div className="space-y-5">
@@ -715,82 +713,6 @@ export function TrafficOverviewPage() {
               </tbody>
             </table>
           </div>
-        </Surface>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <Surface
-          title="Top countries"
-          subtitle={
-            selectedFan
-              ? `Where ${fanDisplayName(selectedFan)} signed up from`
-              : `${formatMetric(analytics.geo.mappedFans)} of ${formatMetric(analytics.geo.totalFans)} fans mapped`
-          }
-        >
-          <div className="space-y-3 p-4">
-            {analytics.geo.countries.length === 0 ? (
-              <p className="py-8 text-center text-sm text-white/40">
-                {selectedFan
-                  ? "No location captured for this fan yet."
-                  : "No country data yet — new signups will appear here."}
-              </p>
-            ) : (
-              analytics.geo.countries.slice(0, 8).map((country) => (
-                <div key={country.country}>
-                  <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
-                    <span className="min-w-0 truncate text-white">
-                      <span className="mr-1.5">{country.flag}</span>
-                      {country.country}
-                    </span>
-                    <span className="shrink-0 tabular-nums text-white/70">
-                      {country.pct}% · {formatMetric(country.count)}
-                    </span>
-                  </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-dt-red to-[#ff4d57]"
-                      style={{ width: `${Math.max(4, (country.count / maxCountry) * 100)}%` }}
-                    />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </Surface>
-
-        <Surface
-          title="Signup map"
-          subtitle={
-            selectedFan
-              ? `${fanDisplayName(selectedFan)}'s signup location`
-              : "Where DameTime fans are signing up from"
-          }
-          action={
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-white/45">
-              <MapPin size={12} className="text-dt-red" />
-              {analytics.geo.points.length} hotspot{analytics.geo.points.length === 1 ? "" : "s"}
-            </span>
-          }
-        >
-          <div className="p-3 sm:p-4">
-            <SignupHeatmap geo={analytics.geo} />
-          </div>
-          {analytics.geo.points.length > 0 ? (
-            <div className="border-t border-dt-border px-4 py-3">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-white/40">Top cities</p>
-              <div className="flex flex-wrap gap-2">
-                {analytics.geo.points.slice(0, 10).map((point) => (
-                  <span
-                    key={`${point.lat}-${point.lng}-${point.label}`}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/35 px-3 py-1.5 text-xs text-white/80"
-                  >
-                    <span className="max-w-[180px] truncate">{point.label}</span>
-                    <span className="font-semibold text-dt-red">{formatMetric(point.count)}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          ) : null}
         </Surface>
       </div>
 

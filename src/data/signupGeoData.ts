@@ -267,12 +267,6 @@ const mainCountries = new Set([
   "Australia",
 ]);
 
-function hashName(name: string) {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h + name.charCodeAt(i) * (i + 1)) % 97;
-  return h;
-}
-
 export function viewIdFromCountryCode(code?: string | null): CountryViewId | null {
   if (!code) return null;
   return codeToView[code.toUpperCase()] ?? null;
@@ -288,7 +282,10 @@ export function countryCodesForView(view: CountryViewId): string[] | null {
   return viewToCodes[view];
 }
 
-/** Live intensity 0–1 from country share; falls back to soft mock for unknown regions. */
+/**
+ * Live intensity 0–1 from country share. Countries with no live signups stay at a
+ * quiet base shade — we never invent heat for regions without real fans.
+ */
 export function getRegionIntensity(
   view: CountryViewId,
   _geoId: string,
@@ -307,17 +304,11 @@ export function getRegionIntensity(
     if (liveByCountry && mapped && liveByCountry[mapped] != null) {
       return liveByCountry[mapped];
     }
-    if (mapped === "USA") return 0.85;
-    if (mapped === "Canada") return 0.55;
-    if (mapped === "UK") return 0.48;
-    if (mapped === "Australia") return 0.42;
-    if (liveByCountry) return 0.08 + (hashName(name) % 3) * 0.03;
-    return 0.12 + (hashName(name) % 6) * 0.04;
+    return 0.1;
   }
 
   if (view === "Other") {
-    if (mainCountries.has(name)) return 0.1;
-    return 0.35 + (hashName(name) % 8) * 0.07;
+    return mainCountries.has(name) ? 0.1 : 0.18;
   }
 
   return 0.3;

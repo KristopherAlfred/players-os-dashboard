@@ -179,7 +179,8 @@ function pointsForView(view: CountryViewId, points: GeoPoint[]): GeoPoint[] {
 
 function buildLiveCountryRows(geo?: DametimeAnalyticsGeo | null): CountryRow[] {
   if (!geo?.countries?.length) {
-    return fallbackOverview.map((row) => ({ ...row, count: 0 }));
+    // No live geo yet — show real zeros, never mock percentages.
+    return fallbackOverview.map((row) => ({ ...row, pct: 0, count: 0 }));
   }
 
   const rows: CountryRow[] = FEATURED.map((featured) => {
@@ -548,7 +549,7 @@ export function SignupGeoExplorer({ className = "", geo = null }: SignupGeoExplo
       </div>
 
       <p className="mt-2 text-[10px] text-dt-muted lg:hidden">
-        Live from DameTime · tap a country for city pins.
+        Live IP locations from signup · tap a country for city pins.
       </p>
     </div>
   );
