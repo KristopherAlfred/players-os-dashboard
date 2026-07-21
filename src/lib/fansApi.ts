@@ -8,6 +8,19 @@ export type FanContact = {
   points: number;
   created_at: string;
   updated_at: string;
+  city?: string | null;
+  region?: string | null;
+  country_code?: string | null;
+  country_name?: string | null;
+};
+
+export type FanGeoUpdate = {
+  city: string | null;
+  region: string | null;
+  country_code: string | null;
+  country_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 export type FansListResponse = {
@@ -54,6 +67,26 @@ export async function fetchFansList(): Promise<FansListResponse> {
       fans.filter((fan) => Boolean(fan.phone)).length,
     fans,
   };
+}
+
+export async function setFanLocation(email: string, geo: FanGeoUpdate): Promise<void> {
+  const secret = getAdminSecret();
+  if (!secret) throw new Error("Set VITE_ADMIN_EXPORT_SECRET to update fan locations");
+
+  const response = await fetch(`${getApiBase()}/api/admin/analytics?view=fans`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+    body: JSON.stringify({ action: "set_location", email, geo }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error((data as { error?: string }).error || `Location update failed (${response.status})`);
+  }
+}
+
+export function fanLocationLabel(fan: FanContact): string | null {
+  const parts = [fan.city, fan.region, fan.country_name || fan.country_code].filter(Boolean);
+  return parts.length ? parts.join(", ") : null;
 }
 
 export function exportFansCsvUrl() {
