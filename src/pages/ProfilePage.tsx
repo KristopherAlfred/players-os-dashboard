@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
 import { Check, ImagePlus, Link2, Palette, RotateCcw, Upload, UserRound } from "lucide-react";
+import Wheel from "@uiw/react-color-wheel";
+import ShadeSlider from "@uiw/react-color-shade-slider";
+import { hexToHsva, hsvaToHex, type HsvaColor } from "@uiw/color-convert";
 import {
   DEFAULT_AVATAR_URL,
   getDashboardAvatar,
   getDashboardAvatarRing,
   isDefaultAvatar,
   resetDashboardAvatar,
-  RING_COLORS,
   setDashboardAvatar,
   setDashboardAvatarRing,
 } from "../lib/adminProfile";
@@ -20,6 +22,7 @@ function fieldClass() {
 export function ProfilePage() {
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
   const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
+  const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(getDashboardAvatarRing()));
   const [urlDraft, setUrlDraft] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,10 +35,11 @@ export function ProfilePage() {
     setError(null);
   }
 
-  function applyRingColor(color: string, label?: string) {
-    setDashboardAvatarRing(color);
-    setRingColor(color);
-    setStatus(label ? `Ring color set to ${label}` : `Ring color set to ${color.toUpperCase()}`);
+  function applyRingHsva(next: HsvaColor) {
+    const hex = hsvaToHex(next);
+    setHsva(next);
+    setRingColor(hex);
+    setDashboardAvatarRing(hex);
     setError(null);
   }
 
@@ -183,77 +187,32 @@ export function ProfilePage() {
               <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">
                 <Palette size={12} /> Ring color
               </p>
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/25 p-3">
-                <label className="relative shrink-0 cursor-pointer" title="Open color wheel">
-                  <span
-                    className="block h-14 w-14 rounded-full border-2 border-white/25 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
-                    style={{ backgroundColor: ringColor }}
+              <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/25 p-4 sm:flex-row sm:items-center sm:gap-6">
+                <Wheel
+                  color={hsva}
+                  width={190}
+                  height={190}
+                  onChange={(color) => applyRingHsva({ ...hsva, ...color.hsva })}
+                />
+                <div className="flex w-full min-w-0 flex-1 flex-col gap-3">
+                  <ShadeSlider
+                    hsva={hsva}
+                    onChange={(newShade) => applyRingHsva({ ...hsva, ...newShade })}
                   />
-                  <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-black/85 text-dt-red">
-                    <Palette size={12} />
-                  </span>
-                  <input
-                    type="color"
-                    value={ringColor}
-                    onChange={(e) => applyRingColor(e.target.value)}
-                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                    aria-label="Ring color wheel"
-                  />
-                </label>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[12px] font-semibold text-white">Pick any color</p>
-                  <p className="text-[11px] text-white/40">
-                    Tap the circle for the full color wheel, or type a hex code.
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="h-10 w-10 shrink-0 rounded-full border-2 border-white/25"
+                      style={{ backgroundColor: ringColor }}
+                      aria-hidden
+                    />
+                    <span className="font-mono text-sm uppercase text-white/80">{ringColor}</span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-white/40">
+                    Drag on the wheel to pick the color, use the slider for brightness. Updates the
+                    circle around the photo here and in the top-right corner instantly.
                   </p>
-                  <input
-                    value={ringColor.toUpperCase()}
-                    onChange={(e) => {
-                      const v = e.target.value.trim();
-                      setRingColor(v.startsWith("#") ? v : `#${v}`);
-                    }}
-                    onBlur={(e) => {
-                      const v = e.target.value.trim();
-                      const hex = v.startsWith("#") ? v : `#${v}`;
-                      if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex)) {
-                        applyRingColor(hex);
-                      } else {
-                        setError("Enter a valid hex color like #E31837");
-                      }
-                    }}
-                    className={`${fieldClass()} mt-1.5 font-mono uppercase`}
-                    placeholder="#E31837"
-                    maxLength={7}
-                  />
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {RING_COLORS.map((color) => {
-                  const active = ringColor.toLowerCase() === color.value.toLowerCase();
-                  return (
-                    <button
-                      key={color.id}
-                      type="button"
-                      title={color.label}
-                      aria-label={`${color.label} ring`}
-                      aria-pressed={active}
-                      onClick={() => applyRingColor(color.value, color.label)}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full border-2 transition ${
-                        active
-                          ? "scale-110 border-white shadow-[0_0_0_3px_rgba(255,255,255,0.15)]"
-                          : "border-white/20 hover:scale-105 hover:border-white/50"
-                      }`}
-                      style={{ backgroundColor: color.value }}
-                    >
-                      {active ? (
-                        <Check size={13} className={color.id === "white" || color.id === "gold" ? "text-black" : "text-white"} />
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-[11px] text-white/35">
-                Changes the circle around the photo here and in the top-right corner.
-              </p>
             </div>
 
             <div className="space-y-2">
