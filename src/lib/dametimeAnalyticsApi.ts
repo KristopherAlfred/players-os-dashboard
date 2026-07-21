@@ -98,7 +98,18 @@ function getAdminSecret() {
   return import.meta.env.VITE_ADMIN_EXPORT_SECRET?.trim() ?? "";
 }
 
-export async function fetchDametimeAnalytics(fanEmail?: string): Promise<DametimeAnalytics> {
+export type AnalyticsTimeRange = {
+  /** Days back (1–365), "all" for all time, or undefined for the default 14. */
+  days?: number | "all";
+  /** Custom range as YYYY-MM-DD — takes priority over days. */
+  from?: string;
+  to?: string;
+};
+
+export async function fetchDametimeAnalytics(
+  fanEmail?: string,
+  range?: AnalyticsTimeRange,
+): Promise<DametimeAnalytics> {
   const secret = getAdminSecret();
   if (!secret) {
     throw new Error(
@@ -109,6 +120,12 @@ export async function fetchDametimeAnalytics(fanEmail?: string): Promise<Dametim
   const params = new URLSearchParams();
   const fan = fanEmail?.trim().toLowerCase();
   if (fan) params.set("fan", fan);
+  if (range?.from) {
+    params.set("from", range.from);
+    if (range.to) params.set("to", range.to);
+  } else if (range?.days != null) {
+    params.set("days", String(range.days));
+  }
   // Bust intermediary caches so loyalty points stay current on each poll.
   params.set("_", String(Date.now()));
   const query = params.toString();

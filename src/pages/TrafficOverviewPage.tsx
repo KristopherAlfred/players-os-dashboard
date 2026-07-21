@@ -32,12 +32,29 @@ import {
   formatMetric,
   formatRelativeTime,
   initialsFromName,
+  type AnalyticsTimeRange,
   type DametimeAnalytics,
 } from "../lib/dametimeAnalyticsApi";
 import { fanDisplayName, fetchFansList, formatFanJoined, type FanContact } from "../lib/fansApi";
+import { DtSelect } from "../components/DtSelect";
 
 const POLL_MS = 30_000;
 const CHART_COLORS = ["#e50914", "#ffffff", "#f87171", "#94a3b8", "#fb7185", "#64748b"];
+
+const TIME_RANGE_OPTIONS = [
+  { value: "1", label: "Last 24 hours" },
+  { value: "7", label: "Last 7 days" },
+  { value: "14", label: "Last 14 days" },
+  { value: "30", label: "Last 30 days" },
+  { value: "90", label: "Last 90 days" },
+  { value: "365", label: "Last year" },
+  { value: "all", label: "All time" },
+  { value: "custom", label: "Custom…" },
+];
+
+function todayIso() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function tooltipStyle() {
   return {
@@ -90,13 +107,38 @@ export function TrafficOverviewPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [timePreset, setTimePreset] = useState("14");
+  const [appliedFrom, setAppliedFrom] = useState("");
+  const [appliedTo, setAppliedTo] = useState("");
+  const [draftFrom, setDraftFrom] = useState("");
+  const [draftTo, setDraftTo] = useState("");
+  const [customOpen, setCustomOpen] = useState(false);
+
+  const timeRange = useMemo<AnalyticsTimeRange | undefined>(() => {
+    if (timePreset === "custom") {
+      if (!appliedFrom) return { days: 14 };
+      return { from: appliedFrom, to: appliedTo || todayIso() };
+    }
+    if (timePreset === "all") return { days: "all" };
+    const days = Number(timePreset);
+    return Number.isFinite(days) ? { days } : { days: 14 };
+  }, [timePreset, appliedFrom, appliedTo]);
+
+  const timeRangeLabel = useMemo(() => {
+    if (timePreset === "custom" && appliedFrom) {
+      return appliedTo && appliedTo !== appliedFrom
+        ? `${appliedFrom} → ${appliedTo}`
+        : `From ${appliedFrom}`;
+    }
+    return TIME_RANGE_OPTIONS.find((option) => option.value === timePreset)?.label ?? "Last 14 days";
+  }, [timePreset, appliedFrom, appliedTo]);
 
   const load = useCallback(
     async (isRefresh = false, email = fanEmail) => {
       if (isRefresh) setRefreshing(true);
       if (!isRefresh) setError(null);
       try {
-        const data = await fetchDametimeAnalytics(email || undefined);
+        const data = await fetchDametimeAnalytics(email || undefined, timeRange);
         setAnalytics(data);
         setError(null);
         const fanLabel = email
@@ -124,7 +166,7 @@ export function TrafficOverviewPage() {
         setRefreshing(false);
       }
     },
-    [fanEmail, fans],
+    [fanEmail, fans, timeRange],
   );
 
   useEffect(() => {
@@ -141,6 +183,7 @@ export function TrafficOverviewPage() {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     void load(false, fanEmail);
     const interval = window.setInterval(() => {
       void load(true, fanEmail);
@@ -452,7 +495,82 @@ export function TrafficOverviewPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <Surface title="Activity over time" subtitle="Events, page views, clicks & nav — last 14 days">
+        <Surface
+          title="Activity over time"
+          subtitle={`Events, page views, clicks & nav — ${timeRangeLabel.toLowerCase()}`}
+          action={
+            <div className="relative flex flex-col items-end gap-2">
+              <DtSelect
+                value={timePreset}
+                options={TIME_RANGE_OPTIONS}
+                aria-label="Timeline range"
+                className="w-[168px]"
+                onChange={(value) => {
+                  if (value === "custom") {
+                    const from = appliedFrom || todayIso();
+                    const to = appliedTo || todayIso();
+                    setDraftFrom(from);
+                    setDraftTo(to);
+                    setCustomOpen(true);
+                    return;
+                  }
+                  setCustomOpen(false);
+                  setTimePreset(value);
+                }}
+              />
+              {customOpen ? (
+                <div className="absolute right-0 top-full z-40 mt-2 w-[280px] rounded-xl border border-dt-border bg-[#0c0c0c] p-3 shadow-[0_18px_40px_rgba(0,0,0,0.65)]">
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+                    Custom date range
+                  </p>
+                  <label className="mb-2 block">
+                    <span className="text-[11px] text-white/50">From</span>
+                    <input
+                      type="date"
+                      value={draftFrom}
+                      max={draftTo || todayIso()}
+                      onChange={(e) => setDraftFrom(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-dt-border bg-black/50 px-3 py-2 text-sm text-white outline-none transition [color-scheme:dark] focus:border-dt-red/55"
+                    />
+                  </label>
+                  <label className="mb-3 block">
+                    <span className="text-[11px] text-white/50">To</span>
+                    <input
+                      type="date"
+                      value={draftTo}
+                      min={draftFrom || undefined}
+                      max={todayIso()}
+                      onChange={(e) => setDraftTo(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-dt-border bg-black/50 px-3 py-2 text-sm text-white outline-none transition [color-scheme:dark] focus:border-dt-red/55"
+                    />
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCustomOpen(false)}
+                      className="flex-1 rounded-lg border border-white/15 px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-white/30"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!draftFrom}
+                      onClick={() => {
+                        setAppliedFrom(draftFrom);
+                        setAppliedTo(draftTo || draftFrom);
+                        setTimePreset("custom");
+                        setCustomOpen(false);
+                      }}
+                      className="flex-1 rounded-lg bg-dt-red px-3 py-2 text-xs font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          }
+        >
           <div className="h-[320px] px-2 py-3">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={derived.timeline}>
