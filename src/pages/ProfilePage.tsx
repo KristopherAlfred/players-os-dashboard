@@ -86,7 +86,7 @@ export function ProfilePage() {
             </div>
           </div>
           <h2 className="relative mt-3 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            Your profile photo
+            Profile Photo
           </h2>
           <p className="relative mt-2 max-w-2xl text-sm leading-relaxed text-white/65">
             This photo shows in the top-right corner of the dashboard. Upload your own or paste an
