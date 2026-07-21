@@ -146,6 +146,10 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Notifications",
     subtitle: "Schedule in-app toasts with the same look as the points earned popup.",
   },
+  "/profile": {
+    title: "Profile",
+    subtitle: "View and change the photo shown in the top-right corner.",
+  },
   "/engagement/activity": {
     title: "Fan Activity",
     subtitle: "Live DameTime app clicks, page views, and fan interactions from Supabase.",

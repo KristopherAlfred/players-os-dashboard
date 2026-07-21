@@ -19,6 +19,7 @@ import { SettingsPage } from "./pages/SettingsPages";
 import { LivePage } from "./pages/LivePage";
 import { ExperiencePage } from "./pages/ExperiencePage";
 import { NotificationsPage } from "./pages/NotificationsPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { LandingPage } from "./pages/LandingPage";
 import { MarketingLandingPage } from "./pages/MarketingLandingPage";
 import { RequireAuth, PublicOnly } from "./components/RequireAuth";
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="live" element={<LivePage />} />
           <Route path="experience" element={<ExperiencePage />} />
           <Route path="notifications" element={<NotificationsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="content/calendar" element={<ContentCalendarPage />} />
           <Route path="engagement/activity" element={<FanActivityPage />} />
           <Route path="engagement/support" element={<SupportInboxPage />} />

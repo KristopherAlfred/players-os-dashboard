@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { SlidersHorizontal, Bell, Menu, Check } from "lucide-react";
 import {
   ALL_DASHBOARD_SOURCES,
@@ -8,6 +8,7 @@ import {
   useDashboardSource,
   type DashboardSource,
 } from "../contexts/DashboardSourceContext";
+import { getDashboardAvatar, onDashboardAvatarChange } from "../lib/adminProfile";
 
 const filterOptions: { id: DashboardSource; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -30,7 +31,10 @@ export function Header({
   const { pathname } = useLocation();
   const { source, setSource, sourceLabel, filterPulse } = useDashboardSource();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
   const filtersRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => onDashboardAvatarChange(() => setAvatar(getDashboardAvatar())), []);
   const onContent = isContentRoute(pathname);
   const allowed = onContent ? CONTENT_ALLOWED_SOURCES : ALL_DASHBOARD_SOURCES;
 
@@ -141,11 +145,17 @@ export function Header({
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-dt-red" />
           </button>
 
-          <img
-            src="/dame-headshot.png"
-            alt="Damian Lillard"
-            className="hidden h-9 w-9 shrink-0 rounded-full border-2 border-dt-red object-cover object-top sm:block"
-          />
+          <Link
+            to="/profile"
+            title="View and edit your profile photo"
+            className="hidden shrink-0 rounded-full transition hover:ring-2 hover:ring-dt-red/60 sm:block"
+          >
+            <img
+              src={avatar}
+              alt="Damian Lillard — open profile"
+              className="h-9 w-9 rounded-full border-2 border-dt-red object-cover object-top"
+            />
+          </Link>
         </div>
       </div>
     </header>
