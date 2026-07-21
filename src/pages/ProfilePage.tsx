@@ -200,7 +200,7 @@ export function ProfilePage() {
                   />
                   <p className="text-sm leading-relaxed text-white">
                     Drag on the wheel to pick the color, use the slider for brightness. Updates the
-                    circle around the photo here and in the top-right corner instantly.
+                    circle around the photo here and in the top-right corner.
                   </p>
                 </div>
               </div>
