@@ -159,6 +159,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
           <img
             src={resolveAssetUrl(widget.imageSrc)}
             alt=""
+            draggable={false}
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/50 to-transparent" />
@@ -195,6 +196,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
             <img
               src={resolveAssetUrl(widget.imageSrc)}
               alt=""
+              draggable={false}
               className="h-full w-full object-contain object-bottom object-right drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
             />
           </div>
@@ -298,12 +300,16 @@ export function ExperiencePage() {
     }
   }
 
-  function onDragStart(id: string) {
+  function onDragStart(e: DragEvent, id: string) {
+    // Required for Firefox/Safari to actually start the drag
+    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.effectAllowed = "move";
     setDragId(id);
   }
 
   function onDragOver(e: DragEvent, targetId: string) {
     e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
     if (dragId && dragId !== targetId) setDropTargetId(targetId);
   }
 
@@ -530,10 +536,13 @@ export function ExperiencePage() {
                 <li
                   key={widget.id}
                   draggable
-                  onDragStart={() => onDragStart(widget.id)}
+                  onDragStart={(e) => onDragStart(e, widget.id)}
                   onDragOver={(e) => onDragOver(e, widget.id)}
                   onDragLeave={() => setDropTargetId((id) => (id === widget.id ? null : id))}
-                  onDrop={() => onDrop(widget.id)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    onDrop(widget.id);
+                  }}
                   onDragEnd={() => {
                     setDragId(null);
                     setDropTargetId(null);
@@ -726,20 +735,27 @@ export function ExperiencePage() {
                   const span = widgetSpan(widget.size);
                   const isDrop = dropTargetId === widget.id && dragId !== widget.id;
                   return (
-                    <button
+                    <div
                       key={widget.id}
-                      type="button"
+                      role="button"
+                      tabIndex={0}
                       draggable
-                      onDragStart={() => onDragStart(widget.id)}
+                      onDragStart={(e) => onDragStart(e, widget.id)}
                       onDragOver={(e) => onDragOver(e, widget.id)}
                       onDragLeave={() => setDropTargetId((id) => (id === widget.id ? null : id))}
-                      onDrop={() => onDrop(widget.id)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        onDrop(widget.id);
+                      }}
                       onDragEnd={() => {
                         setDragId(null);
                         setDropTargetId(null);
                       }}
                       onClick={() => setSelectedId(widget.id)}
-                      className={`relative min-h-[128px] cursor-grab text-left active:cursor-grabbing ${
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") setSelectedId(widget.id);
+                      }}
+                      className={`relative min-h-[128px] cursor-grab select-none text-left active:cursor-grabbing ${
                         dragId === widget.id ? "opacity-45" : ""
                       } ${isDrop ? "rounded-2xl ring-2 ring-dt-red/70" : ""}`}
                       style={{
@@ -757,7 +773,7 @@ export function ExperiencePage() {
                           </span>
                         </div>
                       ) : null}
-                    </button>
+                    </div>
                   );
                 })}
               </div>
