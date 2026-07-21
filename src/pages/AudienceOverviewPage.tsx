@@ -12,7 +12,6 @@ import {
   Users,
   UserCheck,
 } from "lucide-react";
-import { SignupHeatmap } from "../components/SignupHeatmap";
 import {
   fetchDametimeAnalytics,
   formatMetric,
@@ -54,11 +53,6 @@ export function AudienceOverviewPage() {
     const interval = window.setInterval(() => void load(true), POLL_MS);
     return () => window.clearInterval(interval);
   }, [load]);
-
-  const maxCountry = useMemo(() => {
-    if (!analytics?.geo.countries.length) return 1;
-    return Math.max(...analytics.geo.countries.map((c) => c.count), 1);
-  }, [analytics]);
 
   const mappedPct = useMemo(() => {
     if (!analytics?.geo.totalFans) return 0;
@@ -180,40 +174,6 @@ export function AudienceOverviewPage() {
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
           <div className="border-b border-dt-border px-4 py-3.5">
-            <h3 className="font-display text-sm font-semibold tracking-wide text-white">Top countries</h3>
-            <p className="text-[11px] text-white/40">
-              {formatMetric(analytics.geo.mappedFans)} of {formatMetric(analytics.geo.totalFans)} fans mapped
-            </p>
-          </div>
-          <div className="space-y-3 p-4">
-            {analytics.geo.countries.length === 0 ? (
-              <p className="py-8 text-center text-sm text-white/40">No country data yet — new signups will appear here.</p>
-            ) : (
-              analytics.geo.countries.slice(0, 8).map((country) => (
-                <div key={country.country}>
-                  <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
-                    <span className="min-w-0 truncate text-white">
-                      <span className="mr-1.5">{country.flag}</span>
-                      {country.country}
-                    </span>
-                    <span className="shrink-0 tabular-nums text-white/70">
-                      {country.pct}% · {formatMetric(country.count)}
-                    </span>
-                  </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-dt-red to-[#ff4d57]"
-                      style={{ width: `${Math.max(4, (country.count / maxCountry) * 100)}%` }}
-                    />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-          <div className="border-b border-dt-border px-4 py-3.5">
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Audience pulse</h3>
             <p className="text-[11px] text-white/40">How the base engages in the app</p>
           </div>
@@ -242,39 +202,21 @@ export function AudienceOverviewPage() {
             ))}
           </div>
         </section>
-      </div>
 
-      <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="flex flex-col gap-1 border-b border-dt-border px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="font-display text-sm font-semibold tracking-wide text-white">Signup map</h3>
-            <p className="text-[11px] text-white/40">Where DameTime fans are signing up from</p>
+        <Link
+          to="/performance/traffic"
+          className="group flex flex-col justify-center gap-2 rounded-2xl border border-dt-border bg-dt-card p-6 transition hover:border-dt-red/40"
+        >
+          <div className="inline-flex w-fit rounded-lg border border-dt-red/25 bg-dt-red/10 p-2 text-dt-red">
+            <MapPin size={16} />
           </div>
-          <div className="inline-flex items-center gap-1.5 text-[11px] text-white/45">
-            <MapPin size={12} className="text-dt-red" />
-            {analytics.geo.points.length} hotspot{analytics.geo.points.length === 1 ? "" : "s"}
-          </div>
-        </div>
-        <div className="p-3 sm:p-4">
-          <SignupHeatmap geo={analytics.geo} />
-        </div>
-        {analytics.geo.points.length > 0 ? (
-          <div className="border-t border-dt-border px-4 py-3">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-white/40">Top cities</p>
-            <div className="flex flex-wrap gap-2">
-              {analytics.geo.points.slice(0, 10).map((point) => (
-                <span
-                  key={`${point.lat}-${point.lng}-${point.label}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/35 px-3 py-1.5 text-xs text-white/80"
-                >
-                  <span className="max-w-[180px] truncate">{point.label}</span>
-                  <span className="font-semibold text-dt-red">{formatMetric(point.count)}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </section>
+          <p className="text-sm font-semibold text-white group-hover:text-dt-red">Signup map moved</p>
+          <p className="text-xs text-white/45">
+            The heatmap, top countries, and top cities now live on the Traffic overview page with the
+            rest of the analytics.
+          </p>
+        </Link>
+      </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
