@@ -1,11 +1,14 @@
 import { useRef, useState } from "react";
-import { Check, ImagePlus, Link2, RotateCcw, Upload, UserRound } from "lucide-react";
+import { Check, ImagePlus, Link2, Palette, RotateCcw, Upload, UserRound } from "lucide-react";
 import {
   DEFAULT_AVATAR_URL,
   getDashboardAvatar,
+  getDashboardAvatarRing,
   isDefaultAvatar,
   resetDashboardAvatar,
+  RING_COLORS,
   setDashboardAvatar,
+  setDashboardAvatarRing,
 } from "../lib/adminProfile";
 
 const MAX_UPLOAD_BYTES = 2.5 * 1024 * 1024;
@@ -16,6 +19,7 @@ function fieldClass() {
 
 export function ProfilePage() {
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
+  const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
   const [urlDraft, setUrlDraft] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +112,8 @@ export function ProfilePage() {
               <img
                 src={avatar}
                 alt="Profile"
-                className="h-44 w-44 rounded-full border-4 border-dt-red object-cover object-top shadow-[0_12px_40px_rgba(229,9,20,0.25)]"
+                className="h-44 w-44 rounded-full border-4 object-cover object-top shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+                style={{ borderColor: ringColor }}
               />
               <span className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/80 text-dt-red">
                 <ImagePlus size={16} />
@@ -165,6 +170,45 @@ export function ProfilePage() {
                   e.target.value = "";
                 }}
               />
+            </div>
+
+            <div className="space-y-2">
+              <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">
+                <Palette size={12} /> Ring color
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                {RING_COLORS.map((color) => {
+                  const active = ringColor.toLowerCase() === color.value.toLowerCase();
+                  return (
+                    <button
+                      key={color.id}
+                      type="button"
+                      title={color.label}
+                      aria-label={`${color.label} ring`}
+                      aria-pressed={active}
+                      onClick={() => {
+                        setDashboardAvatarRing(color.value);
+                        setRingColor(color.value);
+                        setStatus(`Ring color set to ${color.label}`);
+                        setError(null);
+                      }}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
+                        active
+                          ? "scale-110 border-white shadow-[0_0_0_3px_rgba(255,255,255,0.15)]"
+                          : "border-white/20 hover:scale-105 hover:border-white/50"
+                      }`}
+                      style={{ backgroundColor: color.value }}
+                    >
+                      {active ? (
+                        <Check size={15} className={color.id === "white" || color.id === "gold" ? "text-black" : "text-white"} />
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-white/35">
+                Changes the circle around the photo here and in the top-right corner.
+              </p>
             </div>
 
             <div className="space-y-2">

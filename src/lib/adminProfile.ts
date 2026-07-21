@@ -2,7 +2,42 @@
 export const DEFAULT_AVATAR_URL = "https://a.espncdn.com/i/headshots/nba/players/full/6606.png";
 
 const AVATAR_KEY = "dt-dashboard-avatar";
+const RING_KEY = "dt-dashboard-avatar-ring";
 const AVATAR_EVENT = "dt-avatar-changed";
+
+export const DEFAULT_RING_COLOR = "#e31837";
+
+export const RING_COLORS: { id: string; label: string; value: string }[] = [
+  { id: "red", label: "Dame Red", value: DEFAULT_RING_COLOR },
+  { id: "white", label: "White", value: "#ffffff" },
+  { id: "gold", label: "Gold", value: "#f5b60d" },
+  { id: "green", label: "Green", value: "#22c55e" },
+  { id: "blue", label: "Blue", value: "#3b82f6" },
+  { id: "purple", label: "Purple", value: "#a855f7" },
+  { id: "black", label: "Black", value: "#000000" },
+];
+
+export function getDashboardAvatarRing(): string {
+  try {
+    return localStorage.getItem(RING_KEY)?.trim() || DEFAULT_RING_COLOR;
+  } catch {
+    return DEFAULT_RING_COLOR;
+  }
+}
+
+export function setDashboardAvatarRing(color: string) {
+  try {
+    const value = color.trim();
+    if (!value || value === DEFAULT_RING_COLOR) {
+      localStorage.removeItem(RING_KEY);
+    } else {
+      localStorage.setItem(RING_KEY, value);
+    }
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event(AVATAR_EVENT));
+}
 
 export function getDashboardAvatar(): string {
   try {

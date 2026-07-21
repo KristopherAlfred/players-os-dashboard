@@ -8,7 +8,7 @@ import {
   useDashboardSource,
   type DashboardSource,
 } from "../contexts/DashboardSourceContext";
-import { getDashboardAvatar, onDashboardAvatarChange } from "../lib/adminProfile";
+import { getDashboardAvatar, getDashboardAvatarRing, onDashboardAvatarChange } from "../lib/adminProfile";
 
 const filterOptions: { id: DashboardSource; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -32,9 +32,17 @@ export function Header({
   const { source, setSource, sourceLabel, filterPulse } = useDashboardSource();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
+  const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
   const filtersRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => onDashboardAvatarChange(() => setAvatar(getDashboardAvatar())), []);
+  useEffect(
+    () =>
+      onDashboardAvatarChange(() => {
+        setAvatar(getDashboardAvatar());
+        setRingColor(getDashboardAvatarRing());
+      }),
+    [],
+  );
   const onContent = isContentRoute(pathname);
   const allowed = onContent ? CONTENT_ALLOWED_SOURCES : ALL_DASHBOARD_SOURCES;
 
@@ -153,7 +161,8 @@ export function Header({
             <img
               src={avatar}
               alt="Damian Lillard — open profile"
-              className="h-9 w-9 rounded-full border-2 border-dt-red object-cover object-top"
+              className="h-9 w-9 rounded-full border-2 object-cover object-top"
+              style={{ borderColor: ringColor }}
             />
           </Link>
         </div>
