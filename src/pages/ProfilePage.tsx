@@ -199,14 +199,6 @@ export function ProfilePage() {
                     hsva={hsva}
                     onChange={(newShade) => applyRingHsva({ ...hsva, ...newShade })}
                   />
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="h-10 w-10 shrink-0 rounded-full border-2 border-white/25"
-                      style={{ backgroundColor: ringColor }}
-                      aria-hidden
-                    />
-                    <span className="font-mono text-sm uppercase text-white/80">{ringColor}</span>
-                  </div>
                   <p className="text-[11px] leading-relaxed text-white/40">
                     Drag on the wheel to pick the color, use the slider for brightness. Updates the
                     circle around the photo here and in the top-right corner instantly.
