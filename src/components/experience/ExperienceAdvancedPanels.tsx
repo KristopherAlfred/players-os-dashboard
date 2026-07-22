@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { TITLE_FONT_OPTIONS, type TitleFontFamily } from "../lib/typography";
+import { TITLE_FONT_OPTIONS, type TitleFontFamily } from "../../lib/typography";
 import type {
   ExperienceBrand,
   ExperienceConfig,
@@ -8,15 +8,15 @@ import type {
   ExperiencePages,
   ExperienceTheme,
   ExperienceEffectPreset,
-} from "../lib/experienceConfig";
+} from "../../lib/experienceConfig";
 import {
   BACKGROUND_COLOR_PRESETS,
   EXPERIENCE_BACKGROUNDS,
   EXPERIENCE_HEROES,
   EXPERIENCE_LOGOS,
   type ExperienceAsset,
-} from "../lib/experienceAssets";
-import { resolveAssetUrl } from "../lib/homeLayoutApi";
+} from "../../lib/experienceAssets";
+import { resolveAssetUrl } from "../../lib/homeLayoutApi";
 
 /** Prefer local dashboard copies for /experience/* so pickers work before fan-app deploy. */
 export function resolveExperiencePreviewUrl(src: string) {
