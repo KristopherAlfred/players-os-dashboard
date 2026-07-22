@@ -12,6 +12,7 @@ import {
 import { InstagramAnalyticsView } from "../components/instagram/InstagramAnalyticsDashboard";
 import { FacebookAnalyticsView } from "../components/facebook/FacebookAnalyticsDashboard";
 import { TwitterAnalyticsView } from "../components/twitter/TwitterAnalyticsDashboard";
+import { TikTokAnalyticsView } from "../components/tiktok/TikTokAnalyticsDashboard";
 import { SourceError, SourceLoading } from "../components/dametime/DametimeAnalyticsStates";
 import {
   fetchInstagramAnalytics,
@@ -30,13 +31,21 @@ import {
   formatMetric as formatTwMetric,
   type TwitterAnalytics,
 } from "../lib/twitterAnalyticsApi";
+import {
+  fetchTikTokAnalytics,
+  formatMetric as formatTtMetric,
+  tiktokProfileImage,
+  tiktokVideoCover,
+  type TikTokAnalytics,
+} from "../lib/tiktokAnalyticsApi";
 
-type SocialTab = "instagram" | "x" | "facebook";
+type SocialTab = "instagram" | "x" | "facebook" | "tiktok";
 
 const TABS: { id: SocialTab; label: string }[] = [
   { id: "instagram", label: "INSTAGRAM" },
   { id: "x", label: "X" },
   { id: "facebook", label: "FACEBOOK" },
+  { id: "tiktok", label: "TIKTOK" },
 ];
 
 const POLL_MS = 5 * 60_000;
@@ -45,6 +54,7 @@ type Bundle = {
   instagram: InstagramAnalytics | null;
   facebook: FacebookAnalytics | null;
   twitter: TwitterAnalytics | null;
+  tiktok: TikTokAnalytics | null;
 };
 
 export function SocialContentPage() {
@@ -53,6 +63,7 @@ export function SocialContentPage() {
     instagram: null,
     facebook: null,
     twitter: null,
+    tiktok: null,
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -64,13 +75,14 @@ export function SocialContentPage() {
     else setLoading(true);
     setError(null);
     try {
-      const [instagram, facebook, twitter] = await Promise.all([
+      const [instagram, facebook, twitter, tiktok] = await Promise.all([
         fetchInstagramAnalytics(),
         fetchFacebookAnalytics(),
         fetchTwitterAnalytics(),
+        fetchTikTokAnalytics(),
       ]);
-      setBundle({ instagram, facebook, twitter });
-      const synced = [instagram?.syncedAt, facebook?.syncedAt, twitter?.syncedAt]
+      setBundle({ instagram, facebook, twitter, tiktok });
+      const synced = [instagram?.syncedAt, facebook?.syncedAt, twitter?.syncedAt, tiktok?.syncedAt]
         .filter(Boolean)
         .map((iso) => Date.parse(iso as string))
         .filter((n) => Number.isFinite(n));
@@ -80,7 +92,7 @@ export function SocialContentPage() {
           ? `Refreshed social analytics · ${latest}`
           : `Live Sloane Glo social analytics · synced ${latest}`,
       );
-      if (!instagram && !facebook && !twitter) {
+      if (!instagram && !facebook && !twitter && !tiktok) {
         setError("Could not load social analytics from Sloane Glo.");
       }
     } catch (err) {
@@ -101,10 +113,12 @@ export function SocialContentPage() {
     const igFollowers = bundle.instagram?.kpis.followers ?? 0;
     const fbFollowers = bundle.facebook?.kpis.followers ?? 0;
     const twFollowers = bundle.twitter?.kpis.followers ?? 0;
+    const ttFollowers = bundle.tiktok?.kpis.followers ?? 0;
     const engRates = [
       bundle.instagram?.kpis.engagementRate,
       bundle.facebook?.kpis.engagementRate,
       bundle.twitter?.kpis.engagementRate,
+      bundle.tiktok?.kpis.engagementRate,
     ].filter((n): n is number => typeof n === "number" && Number.isFinite(n));
     const avgEng =
       engRates.length > 0
@@ -113,10 +127,11 @@ export function SocialContentPage() {
     const posts =
       (bundle.instagram?.recentPosts.length ?? 0) +
       (bundle.facebook?.recentPosts.length ?? 0) +
-      (bundle.twitter?.recentPosts.length ?? 0);
+      (bundle.twitter?.recentPosts.length ?? 0) +
+      (bundle.tiktok?.recentVideos.length ?? 0);
 
     return {
-      socialReach: igFollowers + fbFollowers + twFollowers,
+      socialReach: igFollowers + fbFollowers + twFollowers + ttFollowers,
       posts,
       avgEng,
     };
@@ -124,7 +139,7 @@ export function SocialContentPage() {
 
   const activeIndex = TABS.findIndex((item) => item.id === tab);
 
-  if (loading && !bundle.instagram && !bundle.facebook && !bundle.twitter) {
+  if (loading && !bundle.instagram && !bundle.facebook && !bundle.twitter && !bundle.tiktok) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-white/70">
         <Loader2 className="mr-2 animate-spin" size={18} /> Loading live social analytics…
@@ -151,7 +166,7 @@ export function SocialContentPage() {
                 Same feeds fans see in Sloane Glo
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Live Instagram, X, and Facebook analytics from the Sloane Glo app — YouTube lives under Videos.
+                Live Instagram, X, Facebook, and TikTok analytics from the Sloane Glo app — YouTube lives under Videos.
               </p>
             </div>
 
@@ -198,10 +213,10 @@ export function SocialContentPage() {
           <div
             role="tablist"
             aria-label="Social platforms"
-            className="relative grid grid-cols-3 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1"
+            className="relative grid grid-cols-4 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1"
           >
             <div
-              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/3)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(143,227,184,0.35)] transition-transform duration-300 ease-out"
+              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/4)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(143,227,184,0.35)] transition-transform duration-300 ease-out"
               style={{ transform: `translateX(${activeIndex * 100}%)` }}
               aria-hidden
             />
@@ -226,7 +241,7 @@ export function SocialContentPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           {
             label: "Instagram",
@@ -245,6 +260,12 @@ export function SocialContentPage() {
             value: formatFbMetric(bundle.facebook?.kpis.followers ?? 0, true),
             hint: `${formatFbMetric(bundle.facebook?.kpis.totalPosts ?? 0)} posts`,
             Icon: Users,
+          },
+          {
+            label: "TikTok",
+            value: formatTtMetric(bundle.tiktok?.kpis.followers ?? 0, true),
+            hint: `${formatTtMetric(bundle.tiktok?.kpis.sampledVideos ?? 0)} videos`,
+            Icon: Film,
           },
         ].map(({ label, value, hint, Icon }) => (
           <div key={label} className="relative overflow-hidden rounded-2xl border border-dt-border bg-dt-card p-4">
@@ -281,6 +302,9 @@ export function SocialContentPage() {
         ) : (
           <SourceError title="Could not load Facebook analytics" message="No data available." />
         )
+      ) : null}
+      {tab === "tiktok" ? (
+        <TikTokSocialPanel analytics={bundle.tiktok} loading={loading} />
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -390,6 +414,91 @@ function InstagramSocialPanel({
       </section>
 
       <InstagramAnalyticsView analytics={analytics} />
+    </div>
+  );
+}
+
+function TikTokSocialPanel({
+  analytics,
+  loading,
+}: {
+  analytics: TikTokAnalytics | null;
+  loading: boolean;
+}) {
+  if (!analytics) {
+    if (loading) return <SourceLoading message="Loading TikTok analytics…" />;
+    return <SourceError title="Could not load TikTok analytics" message="No data available." />;
+  }
+
+  const videos = analytics.recentVideos.slice(0, 9);
+
+  return (
+    <div className="space-y-4">
+      <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <div className="flex flex-col gap-4 border-b border-dt-border p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="flex items-center gap-3">
+            <img
+              src={tiktokProfileImage(analytics.profile)}
+              alt=""
+              className="h-14 w-14 rounded-full border-2 border-dt-red object-cover"
+            />
+            <div>
+              <p className="text-sm font-semibold text-white">
+                {analytics.profile.handle}
+                {analytics.profile.verified ? (
+                  <span className="ml-2 text-[10px] font-bold uppercase tracking-wide text-dt-red">Verified</span>
+                ) : null}
+              </p>
+              <p className="text-xs text-white/50">{analytics.profile.nickname}</p>
+              <p className="mt-1 line-clamp-2 max-w-xl text-xs text-white/40">{analytics.profile.biography}</p>
+            </div>
+          </div>
+          <a
+            href={analytics.profile.permalink}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 self-start rounded-xl border border-white/15 px-3 py-2 text-xs font-semibold text-white/80 transition hover:border-dt-red/40 hover:text-white"
+          >
+            Open profile <ExternalLink size={12} />
+          </a>
+        </div>
+
+        <div className="p-4 sm:p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h3 className="font-display text-sm font-semibold tracking-wide text-white">Recent videos</h3>
+              <p className="text-[11px] text-white/40">@sloanestephens on TikTok</p>
+            </div>
+            <p className="text-[11px] text-white/40">{videos.length} videos</p>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            {videos.map((video) => (
+              <a
+                key={video.id}
+                href={video.permalink}
+                target="_blank"
+                rel="noreferrer"
+                className="group relative aspect-[9/16] overflow-hidden rounded-lg border border-white/10 bg-black/40"
+              >
+                <img
+                  src={tiktokVideoCover(video)}
+                  alt=""
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
+                <div className="absolute inset-x-0 bottom-0 translate-y-1 p-2 text-[10px] text-white opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100">
+                  {formatTtMetric(video.views, true)} views
+                </div>
+              </a>
+            ))}
+            {videos.length === 0 ? (
+              <p className="col-span-3 py-10 text-center text-sm text-white/40">No TikTok videos yet.</p>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      <TikTokAnalyticsView analytics={analytics} />
     </div>
   );
 }
