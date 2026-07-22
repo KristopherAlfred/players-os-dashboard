@@ -175,8 +175,9 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     subhead: "THE OFFICIAL\nSLOANE GLO\nCOMMUNITY",
     body: "Exclusive drops, early access, giveaways, content, and real connection with Sloane and fans.",
     ctaLabel: "Join My Circle →",
-    heroImage: "",
+    heroImage: "/experience/heroes/sloanewins.png",
     titleImage: "",
+    backgroundImage: "",
     effectPreset: "glow",
   }),
   youreIn: pageDefaults({

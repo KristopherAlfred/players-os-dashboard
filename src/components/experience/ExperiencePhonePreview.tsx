@@ -60,17 +60,11 @@ function LandingPreview({ experience }: { experience: ExperienceConfig }) {
     <div className="flex h-full min-h-[560px] flex-col" style={{ background: pageBackgroundCss(page) }}>
       <BrandBar experience={experience} />
       <div className="relative flex flex-1 flex-col px-4 pb-6 pt-4">
-        {page.heroImage ? (
-          <img
-            src={resolveExperiencePreviewUrl(page.heroImage)}
-            alt=""
-            className="mb-4 h-44 w-full rounded-2xl object-cover object-top opacity-90"
-          />
-        ) : (
-          <div className="mb-4 flex h-44 items-end rounded-2xl border border-white/10 bg-black/30 p-3">
-            <p className="text-[10px] text-white/35">Hero image optional</p>
-          </div>
-        )}
+        <img
+          src={resolveExperiencePreviewUrl(page.heroImage || "/experience/heroes/sloanewins.png")}
+          alt=""
+          className="mb-4 h-44 w-full rounded-2xl object-cover object-top opacity-90"
+        />
         <p className="text-center text-[10px] font-semibold leading-relaxed tracking-[0.14em]" style={{ color: page.accentColor }}>
           {lines.map((line, i) => (
             <span key={`${line}-${i}`}>
@@ -80,6 +74,7 @@ function LandingPreview({ experience }: { experience: ExperienceConfig }) {
           ))}
         </p>
         <p className="mt-3 text-center font-display text-xl text-white">{page.headline || "Join Sloane Glo"}</p>
+        {/* Title art images are optional; headline is the Sloane Glo source of truth */}
         <p className="mt-2 text-center text-[11px] leading-relaxed text-white/60">{page.body}</p>
         <button
           type="button"
