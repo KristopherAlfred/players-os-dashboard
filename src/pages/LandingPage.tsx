@@ -12,7 +12,11 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
-import { saveDashboardSession, type DashboardRole } from "../lib/dashboardAuth";
+import {
+  isDashboardAuthed,
+  saveDashboardSession,
+  type DashboardRole,
+} from "../lib/dashboardAuth";
 
 const rosterAthletes = [
   { id: "sloane", name: "Sloane Stephens", team: "WTA", league: "Tennis" },
@@ -50,7 +54,7 @@ export function LandingPage() {
     if (!email.trim() || !password.trim()) return;
 
     saveDashboardSession({
-      name: name.trim() || (role === "admin" ? "AMX Admin" : "Athlete"),
+      name: name.trim() || (role === "admin" ? "Sloane Glo Admin" : "Sloane Stephens"),
       email: email.trim(),
       role,
     });
@@ -60,7 +64,24 @@ export function LandingPage() {
   function handleSignupRequest(e: FormEvent) {
     e.preventDefault();
     if (!signupName.trim() || !signupEmail.trim()) return;
+    // Mock verification for now — nothing is emailed. Auto-approve so you can enter.
+    saveDashboardSession({
+      name: signupName.trim(),
+      email: signupEmail.trim(),
+      role: "admin",
+    });
     setView("signup-sent");
+  }
+
+  function enterDashboard() {
+    if (!isDashboardAuthed()) {
+      saveDashboardSession({
+        name: signupName.trim() || "Sloane Glo Admin",
+        email: signupEmail.trim() || "admin@sloaneglo.com",
+        role: "admin",
+      });
+    }
+    navigate("/", { replace: true });
   }
 
   const inputClass =
@@ -73,11 +94,11 @@ export function LandingPage() {
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-black">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#1a0000] to-[#0a0000]" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#220000] to-black" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#001a0f] to-[#000a06]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#002214] to-black" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.98),transparent_40%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(143,227,184,0.48),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(180,0,0,0.32),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(143,227,184,0.28),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(143,227,184,0.22),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.88),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.45),transparent_70%)]" />
 
@@ -97,15 +118,16 @@ export function LandingPage() {
           />
         </div>
 
-        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#1a0000]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">
+        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#00140c]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">
           {view === "signin" && (
             <>
               <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#1a0000] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#00140c] to-black" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/35 via-dt-red/10 to-black" />
                 <div className="relative">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
                   <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-white">Sign In</h1>
+                  <p className="mt-1 text-xs text-white/55">Any email + password works for now (mock login).</p>
                 </div>
               </div>
 
@@ -184,7 +206,7 @@ export function LandingPage() {
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-dt-red py-3 text-sm font-semibold text-white shadow-lg shadow-dt-red/30 transition hover:bg-dt-red-hover"
                 >
                   <LogIn size={16} />
-                  Enter AMX Dashboard
+                  Enter Sloane Glo Dashboard
                 </button>
 
                 <p className="text-center text-sm text-white">
@@ -204,7 +226,7 @@ export function LandingPage() {
           {view === "signup" && (
             <>
               <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#1a0000] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#00140c] to-black" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/35 via-dt-red/10 to-black" />
                 <div className="relative">
                 <button
@@ -218,7 +240,7 @@ export function LandingPage() {
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-dt-red">Request access</p>
                 <h1 className="mt-1 font-display text-2xl font-semibold tracking-wide text-white">Sign up</h1>
                 <p className="mt-1 text-xs text-white/60">
-                  Select an athlete and request verification to join their team on AMX.
+                  Mock verification for now — you&apos;ll be auto-approved and can enter right away.
                 </p>
                 </div>
               </div>
@@ -318,7 +340,7 @@ export function LandingPage() {
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-dt-red py-3 text-sm font-semibold text-white shadow-lg shadow-dt-red/30 transition hover:bg-dt-red-hover"
                 >
                   <Send size={16} />
-                  Request verification from {selectedAthlete.name.split(" ")[0]}
+                  Continue with mock verification
                 </button>
               </form>
             </>
@@ -329,15 +351,23 @@ export function LandingPage() {
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-dt-red/15 text-dt-red">
                 <CheckCircle2 size={28} />
               </div>
-              <h2 className="font-display text-xl font-semibold text-white">Verification requested</h2>
+              <h2 className="font-display text-xl font-semibold text-white">Verified (mock)</h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Your request to join <span className="text-white">{selectedAthlete.name}</span>&apos;s team was
-                sent. They&apos;ll need to approve your account before you can sign in.
+                Nothing was emailed — verification is mocked for now. You&apos;re approved for{" "}
+                <span className="text-white">{selectedAthlete.name}</span>&apos;s Sloane Glo dashboard.
               </p>
               <button
                 type="button"
+                onClick={enterDashboard}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-dt-red py-3 text-sm font-semibold text-white shadow-lg shadow-dt-red/30 transition hover:bg-dt-red-hover"
+              >
+                <LogIn size={16} />
+                Enter dashboard
+              </button>
+              <button
+                type="button"
                 onClick={() => setView("signin")}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 py-2.5 text-sm font-semibold text-white hover:bg-white/5"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 py-2.5 text-sm font-semibold text-white hover:bg-white/5"
               >
                 <UserPlus size={15} />
                 Back to sign in
@@ -347,7 +377,7 @@ export function LandingPage() {
         </div>
 
         <p className="mt-6 max-w-sm text-center text-sm font-semibold text-white sm:text-base">
-          Authorized athletes and team staff only.
+          Mock access for building Sloane Glo — real athlete approval comes later.
         </p>
       </div>
     </div>
