@@ -1,3 +1,5 @@
+import { isDameYouTubeAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+
 export type YouTubeVideoAnalytics = {
   id: string;
   title: string;
@@ -36,11 +38,12 @@ function getApiBase() {
 }
 
 async function fetchJsonAnalytics(url: string): Promise<YouTubeAnalytics | null> {
-  const response = await fetch(url);
+  const response = await fetch(url, { cache: "no-store" });
   const contentType = response.headers.get("content-type") ?? "";
   if (!response.ok || !contentType.includes("application/json")) return null;
   const data = (await response.json()) as YouTubeAnalytics & { ok?: boolean };
   if (!data?.kpis) return null;
+  if (isDameYouTubeAnalytics(data)) return null;
   return data;
 }
 
@@ -67,7 +70,7 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
 } | null> {
   const base = getApiBase();
   const urls = [
-    `${base}/api/youtube/videos?refresh=1&limit=${limit}`,
+    `${base}/api/youtube/videos?refresh=1&limit=${limit}&channelId=${SLOANE_SOCIAL.youtubeChannelId}`,
     `${base}/api/social/analytics?source=youtube&view=videos&refresh=1&limit=${limit}`,
   ];
 
@@ -99,17 +102,27 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
         }>;
       };
       if (!data?.videos?.length || !data.channel) continue;
+      const channel = {
+        id: data.channel.id || SLOANE_SOCIAL.youtubeChannelId,
+        name: data.channel.name || "Sloane Stephens",
+        handle: data.channel.handle || `@${SLOANE_SOCIAL.youtubeHandle}`,
+        avatar: data.channel.avatar,
+        subscribers: data.channel.subscribers,
+        subscribersLabel: data.channel.subscribersLabel,
+      };
+      // Live fan API may still return Dame videos — reject those.
+      if (
+        isDameYouTubeAnalytics({
+          channel,
+          recentVideos: data.videos.map((video) => ({ title: video.title })),
+        })
+      ) {
+        continue;
+      }
       return {
         syncedAt: data.syncedAt || new Date().toISOString(),
         source: data.source,
-        channel: {
-          id: data.channel.id || "UCL88E7XtLyJKmLoaGpwxxtQ",
-          name: data.channel.name || "Sloane Stephens",
-          handle: data.channel.handle || "@sloanestephens",
-          avatar: data.channel.avatar,
-          subscribers: data.channel.subscribers,
-          subscribersLabel: data.channel.subscribersLabel,
-        },
+        channel,
         videos: data.videos,
       };
     } catch {
@@ -121,7 +134,6 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
 }
 
 export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> {
-  // Prefer the live videos feed API so newest uploads (e.g. And Still) show on Videos.
   const feed = await fetchYouTubeVideosFeed(48);
   if (feed?.videos.length) {
     const built = buildYouTubeAnalyticsFromFeed({
@@ -129,7 +141,7 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
       channel: feed.channel,
       videos: feed.videos,
     });
-    if (built) {
+    if (built && !isDameYouTubeAnalytics(built)) {
       const withSource = { ...built, source: feed.source ?? "live" } as YouTubeAnalytics;
       return enrichSubscriberStats(withSource);
     }
@@ -140,59 +152,23 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
     `${base}/api/social/analytics?source=youtube&refresh=1`,
     `${base}/api/youtube/analytics?refresh=1`,
     `${base}/api/youtube-analytics?refresh=1`,
+    "/data/youtube-analytics.json",
+    `${base}/data/youtube-analytics.json`,
   ];
 
   for (const url of apiUrls) {
     try {
       const data = await fetchJsonAnalytics(url);
-      if (data) return data;
+      if (!data) continue;
+      return url.includes("/data/")
+        ? enrichSubscriberStats({ ...data, source: "cache" })
+        : enrichSubscriberStats(data);
     } catch {
       // try next source
     }
   }
 
-  const cacheUrls = [
-    "/data/youtube-analytics.json",
-    `${base}/data/youtube-analytics.json`,
-  ];
-
-  for (const url of cacheUrls) {
-    try {
-      const data = await fetchJsonAnalytics(url);
-      if (data) return { ...data, source: "cache" };
-    } catch {
-      // try next source
-    }
-  }
-
-  try {
-    const response = await fetch(`${base}/data/youtube-videos.json`, { cache: "no-store" });
-    if (!response.ok) return null;
-    const staticFeed = (await response.json()) as {
-      channel?: {
-        id?: string;
-        name?: string;
-        handle?: string;
-        subscribers?: number;
-        subscribersLabel?: string;
-      };
-      videos?: Array<{
-        id: string;
-        title: string;
-        viewCount?: number;
-        likeCount?: number;
-        publishedAt?: string;
-        permalink?: string;
-        durationSeconds?: number;
-      }>;
-      syncedAt?: string;
-    };
-    const built = buildYouTubeAnalyticsFromFeed(staticFeed);
-    if (!built) return null;
-    return enrichSubscriberStats(built);
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 async function enrichSubscriberStats(analytics: YouTubeAnalytics): Promise<YouTubeAnalytics> {

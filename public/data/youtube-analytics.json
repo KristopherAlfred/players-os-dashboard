@@ -1,204 +1,204 @@
 {
-  "syncedAt": "2026-07-07T19:12:32.391Z",
+  "syncedAt": "2026-07-22T18:05:14.061Z",
   "source": "cache",
   "channel": {
-    "id": "UCIhTfcMzbR5wyNeh57ju0ug",
+    "id": "UCL88E7XtLyJKmLoaGpwxxtQ",
     "name": "Sloane Stephens",
     "handle": "@sloanestephens",
     "permalink": "https://www.youtube.com/@sloanestephens",
-    "subscribers": 2470000,
-    "subscribersLabel": "2.47M subscribers"
+    "subscribers": 0,
+    "subscribersLabel": "0 subscribers"
   },
   "kpis": {
-    "subscribers": 2470000,
-    "totalVideos": 30,
-    "totalViews": 1904413,
-    "avgViews": 63480,
-    "avgLikes": 1374,
-    "engagementRate": 2.16
+    "subscribers": 0,
+    "totalVideos": 13,
+    "totalViews": 2468,
+    "avgViews": 190,
+    "avgLikes": 1,
+    "engagementRate": 0.53
   },
   "recentVideos": [
     {
-      "id": "iF1S4ggCAOI",
-      "title": "Dame Recovery Mode - Drop 10",
-      "viewCount": 16352,
-      "likeCount": 670,
-      "publishedAt": "2025-11-19T16:31:11-08:00",
-      "permalink": "https://www.youtube.com/watch?v=iF1S4ggCAOI",
-      "durationSeconds": 185
+      "id": "76E08JWg9Yw",
+      "title": "US Open Champ Sloane Stephens talks getting loca 451915 1800",
+      "viewCount": 59,
+      "likeCount": 0,
+      "publishedAt": "2018-05-09T13:15:36-07:00",
+      "permalink": "https://www.youtube.com/watch?v=76E08JWg9Yw",
+      "durationSeconds": 238
     },
     {
-      "id": "oaK1isIleIw",
-      "title": "Sloane Stephens. - Gimme Some Love",
-      "viewCount": 169929,
-      "likeCount": 8840,
-      "publishedAt": "2025-11-15T07:45:07-08:00",
-      "permalink": "https://www.youtube.com/watch?v=oaK1isIleIw",
-      "durationSeconds": 137
+      "id": "pQOACsajkdI",
+      "title": "TENEX UCLA",
+      "viewCount": 70,
+      "likeCount": 0,
+      "publishedAt": "2018-05-09T13:14:48-07:00",
+      "permalink": "https://www.youtube.com/watch?v=pQOACsajkdI",
+      "durationSeconds": 60
     },
     {
-      "id": "PT5otS84FtY",
-      "title": "Sloane Stephens. - Gimme Some Love Trailer",
-      "viewCount": 2049,
-      "likeCount": 145,
-      "publishedAt": "2025-11-14T19:42:51-08:00",
-      "permalink": "https://www.youtube.com/watch?v=PT5otS84FtY",
-      "durationSeconds": 22
+      "id": "4jq4alUkHgY",
+      "title": "TENEX Net Generation Day",
+      "viewCount": 47,
+      "likeCount": 0,
+      "publishedAt": "2018-05-09T13:14:31-07:00",
+      "permalink": "https://www.youtube.com/watch?v=4jq4alUkHgY",
+      "durationSeconds": 60
     },
     {
-      "id": "cQtmAbWeH38",
-      "title": "Sloane Stephens. - Riq Havoc",
-      "viewCount": 1099323,
-      "likeCount": 11407,
-      "publishedAt": "2025-10-23T08:00:06-07:00",
-      "permalink": "https://www.youtube.com/watch?v=cQtmAbWeH38",
-      "durationSeconds": 116
+      "id": "Tgmkem2MDjk",
+      "title": "Sloane Stephens Foundation Net Generation Day",
+      "viewCount": 129,
+      "likeCount": 1,
+      "publishedAt": "2018-05-09T13:14:10-07:00",
+      "permalink": "https://www.youtube.com/watch?v=Tgmkem2MDjk",
+      "durationSeconds": 205
     },
     {
-      "id": "GqygIg_0D2g",
-      "title": "Sloane Stephens. Riq Havoc Trailer",
-      "viewCount": 4151,
-      "likeCount": 181,
-      "publishedAt": "2025-10-22T22:03:05-07:00",
-      "permalink": "https://www.youtube.com/watch?v=GqygIg_0D2g",
-      "durationSeconds": 35
+      "id": "iuSUjpZ8Ugc",
+      "title": "Clinton Special Olympics   HD 1080p",
+      "viewCount": 65,
+      "likeCount": 0,
+      "publishedAt": "2017-11-20T14:49:47-08:00",
+      "permalink": "https://www.youtube.com/watch?v=iuSUjpZ8Ugc",
+      "durationSeconds": 45
     },
     {
-      "id": "9drEtuG4gRw",
-      "title": "License to Lillard 2025 - Ep. 2: The Birth of Logo Lillard",
-      "viewCount": 28515,
-      "likeCount": 1218,
-      "publishedAt": "2025-10-10T08:00:08-07:00",
-      "permalink": "https://www.youtube.com/watch?v=9drEtuG4gRw",
-      "durationSeconds": 1277
+      "id": "8FY0YQTM-o4",
+      "title": "sloane usta   HD 720p",
+      "viewCount": 36,
+      "likeCount": 0,
+      "publishedAt": "2017-10-05T11:46:56-07:00",
+      "permalink": "https://www.youtube.com/watch?v=8FY0YQTM-o4",
+      "durationSeconds": 173
     },
     {
-      "id": "R8h8Kw38t5I",
-      "title": "License to Lillard 2025 - Ep. 2 Trailer",
-      "viewCount": 3463,
-      "likeCount": 132,
-      "publishedAt": "2025-10-09T14:08:17-07:00",
-      "permalink": "https://www.youtube.com/watch?v=R8h8Kw38t5I",
-      "durationSeconds": 34
+      "id": "tGoFxJ-wihk",
+      "title": "IMG 2432",
+      "viewCount": 43,
+      "likeCount": 1,
+      "publishedAt": "2017-09-27T12:31:45-07:00",
+      "permalink": "https://www.youtube.com/watch?v=tGoFxJ-wihk",
+      "durationSeconds": 71
     },
     {
-      "id": "IJP2QmSC3zY",
-      "title": "Dame Recovery Mode - Drop 9",
-      "viewCount": 15861,
-      "likeCount": 529,
-      "publishedAt": "2025-10-08T17:47:56-07:00",
-      "permalink": "https://www.youtube.com/watch?v=IJP2QmSC3zY",
-      "durationSeconds": 172
+      "id": "iiYqt0ua72U",
+      "title": "Serve it up Compton! A Tennis playdate for CUSD students 1",
+      "viewCount": 42,
+      "likeCount": 0,
+      "publishedAt": "2017-09-27T12:31:43-07:00",
+      "permalink": "https://www.youtube.com/watch?v=iiYqt0ua72U",
+      "durationSeconds": 97
     },
     {
-      "id": "PmCBPvH5P1I",
-      "title": "Sloane Stephens. -  Pat Bev",
-      "viewCount": 104672,
-      "likeCount": 5083,
-      "publishedAt": "2025-10-02T21:19:39-07:00",
-      "permalink": "https://www.youtube.com/watch?v=PmCBPvH5P1I",
-      "durationSeconds": 179
+      "id": "SiUjwX86chM",
+      "title": "foundation loop   HD 720p",
+      "viewCount": 45,
+      "likeCount": 0,
+      "publishedAt": "2017-09-23T18:15:39-07:00",
+      "permalink": "https://www.youtube.com/watch?v=SiUjwX86chM",
+      "durationSeconds": 38
     },
     {
-      "id": "2LnWPpPPNPw",
-      "title": "Sloane Stephens. -  Riq Havoc",
-      "viewCount": 4613,
-      "likeCount": 193,
-      "publishedAt": "2025-10-02T21:18:04-07:00",
-      "permalink": "https://www.youtube.com/watch?v=2LnWPpPPNPw",
-      "durationSeconds": 117
+      "id": "EPDXT5QBIaQ",
+      "title": "TENEX Indian Wells",
+      "viewCount": 60,
+      "likeCount": 0,
+      "publishedAt": "2017-09-23T18:13:32-07:00",
+      "permalink": "https://www.youtube.com/watch?v=EPDXT5QBIaQ",
+      "durationSeconds": 60
     },
     {
-      "id": "wAXMQ_pHv-I",
-      "title": "Sloane Stephens. - My Daddy's Son Pt.  2",
-      "viewCount": 3246,
-      "likeCount": 144,
-      "publishedAt": "2025-10-02T21:16:52-07:00",
-      "permalink": "https://www.youtube.com/watch?v=wAXMQ_pHv-I",
-      "durationSeconds": 128
+      "id": "UT5wRdzBUG8",
+      "title": "Serve It Up Compton Play Day",
+      "viewCount": 1287,
+      "likeCount": 5,
+      "publishedAt": "2016-12-21T10:29:09-08:00",
+      "permalink": "https://www.youtube.com/watch?v=UT5wRdzBUG8",
+      "durationSeconds": 174
     },
     {
-      "id": "1FRIRmI8gbo",
-      "title": "Sloane Stephens. -  DOLLA Season ft. Ivory Scott",
-      "viewCount": 5532,
-      "likeCount": 170,
-      "publishedAt": "2025-10-02T21:04:49-07:00",
-      "permalink": "https://www.youtube.com/watch?v=1FRIRmI8gbo",
-      "durationSeconds": 131
+      "id": "KigIQftg5IE",
+      "title": "Sloane Stephens visits Foster Elementary.",
+      "viewCount": 356,
+      "likeCount": 1,
+      "publishedAt": "2016-04-05T21:35:44-07:00",
+      "permalink": "https://www.youtube.com/watch?v=KigIQftg5IE",
+      "durationSeconds": 38
     }
   ],
   "topVideos": [
     {
-      "id": "cQtmAbWeH38",
-      "title": "Sloane Stephens. - Riq Havoc",
-      "viewCount": 1099323,
-      "likeCount": 11407,
-      "publishedAt": "2025-10-23T08:00:06-07:00",
-      "permalink": "https://www.youtube.com/watch?v=cQtmAbWeH38",
-      "durationSeconds": 116
+      "id": "UT5wRdzBUG8",
+      "title": "Serve It Up Compton Play Day",
+      "viewCount": 1287,
+      "likeCount": 5,
+      "publishedAt": "2016-12-21T10:29:09-08:00",
+      "permalink": "https://www.youtube.com/watch?v=UT5wRdzBUG8",
+      "durationSeconds": 174
     },
     {
-      "id": "oaK1isIleIw",
-      "title": "Sloane Stephens. - Gimme Some Love",
-      "viewCount": 169929,
-      "likeCount": 8840,
-      "publishedAt": "2025-11-15T07:45:07-08:00",
-      "permalink": "https://www.youtube.com/watch?v=oaK1isIleIw",
-      "durationSeconds": 137
-    },
-    {
-      "id": "Ipxz3feeOeQ",
-      "title": "Dame Summer 2025 Recovery Mode - Drop 2",
-      "viewCount": 135838,
-      "likeCount": 3051,
-      "publishedAt": "2025-08-04T13:07:03-07:00",
-      "permalink": "https://www.youtube.com/watch?v=Ipxz3feeOeQ",
-      "durationSeconds": 119
-    },
-    {
-      "id": "PmCBPvH5P1I",
-      "title": "Sloane Stephens. -  Pat Bev",
-      "viewCount": 104672,
-      "likeCount": 5083,
-      "publishedAt": "2025-10-02T21:19:39-07:00",
-      "permalink": "https://www.youtube.com/watch?v=PmCBPvH5P1I",
-      "durationSeconds": 179
-    },
-    {
-      "id": "s66EWh6zdlI",
-      "title": "Dame Summer 2025 Recovery Mode - Drop 1",
-      "viewCount": 80918,
-      "likeCount": 1559,
-      "publishedAt": "2025-08-01T08:28:00-07:00",
-      "permalink": "https://www.youtube.com/watch?v=s66EWh6zdlI",
+      "id": "KigIQftg5IE",
+      "title": "Sloane Stephens visits Foster Elementary.",
+      "viewCount": 356,
+      "likeCount": 1,
+      "publishedAt": "2016-04-05T21:35:44-07:00",
+      "permalink": "https://www.youtube.com/watch?v=KigIQftg5IE",
       "durationSeconds": 38
     },
     {
-      "id": "L0UTt73E9qg",
-      "title": "Dame Summer 2025 Recovery Mode - Drop 3",
-      "viewCount": 42755,
-      "likeCount": 1210,
-      "publishedAt": "2025-08-18T21:02:56-07:00",
-      "permalink": "https://www.youtube.com/watch?v=L0UTt73E9qg",
-      "durationSeconds": 178
+      "id": "bPJDboH4O1k",
+      "title": "Sloane Stephens Foundation",
+      "viewCount": 229,
+      "likeCount": 2,
+      "publishedAt": "2016-03-14T16:05:49-07:00",
+      "permalink": "https://www.youtube.com/watch?v=bPJDboH4O1k",
+      "durationSeconds": 173
     },
     {
-      "id": "E97GN62Yfr0",
-      "title": "Dame Summer 2025 Recovery Mode - Drop 4",
-      "viewCount": 40879,
-      "likeCount": 930,
-      "publishedAt": "2025-08-26T13:47:58-07:00",
-      "permalink": "https://www.youtube.com/watch?v=E97GN62Yfr0",
-      "durationSeconds": 169
+      "id": "Tgmkem2MDjk",
+      "title": "Sloane Stephens Foundation Net Generation Day",
+      "viewCount": 129,
+      "likeCount": 1,
+      "publishedAt": "2018-05-09T13:14:10-07:00",
+      "permalink": "https://www.youtube.com/watch?v=Tgmkem2MDjk",
+      "durationSeconds": 205
     },
     {
-      "id": "2X0kBM61hyg",
-      "title": "License To Lillard 2025 - Episode 1: First Series Win in 14 Years",
-      "viewCount": 29683,
-      "likeCount": 1487,
-      "publishedAt": "2025-09-19T13:00:07-07:00",
-      "permalink": "https://www.youtube.com/watch?v=2X0kBM61hyg",
-      "durationSeconds": 992
+      "id": "pQOACsajkdI",
+      "title": "TENEX UCLA",
+      "viewCount": 70,
+      "likeCount": 0,
+      "publishedAt": "2018-05-09T13:14:48-07:00",
+      "permalink": "https://www.youtube.com/watch?v=pQOACsajkdI",
+      "durationSeconds": 60
+    },
+    {
+      "id": "iuSUjpZ8Ugc",
+      "title": "Clinton Special Olympics   HD 1080p",
+      "viewCount": 65,
+      "likeCount": 0,
+      "publishedAt": "2017-11-20T14:49:47-08:00",
+      "permalink": "https://www.youtube.com/watch?v=iuSUjpZ8Ugc",
+      "durationSeconds": 45
+    },
+    {
+      "id": "EPDXT5QBIaQ",
+      "title": "TENEX Indian Wells",
+      "viewCount": 60,
+      "likeCount": 0,
+      "publishedAt": "2017-09-23T18:13:32-07:00",
+      "permalink": "https://www.youtube.com/watch?v=EPDXT5QBIaQ",
+      "durationSeconds": 60
+    },
+    {
+      "id": "76E08JWg9Yw",
+      "title": "US Open Champ Sloane Stephens talks getting loca 451915 1800",
+      "viewCount": 59,
+      "likeCount": 0,
+      "publishedAt": "2018-05-09T13:15:36-07:00",
+      "permalink": "https://www.youtube.com/watch?v=76E08JWg9Yw",
+      "durationSeconds": 238
     }
   ]
 }

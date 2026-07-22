@@ -106,7 +106,7 @@ export type DocAndGloCatalogResult = {
 };
 
 export async function fetchDocAndGloCatalog(refresh = false): Promise<DocAndGloCatalogResult> {
-  const url = `${getApiBase()}/api/doc-and-glo/catalog${refresh ? "?refresh=1" : ""}`;
+  const url = `${getApiBase()}/api/admin/analytics?view=doc-and-glo-catalog${refresh ? "&refresh=1" : ""}`;
   const response = await fetch(url);
   const data = await response.json().catch(() => ({}));
   const products = Array.isArray((data as { products?: DocAndGloCatalogProduct[] }).products)

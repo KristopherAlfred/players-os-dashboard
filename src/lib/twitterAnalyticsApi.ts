@@ -1,3 +1,5 @@
+import { isDameTwitterAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+
 export type TwitterPostAnalytics = {
   id: string;
   text: string;
@@ -39,19 +41,20 @@ function getApiBase() {
   return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
 }
 
-async function fetchJsonAnalytics(url: string): Promise<TwitterAnalytics | null> {
-  const response = await fetch(url);
+async function fetchJsonAnalytics(url: string, { allowEmpty = false } = {}): Promise<TwitterAnalytics | null> {
+  const response = await fetch(url, { cache: "no-store" });
   const contentType = response.headers.get("content-type") ?? "";
   if (!response.ok || !contentType.includes("application/json")) return null;
   const data = (await response.json()) as TwitterAnalytics & { ok?: boolean };
   if (!data?.kpis) return null;
+  if (isDameTwitterAnalytics(data)) return null;
   const hasEngagement =
     Number(data.kpis.avgLikes ?? 0) + Number(data.kpis.avgReplies ?? 0) + Number(data.kpis.avgReposts ?? 0) > 0;
-  if (!hasEngagement && data.source === "cache") return null;
+  if (!allowEmpty && !hasEngagement && data.source === "cache") return null;
   return data;
 }
 
-function normalizePost(post: {
+export function normalizePost(post: {
   id: string;
   text?: string;
   permalink?: string;
@@ -65,7 +68,7 @@ function normalizePost(post: {
   return {
     id: post.id,
     text: post.text?.trim() || "Post on X",
-    permalink: post.permalink || `https://x.com/sloanestephens/status/${post.id}`,
+    permalink: post.permalink || `https://x.com/SloaneStephens/status/${post.id}`,
     createdAt: post.createdAt || new Date().toISOString(),
     likes: Number(post.likes ?? post.stats?.likes ?? 0),
     replies: Number(post.replies ?? post.stats?.replies ?? 0),
@@ -74,7 +77,7 @@ function normalizePost(post: {
   };
 }
 
-function buildTwitterAnalyticsFromPosts(
+export function buildTwitterAnalyticsFromPosts(
   posts: TwitterPostAnalytics[],
   profile?: Partial<TwitterAnalytics["profile"]>,
 ): TwitterAnalytics | null {
@@ -97,10 +100,10 @@ function buildTwitterAnalyticsFromPosts(
     syncedAt: new Date().toISOString(),
     source: "cache",
     profile: {
-      screenName: profile?.screenName ?? "sloanestephens",
+      screenName: profile?.screenName ?? "SloaneStephens",
       name: profile?.name ?? "Sloane Stephens",
-      handle: profile?.handle ?? "@sloanestephens",
-      permalink: profile?.permalink ?? "https://x.com/sloanestephens",
+      handle: profile?.handle ?? "@SloaneStephens",
+      permalink: profile?.permalink ?? "https://x.com/SloaneStephens",
       followers,
       followersLabel:
         profile?.followersLabel ??
@@ -127,10 +130,11 @@ function buildTwitterAnalyticsFromPosts(
 
 export async function fetchTwitterAnalytics(): Promise<TwitterAnalytics | null> {
   const base = getApiBase();
+  const screen = SLOANE_SOCIAL.twitter;
   const apiUrls = [
-    `${base}/api/social/analytics?source=twitter`,
-    `${base}/api/twitter/analytics`,
-    `${base}/api/x/analytics`,
+    `${base}/api/social/analytics?source=twitter&screen_name=${screen}&refresh=1`,
+    `${base}/api/twitter/analytics?screen_name=${screen}`,
+    `${base}/api/x/analytics?screen_name=${screen}`,
   ];
 
   for (const url of apiUrls) {
@@ -142,31 +146,16 @@ export async function fetchTwitterAnalytics(): Promise<TwitterAnalytics | null> 
     }
   }
 
-  const cacheUrls = ["/data/twitter-analytics.json", `${base}/data/twitter-analytics.json`];
-
-  for (const url of cacheUrls) {
+  for (const url of ["/data/twitter-analytics.json", `${base}/data/twitter-analytics.json`]) {
     try {
-      const data = await fetchJsonAnalytics(url);
-      if (data) return { ...data, source: "cache" };
+      const data = await fetchJsonAnalytics(url, { allowEmpty: true });
+      if (data && !isDameTwitterAnalytics(data)) return { ...data, source: "cache" };
     } catch {
-      // try next source
+      // try next
     }
   }
 
-  try {
-    const response = await fetch(`${base}/data/x-posts.json`);
-    if (!response.ok) return null;
-    const feed = (await response.json()) as Array<{
-      id: string;
-      text?: string;
-      permalink?: string;
-      createdAt?: string;
-      stats?: { likes?: number; replies?: number; reposts?: number; quotes?: number };
-    }>;
-    return buildTwitterAnalyticsFromPosts(feed.map(normalizePost));
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export function formatMetric(value: number, compact = false) {

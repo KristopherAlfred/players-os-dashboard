@@ -1,3 +1,5 @@
+import { isDameFacebookAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+
 export type FacebookPostAnalytics = {
   id: string;
   text: string;
@@ -36,19 +38,20 @@ function getApiBase() {
   return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
 }
 
-async function fetchJsonAnalytics(url: string): Promise<FacebookAnalytics | null> {
-  const response = await fetch(url);
+async function fetchJsonAnalytics(url: string, { allowEmpty = false } = {}): Promise<FacebookAnalytics | null> {
+  const response = await fetch(url, { cache: "no-store" });
   const contentType = response.headers.get("content-type") ?? "";
   if (!response.ok || !contentType.includes("application/json")) return null;
   const data = (await response.json()) as FacebookAnalytics & { ok?: boolean };
   if (!data?.kpis) return null;
+  if (isDameFacebookAnalytics(data)) return null;
   const hasEngagement =
     Number(data.kpis.avgLikes ?? 0) + Number(data.kpis.avgComments ?? 0) + Number(data.kpis.avgShares ?? 0) > 0;
-  if (!hasEngagement && data.source === "cache") return null;
+  if (!allowEmpty && !hasEngagement && data.source === "cache") return null;
   return data;
 }
 
-function normalizePost(post: {
+export function normalizePost(post: {
   id: string;
   text?: string;
   permalink?: string;
@@ -61,7 +64,7 @@ function normalizePost(post: {
   return {
     id: post.id,
     text: post.text?.trim() || "Facebook post",
-    permalink: post.permalink || `https://www.facebook.com/sloanestephens/posts/${post.id}/`,
+    permalink: post.permalink || `https://www.facebook.com/sloane.stephens/posts/${post.id}/`,
     createdAt: post.createdAt || new Date().toISOString(),
     likes: Number(post.likes ?? post.stats?.likes ?? 0),
     comments: Number(post.comments ?? post.stats?.comments ?? 0),
@@ -69,7 +72,7 @@ function normalizePost(post: {
   };
 }
 
-function buildFacebookAnalyticsFromPosts(
+export function buildFacebookAnalyticsFromPosts(
   posts: FacebookPostAnalytics[],
   page?: Partial<FacebookAnalytics["page"]>,
 ): FacebookAnalytics | null {
@@ -92,10 +95,10 @@ function buildFacebookAnalyticsFromPosts(
     syncedAt: new Date().toISOString(),
     source: "cache",
     page: {
-      id: page?.id ?? "sloanestephens",
+      id: page?.id ?? "sloane.stephens",
       name: page?.name ?? "Sloane Stephens",
-      slug: page?.slug ?? "sloanestephens",
-      permalink: page?.permalink ?? "https://www.facebook.com/sloanestephens/",
+      slug: page?.slug ?? "sloane.stephens",
+      permalink: page?.permalink ?? "https://www.facebook.com/sloane.stephens/",
       followers,
       followersLabel:
         page?.followersLabel ??
@@ -126,8 +129,8 @@ async function enrichFollowerStats(analytics: FacebookAnalytics): Promise<Facebo
 
   for (const url of cacheUrls) {
     try {
-      const cached = await fetchJsonAnalytics(url);
-      if (!cached?.kpis.followers) continue;
+      const cached = await fetchJsonAnalytics(url, { allowEmpty: true });
+      if (!cached?.kpis.followers || isDameFacebookAnalytics(cached)) continue;
       return {
         ...analytics,
         page: {
@@ -152,7 +155,12 @@ async function enrichFollowerStats(analytics: FacebookAnalytics): Promise<Facebo
 
 export async function fetchFacebookAnalytics(): Promise<FacebookAnalytics | null> {
   const base = getApiBase();
-  const apiUrls = [`${base}/api/social/analytics?source=facebook`, `${base}/api/facebook/analytics`, `${base}/api/facebook-analytics`];
+  const slug = SLOANE_SOCIAL.facebook;
+  const apiUrls = [
+    `${base}/api/social/analytics?source=facebook&page=${slug}&refresh=1`,
+    `${base}/api/facebook/analytics?page=${slug}`,
+    `${base}/api/facebook-analytics?page=${slug}`,
+  ];
 
   for (const url of apiUrls) {
     try {
@@ -163,33 +171,19 @@ export async function fetchFacebookAnalytics(): Promise<FacebookAnalytics | null
     }
   }
 
-  const cacheUrls = ["/data/facebook-analytics.json", `${base}/data/facebook-analytics.json`];
-
-  for (const url of cacheUrls) {
+  // Prefer dashboard-bundled Sloane cache even if follower scrape is empty.
+  for (const url of ["/data/facebook-analytics.json", `${base}/data/facebook-analytics.json`]) {
     try {
-      const data = await fetchJsonAnalytics(url);
-      if (data) return enrichFollowerStats({ ...data, source: "cache" });
+      const data = await fetchJsonAnalytics(url, { allowEmpty: true });
+      if (data && !isDameFacebookAnalytics(data)) {
+        return enrichFollowerStats({ ...data, source: "cache" });
+      }
     } catch {
-      // try next source
+      // try next
     }
   }
 
-  try {
-    const response = await fetch(`${base}/data/facebook-posts.json`);
-    if (!response.ok) return null;
-    const feed = (await response.json()) as Array<{
-      id: string;
-      text?: string;
-      permalink?: string;
-      createdAt?: string;
-      stats?: { likes?: number; comments?: number; shares?: number };
-    }>;
-    const built = buildFacebookAnalyticsFromPosts(feed.map(normalizePost));
-    if (!built) return null;
-    return enrichFollowerStats(built);
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export function formatMetric(value: number, compact = false) {

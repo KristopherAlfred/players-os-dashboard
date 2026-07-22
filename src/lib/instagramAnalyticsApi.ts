@@ -1,3 +1,5 @@
+import { isDameInstagramAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+
 export type InstagramPostAnalytics = {
   id: string;
   code: string;
@@ -66,36 +68,33 @@ export function instagramProfileImage(profile: InstagramAnalytics["profile"]) {
   return profile.profilePicUrl;
 }
 
+async function readInstagramAnalytics(url: string): Promise<InstagramAnalytics | null> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    const data = (await response.json()) as InstagramAnalytics & { ok?: boolean };
+    if (!data?.kpis) return null;
+    if (isDameInstagramAnalytics(data)) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchInstagramAnalytics(): Promise<InstagramAnalytics | null> {
   const base = getApiBase();
-  const apiUrls = [
-    `${base}/api/social/analytics?source=instagram&username=sloanestephens&refresh=1`,
-    `${base}/api/instagram/analytics?username=sloanestephens&refresh=1`,
+  const username = SLOANE_SOCIAL.instagram;
+  const urls = [
+    `${base}/api/social/analytics?source=instagram&username=${username}&refresh=1`,
+    `${base}/api/instagram/analytics?username=${username}&refresh=1`,
+    "/data/instagram-analytics.json",
+    `${base}/data/instagram-analytics.json`,
   ];
 
-  for (const url of apiUrls) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) continue;
-      const data = (await response.json()) as InstagramAnalytics & { ok?: boolean };
-      if (!data?.kpis) continue;
-      return data;
-    } catch {
-      // try next source
-    }
-  }
-
-  const cacheUrls = ["/data/instagram-analytics.json", `${base}/data/instagram-analytics.json`];
-  for (const url of cacheUrls) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) continue;
-      const data = (await response.json()) as InstagramAnalytics;
-      if (!data?.kpis) continue;
-      return { ...data, source: "cache" };
-    } catch {
-      // try next source
-    }
+  for (const url of urls) {
+    const data = await readInstagramAnalytics(url);
+    if (!data) continue;
+    return url.includes("/data/") ? { ...data, source: "cache" } : data;
   }
 
   return null;
