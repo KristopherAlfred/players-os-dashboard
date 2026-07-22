@@ -1,5 +1,6 @@
-/** Default Sloane Glo dashboard avatar. */
-export const DEFAULT_AVATAR_URL = "/images/sloane-avatar.png";
+/** Sloane Stephens' official ESPN headshot — the default dashboard avatar. */
+export const DEFAULT_AVATAR_URL =
+  "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png";
 
 const AVATAR_KEY = "dt-dashboard-avatar";
 const RING_KEY = "dt-dashboard-avatar-ring";
