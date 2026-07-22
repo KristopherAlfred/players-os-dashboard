@@ -80,7 +80,7 @@ type TitleFilter =
   | "lowercase"
   | "stacked"
   | "single_line"
-  | "dame_style";
+  | "sloane_style";
 
 const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
   { id: "as_typed", label: "As typed", hint: "Keep your wording" },
@@ -126,7 +126,7 @@ function applyTitleFilter(title: string, filter: TitleFilter) {
         .join("\n");
     case "single_line":
       return flat.toUpperCase();
-    case "dame_style": {
+    case "sloane_style": {
       const words = flat.toUpperCase().split(/\s+/).filter(Boolean);
       if (words.length <= 2) return words.join("\n");
       if (words.length === 3) return `${words[0]}\n${words[1]}\n${words[2]}`;
