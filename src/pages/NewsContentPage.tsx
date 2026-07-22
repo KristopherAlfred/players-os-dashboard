@@ -388,7 +388,7 @@ export function NewsContentPage() {
                   value={draft.title}
                   onChange={(e) => patchDraft({ title: e.target.value })}
                   className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="Loyalty Over Everything"
+                  placeholder="Sincerely, Sloane Episode #21"
                   style={titleTypographyStyle(draft)}
                 />
               </label>
