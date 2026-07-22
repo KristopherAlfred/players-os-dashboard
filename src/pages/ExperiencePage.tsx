@@ -9,6 +9,7 @@ import {
   ImagePlus,
   Loader2,
   Newspaper,
+  Palette,
   Plus,
   Sparkles,
   Ticket,
@@ -16,13 +17,16 @@ import {
   Undo2,
   Upload,
   LayoutTemplate,
+  Wand2,
 } from "lucide-react";
 import {
   createWidget,
   fetchHomeLayout,
   generateHomeImage,
+  getExperienceFromLayout,
   publishHomeLayout,
   resolveAssetUrl,
+  withExperience,
   WIDGET_SIZES,
   widgetSpan,
   type HomeLayout,
@@ -30,9 +34,51 @@ import {
   type HomeWidgetSize,
   type HomeWidgetType,
 } from "../lib/homeLayoutApi";
+import type { ExperienceConfig, ExperiencePageConfig, WidgetVisualStyle } from "../lib/experienceConfig";
+import { widgetStyleCss } from "../lib/experienceConfig";
 import { titleTypographyStyle } from "../lib/typography";
 import { TypographyControls } from "../components/TypographyControls";
 import { DtSelect } from "../components/DtSelect";
+import {
+  ExperienceBrandPanel,
+  ExperienceEffectsPanel,
+  ExperiencePagePanel,
+  ExperiencePreviewChrome,
+  ExperienceThemePanel,
+} from "../components/experience/ExperienceAdvancedPanels";
+
+type ExperienceSection =
+  | "boxes"
+  | "brand"
+  | "theme"
+  | "effects"
+  | "landing"
+  | "youreIn"
+  | "settings"
+  | "homePage";
+
+const SECTIONS: { id: ExperienceSection; label: string }[] = [
+  { id: "brand", label: "Brand / Logo" },
+  { id: "theme", label: "Colors" },
+  { id: "effects", label: "Effects" },
+  { id: "landing", label: "Landing" },
+  { id: "youreIn", label: "You're In" },
+  { id: "settings", label: "Settings" },
+  { id: "homePage", label: "Home chrome" },
+  { id: "boxes", label: "Home boxes" },
+];
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") resolve(reader.result);
+      else reject(new Error("Could not read file"));
+    };
+    reader.onerror = () => reject(new Error("Could not read file"));
+    reader.readAsDataURL(file);
+  });
+}
 
 const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: typeof Ticket }[] = [
   { type: "tickets", label: "Sloane Glo Tickets", hint: "Ticket drops", Icon: Ticket },
@@ -144,7 +190,8 @@ function fieldClass() {
 function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boolean }) {
   const lines = titleLines(widget.title);
   const fit = widget.imageFit || "half";
-  const titleStyle = titleTypographyStyle(widget);
+  const titleStyle = { ...titleTypographyStyle(widget), color: widget.style?.textColor };
+  const visual = widgetStyleCss(widget.style);
   return (
     <div
       className={`relative flex h-full min-h-[112px] overflow-hidden rounded-2xl border transition ${
@@ -152,6 +199,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
           ? "border-dt-red shadow-[0_0_0_1px_rgba(143,227,184,0.45),0_8px_24px_rgba(143,227,184,0.18)]"
           : "border-white/10 hover:border-white/25"
       } bg-gradient-to-br from-white/[0.06] to-black/80`}
+      style={visual}
     >
       {fit === "full" ? (
         <>
@@ -214,6 +262,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
 
 export function ExperiencePage() {
   const [layout, setLayout] = useState<HomeLayout | null>(null);
+  const [section, setSection] = useState<ExperienceSection>("brand");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -249,6 +298,8 @@ export function ExperiencePage() {
     [layout, selectedId],
   );
 
+  const experience = useMemo(() => getExperienceFromLayout(layout), [layout]);
+
   const ordered = useMemo(
     () => (layout ? [...layout.widgets].sort((a, b) => a.order - b.order) : []),
     [layout],
@@ -257,15 +308,51 @@ export function ExperiencePage() {
   const visibleCount = ordered.filter((w) => w.enabled).length;
   const canUndo = history.length > 0;
 
-  function updateWidgets(updater: (widgets: HomeWidget[]) => HomeWidget[]) {
-    if (!layout) return;
+  function pushHistory(current: HomeLayout) {
     if (!skippingHistory.current) {
-      setHistory((prev) => [...prev.slice(-29), structuredClone(layout)]);
+      setHistory((prev) => [...prev.slice(-29), structuredClone(current)]);
     }
     skippingHistory.current = false;
+  }
+
+  function updateWidgets(updater: (widgets: HomeWidget[]) => HomeWidget[]) {
+    if (!layout) return;
+    pushHistory(layout);
     setDirty(true);
     const widgets = updater([...layout.widgets]).map((w, index) => ({ ...w, order: index }));
     setLayout({ ...layout, widgets });
+  }
+
+  function patchExperience(updater: (prev: ExperienceConfig) => ExperienceConfig) {
+    if (!layout) return;
+    pushHistory(layout);
+    setDirty(true);
+    setLayout(withExperience(layout, updater(experience)));
+    setStatus("Experience updated — publish to push live");
+  }
+
+  function patchPage(pageKey: keyof ExperienceConfig["pages"], patch: Partial<ExperiencePageConfig>) {
+    patchExperience((prev) => ({
+      ...prev,
+      pages: {
+        ...prev.pages,
+        [pageKey]: { ...prev.pages[pageKey], ...patch },
+      },
+    }));
+  }
+
+  async function uploadIntoExperience(
+    apply: (dataUrl: string) => void,
+    file: File | null,
+  ) {
+    if (!file) return;
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      apply(dataUrl);
+      setStatus("Image uploaded");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    }
   }
 
   function undoChange() {
@@ -357,15 +444,16 @@ export function ExperiencePage() {
     setError(null);
     setStatus(null);
     try {
+      const withXp = withExperience(layout, getExperienceFromLayout(layout));
       const published = await publishHomeLayout({
-        ...layout,
+        ...withXp,
         version: (layout.version || 1) + 1,
         updatedAt: new Date().toISOString(),
-        widgets: layout.widgets.map((w, index) => ({ ...w, order: index })),
+        widgets: withXp.widgets.map((w, index) => ({ ...w, order: index })),
       });
       setLayout(published);
       setDirty(false);
-      setStatus("Published to Sloane Glo app home");
+      setStatus("Published experience to Sloane Glo");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Publish failed");
     } finally {
@@ -442,14 +530,15 @@ export function ExperiencePage() {
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
-                <Sparkles size={12} />
-                Experience builder
+                <Wand2 size={12} />
+                Advanced experience studio
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Design the Sloane Glo home experience
+                Customize every page of Sloane Glo
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Drag tiles, swap art, drop in Tickets or custom boxes, generate AI cutouts, then publish straight to the fan app.
+                Logos, gradients, button colors, fonts, effects, landing / you&apos;re-in / settings / home boxes —
+                edit here and publish live to the fan app.
               </p>
             </div>
 
@@ -501,6 +590,113 @@ export function ExperiencePage() {
         )}
       </div>
 
+      <div className="flex flex-wrap gap-1.5 rounded-2xl border border-dt-border bg-dt-card p-2">
+        {SECTIONS.map((item) => {
+          const active = section === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSection(item.id)}
+              className={`rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition ${
+                active
+                  ? "bg-dt-red text-white shadow-[0_8px_24px_rgba(143,227,184,0.28)]"
+                  : "text-white/45 hover:bg-white/[0.04] hover:text-white/80"
+              }`}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {section !== "boxes" ? (
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+          <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+            <div className="border-b border-dt-border px-4 py-3">
+              <h3 className="font-display text-sm font-semibold tracking-wide text-white">
+                {SECTIONS.find((s) => s.id === section)?.label}
+              </h3>
+              <p className="text-[11px] text-white/40">Changes sync to Sloane Glo when you publish</p>
+            </div>
+            <div className="p-4">
+              {section === "brand" ? (
+                <ExperienceBrandPanel
+                  brand={experience.brand}
+                  onChange={(patch) =>
+                    patchExperience((prev) => ({ ...prev, brand: { ...prev.brand, ...patch } }))
+                  }
+                  onUploadLogo={(file) =>
+                    void uploadIntoExperience(
+                      (logoSrc) =>
+                        patchExperience((prev) => ({
+                          ...prev,
+                          brand: { ...prev.brand, logoSrc, showLogoImage: true },
+                        })),
+                      file,
+                    )
+                  }
+                />
+              ) : null}
+              {section === "theme" ? (
+                <ExperienceThemePanel
+                  theme={experience.theme}
+                  onChange={(patch) =>
+                    patchExperience((prev) => ({ ...prev, theme: { ...prev.theme, ...patch } }))
+                  }
+                />
+              ) : null}
+              {section === "effects" ? (
+                <ExperienceEffectsPanel
+                  effects={experience.effects}
+                  onChange={(patch) =>
+                    patchExperience((prev) => ({ ...prev, effects: { ...prev.effects, ...patch } }))
+                  }
+                />
+              ) : null}
+              {section === "landing" ||
+              section === "youreIn" ||
+              section === "settings" ||
+              section === "homePage" ? (
+                <ExperiencePagePanel
+                  pageKey={section === "homePage" ? "home" : section}
+                  page={
+                    experience.pages[
+                      section === "homePage" ? "home" : section
+                    ]
+                  }
+                  onChange={(patch) =>
+                    patchPage(section === "homePage" ? "home" : section, patch)
+                  }
+                  onUpload={(field, file) =>
+                    void uploadIntoExperience((dataUrl) => {
+                      patchPage(section === "homePage" ? "home" : section, {
+                        [field]: dataUrl,
+                      });
+                    }, file)
+                  }
+                />
+              ) : null}
+            </div>
+          </section>
+          <div className="space-y-4">
+            <ExperiencePreviewChrome experience={experience} />
+            <div className="rounded-2xl border border-dt-border bg-dt-card p-4 text-xs text-white/55">
+              <p className="mb-2 flex items-center gap-2 font-semibold text-white">
+                <Palette size={14} className="text-dt-red" /> Studio tips
+              </p>
+              <ul className="space-y-1.5 list-disc pl-4">
+                <li>Upload custom logos and tint the wordmark any color.</li>
+                <li>Layer glow, noise, vignette, and animated gradients.</li>
+                <li>Landing / You&apos;re In / Settings each have their own copy + art.</li>
+                <li>Home boxes still support per-tile colors and effects.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {section === "boxes" ? (
       <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_minmax(400px,440px)]">
         {/* Left: Home boxes + AI studio */}
         <div className="flex min-w-0 flex-col gap-4">
@@ -706,7 +902,15 @@ export function ExperiencePage() {
           <div className="exp-phone-shell relative w-full max-w-[340px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
             <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
             <div className="border-b border-white/10 bg-[#0d0d0d] px-4 pb-3 pt-8 text-center">
-              <p className="text-[10px] font-semibold tracking-[0.28em] text-white/55">DAMETIME HOME</p>
+              <p
+                className="text-[10px] font-semibold tracking-[0.28em]"
+                style={{ color: experience.brand.wordmarkColor }}
+              >
+                {experience.brand.wordmark || "SLOANE GLO"}
+              </p>
+              <p className="mt-1 text-[9px]" style={{ color: experience.brand.taglineColor }}>
+                {experience.brand.tagline}
+              </p>
             </div>
             <div className="space-y-2 bg-[radial-gradient(circle_at_top,_#321018_0%,_#0a0a0a_52%)] p-3 pb-6">
               {layout.heroEnabled ? (
@@ -951,12 +1155,82 @@ export function ExperiencePage() {
                         className={fieldClass()}
                       />
                     </label>
+
+                    <div className="space-y-3 rounded-xl border border-dt-red/25 bg-dt-red/5 p-3">
+                      <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
+                        <Palette size={12} /> Advanced box look
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="block space-y-1">
+                          <span className="text-[10px] text-white/40">Gradient from</span>
+                          <input
+                            type="color"
+                            value={selected.style?.gradientFrom || "#0a1a12"}
+                            onChange={(e) =>
+                              patchSelected({
+                                style: { ...selected.style, gradientFrom: e.target.value } as WidgetVisualStyle,
+                              })
+                            }
+                            className="h-9 w-full cursor-pointer rounded border border-dt-border bg-transparent"
+                          />
+                        </label>
+                        <label className="block space-y-1">
+                          <span className="text-[10px] text-white/40">Gradient to</span>
+                          <input
+                            type="color"
+                            value={selected.style?.gradientTo || "#050505"}
+                            onChange={(e) =>
+                              patchSelected({
+                                style: { ...selected.style, gradientTo: e.target.value } as WidgetVisualStyle,
+                              })
+                            }
+                            className="h-9 w-full cursor-pointer rounded border border-dt-border bg-transparent"
+                          />
+                        </label>
+                        <label className="block space-y-1">
+                          <span className="text-[10px] text-white/40">Text color</span>
+                          <input
+                            type="color"
+                            value={selected.style?.textColor || "#ffffff"}
+                            onChange={(e) =>
+                              patchSelected({
+                                style: { ...selected.style, textColor: e.target.value } as WidgetVisualStyle,
+                              })
+                            }
+                            className="h-9 w-full cursor-pointer rounded border border-dt-border bg-transparent"
+                          />
+                        </label>
+                        <label className="block space-y-1">
+                          <span className="text-[10px] text-white/40">Effect</span>
+                          <select
+                            value={selected.style?.effect || "none"}
+                            onChange={(e) =>
+                              patchSelected({
+                                style: {
+                                  ...selected.style,
+                                  effect: e.target.value as WidgetVisualStyle["effect"],
+                                },
+                              })
+                            }
+                            className={fieldClass()}
+                          >
+                            <option value="none">None</option>
+                            <option value="glow">Glow</option>
+                            <option value="neon">Neon</option>
+                            <option value="glass">Glass</option>
+                            <option value="shimmer">Shimmer</option>
+                            <option value="soft">Soft</option>
+                          </select>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
           </section>
       </div>
+      ) : null}
     </div>
   );
 }

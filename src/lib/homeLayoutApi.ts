@@ -1,3 +1,17 @@
+import type {
+  ExperienceBrand,
+  ExperienceConfig,
+  ExperienceEffects,
+  ExperiencePages,
+  ExperienceTheme,
+  WidgetVisualStyle,
+} from "./experienceConfig";
+import {
+  DEFAULT_EXPERIENCE_CONFIG,
+  normalizeExperienceConfig,
+  normalizeWidgetVisualStyle,
+} from "./experienceConfig";
+
 export type HomeWidgetType =
   | "videos"
   | "news"
@@ -26,6 +40,7 @@ export type HomeWidget = {
   showMusicBars?: boolean;
   titleFontFamily?: import("./typography").TitleFontFamily;
   titleFontSize?: import("./typography").TitleFontSize;
+  style?: WidgetVisualStyle;
 };
 
 export type HomeLayout = {
@@ -33,7 +48,38 @@ export type HomeLayout = {
   updatedAt: string;
   heroEnabled: boolean;
   widgets: HomeWidget[];
+  brand?: ExperienceBrand;
+  theme?: ExperienceTheme;
+  effects?: ExperienceEffects;
+  pages?: ExperiencePages;
+  experience?: ExperienceConfig;
 };
+
+export function getExperienceFromLayout(layout: HomeLayout | null | undefined): ExperienceConfig {
+  if (!layout) return DEFAULT_EXPERIENCE_CONFIG;
+  if (layout.experience) return normalizeExperienceConfig(layout.experience);
+  return normalizeExperienceConfig({
+    brand: layout.brand,
+    theme: layout.theme,
+    effects: layout.effects,
+    pages: layout.pages,
+  });
+}
+
+export function withExperience(layout: HomeLayout, experience: ExperienceConfig): HomeLayout {
+  const next = normalizeExperienceConfig(experience);
+  return {
+    ...layout,
+    brand: next.brand,
+    theme: next.theme,
+    effects: next.effects,
+    pages: next.pages,
+    experience: next,
+  };
+}
+
+export { normalizeWidgetVisualStyle, DEFAULT_EXPERIENCE_CONFIG };
+export type { ExperienceConfig, WidgetVisualStyle };
 
 function getApiBase() {
   return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
