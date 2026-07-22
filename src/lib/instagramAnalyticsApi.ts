@@ -85,9 +85,9 @@ export async function fetchInstagramAnalytics(): Promise<InstagramAnalytics | nu
   const base = getApiBase();
   const username = SLOANE_SOCIAL.instagram;
   const urls = [
+    "/data/instagram-analytics.json",
     `${base}/api/social/analytics?source=instagram&username=${username}&refresh=1`,
     `${base}/api/instagram/analytics?username=${username}&refresh=1`,
-    "/data/instagram-analytics.json",
     `${base}/data/instagram-analytics.json`,
   ];
 

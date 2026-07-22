@@ -149,10 +149,10 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
 
   const base = getApiBase();
   const apiUrls = [
+    "/data/youtube-analytics.json",
     `${base}/api/social/analytics?source=youtube&refresh=1`,
     `${base}/api/youtube/analytics?refresh=1`,
     `${base}/api/youtube-analytics?refresh=1`,
-    "/data/youtube-analytics.json",
     `${base}/data/youtube-analytics.json`,
   ];
 
