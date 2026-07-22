@@ -6,6 +6,8 @@ export type ExperienceEffectPreset = "none" | "glow" | "shimmer" | "glass" | "ne
 export type ExperienceBrand = {
   logoSrc: string;
   logoColor: string;
+  /** Recolor illustrated logos with logoColor (mask tint). */
+  logoTint: boolean;
   wordmark: string;
   wordmarkColor: string;
   wordmarkFontFamily?: TitleFontFamily;
@@ -68,6 +70,10 @@ export type ExperiencePageConfig = {
   accentColor: string;
   heroImage: string;
   titleImage: string;
+  /** Hero art scale percent (40–180). */
+  heroScale: number;
+  heroFit: "contain" | "cover";
+  heroPosition: string;
   effectPreset: ExperienceEffectPreset;
   loaderLabel?: string;
   title?: string;
@@ -102,6 +108,7 @@ export type ExperienceConfig = {
 export const DEFAULT_EXPERIENCE_BRAND: ExperienceBrand = {
   logoSrc: "/experience/logos/logo-ai-crown.png",
   logoColor: "#8FE3B8",
+  logoTint: true,
   wordmark: "SLOANE GLO",
   wordmarkColor: "#FFFFFF",
   wordmarkFontFamily: "default",
@@ -164,6 +171,9 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     accentColor: "#8FE3B8",
     heroImage: "",
     titleImage: "",
+    heroScale: 100,
+    heroFit: "contain",
+    heroPosition: "right center",
     effectPreset: "soft",
     ...partial,
   };
@@ -175,7 +185,7 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     subhead: "THE OFFICIAL\nSLOANE GLO\nCOMMUNITY",
     body: "Exclusive drops, early access, giveaways, content, and real connection with Sloane and fans.",
     ctaLabel: "Join My Circle →",
-    heroImage: "/experience/heroes/sloanewins.png",
+    heroImage: "",
     titleImage: "",
     backgroundImage: "",
     effectPreset: "glow",
@@ -245,6 +255,7 @@ export function normalizeExperienceBrand(raw: unknown): ExperienceBrand {
   return {
     logoSrc: asString(b.logoSrc, DEFAULT_EXPERIENCE_BRAND.logoSrc),
     logoColor: asString(b.logoColor, DEFAULT_EXPERIENCE_BRAND.logoColor),
+    logoTint: asBool(b.logoTint, DEFAULT_EXPERIENCE_BRAND.logoTint),
     wordmark: asString(b.wordmark, DEFAULT_EXPERIENCE_BRAND.wordmark),
     wordmarkColor: asString(b.wordmarkColor, DEFAULT_EXPERIENCE_BRAND.wordmarkColor),
     wordmarkFontFamily: normalizeTitleFontFamily(b.wordmarkFontFamily) ?? DEFAULT_EXPERIENCE_BRAND.wordmarkFontFamily,
@@ -318,6 +329,9 @@ export function normalizeExperiencePage(
     accentColor: asString(p.accentColor, fallback.accentColor),
     heroImage: asString(p.heroImage, fallback.heroImage),
     titleImage: asString(p.titleImage, fallback.titleImage),
+    heroScale: Math.max(40, Math.min(180, asNumber(p.heroScale, fallback.heroScale ?? 100))),
+    heroFit: p.heroFit === "cover" ? "cover" : "contain",
+    heroPosition: asString(p.heroPosition, fallback.heroPosition || "right center"),
     effectPreset: normalizeEffectPreset(p.effectPreset, fallback.effectPreset),
     loaderLabel: asString(p.loaderLabel, fallback.loaderLabel || ""),
     title: asString(p.title, fallback.title || ""),

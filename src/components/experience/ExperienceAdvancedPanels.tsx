@@ -10,12 +10,13 @@ import type {
 } from "../../lib/experienceConfig";
 import {
   GRADIENT_BACKGROUND_PRESETS,
-  EXPERIENCE_HEROES,
   EXPERIENCE_LOGOS,
+  HERO_POSITION_OPTIONS,
   type ExperienceAsset,
   type GradientBackgroundPreset,
 } from "../../lib/experienceAssets";
 import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
+import { TintedBrandLogo } from "./TintedBrandLogo";
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -233,13 +234,11 @@ export function ExperienceBrandPanel({
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dt-red">Live logo preview</p>
         <div className="flex items-center gap-3">
           {brand.showLogoImage && brand.logoSrc ? (
-            <img
+            <TintedBrandLogo
               src={resolveExperiencePreviewUrl(brand.logoSrc)}
-              alt=""
-              className="h-12 w-12 rounded-full object-cover"
-              style={{
-                filter: "drop-shadow(0 0 10px var(--preview-logo, #8FE3B8))",
-              }}
+              color={brand.logoColor}
+              tint={brand.logoTint !== false}
+              size={48}
             />
           ) : null}
           <div>
@@ -260,16 +259,16 @@ export function ExperienceBrandPanel({
       />
 
       <AssetPicker
-        label="Pick an AI logo"
+        label="Pick a starter logo"
         assets={EXPERIENCE_LOGOS}
         value={brand.logoSrc}
-        onSelect={(logoSrc) => onChange({ logoSrc, showLogoImage: Boolean(logoSrc) })}
+        onSelect={(logoSrc) => onChange({ logoSrc, showLogoImage: Boolean(logoSrc), logoTint: true })}
       />
 
-      <Field label="Logo image URL" hint="Custom AI / illustrated mark only — no photo headshots">
+      <Field label="Logo image URL" hint="Or upload your own mark">
         <TextInput value={brand.logoSrc} onChange={(logoSrc) => onChange({ logoSrc })} />
       </Field>
-      <Field label="Upload custom AI logo">
+      <Field label="Upload logo">
         <input
           type="file"
           accept="image/*"
@@ -277,7 +276,12 @@ export function ExperienceBrandPanel({
           className="block w-full text-xs text-white/70"
         />
       </Field>
-      <Field label="Logo accent color" hint="Used for glow / accent around the mark">
+      <Toggle
+        checked={brand.logoTint !== false}
+        onChange={(logoTint) => onChange({ logoTint })}
+        label="Tint logo with color below"
+      />
+      <Field label="Logo color" hint="Recolors illustrated / AI logos (turn tint off for photo uploads)">
         <ColorInput value={brand.logoColor} onChange={(logoColor) => onChange({ logoColor })} />
       </Field>
       <Field label="Wordmark text (under / beside logo)">
@@ -575,45 +579,92 @@ export function ExperiencePagePanel({
         </>
       ) : null}
 
-      <AssetPicker
-        label="Hero / player image"
-        assets={EXPERIENCE_HEROES}
-        value={page.heroImage}
-        onSelect={(heroImage) => onChange({ heroImage })}
-      />
-      <AssetPicker
-        label="Title art image"
-        assets={EXPERIENCE_LOGOS}
-        value={page.titleImage}
-        onSelect={(titleImage) => onChange({ titleImage })}
-        aspect="wide"
-      />
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        {(
-          [
-            ["heroImage", "Hero / player image"],
-            ["titleImage", "Title art image"],
-          ] as const
-        ).map(([field, label]) => (
-          <div key={field} className="space-y-2 rounded-lg border border-dt-border p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">{label}</p>
-            {page[field] ? (
-              <img src={resolveExperiencePreviewUrl(page[field])} alt="" className="h-24 w-full rounded object-cover" />
-            ) : (
-              <div className="flex h-24 items-center justify-center rounded border border-dashed border-white/15 text-[11px] text-white/35">
-                No image
-              </div>
-            )}
-            <TextInput value={page[field]} onChange={(value) => onChange({ [field]: value })} />
-            <input
-              type="file"
-              accept="image/*"
-              className="block w-full text-[10px] text-white/60"
-              onChange={(e) => onUpload(field, e.target.files?.[0] ?? null)}
+      <div className="space-y-3 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
+          Hero / player image
+        </p>
+        <p className="text-[11px] text-white/40">
+          Empty by default — upload your athlete art (transparent PNGs work best).
+        </p>
+        {page.heroImage ? (
+          <div className="overflow-hidden rounded-lg border border-white/10 bg-black/40 p-2">
+            <img
+              src={resolveExperiencePreviewUrl(page.heroImage)}
+              alt=""
+              className="mx-auto max-h-40 w-full"
+              style={{
+                objectFit: page.heroFit || "contain",
+                objectPosition: page.heroPosition || "right center",
+                transform: `scale(${(page.heroScale || 100) / 100})`,
+                transformOrigin: "center bottom",
+              }}
             />
           </div>
-        ))}
+        ) : (
+          <div className="flex h-28 items-center justify-center rounded border border-dashed border-white/15 text-[11px] text-white/35">
+            Placement preview only — no starter photo
+          </div>
+        )}
+        <TextInput value={page.heroImage} onChange={(heroImage) => onChange({ heroImage })} />
+        <input
+          type="file"
+          accept="image/*"
+          className="block w-full text-[10px] text-white/60"
+          onChange={(e) => onUpload("heroImage", e.target.files?.[0] ?? null)}
+        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label={`Size (${page.heroScale || 100}%)`}>
+            <input
+              type="range"
+              min={40}
+              max={180}
+              value={page.heroScale || 100}
+              onChange={(e) => onChange({ heroScale: Number(e.target.value) })}
+              className="w-full"
+            />
+          </Field>
+          <Field label="Fit">
+            <select
+              value={page.heroFit || "contain"}
+              onChange={(e) => onChange({ heroFit: e.target.value as "contain" | "cover" })}
+              className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm"
+            >
+              <option value="contain">Contain (no crop)</option>
+              <option value="cover">Cover (fill)</option>
+            </select>
+          </Field>
+          <Field label="Position">
+            <select
+              value={page.heroPosition || "right center"}
+              onChange={(e) => onChange({ heroPosition: e.target.value })}
+              className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm"
+            >
+              {HERO_POSITION_OPTIONS.map((opt) => (
+                <option key={opt.id} value={opt.id}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+      </div>
+
+      <div className="space-y-2 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">Title art image</p>
+        {page.titleImage ? (
+          <img src={resolveExperiencePreviewUrl(page.titleImage)} alt="" className="h-24 w-full rounded object-contain" />
+        ) : (
+          <div className="flex h-20 items-center justify-center rounded border border-dashed border-white/15 text-[11px] text-white/35">
+            Optional — upload or leave blank for text headline
+          </div>
+        )}
+        <TextInput value={page.titleImage} onChange={(titleImage) => onChange({ titleImage })} />
+        <input
+          type="file"
+          accept="image/*"
+          className="block w-full text-[10px] text-white/60"
+          onChange={(e) => onUpload("titleImage", e.target.files?.[0] ?? null)}
+        />
       </div>
     </div>
   );

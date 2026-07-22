@@ -194,6 +194,13 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
   const fit = widget.imageFit || "half";
   const titleStyle = { ...titleTypographyStyle(widget), color: widget.style?.textColor };
   const visual = widgetStyleCss(widget.style);
+  const scale = (widget.imageScale ?? 100) / 100;
+  const imgStyle = {
+    objectFit: (widget.imageObjectFit || "contain") as "contain" | "cover",
+    objectPosition: widget.imagePosition || "right bottom",
+    transform: `scale(${scale})`,
+    transformOrigin: "bottom right" as const,
+  };
   return (
     <div
       className={`relative flex h-full min-h-[112px] overflow-hidden rounded-2xl border transition ${
@@ -205,12 +212,15 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
     >
       {fit === "full" ? (
         <>
-          <img
-            src={resolveAssetUrl(widget.imageSrc)}
-            alt=""
-            draggable={false}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+          {widget.imageSrc ? (
+            <img
+              src={resolveAssetUrl(widget.imageSrc)}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 h-full w-full"
+              style={imgStyle}
+            />
+          ) : null}
           <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/50 to-transparent" />
           <div className="relative z-10 flex h-full flex-col justify-between p-3">
             <p
@@ -241,13 +251,18 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
               ))}
             </p>
           </div>
-          <div className="relative h-full w-[52%] shrink-0">
-            <img
-              src={resolveAssetUrl(widget.imageSrc)}
-              alt=""
-              draggable={false}
-              className="h-full w-full object-contain object-bottom object-right drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
-            />
+          <div className="relative h-full w-[52%] shrink-0 overflow-hidden">
+            {widget.imageSrc ? (
+              <img
+                src={resolveAssetUrl(widget.imageSrc)}
+                alt=""
+                draggable={false}
+                className="h-full w-full drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
+                style={imgStyle}
+              />
+            ) : (
+              <div className="flex h-full items-end justify-end p-2 text-[9px] text-white/25">Art</div>
+            )}
           </div>
         </div>
       )}
@@ -1151,6 +1166,48 @@ export function ExperiencePage() {
                         ]}
                       />
                     </label>
+                    <label className="block space-y-1.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
+                        Art size ({selected.imageScale ?? 100}%)
+                      </span>
+                      <input
+                        type="range"
+                        min={50}
+                        max={160}
+                        value={selected.imageScale ?? 100}
+                        onChange={(e) => patchSelected({ imageScale: Number(e.target.value) })}
+                        className="w-full"
+                      />
+                    </label>
+                    <label className="block space-y-1.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Art crop</span>
+                      <DtSelect
+                        value={selected.imageObjectFit || "contain"}
+                        aria-label="Art crop"
+                        onChange={(value) =>
+                          patchSelected({ imageObjectFit: value as "contain" | "cover" })
+                        }
+                        options={[
+                          { value: "contain", label: "Contain (no crop)" },
+                          { value: "cover", label: "Cover (fill)" },
+                        ]}
+                      />
+                    </label>
+                    <label className="block space-y-1.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">Art position</span>
+                      <DtSelect
+                        value={selected.imagePosition || "right bottom"}
+                        aria-label="Art position"
+                        onChange={(value) => patchSelected({ imagePosition: value })}
+                        options={[
+                          { value: "right bottom", label: "Right bottom" },
+                          { value: "right center", label: "Right center" },
+                          { value: "center bottom", label: "Center bottom" },
+                          { value: "center center", label: "Center" },
+                          { value: "left bottom", label: "Left bottom" },
+                        ]}
+                      />
+                    </label>
                     <div className="flex items-end">
                       <button
                         type="button"
@@ -1170,11 +1227,23 @@ export function ExperiencePage() {
                   <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-3.5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">Image</p>
                     <div className="overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(135deg,#141414,#0a0a0a)]">
-                      <img
-                        src={resolveAssetUrl(selected.imageSrc)}
-                        alt=""
-                        className="mx-auto h-48 w-full object-contain"
-                      />
+                      {selected.imageSrc ? (
+                        <img
+                          src={resolveAssetUrl(selected.imageSrc)}
+                          alt=""
+                          className="mx-auto h-48 w-full"
+                          style={{
+                            objectFit: selected.imageObjectFit || "contain",
+                            objectPosition: selected.imagePosition || "center bottom",
+                            transform: `scale(${(selected.imageScale ?? 100) / 100})`,
+                            transformOrigin: "center bottom",
+                          }}
+                        />
+                      ) : (
+                        <div className="flex h-48 items-center justify-center text-[11px] text-white/35">
+                          Upload art for this box
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/85 transition hover:bg-white/[0.08]">
@@ -1191,7 +1260,14 @@ export function ExperiencePage() {
                     <label className="block space-y-1.5">
                       <span className="text-[11px] text-white/40">Or image URL / path</span>
                       <input
-                        value={selected.imageSrc.startsWith("data:") ? "(uploaded data URL)" : selected.imageSrc}
+                        value={
+                          !selected.imageSrc
+                            ? ""
+                            : selected.imageSrc.startsWith("data:")
+                              ? "(uploaded data URL)"
+                              : selected.imageSrc
+                        }
+                        placeholder="No image yet — upload above"
                         onChange={(e) => {
                           if (!e.target.value.startsWith("(")) patchSelected({ imageSrc: e.target.value });
                         }}

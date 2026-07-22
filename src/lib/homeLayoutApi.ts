@@ -34,6 +34,10 @@ export type HomeWidget = {
   /** Grid footprint: standard 1×1, wide 2×1, tall 1×2, large 2×2 */
   size?: HomeWidgetSize;
   imageFit?: "half" | "full";
+  /** Scale percent for box art (50–160). */
+  imageScale?: number;
+  imageObjectFit?: "contain" | "cover";
+  imagePosition?: string;
   cardClassName?: string;
   showLock?: boolean;
   showPlay?: boolean;
@@ -146,31 +150,33 @@ export function widgetSpan(size?: HomeWidgetSize): { cols: number; rows: number 
 
 export function createWidget(type: HomeWidgetType, order: number, size: HomeWidgetSize = "standard"): HomeWidget {
   const id = `${type}-${Date.now().toString(36)}`;
+  const base = {
+    id,
+    enabled: true,
+    order,
+    size,
+    imageFit: "half" as const,
+    imageScale: 100,
+    imageObjectFit: "contain" as const,
+    imagePosition: "center top",
+    imageSrc: "",
+  };
   if (type === "tickets") {
     return {
-      id,
+      ...base,
       type: "tickets",
-      title: "DAMETIME\nTICKETS",
-      imageSrc: "/images/eventsbackground.png",
+      title: "TICKETS",
       linkTo: "https://www.ticketmaster.com",
-      enabled: true,
-      order,
-      size,
       imageFit: "half",
       cardClassName: "member-card-events-gradient",
     };
   }
   if (type === "custom") {
     return {
-      id,
+      ...base,
       type: "custom",
       title: "NEW\nDROP",
-      imageSrc: "/images/damecity.png",
       linkTo: "/access",
-      enabled: true,
-      order,
-      size,
-      imageFit: "half",
       cardClassName: "member-card-ghost",
     };
   }
@@ -179,55 +185,47 @@ export function createWidget(type: HomeWidgetType, order: number, size: HomeWidg
 }
 
 function presetsFor(id: string, order: number, size: HomeWidgetSize): Record<Exclude<HomeWidgetType, "tickets" | "custom">, HomeWidget> {
+  const shared = {
+    id,
+    enabled: true,
+    order,
+    size,
+    imageFit: "half" as const,
+    imageScale: 100,
+    imageObjectFit: "contain" as const,
+    imagePosition: "center top",
+    imageSrc: "",
+  };
   return {
     videos: {
-      id,
+      ...shared,
       type: "videos",
       title: "EXCLUSIVE\nVIDEOS",
-      imageSrc: "/images/dameexclusive.png?v=2",
       linkTo: "/access/videos",
-      enabled: true,
-      order,
-      size,
-      imageFit: "half",
       cardClassName: "member-card-videos-gradient",
       showPlay: true,
     },
     news: {
-      id,
+      ...shared,
       type: "news",
       title: "LATEST NEWS\n& UPDATES",
-      imageSrc: "/images/dametimenewshome.png?v=4",
       linkTo: "/access/latest-news",
-      enabled: true,
-      order,
-      size,
-      imageFit: "half",
       cardClassName: "member-card-drops-gradient",
     },
     events: {
-      id,
+      ...shared,
       type: "events",
       title: "EVENTS &\nGIVEAWAYS",
-      imageSrc: "/images/eventsbackground.png",
       linkTo: "/access/events",
-      enabled: true,
-      order,
-      size,
       imageFit: "full",
       cardClassName: "member-card-events-gradient",
       showLock: true,
     },
     music: {
-      id,
+      ...shared,
       type: "music",
       title: "DOC &\nGLO",
-      imageSrc: "/images/damedollamusichome.png?v=11",
       linkTo: "/access/doc-and-glo",
-      enabled: true,
-      order,
-      size,
-      imageFit: "half",
       cardClassName: "member-card-music-gradient",
       showMusicBars: false,
     },

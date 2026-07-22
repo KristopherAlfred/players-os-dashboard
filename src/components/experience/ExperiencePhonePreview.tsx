@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { ExperienceConfig, ExperiencePageConfig } from "../../lib/experienceConfig";
 import { pageBackgroundCss, themeBackgroundCss } from "../../lib/experienceConfig";
 import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
+import { TintedBrandLogo } from "./TintedBrandLogo";
 
 export type PhonePreviewMode =
   | "brand"
@@ -32,16 +33,16 @@ function BrandBar({ experience }: { experience: ExperienceConfig }) {
   return (
     <div className="flex items-center gap-2.5 border-b border-white/10 px-4 pb-3 pt-8">
       {brand.showLogoImage && brand.logoSrc ? (
-        <img
+        <TintedBrandLogo
           src={resolveExperiencePreviewUrl(brand.logoSrc)}
-          alt=""
-          className="h-9 w-9 rounded-full object-cover"
-          style={{ boxShadow: `0 0 14px ${brand.logoColor}88` }}
+          color={brand.logoColor}
+          tint={brand.logoTint !== false}
+          size={36}
         />
       ) : null}
       <div className="min-w-0">
         <p className="truncate text-[11px] font-bold tracking-[0.18em]" style={{ color: brand.wordmarkColor }}>
-          {brand.wordmark || "SLOANE GLO"}
+          {brand.wordmark || "YOUR BRAND"}
         </p>
         {brand.tagline ? (
           <p className="truncate text-[9px]" style={{ color: brand.taglineColor }}>
@@ -55,16 +56,29 @@ function BrandBar({ experience }: { experience: ExperienceConfig }) {
 
 function LandingPreview({ experience }: { experience: ExperienceConfig }) {
   const page = experience.pages.landing;
-  const lines = (page.subhead || "THE OFFICIAL\nSLOANE GLO\nCOMMUNITY").split("\n");
+  const lines = (page.subhead || "THE OFFICIAL\nCOMMUNITY").split("\n");
+  const scale = (page.heroScale || 100) / 100;
   return (
     <div className="flex h-full min-h-[560px] flex-col" style={{ background: pageBackgroundCss(page) }}>
       <BrandBar experience={experience} />
       <div className="relative flex flex-1 flex-col px-4 pb-6 pt-4">
-        <img
-          src={resolveExperiencePreviewUrl(page.heroImage || "/experience/heroes/sloanewins.png")}
-          alt=""
-          className="mb-4 h-44 w-full rounded-2xl object-cover object-top opacity-90"
-        />
+        {page.heroImage ? (
+          <img
+            src={resolveExperiencePreviewUrl(page.heroImage)}
+            alt=""
+            className="mb-4 h-44 w-full rounded-2xl"
+            style={{
+              objectFit: page.heroFit || "contain",
+              objectPosition: page.heroPosition || "right center",
+              transform: `scale(${scale})`,
+              transformOrigin: "center bottom",
+            }}
+          />
+        ) : (
+          <div className="mb-4 flex h-44 items-end justify-end rounded-2xl border border-dashed border-white/20 bg-black/20 p-3">
+            <p className="text-[10px] text-white/35">Hero placement</p>
+          </div>
+        )}
         <p className="text-center text-[10px] font-semibold leading-relaxed tracking-[0.14em]" style={{ color: page.accentColor }}>
           {lines.map((line, i) => (
             <span key={`${line}-${i}`}>
@@ -73,8 +87,7 @@ function LandingPreview({ experience }: { experience: ExperienceConfig }) {
             </span>
           ))}
         </p>
-        <p className="mt-3 text-center font-display text-xl text-white">{page.headline || "Join Sloane Glo"}</p>
-        {/* Title art images are optional; headline is the Sloane Glo source of truth */}
+        <p className="mt-3 text-center font-display text-xl text-white">{page.headline || "Join the circle"}</p>
         <p className="mt-2 text-center text-[11px] leading-relaxed text-white/60">{page.body}</p>
         <button
           type="button"

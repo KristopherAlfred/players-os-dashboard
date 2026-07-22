@@ -1,4 +1,4 @@
-/** Responsive CSS gradient presets — scale on any screen, no image upload required. */
+/** Platform-provided marks only — no athlete photos. Athletes upload their own imagery. */
 
 export type ExperienceAsset = {
   id: string;
@@ -6,46 +6,32 @@ export type ExperienceAsset = {
   src: string;
 };
 
+/** Generic AI / illustrated logos athletes can start from (recolorable). */
 export const EXPERIENCE_LOGOS: ExperienceAsset[] = [
   {
     id: "ai-crown",
-    label: "AI crown",
+    label: "Crown",
     src: "/experience/logos/logo-ai-crown.png",
   },
   {
     id: "ai-racquet",
-    label: "AI racquet",
+    label: "Racquet",
     src: "/experience/logos/logo-ai-racquet.png",
   },
   {
-    id: "ai-letter-s",
-    label: "AI letter S",
-    src: "/experience/logos/logo-ai-letter-s.png",
-  },
-  {
-    id: "ai-sg",
-    label: "AI SG mark",
-    src: "/experience/logos/logo-ai-sg.png",
-  },
-  {
     id: "ai-ball",
-    label: "AI tennis ball",
+    label: "Ball",
     src: "/experience/logos/logo-ai-ball.png",
   },
   {
     id: "ai-glow",
-    label: "AI glow orb",
+    label: "Glow orb",
     src: "/experience/logos/logo-ai-glow.png",
   },
 ];
 
-export const EXPERIENCE_HEROES: ExperienceAsset[] = [
-  { id: "wins", label: "Wins", src: "/experience/heroes/sloanewins.png" },
-  { id: "fistpump", label: "Fist pump", src: "/experience/heroes/sloanefistpump.png" },
-  { id: "trophy", label: "Trophy", src: "/experience/heroes/sloanetrophy.png" },
-  { id: "match-ready", label: "Match ready", src: "/experience/heroes/sloanematchready.png" },
-  { id: "doc-and-glo", label: "Doc & Glo", src: "/experience/heroes/docandglo.png" },
-];
+/** @deprecated Athlete photo libraries removed — upload only. */
+export const EXPERIENCE_HEROES: ExperienceAsset[] = [];
 
 export type GradientBackgroundPreset = {
   id: string;
@@ -212,5 +198,13 @@ export const GRADIENT_BACKGROUND_PRESETS: GradientBackgroundPreset[] = [
   },
 ];
 
-/** @deprecated use GRADIENT_BACKGROUND_PRESETS */
 export const BACKGROUND_COLOR_PRESETS = GRADIENT_BACKGROUND_PRESETS;
+
+export const HERO_POSITION_OPTIONS = [
+  { id: "right center", label: "Right" },
+  { id: "center center", label: "Center" },
+  { id: "left center", label: "Left" },
+  { id: "right top", label: "Right top" },
+  { id: "center top", label: "Center top" },
+  { id: "right bottom", label: "Right bottom" },
+] as const;
