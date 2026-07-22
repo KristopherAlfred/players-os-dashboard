@@ -1,3 +1,7 @@
+# Sloane Dashboard
+
+Cloned from Dame Time AMX dashboard. Edit branding, data sources, and env vars for Sloane Stephens — Dame projects are unchanged.
+
 # DAME.TIME Dashboard
 
 Pixel-faithful recreation of the **DAME.TIME Dashboard Overview** — a dark-themed analytics dashboard for the DameTime content ecosystem.

@@ -46,14 +46,45 @@ const TIME_RANGE_OPTIONS = [
   { value: "7", label: "Last 7 days" },
   { value: "14", label: "Last 14 days" },
   { value: "30", label: "Last 30 days" },
-  { value: "90", label: "Last 90 days" },
-  { value: "365", label: "Last year" },
-  { value: "all", label: "All time" },
-  { value: "custom", label: "Custom…" },
+  { value: "custom", label: "Pick a day…" },
 ];
 
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
+/** Local calendar date as YYYY-MM-DD (not UTC). */
+function localDateIso(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Midnight → 11:59:59.999 local for a YYYY-MM-DD calendar day, as ISO strings for the API. */
+function localDayBounds(isoDate: string): { from: string; to: string } {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const start = new Date(y, m - 1, d, 0, 0, 0, 0);
+  const end = new Date(y, m - 1, d, 23, 59, 59, 999);
+  return { from: start.toISOString(), to: end.toISOString() };
+}
+
+function formatPickedDay(isoDate: string) {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+/** Turn an hourly bucket key (UTC) into a local 12-hour clock label. */
+function formatLocalHourLabel(dateKey: string) {
+  const iso = dateKey.includes("T")
+    ? dateKey.length <= 13
+      ? `${dateKey}:00:00.000Z`
+      : dateKey
+    : `${dateKey}T12:00:00.000Z`;
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return dateKey;
+  return parsed.toLocaleTimeString(undefined, { hour: "numeric" });
 }
 
 function tooltipStyle() {
@@ -108,30 +139,35 @@ export function TrafficOverviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [timePreset, setTimePreset] = useState("14");
-  const [appliedFrom, setAppliedFrom] = useState("");
-  const [appliedTo, setAppliedTo] = useState("");
-  const [draftFrom, setDraftFrom] = useState("");
-  const [draftTo, setDraftTo] = useState("");
+  const [appliedDay, setAppliedDay] = useState("");
+  const [draftDay, setDraftDay] = useState("");
   const [customOpen, setCustomOpen] = useState(false);
 
   const timeRange = useMemo<AnalyticsTimeRange | undefined>(() => {
     if (timePreset === "custom") {
-      if (!appliedFrom) return { days: 14 };
-      return { from: appliedFrom, to: appliedTo || todayIso() };
+      if (!appliedDay) return { days: 14 };
+      return localDayBounds(appliedDay);
     }
-    if (timePreset === "all") return { days: "all" };
     const days = Number(timePreset);
-    return Number.isFinite(days) ? { days } : { days: 14 };
-  }, [timePreset, appliedFrom, appliedTo]);
+    return Number.isFinite(days) ? { days: Math.min(30, days) } : { days: 14 };
+  }, [timePreset, appliedDay]);
 
   const timeRangeLabel = useMemo(() => {
-    if (timePreset === "custom" && appliedFrom) {
-      return appliedTo && appliedTo !== appliedFrom
-        ? `${appliedFrom} → ${appliedTo}`
-        : `From ${appliedFrom}`;
+    if (timePreset === "custom" && appliedDay) {
+      return `${formatPickedDay(appliedDay)} · 12 AM – 12 AM`;
     }
     return TIME_RANGE_OPTIONS.find((option) => option.value === timePreset)?.label ?? "Last 14 days";
-  }, [timePreset, appliedFrom, appliedTo]);
+  }, [timePreset, appliedDay]);
+
+  const timeRangeOptions = useMemo(
+    () =>
+      TIME_RANGE_OPTIONS.map((option) =>
+        option.value === "custom" && appliedDay
+          ? { ...option, label: formatPickedDay(appliedDay) }
+          : option,
+      ),
+    [appliedDay],
+  );
 
   const load = useCallback(
     async (isRefresh = false, email = fanEmail) => {
@@ -219,11 +255,15 @@ export function TrafficOverviewPage() {
       value: item.count,
       type: item.type,
     }));
-    const timeline = analytics.eventsOverTime.map((point) => ({
-      ...point,
-      clicks: point.clicks ?? 0,
-      navClicks: point.navClicks ?? 0,
-    }));
+    const timeline = analytics.eventsOverTime.map((point) => {
+      const hourly = point.date.includes("T");
+      return {
+        ...point,
+        label: hourly ? formatLocalHourLabel(point.date) : point.label,
+        clicks: point.clicks ?? 0,
+        navClicks: point.navClicks ?? 0,
+      };
+    });
     return { navClicks, cardClicks, externalLinks, pie, timeline };
   }, [analytics]);
 
@@ -497,20 +537,21 @@ export function TrafficOverviewPage() {
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Surface
           title="Activity over time"
-          subtitle={`Events, page views, clicks & nav — ${timeRangeLabel.toLowerCase()}`}
+          subtitle={
+            timePreset === "custom" && appliedDay
+              ? `Hourly activity for ${formatPickedDay(appliedDay)} · 12 AM – 12 AM`
+              : `Events, page views, clicks & nav — ${timeRangeLabel.toLowerCase()}`
+          }
           action={
             <div className="relative flex flex-col items-end gap-2">
               <DtSelect
                 value={timePreset}
-                options={TIME_RANGE_OPTIONS}
+                options={timeRangeOptions}
                 aria-label="Timeline range"
-                className="w-[168px]"
+                className="w-[180px]"
                 onChange={(value) => {
                   if (value === "custom") {
-                    const from = appliedFrom || todayIso();
-                    const to = appliedTo || todayIso();
-                    setDraftFrom(from);
-                    setDraftTo(to);
+                    setDraftDay(appliedDay || localDateIso());
                     setCustomOpen(true);
                     return;
                   }
@@ -521,26 +562,18 @@ export function TrafficOverviewPage() {
               {customOpen ? (
                 <div className="absolute right-0 top-full z-40 mt-2 w-[280px] rounded-xl border border-dt-border bg-[#0c0c0c] p-3 shadow-[0_18px_40px_rgba(0,0,0,0.65)]">
                   <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-white/45">
-                    Custom date range
+                    Pick a day
                   </p>
-                  <label className="mb-2 block">
-                    <span className="text-[11px] text-white/50">From</span>
-                    <input
-                      type="date"
-                      value={draftFrom}
-                      max={draftTo || todayIso()}
-                      onChange={(e) => setDraftFrom(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-dt-border bg-black/50 px-3 py-2 text-sm text-white outline-none transition [color-scheme:dark] focus:border-dt-red/55"
-                    />
-                  </label>
+                  <p className="mb-2 text-[11px] leading-relaxed text-white/45">
+                    Chart that day from 12 AM to 12 AM in your local time.
+                  </p>
                   <label className="mb-3 block">
-                    <span className="text-[11px] text-white/50">To</span>
+                    <span className="text-[11px] text-white/50">Date</span>
                     <input
                       type="date"
-                      value={draftTo}
-                      min={draftFrom || undefined}
-                      max={todayIso()}
-                      onChange={(e) => setDraftTo(e.target.value)}
+                      value={draftDay}
+                      max={localDateIso()}
+                      onChange={(e) => setDraftDay(e.target.value)}
                       className="mt-1 w-full rounded-lg border border-dt-border bg-black/50 px-3 py-2 text-sm text-white outline-none transition [color-scheme:dark] focus:border-dt-red/55"
                     />
                   </label>
@@ -554,10 +587,9 @@ export function TrafficOverviewPage() {
                     </button>
                     <button
                       type="button"
-                      disabled={!draftFrom}
+                      disabled={!draftDay}
                       onClick={() => {
-                        setAppliedFrom(draftFrom);
-                        setAppliedTo(draftTo || draftFrom);
+                        setAppliedDay(draftDay);
                         setTimePreset("custom");
                         setCustomOpen(false);
                       }}
