@@ -15,7 +15,7 @@ export type SignupGeoStats = {
 };
 
 export async function fetchSignupGeoStats(): Promise<SignupGeoStats | null> {
-  const base = import.meta.env.VITE_DAME_BIO_API_URL ?? "https://dametime-app.vercel.app";
+  const base = import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app";
   const secret = import.meta.env.VITE_ADMIN_EXPORT_SECRET;
   if (!secret) return null;
 
