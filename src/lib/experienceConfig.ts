@@ -21,6 +21,8 @@ export type ExperienceTheme = {
   bgGradientTo: string;
   bgGradientAngle: number;
   useGradientBg: boolean;
+  /** Optional full-bleed image behind the whole app chrome */
+  backgroundImage: string;
   surface: string;
   card: string;
   border: string;
@@ -98,7 +100,7 @@ export type ExperienceConfig = {
 };
 
 export const DEFAULT_EXPERIENCE_BRAND: ExperienceBrand = {
-  logoSrc: "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png",
+  logoSrc: "/experience/logos/sloane-avatar.png",
   logoColor: "#8FE3B8",
   wordmark: "SLOANE GLO",
   wordmarkColor: "#FFFFFF",
@@ -115,6 +117,7 @@ export const DEFAULT_EXPERIENCE_THEME: ExperienceTheme = {
   bgGradientTo: "#05140e",
   bgGradientAngle: 160,
   useGradientBg: true,
+  backgroundImage: "/experience/backgrounds/app-background.png",
   surface: "#0c0c0c",
   card: "#121212",
   border: "rgba(255,255,255,0.12)",
@@ -259,6 +262,7 @@ export function normalizeExperienceTheme(raw: unknown): ExperienceTheme {
     bgGradientTo: asString(t.bgGradientTo, DEFAULT_EXPERIENCE_THEME.bgGradientTo),
     bgGradientAngle: asNumber(t.bgGradientAngle, DEFAULT_EXPERIENCE_THEME.bgGradientAngle),
     useGradientBg: asBool(t.useGradientBg, true),
+    backgroundImage: asString(t.backgroundImage, DEFAULT_EXPERIENCE_THEME.backgroundImage),
     surface: asString(t.surface, DEFAULT_EXPERIENCE_THEME.surface),
     card: asString(t.card, DEFAULT_EXPERIENCE_THEME.card),
     border: asString(t.border, DEFAULT_EXPERIENCE_THEME.border),
@@ -357,6 +361,12 @@ export function normalizeWidgetVisualStyle(raw: unknown): WidgetVisualStyle | un
 }
 
 export function themeBackgroundCss(theme: ExperienceTheme) {
+  if (theme.backgroundImage) {
+    const wash = theme.useGradientBg
+      ? `linear-gradient(${theme.bgGradientAngle}deg, ${theme.bgGradientFrom}cc, ${theme.bgGradientTo}ee)`
+      : `linear-gradient(180deg, ${theme.bg}99, ${theme.bg})`;
+    return `${wash}, center / cover no-repeat url(${theme.backgroundImage})`;
+  }
   if (!theme.useGradientBg) return theme.bg;
   return `linear-gradient(${theme.bgGradientAngle}deg, ${theme.bgGradientFrom}, ${theme.bgGradientVia}, ${theme.bgGradientTo})`;
 }

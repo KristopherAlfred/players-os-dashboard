@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { Link } from "react-router-dom";
 import {
   CalendarDays,
   Eye,
   EyeOff,
+  ExternalLink,
   Film,
   Gift,
   GripVertical,
@@ -590,24 +592,41 @@ export function ExperiencePage() {
         )}
       </div>
 
-      <div className="flex flex-wrap gap-1.5 rounded-2xl border border-dt-border bg-dt-card p-2">
-        {SECTIONS.map((item) => {
-          const active = section === item.id;
-          return (
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+          <p className="text-xs text-white/55">
+            Pick what to edit — <span className="text-white">Landing</span>,{" "}
+            <span className="text-white">You&apos;re In</span>, Settings, Brand, or Home boxes.
+          </p>
+          {section === "boxes" ? (
             <button
-              key={item.id}
               type="button"
-              onClick={() => setSection(item.id)}
-              className={`rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition ${
-                active
-                  ? "bg-dt-red text-white shadow-[0_8px_24px_rgba(143,227,184,0.28)]"
-                  : "text-white/45 hover:bg-white/[0.04] hover:text-white/80"
-              }`}
+              onClick={() => setSection("landing")}
+              className="text-[11px] font-semibold text-dt-red hover:underline"
             >
-              {item.label}
+              Edit landing page →
             </button>
-          );
-        })}
+          ) : null}
+        </div>
+        <div className="flex flex-wrap gap-1.5 rounded-2xl border border-dt-border bg-dt-card p-2">
+          {SECTIONS.map((item) => {
+            const active = section === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setSection(item.id)}
+                className={`rounded-xl px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] transition ${
+                  active
+                    ? "bg-dt-red text-white shadow-[0_8px_24px_rgba(143,227,184,0.28)]"
+                    : "text-white/45 hover:bg-white/[0.04] hover:text-white/80"
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {section !== "boxes" ? (
@@ -643,6 +662,16 @@ export function ExperiencePage() {
                   theme={experience.theme}
                   onChange={(patch) =>
                     patchExperience((prev) => ({ ...prev, theme: { ...prev.theme, ...patch } }))
+                  }
+                  onUploadBackground={(file) =>
+                    void uploadIntoExperience(
+                      (backgroundImage) =>
+                        patchExperience((prev) => ({
+                          ...prev,
+                          theme: { ...prev.theme, backgroundImage },
+                        })),
+                      file,
+                    )
                   }
                 />
               ) : null}
@@ -686,10 +715,10 @@ export function ExperiencePage() {
                 <Palette size={14} className="text-dt-red" /> Studio tips
               </p>
               <ul className="space-y-1.5 list-disc pl-4">
-                <li>Upload custom logos and tint the wordmark any color.</li>
-                <li>Layer glow, noise, vignette, and animated gradients.</li>
-                <li>Landing / You&apos;re In / Settings each have their own copy + art.</li>
+                <li>Pick logos, heroes, and backgrounds from the library — or upload your own.</li>
+                <li>Landing / You&apos;re In / Settings each have their own copy, colors, and art.</li>
                 <li>Home boxes still support per-tile colors and effects.</li>
+                <li>Hit Publish to app to push everything live to Sloane Glo.</li>
               </ul>
             </div>
           </div>
@@ -697,7 +726,7 @@ export function ExperiencePage() {
       ) : null}
 
       {section === "boxes" ? (
-      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_minmax(400px,440px)]">
+      <div className="grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)_minmax(400px,440px)]">
         {/* Left: Home boxes + AI studio */}
         <div className="flex min-w-0 flex-col gap-4">
         <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
@@ -896,8 +925,8 @@ export function ExperiencePage() {
           </section>
         </div>
 
-        {/* Center: phone */}
-        <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
+        {/* Center: phone — sticky so it stays at the top while side panels scroll */}
+        <section className="relative sticky top-4 flex max-h-[calc(100vh-6rem)] items-start justify-center self-start overflow-y-auto rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-6">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
           <div className="exp-phone-shell relative w-full max-w-[340px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
             <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
@@ -912,20 +941,34 @@ export function ExperiencePage() {
                 {experience.brand.tagline}
               </p>
             </div>
-            <div className="space-y-2 bg-[radial-gradient(circle_at_top,_#321018_0%,_#0a0a0a_52%)] p-3 pb-6">
+            <div
+              className="space-y-2 p-3 pb-6"
+              style={{
+                background: experience.theme.useGradientBg
+                  ? `radial-gradient(circle at top, ${experience.theme.bgGradientVia}, ${experience.theme.bg})`
+                  : experience.theme.bg,
+              }}
+            >
               {layout.heroEnabled ? (
                 <div className="relative flex h-[118px] overflow-hidden rounded-2xl border border-white/10">
                   <img
-                    src={resolveAssetUrl("/images/damecity.png")}
+                    src={resolveAssetUrl(
+                      experience.pages.home.heroImage ||
+                        experience.brand.logoSrc ||
+                        "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png",
+                    )}
                     alt=""
                     className="absolute inset-0 h-full w-full object-cover opacity-80"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent" />
                   <div className="relative z-10 flex h-full flex-col justify-end p-3.5">
                     <p className="font-display text-lg font-extrabold tracking-[0.12em] text-white">
-                      DAME <span className="text-dt-green">LIVE</span>
+                      {experience.brand.wordmark.split(" ")[0] || "SLOANE"}{" "}
+                      <span style={{ color: experience.theme.accent }}>LIVE</span>
                     </p>
-                    <p className="mt-0.5 text-[11px] text-white/60">Hero carousel stays live-aware</p>
+                    <p className="mt-0.5 text-[11px] text-white/60">
+                      {experience.pages.home.body || "Home preview"}
+                    </p>
                   </div>
                 </div>
               ) : null}
@@ -988,7 +1031,7 @@ export function ExperiencePage() {
         </section>
 
         {/* Right: edit box (larger) */}
-        <section className="flex min-h-[640px] flex-col overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+        <section className="flex min-h-0 flex-col self-start overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
             {!selected ? (
               <div className="flex min-h-[420px] flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-white/40">
@@ -1081,6 +1124,29 @@ export function ExperiencePage() {
                       onChange={(e) => patchSelected({ linkTo: e.target.value })}
                       className={fieldClass()}
                     />
+                    <p className="text-[11px] text-white/35">
+                      Where fans go when they tap this box.
+                    </p>
+                    {selected.type === "news" ||
+                    selected.type === "videos" ||
+                    selected.type === "music" ||
+                    selected.type === "events" ? (
+                      <Link
+                        to={
+                          selected.type === "news"
+                            ? "/content/news"
+                            : selected.type === "videos"
+                              ? "/content/videos"
+                              : selected.type === "music"
+                                ? "/content/doc-and-glo"
+                                : "/content/events"
+                        }
+                        className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-dt-red hover:underline"
+                      >
+                        <ExternalLink size={12} />
+                        Edit the content inside this destination
+                      </Link>
+                    ) : null}
                   </label>
 
                   <div className="grid grid-cols-2 gap-3">

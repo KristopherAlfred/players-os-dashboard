@@ -9,6 +9,22 @@ import type {
   ExperienceTheme,
   ExperienceEffectPreset,
 } from "../lib/experienceConfig";
+import {
+  BACKGROUND_COLOR_PRESETS,
+  EXPERIENCE_BACKGROUNDS,
+  EXPERIENCE_HEROES,
+  EXPERIENCE_LOGOS,
+  type ExperienceAsset,
+} from "../lib/experienceAssets";
+import { resolveAssetUrl } from "../lib/homeLayoutApi";
+
+/** Prefer local dashboard copies for /experience/* so pickers work before fan-app deploy. */
+export function resolveExperiencePreviewUrl(src: string) {
+  if (!src) return "";
+  if (src.startsWith("data:") || src.startsWith("http://") || src.startsWith("https://")) return src;
+  if (src.startsWith("/experience/")) return src;
+  return resolveAssetUrl(src);
+}
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -99,6 +115,67 @@ function FontSelect({
   );
 }
 
+function AssetPicker({
+  label,
+  assets,
+  value,
+  onSelect,
+  allowClear = true,
+  aspect = "square",
+}: {
+  label: string;
+  assets: ExperienceAsset[];
+  value: string;
+  onSelect: (src: string) => void;
+  allowClear?: boolean;
+  aspect?: "square" | "wide";
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">{label}</p>
+        {allowClear ? (
+          <button
+            type="button"
+            onClick={() => onSelect("")}
+            className="text-[10px] font-semibold uppercase tracking-wide text-white/40 hover:text-white"
+          >
+            Clear
+          </button>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+        {assets.map((asset) => {
+          const active = value === asset.src;
+          return (
+            <button
+              key={asset.id}
+              type="button"
+              onClick={() => onSelect(asset.src)}
+              className={`overflow-hidden rounded-xl border text-left transition ${
+                active
+                  ? "border-dt-red ring-2 ring-dt-red/40"
+                  : "border-dt-border hover:border-white/30"
+              }`}
+            >
+              <div
+                className={`bg-black/50 ${aspect === "wide" ? "aspect-[16/10]" : "aspect-square"}`}
+              >
+                <img
+                  src={resolveExperiencePreviewUrl(asset.src)}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <p className="truncate px-2 py-1.5 text-[10px] text-white/70">{asset.label}</p>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 const EFFECT_OPTIONS: { id: ExperienceEffectPreset; label: string }[] = [
   { id: "none", label: "None" },
   { id: "soft", label: "Soft wash" },
@@ -126,12 +203,11 @@ export function ExperienceBrandPanel({
         <div className="flex items-center gap-3">
           {brand.showLogoImage && brand.logoSrc ? (
             <img
-              src={brand.logoSrc}
+              src={resolveExperiencePreviewUrl(brand.logoSrc)}
               alt=""
               className="h-12 w-12 rounded-full object-cover"
               style={{
                 filter: "drop-shadow(0 0 10px var(--preview-logo, #8FE3B8))",
-                // tint via outline glow; wordmark carries exact color
               }}
             />
           ) : null}
@@ -151,10 +227,18 @@ export function ExperienceBrandPanel({
         onChange={(showLogoImage) => onChange({ showLogoImage })}
         label="Show logo image"
       />
-      <Field label="Logo image URL">
+
+      <AssetPicker
+        label="Pick a logo"
+        assets={EXPERIENCE_LOGOS}
+        value={brand.logoSrc}
+        onSelect={(logoSrc) => onChange({ logoSrc, showLogoImage: Boolean(logoSrc) })}
+      />
+
+      <Field label="Logo image URL" hint="Or paste any image URL">
         <TextInput value={brand.logoSrc} onChange={(logoSrc) => onChange({ logoSrc })} />
       </Field>
-      <Field label="Upload logo">
+      <Field label="Upload custom logo">
         <input
           type="file"
           accept="image/*"
@@ -190,82 +274,141 @@ export function ExperienceBrandPanel({
 export function ExperienceThemePanel({
   theme,
   onChange,
+  onUploadBackground,
 }: {
   theme: ExperienceTheme;
   onChange: (patch: Partial<ExperienceTheme>) => void;
+  onUploadBackground?: (file: File | null) => void;
 }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <Toggle
-        checked={theme.useGradientBg}
-        onChange={(useGradientBg) => onChange({ useGradientBg })}
-        label="Gradient background"
+    <div className="space-y-5">
+      <AssetPicker
+        label="App background image"
+        assets={EXPERIENCE_BACKGROUNDS}
+        value={theme.backgroundImage}
+        onSelect={(backgroundImage) => onChange({ backgroundImage })}
+        aspect="wide"
       />
-      <Field label="Gradient angle">
-        <input
-          type="range"
-          min={0}
-          max={360}
-          value={theme.bgGradientAngle}
-          onChange={(e) => onChange({ bgGradientAngle: Number(e.target.value) })}
-          className="w-full"
+      <Field label="Background image URL">
+        <TextInput
+          value={theme.backgroundImage}
+          onChange={(backgroundImage) => onChange({ backgroundImage })}
         />
       </Field>
-      <Field label="BG solid">
-        <ColorInput value={theme.bg} onChange={(bg) => onChange({ bg })} />
-      </Field>
-      <Field label="Gradient from">
-        <ColorInput value={theme.bgGradientFrom} onChange={(bgGradientFrom) => onChange({ bgGradientFrom })} />
-      </Field>
-      <Field label="Gradient via">
-        <ColorInput value={theme.bgGradientVia} onChange={(bgGradientVia) => onChange({ bgGradientVia })} />
-      </Field>
-      <Field label="Gradient to">
-        <ColorInput value={theme.bgGradientTo} onChange={(bgGradientTo) => onChange({ bgGradientTo })} />
-      </Field>
-      <Field label="Accent">
-        <ColorInput value={theme.accent} onChange={(accent) => onChange({ accent })} />
-      </Field>
-      <Field label="Accent hover">
-        <ColorInput value={theme.accentHover} onChange={(accentHover) => onChange({ accentHover })} />
-      </Field>
-      <Field label="Button background">
-        <ColorInput value={theme.buttonBg} onChange={(buttonBg) => onChange({ buttonBg })} />
-      </Field>
-      <Field label="Button text">
-        <ColorInput value={theme.buttonText} onChange={(buttonText) => onChange({ buttonText })} />
-      </Field>
-      <Field label="Button border">
-        <ColorInput value={theme.buttonBorder} onChange={(buttonBorder) => onChange({ buttonBorder })} />
-      </Field>
-      <Field label="Button radius">
-        <input
-          type="range"
-          min={0}
-          max={40}
-          value={theme.buttonRadius}
-          onChange={(e) => onChange({ buttonRadius: Number(e.target.value) })}
-          className="w-full"
+      {onUploadBackground ? (
+        <Field label="Upload custom app background">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => onUploadBackground(e.target.files?.[0] ?? null)}
+            className="block w-full text-xs text-white/70"
+          />
+        </Field>
+      ) : null}
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/55">
+          Color wash presets
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {BACKGROUND_COLOR_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() =>
+                onChange({
+                  bg: preset.backgroundColor,
+                  bgGradientFrom: preset.backgroundGradientFrom,
+                  bgGradientVia: preset.backgroundGradientFrom,
+                  bgGradientTo: preset.backgroundGradientTo,
+                  useGradientBg: preset.useGradientBg,
+                })
+              }
+              className="rounded-lg border border-dt-border px-3 py-2 text-[11px] text-white/80 hover:border-dt-red/50"
+              style={{
+                background: preset.useGradientBg
+                  ? `linear-gradient(135deg, ${preset.backgroundGradientFrom}, ${preset.backgroundGradientTo})`
+                  : preset.backgroundColor,
+              }}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Toggle
+          checked={theme.useGradientBg}
+          onChange={(useGradientBg) => onChange({ useGradientBg })}
+          label="Gradient background"
         />
-      </Field>
-      <Field label="Text">
-        <ColorInput value={theme.text} onChange={(text) => onChange({ text })} />
-      </Field>
-      <Field label="Muted text">
-        <ColorInput value={theme.muted} onChange={(muted) => onChange({ muted })} />
-      </Field>
-      <Field label="Card">
-        <ColorInput value={theme.card} onChange={(card) => onChange({ card })} />
-      </Field>
-      <Field label="Surface">
-        <ColorInput value={theme.surface} onChange={(surface) => onChange({ surface })} />
-      </Field>
-      <Field label="Display font">
-        <FontSelect value={theme.fontDisplay} onChange={(fontDisplay) => onChange({ fontDisplay })} />
-      </Field>
-      <Field label="Body font">
-        <FontSelect value={theme.fontBody} onChange={(fontBody) => onChange({ fontBody })} />
-      </Field>
+        <Field label="Gradient angle">
+          <input
+            type="range"
+            min={0}
+            max={360}
+            value={theme.bgGradientAngle}
+            onChange={(e) => onChange({ bgGradientAngle: Number(e.target.value) })}
+            className="w-full"
+          />
+        </Field>
+        <Field label="BG solid">
+          <ColorInput value={theme.bg} onChange={(bg) => onChange({ bg })} />
+        </Field>
+        <Field label="Gradient from">
+          <ColorInput value={theme.bgGradientFrom} onChange={(bgGradientFrom) => onChange({ bgGradientFrom })} />
+        </Field>
+        <Field label="Gradient via">
+          <ColorInput value={theme.bgGradientVia} onChange={(bgGradientVia) => onChange({ bgGradientVia })} />
+        </Field>
+        <Field label="Gradient to">
+          <ColorInput value={theme.bgGradientTo} onChange={(bgGradientTo) => onChange({ bgGradientTo })} />
+        </Field>
+        <Field label="Accent">
+          <ColorInput value={theme.accent} onChange={(accent) => onChange({ accent })} />
+        </Field>
+        <Field label="Accent hover">
+          <ColorInput value={theme.accentHover} onChange={(accentHover) => onChange({ accentHover })} />
+        </Field>
+        <Field label="Button background">
+          <ColorInput value={theme.buttonBg} onChange={(buttonBg) => onChange({ buttonBg })} />
+        </Field>
+        <Field label="Button text">
+          <ColorInput value={theme.buttonText} onChange={(buttonText) => onChange({ buttonText })} />
+        </Field>
+        <Field label="Button border">
+          <ColorInput value={theme.buttonBorder} onChange={(buttonBorder) => onChange({ buttonBorder })} />
+        </Field>
+        <Field label="Button radius">
+          <input
+            type="range"
+            min={0}
+            max={40}
+            value={theme.buttonRadius}
+            onChange={(e) => onChange({ buttonRadius: Number(e.target.value) })}
+            className="w-full"
+          />
+        </Field>
+        <Field label="Text">
+          <ColorInput value={theme.text} onChange={(text) => onChange({ text })} />
+        </Field>
+        <Field label="Muted text">
+          <ColorInput value={theme.muted} onChange={(muted) => onChange({ muted })} />
+        </Field>
+        <Field label="Card">
+          <ColorInput value={theme.card} onChange={(card) => onChange({ card })} />
+        </Field>
+        <Field label="Surface">
+          <ColorInput value={theme.surface} onChange={(surface) => onChange({ surface })} />
+        </Field>
+        <Field label="Display font">
+          <FontSelect value={theme.fontDisplay} onChange={(fontDisplay) => onChange({ fontDisplay })} />
+        </Field>
+        <Field label="Body font">
+          <FontSelect value={theme.fontBody} onChange={(fontBody) => onChange({ fontBody })} />
+        </Field>
+      </div>
     </div>
   );
 }
@@ -345,6 +488,46 @@ export function ExperiencePagePanel({
       <p className="text-xs text-white/45">
         Editing <span className="text-dt-red">{pageKey}</span> — publish to push live into Sloane Glo.
       </p>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/55">
+          Background color presets
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {BACKGROUND_COLOR_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() =>
+                onChange({
+                  backgroundColor: preset.backgroundColor,
+                  backgroundGradientFrom: preset.backgroundGradientFrom,
+                  backgroundGradientTo: preset.backgroundGradientTo,
+                  useGradientBg: preset.useGradientBg,
+                  backgroundImage: "",
+                })
+              }
+              className="rounded-lg border border-dt-border px-3 py-2 text-[11px] text-white/80 hover:border-dt-red/50"
+              style={{
+                background: preset.useGradientBg
+                  ? `linear-gradient(135deg, ${preset.backgroundGradientFrom}, ${preset.backgroundGradientTo})`
+                  : preset.backgroundColor,
+              }}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <AssetPicker
+        label="Page background image"
+        assets={EXPERIENCE_BACKGROUNDS}
+        value={page.backgroundImage}
+        onSelect={(backgroundImage) => onChange({ backgroundImage })}
+        aspect="wide"
+      />
+
       <div className="grid gap-4 sm:grid-cols-2">
         <Toggle
           checked={page.useGradientBg}
@@ -429,6 +612,20 @@ export function ExperiencePagePanel({
         </>
       ) : null}
 
+      <AssetPicker
+        label="Hero / player image"
+        assets={EXPERIENCE_HEROES}
+        value={page.heroImage}
+        onSelect={(heroImage) => onChange({ heroImage })}
+      />
+      <AssetPicker
+        label="Title art image"
+        assets={[...EXPERIENCE_LOGOS, ...EXPERIENCE_HEROES]}
+        value={page.titleImage}
+        onSelect={(titleImage) => onChange({ titleImage })}
+        aspect="wide"
+      />
+
       <div className="grid gap-4 sm:grid-cols-3">
         {(
           [
@@ -440,7 +637,7 @@ export function ExperiencePagePanel({
           <div key={field} className="space-y-2 rounded-lg border border-dt-border p-3">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">{label}</p>
             {page[field] ? (
-              <img src={page[field]} alt="" className="h-24 w-full rounded object-cover" />
+              <img src={resolveExperiencePreviewUrl(page[field])} alt="" className="h-24 w-full rounded object-cover" />
             ) : (
               <div className="flex h-24 items-center justify-center rounded border border-dashed border-white/15 text-[11px] text-white/35">
                 No image
@@ -466,9 +663,11 @@ export function ExperiencePreviewChrome({ experience }: { experience: Experience
     <div
       className="relative overflow-hidden rounded-2xl border border-white/10 p-4"
       style={{
-        background: theme.useGradientBg
-          ? `linear-gradient(${theme.bgGradientAngle}deg, ${theme.bgGradientFrom}, ${theme.bgGradientVia}, ${theme.bgGradientTo})`
-          : theme.bg,
+        background: theme.backgroundImage
+          ? `linear-gradient(160deg, ${theme.bgGradientFrom}aa, ${theme.bgGradientTo}cc), center / cover no-repeat url(${resolveExperiencePreviewUrl(theme.backgroundImage)})`
+          : theme.useGradientBg
+            ? `linear-gradient(${theme.bgGradientAngle}deg, ${theme.bgGradientFrom}, ${theme.bgGradientVia}, ${theme.bgGradientTo})`
+            : theme.bg,
         color: theme.text,
         boxShadow: effects.glow
           ? `0 0 ${12 + effects.glowIntensity / 3}px ${effects.glowColor}55`
@@ -492,7 +691,7 @@ export function ExperiencePreviewChrome({ experience }: { experience: Experience
       ) : null}
       <div className="relative flex items-center gap-3">
         {brand.showLogoImage ? (
-          <img src={brand.logoSrc} alt="" className="h-10 w-10 rounded-full object-cover" />
+          <img src={resolveExperiencePreviewUrl(brand.logoSrc)} alt="" className="h-10 w-10 rounded-full object-cover" />
         ) : null}
         <div>
           <p className="text-lg font-bold tracking-wide" style={{ color: brand.wordmarkColor }}>
