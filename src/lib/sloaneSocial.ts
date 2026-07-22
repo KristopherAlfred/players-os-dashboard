@@ -11,9 +11,21 @@ const DAME_CHANNEL_IDS = new Set(["UCIhTfcMzbR5wyNeh57ju0ug"]);
 export const SLOANE_SOCIAL = {
   instagram: "sloanestephens",
   twitter: "SloaneStephens",
-  facebook: "sloane.stephens",
+  facebook: "Sloaneposts",
   youtubeHandle: "sloanestephens",
   youtubeChannelId: "UCL88E7XtLyJKmLoaGpwxxtQ",
+  tiktok: "sloanestephens",
+  beehiivUrl: "https://sloanestephens.beehiiv.com/",
+  docAndGloUrl: "https://docandglo.com/",
+  urls: {
+    instagram: "https://www.instagram.com/sloanestephens/",
+    twitter: "https://x.com/SloaneStephens",
+    facebook: "https://www.facebook.com/Sloaneposts/",
+    youtube: "https://www.youtube.com/@sloanestephens",
+    tiktok: "https://www.tiktok.com/@sloanestephens",
+    beehiiv: "https://sloanestephens.beehiiv.com/",
+    docAndGlo: "https://docandglo.com/",
+  },
 } as const;
 
 function norm(value: unknown) {

@@ -131,27 +131,22 @@ export function buildTwitterAnalyticsFromPosts(
 export async function fetchTwitterAnalytics(): Promise<TwitterAnalytics | null> {
   const base = getApiBase();
   const screen = SLOANE_SOCIAL.twitter;
-  const apiUrls = [
+  // Local Sloane cache first — fan API may still serve Dame.
+  const urls = [
+    "/data/twitter-analytics.json",
     `${base}/api/social/analytics?source=twitter&screen_name=${screen}&refresh=1`,
     `${base}/api/twitter/analytics?screen_name=${screen}`,
     `${base}/api/x/analytics?screen_name=${screen}`,
+    `${base}/data/twitter-analytics.json`,
   ];
 
-  for (const url of apiUrls) {
+  for (const url of urls) {
     try {
-      const data = await fetchJsonAnalytics(url);
-      if (data) return data;
+      const data = await fetchJsonAnalytics(url, { allowEmpty: url.includes("/data/") });
+      if (!data || isDameTwitterAnalytics(data)) continue;
+      return url.includes("/data/") ? { ...data, source: "cache" } : data;
     } catch {
       // try next source
-    }
-  }
-
-  for (const url of ["/data/twitter-analytics.json", `${base}/data/twitter-analytics.json`]) {
-    try {
-      const data = await fetchJsonAnalytics(url, { allowEmpty: true });
-      if (data && !isDameTwitterAnalytics(data)) return { ...data, source: "cache" };
-    } catch {
-      // try next
     }
   }
 

@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-07-22T18:05:14.061Z",
+  "syncedAt": "2026-07-22T18:29:03.844Z",
   "source": "cache",
   "channel": {
     "id": "UCL88E7XtLyJKmLoaGpwxxtQ",
@@ -7,124 +7,124 @@
     "handle": "@sloanestephens",
     "permalink": "https://www.youtube.com/@sloanestephens",
     "subscribers": 0,
-    "subscribersLabel": "0 subscribers"
+    "subscribersLabel": "Subscribers unavailable"
   },
   "kpis": {
     "subscribers": 0,
-    "totalVideos": 13,
-    "totalViews": 2468,
-    "avgViews": 190,
-    "avgLikes": 1,
-    "engagementRate": 0.53
+    "totalVideos": 15,
+    "totalViews": 2793,
+    "avgViews": 186,
+    "avgLikes": 0,
+    "engagementRate": 0
   },
   "recentVideos": [
+    {
+      "id": "1_qhQIDf6Qc",
+      "title": "IMG 0320",
+      "viewCount": 39,
+      "likeCount": 0,
+      "publishedAt": "2019-09-01T22:32:07+00:00",
+      "permalink": "https://www.youtube.com/watch?v=1_qhQIDf6Qc",
+      "durationSeconds": 0
+    },
     {
       "id": "76E08JWg9Yw",
       "title": "US Open Champ Sloane Stephens talks getting loca 451915 1800",
       "viewCount": 59,
       "likeCount": 0,
-      "publishedAt": "2018-05-09T13:15:36-07:00",
+      "publishedAt": "2018-05-09T20:15:36+00:00",
       "permalink": "https://www.youtube.com/watch?v=76E08JWg9Yw",
-      "durationSeconds": 238
+      "durationSeconds": 0
     },
     {
       "id": "pQOACsajkdI",
       "title": "TENEX UCLA",
       "viewCount": 70,
       "likeCount": 0,
-      "publishedAt": "2018-05-09T13:14:48-07:00",
+      "publishedAt": "2018-05-09T20:14:48+00:00",
       "permalink": "https://www.youtube.com/watch?v=pQOACsajkdI",
-      "durationSeconds": 60
+      "durationSeconds": 0
     },
     {
       "id": "4jq4alUkHgY",
       "title": "TENEX Net Generation Day",
       "viewCount": 47,
       "likeCount": 0,
-      "publishedAt": "2018-05-09T13:14:31-07:00",
+      "publishedAt": "2018-05-09T20:14:31+00:00",
       "permalink": "https://www.youtube.com/watch?v=4jq4alUkHgY",
-      "durationSeconds": 60
+      "durationSeconds": 0
     },
     {
       "id": "Tgmkem2MDjk",
       "title": "Sloane Stephens Foundation Net Generation Day",
       "viewCount": 129,
-      "likeCount": 1,
-      "publishedAt": "2018-05-09T13:14:10-07:00",
+      "likeCount": 0,
+      "publishedAt": "2018-05-09T20:14:10+00:00",
       "permalink": "https://www.youtube.com/watch?v=Tgmkem2MDjk",
-      "durationSeconds": 205
+      "durationSeconds": 0
     },
     {
       "id": "iuSUjpZ8Ugc",
       "title": "Clinton Special Olympics   HD 1080p",
       "viewCount": 65,
       "likeCount": 0,
-      "publishedAt": "2017-11-20T14:49:47-08:00",
+      "publishedAt": "2017-11-20T22:49:47+00:00",
       "permalink": "https://www.youtube.com/watch?v=iuSUjpZ8Ugc",
-      "durationSeconds": 45
+      "durationSeconds": 0
     },
     {
       "id": "8FY0YQTM-o4",
       "title": "sloane usta   HD 720p",
       "viewCount": 36,
       "likeCount": 0,
-      "publishedAt": "2017-10-05T11:46:56-07:00",
+      "publishedAt": "2017-10-05T18:46:56+00:00",
       "permalink": "https://www.youtube.com/watch?v=8FY0YQTM-o4",
-      "durationSeconds": 173
+      "durationSeconds": 0
     },
     {
       "id": "tGoFxJ-wihk",
       "title": "IMG 2432",
       "viewCount": 43,
-      "likeCount": 1,
-      "publishedAt": "2017-09-27T12:31:45-07:00",
+      "likeCount": 0,
+      "publishedAt": "2017-09-27T19:31:45+00:00",
       "permalink": "https://www.youtube.com/watch?v=tGoFxJ-wihk",
-      "durationSeconds": 71
+      "durationSeconds": 0
     },
     {
       "id": "iiYqt0ua72U",
       "title": "Serve it up Compton! A Tennis playdate for CUSD students 1",
       "viewCount": 42,
       "likeCount": 0,
-      "publishedAt": "2017-09-27T12:31:43-07:00",
+      "publishedAt": "2017-09-27T19:31:43+00:00",
       "permalink": "https://www.youtube.com/watch?v=iiYqt0ua72U",
-      "durationSeconds": 97
+      "durationSeconds": 0
     },
     {
       "id": "SiUjwX86chM",
       "title": "foundation loop   HD 720p",
       "viewCount": 45,
       "likeCount": 0,
-      "publishedAt": "2017-09-23T18:15:39-07:00",
+      "publishedAt": "2017-09-24T01:15:39+00:00",
       "permalink": "https://www.youtube.com/watch?v=SiUjwX86chM",
-      "durationSeconds": 38
+      "durationSeconds": 0
     },
     {
       "id": "EPDXT5QBIaQ",
       "title": "TENEX Indian Wells",
       "viewCount": 60,
       "likeCount": 0,
-      "publishedAt": "2017-09-23T18:13:32-07:00",
+      "publishedAt": "2017-09-24T01:13:32+00:00",
       "permalink": "https://www.youtube.com/watch?v=EPDXT5QBIaQ",
-      "durationSeconds": 60
+      "durationSeconds": 0
     },
     {
       "id": "UT5wRdzBUG8",
       "title": "Serve It Up Compton Play Day",
       "viewCount": 1287,
-      "likeCount": 5,
-      "publishedAt": "2016-12-21T10:29:09-08:00",
+      "likeCount": 0,
+      "publishedAt": "2016-12-21T18:29:09+00:00",
       "permalink": "https://www.youtube.com/watch?v=UT5wRdzBUG8",
-      "durationSeconds": 174
-    },
-    {
-      "id": "KigIQftg5IE",
-      "title": "Sloane Stephens visits Foster Elementary.",
-      "viewCount": 356,
-      "likeCount": 1,
-      "publishedAt": "2016-04-05T21:35:44-07:00",
-      "permalink": "https://www.youtube.com/watch?v=KigIQftg5IE",
-      "durationSeconds": 38
+      "durationSeconds": 0
     }
   ],
   "topVideos": [
@@ -132,73 +132,73 @@
       "id": "UT5wRdzBUG8",
       "title": "Serve It Up Compton Play Day",
       "viewCount": 1287,
-      "likeCount": 5,
-      "publishedAt": "2016-12-21T10:29:09-08:00",
+      "likeCount": 0,
+      "publishedAt": "2016-12-21T18:29:09+00:00",
       "permalink": "https://www.youtube.com/watch?v=UT5wRdzBUG8",
-      "durationSeconds": 174
+      "durationSeconds": 0
     },
     {
       "id": "KigIQftg5IE",
       "title": "Sloane Stephens visits Foster Elementary.",
       "viewCount": 356,
-      "likeCount": 1,
-      "publishedAt": "2016-04-05T21:35:44-07:00",
+      "likeCount": 0,
+      "publishedAt": "2016-04-06T04:35:44+00:00",
       "permalink": "https://www.youtube.com/watch?v=KigIQftg5IE",
-      "durationSeconds": 38
+      "durationSeconds": 0
+    },
+    {
+      "id": "gPLy2tTPJEo",
+      "title": "I CAN. I WILL. I MUST",
+      "viewCount": 286,
+      "likeCount": 0,
+      "publishedAt": "2016-03-14T23:06:09+00:00",
+      "permalink": "https://www.youtube.com/watch?v=gPLy2tTPJEo",
+      "durationSeconds": 0
     },
     {
       "id": "bPJDboH4O1k",
       "title": "Sloane Stephens Foundation",
       "viewCount": 229,
-      "likeCount": 2,
-      "publishedAt": "2016-03-14T16:05:49-07:00",
+      "likeCount": 0,
+      "publishedAt": "2016-03-14T23:05:49+00:00",
       "permalink": "https://www.youtube.com/watch?v=bPJDboH4O1k",
-      "durationSeconds": 173
+      "durationSeconds": 0
     },
     {
       "id": "Tgmkem2MDjk",
       "title": "Sloane Stephens Foundation Net Generation Day",
       "viewCount": 129,
-      "likeCount": 1,
-      "publishedAt": "2018-05-09T13:14:10-07:00",
+      "likeCount": 0,
+      "publishedAt": "2018-05-09T20:14:10+00:00",
       "permalink": "https://www.youtube.com/watch?v=Tgmkem2MDjk",
-      "durationSeconds": 205
+      "durationSeconds": 0
     },
     {
       "id": "pQOACsajkdI",
       "title": "TENEX UCLA",
       "viewCount": 70,
       "likeCount": 0,
-      "publishedAt": "2018-05-09T13:14:48-07:00",
+      "publishedAt": "2018-05-09T20:14:48+00:00",
       "permalink": "https://www.youtube.com/watch?v=pQOACsajkdI",
-      "durationSeconds": 60
+      "durationSeconds": 0
     },
     {
       "id": "iuSUjpZ8Ugc",
       "title": "Clinton Special Olympics   HD 1080p",
       "viewCount": 65,
       "likeCount": 0,
-      "publishedAt": "2017-11-20T14:49:47-08:00",
+      "publishedAt": "2017-11-20T22:49:47+00:00",
       "permalink": "https://www.youtube.com/watch?v=iuSUjpZ8Ugc",
-      "durationSeconds": 45
+      "durationSeconds": 0
     },
     {
       "id": "EPDXT5QBIaQ",
       "title": "TENEX Indian Wells",
       "viewCount": 60,
       "likeCount": 0,
-      "publishedAt": "2017-09-23T18:13:32-07:00",
+      "publishedAt": "2017-09-24T01:13:32+00:00",
       "permalink": "https://www.youtube.com/watch?v=EPDXT5QBIaQ",
-      "durationSeconds": 60
-    },
-    {
-      "id": "76E08JWg9Yw",
-      "title": "US Open Champ Sloane Stephens talks getting loca 451915 1800",
-      "viewCount": 59,
-      "likeCount": 0,
-      "publishedAt": "2018-05-09T13:15:36-07:00",
-      "permalink": "https://www.youtube.com/watch?v=76E08JWg9Yw",
-      "durationSeconds": 238
+      "durationSeconds": 0
     }
   ]
 }

@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  ExternalLink,
   FileText,
   Loader2,
   Plus,
+  RefreshCw,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -19,6 +21,12 @@ import {
   type NewsItem,
   type NewsStatus,
 } from "../lib/newsApi";
+import {
+  fetchBeehiivFeed,
+  formatBeehiivDate,
+  type BeehiivFeed,
+} from "../lib/beehiivApi";
+import { SLOANE_SOCIAL } from "../lib/sloaneSocial";
 import { TypographyControls } from "../components/TypographyControls";
 import { DtSelect } from "../components/DtSelect";
 import { titleTypographyStyle } from "../lib/typography";
@@ -31,6 +39,8 @@ function categoryLabel(category: NewsCategory) {
 
 export function NewsContentPage() {
   const [feed, setFeed] = useState<NewsFeed | null>(null);
+  const [beehiiv, setBeehiiv] = useState<BeehiivFeed | null>(null);
+  const [beehiivLoading, setBeehiivLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +48,17 @@ export function NewsContentPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+
+  async function loadBeehiiv() {
+    setBeehiivLoading(true);
+    try {
+      setBeehiiv(await fetchBeehiivFeed());
+    } catch {
+      setBeehiiv(null);
+    } finally {
+      setBeehiivLoading(false);
+    }
+  }
 
   useEffect(() => {
     void fetchNewsFeed()
@@ -51,6 +72,8 @@ export function NewsContentPage() {
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load news"))
       .finally(() => setLoading(false));
+
+    void loadBeehiiv();
   }, []);
 
   const items = useMemo(() => {
@@ -68,11 +91,12 @@ export function NewsContentPage() {
   const stats = useMemo(() => {
     const all = feed?.items ?? [];
     return {
+      beehiiv: beehiiv?.posts.length ?? 0,
       newsletters: all.filter((i) => i.category === "newsletters" || i.category === "news").length,
       drafts: all.filter((i) => i.status === "draft").length,
       published: all.filter((i) => i.status === "published").length,
     };
-  }, [feed]);
+  }, [feed, beehiiv]);
 
   function selectItem(item: NewsItem) {
     setSelectedId(item.id);
@@ -191,11 +215,59 @@ export function NewsContentPage() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <StatCard label="Newsletters" value={String(stats.newsletters)} />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard label="Beehiiv live" value={String(stats.beehiiv)} />
+        <StatCard label="App newsletters" value={String(stats.newsletters)} />
         <StatCard label="Published" value={String(stats.published)} />
         <StatCard label="Drafts" value={String(stats.drafts)} />
       </div>
+
+      <Panel title="Sloane Stephens Off-Court">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] text-dt-muted">
+            {beehiiv?.source === "live" ? "Live from Beehiiv" : beehiiv ? "Cached" : "—"}
+          </span>
+          <a
+            href={SLOANE_SOCIAL.beehiivUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-[11px] text-white/70 hover:text-white"
+          >
+            Open <ExternalLink size={11} />
+          </a>
+          <button
+            type="button"
+            onClick={() => void loadBeehiiv()}
+            disabled={beehiivLoading}
+            className="inline-flex items-center gap-1 rounded-md border border-dt-border px-2 py-1 text-[11px] text-white/70 disabled:opacity-50"
+          >
+            <RefreshCw size={11} className={beehiivLoading ? "animate-spin" : ""} /> Refresh
+          </button>
+        </div>
+        {beehiivLoading && !beehiiv ? (
+          <div className="flex items-center gap-2 py-6 text-sm text-white/50">
+            <Loader2 className="animate-spin" size={16} /> Loading Beehiiv…
+          </div>
+        ) : !beehiiv?.posts.length ? (
+          <p className="py-4 text-sm text-dt-muted">No Beehiiv posts found yet.</p>
+        ) : (
+          <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {beehiiv.posts.slice(0, 9).map((post) => (
+              <li key={post.id}>
+                <a
+                  href={post.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block rounded-lg border border-dt-border bg-dt-bg/50 p-3 transition hover:border-dt-red/40"
+                >
+                  <p className="line-clamp-2 text-sm font-medium text-white">{post.title}</p>
+                  <p className="mt-2 text-[11px] text-dt-muted">{formatBeehiivDate(post.publishedAt)}</p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
 
       {error ? (
         <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>
