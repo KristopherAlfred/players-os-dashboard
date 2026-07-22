@@ -9,7 +9,7 @@ export function UploadWidget() {
         <div className="mb-4 rounded-full border border-dt-red/30 bg-dt-red/10 p-4 text-dt-red">
           <Sparkles size={36} strokeWidth={1.25} />
         </div>
-        <p className="mb-1 text-sm font-medium text-white">Publish to DameTime</p>
+        <p className="mb-1 text-sm font-medium text-white">Publish to Sloane Glo</p>
         <p className="mb-5 text-xs text-dt-muted">
           Build the home experience or write a newsletter fans see in the app.
         </p>

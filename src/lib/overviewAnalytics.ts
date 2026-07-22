@@ -25,7 +25,7 @@ export type OverviewMetrics = {
   followersOverTime: Array<{ date: string; followers: number }>;
 };
 
-const PLATFORM_COLORS = ["#e50914", "#ff4444", "#cc0000", "#990000"];
+const PLATFORM_COLORS = ["#8FE3B8", "#A8F0CC", "#7DCEA0", "#5CBF8F"];
 
 const FALLBACK_PLATFORMS = [
   { name: "Instagram", followers: 9_586_731 },

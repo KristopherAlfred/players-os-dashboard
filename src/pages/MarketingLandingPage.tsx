@@ -57,8 +57,8 @@ function PageBackground() {
     <>
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-b from-black via-[#0a0000] to-black" />
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-black via-[#140000] to-black" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(229,9,20,0.22),transparent_50%)]" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(229,9,20,0.08),transparent_45%)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(143,227,184,0.22),transparent_50%)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(143,227,184,0.08),transparent_45%)]" />
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.95),transparent_55%)]" />
     </>
   );

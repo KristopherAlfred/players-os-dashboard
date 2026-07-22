@@ -24,7 +24,7 @@ async function getDashboardSupabase() {
   return sharedClient;
 }
 
-/** Broadcast Dame's camera to DameTime app viewers via WebRTC. */
+/** Broadcast Sloane's camera to Sloane Glo app viewers via WebRTC. */
 export function useLiveHost(
   enabled: boolean,
   localStream: MediaStream | null,
@@ -49,7 +49,7 @@ export function useLiveHost(
     async function setup() {
       const supabase = await getDashboardSupabase();
       if (!supabase || cancelled) {
-        setError("Live video signaling unavailable — check DameTime /api/config");
+        setError("Live video signaling unavailable — check Sloane Glo /api/config");
         return;
       }
 

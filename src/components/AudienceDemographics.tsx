@@ -105,7 +105,7 @@ export function AudienceDemographics() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-dt-muted">Top Countries</p>
             <p className="mt-0.5 text-[11px] text-white/40">
-              Live DameTime fan geo
+              Live Sloane Glo fan geo
               {totalFans > 0
                 ? ` · ${formatMetric(mappedFans)} of ${formatMetric(totalFans)} fans mapped`
                 : " · waiting for signups"}

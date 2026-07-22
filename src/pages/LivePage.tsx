@@ -45,7 +45,7 @@ export function LivePage() {
   const streamRef = useRef<MediaStream | null>(null);
 
   const [status, setStatus] = useState<UiStatus>("idle");
-  const [title, setTitle] = useState("Dame Time Live");
+  const [title, setTitle] = useState("Sloane Glo Live");
   const [titleFontFamily, setTitleFontFamily] = useState<TitleFontFamily>("default");
   const [titleFontSize, setTitleFontSize] = useState<TitleFontSize>("md");
   const [scheduleAt, setScheduleAt] = useState(() => toLocalInputValue(new Date(Date.now() + 60 * 60 * 1000)));
@@ -173,7 +173,7 @@ export function LivePage() {
     setActionError(null);
     try {
       const result = await scheduleLive({
-        title: title.trim() || "Dame Time Live",
+        title: title.trim() || "Sloane Glo Live",
         scheduledAt: new Date(scheduleAt).toISOString(),
       });
       setSession(result.session);
@@ -190,7 +190,7 @@ export function LivePage() {
     try {
       await ensurePreview();
       const result = await startLive({
-        title: title.trim() || "Dame Time Live",
+        title: title.trim() || "Sloane Glo Live",
         sessionId: session?.status === "scheduled" ? session.id : undefined,
       });
       setSession(result.session);
@@ -243,26 +243,26 @@ export function LivePage() {
     <div className="space-y-5">
       <style>{`
         @keyframes go-live-pulse {
-          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.55), 0 0 28px rgba(229, 9, 20, 0.35); }
-          50% { transform: scale(1.03); box-shadow: 0 0 0 14px rgba(229, 9, 20, 0), 0 0 40px rgba(229, 9, 20, 0.55); }
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(143, 227, 184, 0.55), 0 0 28px rgba(143, 227, 184, 0.35); }
+          50% { transform: scale(1.03); box-shadow: 0 0 0 14px rgba(143, 227, 184, 0), 0 0 40px rgba(143, 227, 184, 0.55); }
         }
         .go-live-pulse { animation: go-live-pulse 1.6s ease-in-out infinite; }
       `}</style>
 
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_0%,rgba(229,9,20,0.22),transparent_50%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_0%,rgba(143,227,184,0.22),transparent_50%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
                 <Sparkles size={12} />
-                DameTime Live
+                Sloane Glo Live
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Go live for the DameTime community
+                Go live for the Sloane Glo community
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Schedule a time, then hit Go Live — fans see your camera on the DameTime home and live screens with chat.
+                Schedule a time, then hit Go Live — fans see your camera on the Sloane Glo home and live screens with chat.
               </p>
             </div>
 
@@ -289,7 +289,7 @@ export function LivePage() {
           <div className="border-b border-dt-border p-4 sm:p-5 xl:col-span-7 xl:border-b-0 xl:border-r">
             <div
               ref={stageRef}
-              className="relative overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_0_40px_rgba(229,9,20,0.08)]"
+              className="relative overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_0_40px_rgba(143,227,184,0.08)]"
             >
               <div className="aspect-video w-full">
                 <video
@@ -300,12 +300,12 @@ export function LivePage() {
                   className={`h-full w-full object-cover ${showVideo ? "block" : "hidden"}`}
                 />
                 {!showVideo && (
-                  <div className="flex h-full flex-col items-center justify-center gap-4 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.2),transparent_55%),linear-gradient(180deg,#0a0a0a,#050505)] px-6 text-center">
+                  <div className="flex h-full flex-col items-center justify-center gap-4 bg-[radial-gradient(ellipse_at_center,rgba(143,227,184,0.2),transparent_55%),linear-gradient(180deg,#0a0a0a,#050505)] px-6 text-center">
                     <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dt-red/35 bg-dt-red/10">
                       <Radio size={32} className="text-dt-red" />
                     </div>
                     <div>
-                      <p className="text-xl font-semibold text-white">DameTime live studio</p>
+                      <p className="text-xl font-semibold text-white">Sloane Glo live studio</p>
                       <p className="mx-auto mt-2 max-w-md text-sm text-white/55">
                         {cameraError ?? "Open camera, schedule if needed, then hit the pulsing Go Live button."}
                       </p>
@@ -344,9 +344,9 @@ export function LivePage() {
                     <Radio size={20} />
                   </div>
                   <div>
-                    <p className="text-base font-semibold text-white">Go Live on DameTime</p>
+                    <p className="text-base font-semibold text-white">Go Live on Sloane Glo</p>
                     <p className="mt-1 text-sm text-white/55">
-                      Fans on dametime-app see your stream in the live box and /access/live.
+                      Fans on sloane-bio see your stream in the live box and /access/live.
                     </p>
                   </div>
                 </div>
@@ -393,7 +393,7 @@ export function LivePage() {
               </button>
               {scheduledLabel && (
                 <p className="mt-2 text-xs text-dt-green">
-                  Countdown on DameTime targets {scheduledLabel}
+                  Countdown on Sloane Glo targets {scheduledLabel}
                 </p>
               )}
             </div>
@@ -425,7 +425,7 @@ export function LivePage() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
                   <Radio size={18} />
                 </span>
-                Go Live on DameTime
+                Go Live on Sloane Glo
               </button>
             )}
 
@@ -451,8 +451,8 @@ export function LivePage() {
 
         <div className="border-t border-dt-border p-5 sm:p-6">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">Live chat from DameTime</h3>
-            <span className="text-xs text-white/40">{isLive ? "Updating live" : "Appears when Dame is live"}</span>
+            <h3 className="text-sm font-semibold text-white">Live chat from Sloane Glo</h3>
+            <span className="text-xs text-white/40">{isLive ? "Updating live" : "Appears when Sloane is live"}</span>
           </div>
           <div className="max-h-56 space-y-2 overflow-y-auto rounded-xl border border-dt-border bg-black/40 p-3">
             {messages.length === 0 ? (
@@ -487,7 +487,7 @@ export function LivePage() {
             </div>
             <div className="space-y-3 px-5 py-4 text-sm leading-relaxed text-white/70">
               <p>
-                If you hit <span className="font-semibold text-white">Yes</span>, your camera will start broadcasting on DameTime right away.
+                If you hit <span className="font-semibold text-white">Yes</span>, your camera will start broadcasting on Sloane Glo right away.
               </p>
               <p>
                 Fans will see <span className="font-semibold text-dt-green">DAME LIVE NOW</span> on the home screen and can join your live video and chat.

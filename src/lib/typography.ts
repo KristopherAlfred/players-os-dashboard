@@ -18,7 +18,7 @@ export type TypographySettings = {
 };
 
 export const TITLE_FONT_OPTIONS: { id: TitleFontFamily; label: string; css: string }[] = [
-  { id: "default", label: "Default (Dame display)", css: "var(--font-display), ui-sans-serif, system-ui, sans-serif" },
+  { id: "default", label: "Default (Sloane display)", css: "var(--font-display), ui-sans-serif, system-ui, sans-serif" },
   { id: "barlow", label: "Barlow Condensed", css: '"Barlow Condensed", ui-sans-serif, system-ui, sans-serif' },
   { id: "source_sans", label: "Source Sans 3", css: '"Source Sans 3", ui-sans-serif, system-ui, sans-serif' },
   { id: "times", label: "Times New Roman", css: '"Times New Roman", Times, serif' },

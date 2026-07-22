@@ -38,7 +38,7 @@ const DashboardSourceContext = createContext<DashboardSourceContextValue | null>
 
 const sourceLabels: Record<DashboardSource, string> = {
   overview: "Overview",
-  dametime: "Dametime",
+  dametime: "Sloane Glo",
   instagram: "Instagram",
   youtube: "YouTube",
   facebook: "Facebook",

@@ -39,7 +39,7 @@ import { fanDisplayName, fetchFansList, formatFanJoined, type FanContact } from 
 import { DtSelect } from "../components/DtSelect";
 
 const POLL_MS = 30_000;
-const CHART_COLORS = ["#e50914", "#ffffff", "#f87171", "#94a3b8", "#fb7185", "#64748b"];
+const CHART_COLORS = ["#8FE3B8", "#ffffff", "#7DCEA0", "#94a3b8", "#A3E4C5", "#64748b"];
 
 const TIME_RANGE_OPTIONS = [
   { value: "1", label: "Last 24 hours" },
@@ -187,7 +187,7 @@ export function TrafficOverviewPage() {
             ? `Filtered to ${fanLabel} · synced ${new Date(data.syncedAt).toLocaleString()}`
             : isRefresh
               ? `Refreshed from Supabase · ${new Date(data.syncedAt).toLocaleString()}`
-              : `Live from DameTime fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
+              : `Live from Sloane Glo fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to load traffic analytics";
@@ -313,8 +313,8 @@ export function TrafficOverviewPage() {
   return (
     <div className="space-y-5">
       <div className="relative z-20 rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative overflow-hidden rounded-t-2xl border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative overflow-hidden rounded-t-2xl border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
@@ -328,7 +328,7 @@ export function TrafficOverviewPage() {
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {selectedFan
                   ? `Traffic for ${fanDisplayName(selectedFan)}`
-                  : "Clicks, page views & nav from DameTime"}
+                  : "Clicks, page views & nav from Sloane Glo"}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 {selectedFan
@@ -358,7 +358,7 @@ export function TrafficOverviewPage() {
                 type="button"
                 onClick={() => void load(true)}
                 disabled={refreshing}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {refreshing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
                 Refresh
@@ -473,7 +473,7 @@ export function TrafficOverviewPage() {
       </div>
 
       {fanEmail ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dt-red/35 bg-gradient-to-r from-dt-red/20 via-[#1a0505] to-dt-card px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dt-red/35 bg-gradient-to-r from-dt-red/20 via-[#051a12] to-dt-card px-5 py-4">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-dt-red/40 bg-dt-red/20 text-sm font-bold text-white">
               {initialsFromName(
@@ -522,7 +522,7 @@ export function TrafficOverviewPage() {
             key={label}
             className="relative overflow-hidden rounded-2xl border border-dt-border bg-dt-card p-4"
           >
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(229,9,20,0.18),transparent_55%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(143,227,184,0.18),transparent_55%)]" />
             <div className="relative flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">{label}</p>
@@ -608,8 +608,8 @@ export function TrafficOverviewPage() {
               <AreaChart data={derived.timeline}>
                 <defs>
                   <linearGradient id="trafficEvents" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#e50914" stopOpacity={0.45} />
-                    <stop offset="100%" stopColor="#e50914" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#8FE3B8" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="#8FE3B8" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="trafficViews" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#ffffff" stopOpacity={0.28} />
@@ -625,7 +625,7 @@ export function TrafficOverviewPage() {
                   type="monotone"
                   dataKey="events"
                   name="Events"
-                  stroke="#e50914"
+                  stroke="#8FE3B8"
                   fill="url(#trafficEvents)"
                   strokeWidth={2.5}
                 />
@@ -641,7 +641,7 @@ export function TrafficOverviewPage() {
                   type="monotone"
                   dataKey="clicks"
                   name="Clicks"
-                  stroke="#f87171"
+                  stroke="#7DCEA0"
                   fill="transparent"
                   strokeWidth={2}
                 />
@@ -725,7 +725,7 @@ export function TrafficOverviewPage() {
                   tickLine={false}
                 />
                 <Tooltip contentStyle={tooltipStyle()} />
-                <Bar dataKey="count" name="Count" fill="#e50914" radius={[0, 8, 8, 0]} />
+                <Bar dataKey="count" name="Count" fill="#8FE3B8" radius={[0, 8, 8, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

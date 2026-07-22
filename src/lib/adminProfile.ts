@@ -1,14 +1,14 @@
-/** Damian Lillard's official ESPN headshot — the default dashboard avatar. */
-export const DEFAULT_AVATAR_URL = "https://a.espncdn.com/i/headshots/nba/players/full/6606.png";
+/** Default Sloane Glo dashboard avatar. */
+export const DEFAULT_AVATAR_URL = "/images/sloane-avatar.png";
 
 const AVATAR_KEY = "dt-dashboard-avatar";
 const RING_KEY = "dt-dashboard-avatar-ring";
 const AVATAR_EVENT = "dt-avatar-changed";
 
-export const DEFAULT_RING_COLOR = "#e31837";
+export const DEFAULT_RING_COLOR = "#8FE3B8";
 
 export const RING_COLORS: { id: string; label: string; value: string }[] = [
-  { id: "red", label: "Dame Red", value: DEFAULT_RING_COLOR },
+  { id: "mint", label: "Sloane Mint", value: DEFAULT_RING_COLOR },
   { id: "white", label: "White", value: "#ffffff" },
   { id: "gold", label: "Gold", value: "#f5b60d" },
   { id: "green", label: "Green", value: "#22c55e" },

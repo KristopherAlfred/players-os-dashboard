@@ -43,11 +43,11 @@ const defaultPalette: ThemePalette = {
   border: "#1e1e1e",
   muted: "#8a8a8a",
   text: "#f0f0f0",
-  accent: "#e50914",
-  accentHover: "#ff1a26",
-  chartSecondary: "#991b1b",
-  chartTertiary: "#450a0a",
-  trafficShades: shades("#e50914"),
+  accent: "#8FE3B8",
+  accentHover: "#A8F0CC",
+  chartSecondary: "#5CBF8F",
+  chartTertiary: "#2F6B4F",
+  trafficShades: shades("#8FE3B8"),
 };
 
 const teamPalette: ThemePalette = {
@@ -57,11 +57,11 @@ const teamPalette: ThemePalette = {
   border: "#1f1f1f",
   muted: "#8a8a8a",
   text: "#f0f0f0",
-  accent: "#e03a3e",
-  accentHover: "#ff4d52",
-  chartSecondary: "#9f2b2e",
-  chartTertiary: "#5c181a",
-  trafficShades: shades("#e03a3e"),
+  accent: "#7DCEA0",
+  accentHover: "#A3E4C5",
+  chartSecondary: "#52B788",
+  chartTertiary: "#1B4332",
+  trafficShades: shades("#7DCEA0"),
 };
 
 const athletePalette: ThemePalette = {
@@ -117,17 +117,17 @@ export const themeTemplates: {
 }[] = [
   {
     id: "default",
-    name: "DameTime Classic",
-    description: "Classic DameTime red & black",
-    swatches: ["#e50914", "#f0f0f0", "#080808"],
-    preview: "linear-gradient(135deg, #080808 0%, #1a0505 45%, #e50914 100%)",
+    name: "Sloane Glo",
+    description: "Soft mint green & black",
+    swatches: ["#8FE3B8", "#f0f0f0", "#080808"],
+    preview: "linear-gradient(135deg, #080808 0%, #051a12 45%, #8FE3B8 100%)",
   },
   {
     id: "team",
-    name: "Rip City",
-    description: "Portland Trail Blazers red & black",
-    swatches: ["#e03a3e", "#f0f0f0", "#000000"],
-    preview: "linear-gradient(135deg, #000000 0%, #1a0808 45%, #e03a3e 100%)",
+    name: "Court Glow",
+    description: "Soft court green & black",
+    swatches: ["#7DCEA0", "#f0f0f0", "#000000"],
+    preview: "linear-gradient(135deg, #000000 0%, #051a12 45%, #7DCEA0 100%)",
   },
   {
     id: "athlete",
@@ -223,4 +223,4 @@ export function applyPalette(palette: ThemePalette) {
   }
 }
 
-export const STORAGE_KEY = "dametime-theme-template";
+export const STORAGE_KEY = "sloane-glo-theme-template";

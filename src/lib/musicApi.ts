@@ -157,7 +157,7 @@ export function createEmptyMusicItem(): AppMusicItem {
   return {
     id: `music-${now.getTime().toString(36)}`,
     title: "",
-    artist: "Dame D.O.L.L.A",
+    artist: "Sloane Stephens",
     duration: "",
     thumbnail: "",
     spotifyUrl: "",
@@ -178,7 +178,7 @@ export function musicItemFromSpotify(track: SpotifyCatalogTrack, existing?: AppM
   return {
     id: existing?.id || track.id,
     title: existing?.title || track.title,
-    artist: existing?.artist || track.artist || "Dame D.O.L.L.A",
+    artist: existing?.artist || track.artist || "Sloane Stephens",
     duration: existing?.duration || track.duration || "",
     thumbnail: existing?.thumbnail || track.coverImage || "",
     spotifyUrl: existing?.spotifyUrl || track.spotifyUrl || `https://open.spotify.com/track/${track.id}`,

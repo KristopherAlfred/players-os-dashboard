@@ -61,7 +61,7 @@ function normalizePost(post: {
   return {
     id: post.id,
     text: post.text?.trim() || "Facebook post",
-    permalink: post.permalink || `https://www.facebook.com/DamianLillard/posts/${post.id}/`,
+    permalink: post.permalink || `https://www.facebook.com/sloanestephens/posts/${post.id}/`,
     createdAt: post.createdAt || new Date().toISOString(),
     likes: Number(post.likes ?? post.stats?.likes ?? 0),
     comments: Number(post.comments ?? post.stats?.comments ?? 0),
@@ -92,10 +92,10 @@ function buildFacebookAnalyticsFromPosts(
     syncedAt: new Date().toISOString(),
     source: "cache",
     page: {
-      id: page?.id ?? "DamianLillard",
-      name: page?.name ?? "Damian Lillard",
-      slug: page?.slug ?? "DamianLillard",
-      permalink: page?.permalink ?? "https://www.facebook.com/DamianLillard/",
+      id: page?.id ?? "sloanestephens",
+      name: page?.name ?? "Sloane Stephens",
+      slug: page?.slug ?? "sloanestephens",
+      permalink: page?.permalink ?? "https://www.facebook.com/sloanestephens/",
       followers,
       followersLabel:
         page?.followersLabel ??

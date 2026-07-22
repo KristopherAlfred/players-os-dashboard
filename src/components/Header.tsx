@@ -12,7 +12,7 @@ import { getDashboardAvatar, getDashboardAvatarRing, onDashboardAvatarChange } f
 
 const filterOptions: { id: DashboardSource; label: string }[] = [
   { id: "overview", label: "Overview" },
-  { id: "dametime", label: "Dametime" },
+  { id: "dametime", label: "Sloane Glo" },
   { id: "instagram", label: "Instagram" },
   { id: "youtube", label: "YouTube" },
   { id: "facebook", label: "Facebook" },
@@ -108,7 +108,7 @@ export function Header({
               >
                 {onContent ? (
                   <p className="border-b border-dt-border px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-white/40">
-                    Content pages: Overview or Dametime only
+                    Content pages: Overview or Sloane Glo only
                   </p>
                 ) : null}
                 {filterOptions.map((option) => {
@@ -160,7 +160,7 @@ export function Header({
           >
             <img
               src={avatar}
-              alt="Damian Lillard — open profile"
+              alt="Sloane Stephens — open profile"
               className="h-9 w-9 rounded-full border-2 object-cover object-top"
               style={{ borderColor: ringColor }}
             />

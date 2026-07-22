@@ -124,7 +124,7 @@ export function NewsContentPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — live on DameTime News"
+          ? "Published — live on Sloane Glo News"
           : "Draft saved",
       );
     } catch (err) {
@@ -374,7 +374,7 @@ export function NewsContentPage() {
                   onChange={(e) => patchDraft({ body: e.target.value })}
                   rows={12}
                   className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 font-mono text-sm leading-relaxed outline-none focus:border-dt-red/50"
-                  placeholder="Type the full newsletter here. Fans read this in the DameTime app."
+                  placeholder="Type the full newsletter here. Fans read this in the Sloane Glo app."
                 />
               </label>
 

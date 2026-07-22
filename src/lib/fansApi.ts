@@ -43,7 +43,7 @@ function getAdminSecret() {
 export async function fetchFansList(): Promise<FansListResponse> {
   const secret = getAdminSecret();
   if (!secret) {
-    throw new Error("Set VITE_ADMIN_EXPORT_SECRET to load live fan emails from DameTime");
+    throw new Error("Set VITE_ADMIN_EXPORT_SECRET to load live fan emails from Sloane Glo");
   }
 
   const response = await fetch(`${getApiBase()}/api/admin/analytics?view=fans`, {

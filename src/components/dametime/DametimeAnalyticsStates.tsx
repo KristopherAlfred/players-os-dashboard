@@ -29,12 +29,12 @@ export function SourceError({
   );
 }
 
-export function DametimeLoading({ message = "Loading Dametime analytics…" }: { message?: string }) {
+export function DametimeLoading({ message = "Loading Sloane Glo analytics…" }: { message?: string }) {
   return <SourceLoading message={message} />;
 }
 
 export function DametimeError({ message }: { message: string }) {
-  return <SourceError title="Could not load Dametime analytics" message={message} />;
+  return <SourceError title="Could not load Sloane Glo analytics" message={message} />;
 }
 
 export function SourceBanner() {
@@ -45,7 +45,7 @@ export function SourceBanner() {
     return (
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
-          Dametime filter active — showing live analytics from the DameTime app.
+          Sloane Glo filter active — showing live analytics from the Sloane Glo app.
         </p>
         {!loading && analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
@@ -77,7 +77,7 @@ export function SourceBanner() {
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           YouTube filter active — showing{" "}
-          {youtube.analytics?.source === "cache" ? "cached" : "live"} analytics for @DamianLillard.
+          {youtube.analytics?.source === "cache" ? "cached" : "live"} analytics for @sloanestephens.
         </p>
         {!youtube.loading && youtube.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
@@ -93,7 +93,7 @@ export function SourceBanner() {
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           Facebook filter active — showing{" "}
-          {facebook.analytics?.source === "cache" ? "cached" : "live"} analytics for @DamianLillard.
+          {facebook.analytics?.source === "cache" ? "cached" : "live"} analytics for @sloanestephens.
         </p>
         {!facebook.loading && facebook.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
@@ -109,7 +109,7 @@ export function SourceBanner() {
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           X filter active — showing{" "}
-          {twitter.analytics?.source === "cache" ? "cached" : "live"} analytics for @Dame_Lillard.
+          {twitter.analytics?.source === "cache" ? "cached" : "live"} analytics for @sloanestephens.
         </p>
         {!twitter.loading && twitter.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">

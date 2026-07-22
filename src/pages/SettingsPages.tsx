@@ -61,7 +61,7 @@ export function SettingsPage() {
   return (
     <div className="space-y-5">
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
           <div
             className="pointer-events-none absolute inset-0 opacity-90"
             style={{
@@ -78,14 +78,14 @@ export function SettingsPage() {
                 Appearance, account & access
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Pick a color template, manage preferences, and see how connected platforms sync into DameTime.
+                Pick a color template, manage preferences, and see how connected platforms sync into Sloane Glo.
               </p>
             </div>
 
             <button
               type="button"
               onClick={handleSignOut}
-              className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-dt-red/40 bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.28)] transition hover:brightness-110"
+              className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-dt-red/40 bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.28)] transition hover:brightness-110"
             >
               <LogOut size={15} />
               Sign out
@@ -197,14 +197,14 @@ export function SettingsPage() {
             <label className="block">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Display name</span>
               <input
-                defaultValue="Dame Time Admin"
+                defaultValue="Sloane Glo Admin"
                 className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
               />
             </label>
             <label className="block">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Email</span>
               <input
-                defaultValue="admin@dametime.com"
+                defaultValue="admin@sloaneglo.com"
                 className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
               />
             </label>
@@ -246,7 +246,7 @@ export function SettingsPage() {
               },
               {
                 label: "SMS alerts for live drops",
-                hint: "When Dame goes live or posts exclusive content",
+                hint: "When Sloane goes live or posts exclusive content",
                 checked: smsAlerts,
                 onChange: setSmsAlerts,
               },
@@ -315,7 +315,7 @@ export function SettingsPage() {
             <Shield size={16} />
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Roles & permissions</h3>
           </div>
-          <p className="mt-1 text-[11px] text-white/40">Reference matrix for DameTime dashboard access levels</p>
+          <p className="mt-1 text-[11px] text-white/40">Reference matrix for Sloane Glo dashboard access levels</p>
         </div>
         <div className="overflow-x-auto p-2 sm:p-4">
           <table className="w-full min-w-[520px] text-left text-sm">

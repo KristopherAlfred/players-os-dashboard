@@ -38,7 +38,7 @@ export function FanActivityPage() {
       setStatus(
         isRefresh
           ? `Refreshed · ${new Date(data.syncedAt).toLocaleString()}`
-          : `Live DameTime fan activity · synced ${new Date(data.syncedAt).toLocaleString()}`,
+          : `Live Sloane Glo fan activity · synced ${new Date(data.syncedAt).toLocaleString()}`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load fan activity");
@@ -90,8 +90,8 @@ export function FanActivityPage() {
   return (
     <div className="space-y-5">
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
@@ -106,7 +106,7 @@ export function FanActivityPage() {
                 What fans are doing in the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Live from DameTime `fan_events` — page views, nav taps, card opens, buys, and more as they happen.
+                Live from Sloane Glo `fan_events` — page views, nav taps, card opens, buys, and more as they happen.
               </p>
             </div>
 
@@ -127,7 +127,7 @@ export function FanActivityPage() {
                 type="button"
                 onClick={() => void load(true)}
                 disabled={refreshing}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {refreshing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
                 Refresh
@@ -158,7 +158,7 @@ export function FanActivityPage() {
           { label: "Engagement", value: `${analytics.kpis.engagementRate}%`, Icon: TrendingUp },
         ].map(({ label, value, Icon }) => (
           <div key={label} className="relative overflow-hidden rounded-2xl border border-dt-border bg-dt-card p-4">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(229,9,20,0.16),transparent_55%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(143,227,184,0.16),transparent_55%)]" />
             <div className="relative flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">{label}</p>
@@ -175,7 +175,7 @@ export function FanActivityPage() {
           <div className="flex flex-col gap-3 border-b border-dt-border p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">Live activity feed</h3>
-              <p className="text-[11px] text-white/40">Latest fan_events from the DameTime app</p>
+              <p className="text-[11px] text-white/40">Latest fan_events from the Sloane Glo app</p>
             </div>
             <div className="flex flex-wrap gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
               <button

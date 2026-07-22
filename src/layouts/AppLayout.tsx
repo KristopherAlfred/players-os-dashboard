@@ -16,7 +16,7 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const meta = routeMeta[pathname] ?? {
-    title: "DAME.TIME",
+    title: "SLOANE GLO",
     subtitle: "Creator analytics and fan engagement platform.",
   };
 

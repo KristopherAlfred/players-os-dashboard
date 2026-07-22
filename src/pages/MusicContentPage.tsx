@@ -67,9 +67,9 @@ export function MusicContentPage() {
     setSpotifyTracks(tracks);
     setCatalogSource(source);
     if (source === "spotify") {
-      setStatus(`Synced ${tracks.length} live tracks from Dame D.O.L.L.A on Spotify`);
+      setStatus(`Synced ${tracks.length} live tracks from Sloane Stephens on Spotify`);
     } else {
-      setStatus(`Loaded ${tracks.length} Dame D.O.L.L.A tracks (built-in catalog)`);
+      setStatus(`Loaded ${tracks.length} Sloane Stephens tracks (built-in catalog)`);
     }
 
     if (!draft && tracks[0]) {
@@ -188,7 +188,7 @@ export function MusicContentPage() {
       const catalog = await fetchSpotifyCatalog(true);
       applyCatalog(catalog.tracks, catalog.source);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Dame D.O.L.L.A sync failed");
+      setError(err instanceof Error ? err.message : "Sloane Stephens sync failed");
     } finally {
       setSyncing(false);
     }
@@ -237,7 +237,7 @@ export function MusicContentPage() {
       const payload: AppMusicItem = {
         ...draft,
         title: draft.title.trim(),
-        artist: draft.artist.trim() || "Dame D.O.L.L.A",
+        artist: draft.artist.trim() || "Sloane Stephens",
         duration: draft.duration.trim(),
         thumbnail: draft.thumbnail.trim(),
         spotifyUrl: draft.spotifyUrl.trim(),
@@ -254,7 +254,7 @@ export function MusicContentPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — thumbnail & links live on DameTime Music"
+          ? "Published — thumbnail & links live on Sloane Glo Music"
           : "Draft saved",
       );
     } catch (err) {
@@ -324,7 +324,7 @@ export function MusicContentPage() {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-white/70">
-        <Loader2 className="mr-2 animate-spin" size={18} /> Loading Dame D.O.L.L.A catalog…
+        <Loader2 className="mr-2 animate-spin" size={18} /> Loading Sloane Stephens catalog…
       </div>
     );
   }
@@ -334,25 +334,25 @@ export function MusicContentPage() {
       <style>{`
         @keyframes music-phone-glow {
           0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); }
-          50% { box-shadow: 0 0 0 1px rgba(229,9,20,0.28), 0 28px 70px rgba(229,9,20,0.14); }
+          50% { box-shadow: 0 0 0 1px rgba(143,227,184,0.28), 0 28px 70px rgba(143,227,184,0.14); }
         }
         .music-phone-shell { animation: music-phone-glow 4.5s ease-in-out infinite; }
       `}</style>
 
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
                 <Music2 size={12} />
-                Dame D.O.L.L.A Music
+                Sloane Stephens Music
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 Curate Spotify tracks fans hear in the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Sync the Dame D.O.L.L.A catalog, swap thumbnails, add song or video links, feature cuts for Top songs, then publish. No Spotify login needed for Dame — tracks come from his public catalog.
+                Sync the Sloane Stephens catalog, swap thumbnails, add song or video links, feature cuts for Top songs, then publish. Connect Spotify later — for now manage tracks manually for Sloane Glo.
               </p>
             </div>
 
@@ -375,7 +375,7 @@ export function MusicContentPage() {
                 type="button"
                 onClick={() => void (draft ? saveDraft("published") : startNew())}
                 disabled={saving}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                 {draft ? "Publish to app" : "Add track"}
@@ -402,7 +402,7 @@ export function MusicContentPage() {
         <section className="flex min-h-[640px] flex-col overflow-hidden rounded-2xl border border-dt-border bg-dt-card xl:min-h-0">
           <div className="shrink-0 border-b border-dt-border px-4 py-3">
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Library</h3>
-            <p className="text-[11px] text-white/40">Dame D.O.L.L.A catalog + custom uploads</p>
+            <p className="text-[11px] text-white/40">Sloane Stephens catalog + custom uploads</p>
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
@@ -414,7 +414,7 @@ export function MusicContentPage() {
                 className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold text-white/85 hover:border-dt-red/40 disabled:opacity-60"
               >
                 {syncing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-                Sync Dame D.O.L.L.A
+                Sync Sloane Stephens
               </button>
               <button
                 type="button"
@@ -505,7 +505,7 @@ export function MusicContentPage() {
               })}
               {!library.length ? (
                 <li className="rounded-xl border border-dashed border-white/10 px-3 py-8 text-center text-xs text-white/40">
-                  Click Sync Dame D.O.L.L.A or add a custom track
+                  Click Sync Sloane Stephens or add a custom track
                 </li>
               ) : null}
             </ul>
@@ -516,7 +516,7 @@ export function MusicContentPage() {
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">App preview</p>
           <div className="music-phone-shell w-full max-w-[320px] overflow-hidden rounded-[2rem] border border-white/10 bg-black">
             <div className="relative min-h-[560px] bg-gradient-to-b from-[#2a0a0a] via-black to-black px-4 pb-6 pt-8">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.35),transparent_55%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.35),transparent_55%)]" />
               <div className="relative">
                 <p className="font-display text-[0.7rem] font-extrabold tracking-[0.18em] text-white/55">DAME D.O.L.L.A</p>
                 <h3 className="mt-1 font-display text-2xl font-extrabold tracking-[0.06em] text-white">MUSIC</h3>
@@ -620,7 +620,7 @@ export function MusicContentPage() {
                   value={draft.artist}
                   onChange={(e) => patchDraft({ artist: e.target.value })}
                   className={fieldClass()}
-                  placeholder="Dame D.O.L.L.A"
+                  placeholder="Sloane Stephens"
                 />
               </label>
 

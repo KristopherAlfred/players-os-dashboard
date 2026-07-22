@@ -304,7 +304,7 @@ export function AudienceOverviewPage() {
       setStatus(
         isRefresh
           ? `Refreshed · ${new Date(data.syncedAt).toLocaleString()}`
-          : `Live from DameTime · synced ${new Date(data.syncedAt).toLocaleString()}`,
+          : `Live from Sloane Glo · synced ${new Date(data.syncedAt).toLocaleString()}`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load audience overview");
@@ -367,8 +367,8 @@ export function AudienceOverviewPage() {
   return (
     <div className="space-y-5">
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
@@ -380,7 +380,7 @@ export function AudienceOverviewPage() {
                 </span>
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Where DameTime fans are signing up
+                Where Sloane Glo fans are signing up
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Live composition from Supabase — signups, email & SMS capture, active fans, and where they’re located.
@@ -404,7 +404,7 @@ export function AudienceOverviewPage() {
                 type="button"
                 onClick={() => void load(true)}
                 disabled={refreshing}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {refreshing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
                 Refresh
@@ -430,7 +430,7 @@ export function AudienceOverviewPage() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
         {kpis.map(({ label, value, Icon }) => (
           <div key={label} className="relative overflow-hidden rounded-2xl border border-dt-border bg-dt-card p-4">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(229,9,20,0.16),transparent_55%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(143,227,184,0.16),transparent_55%)]" />
             <div className="relative flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">{label}</p>
@@ -514,7 +514,7 @@ export function AudienceOverviewPage() {
         <div className="flex flex-col gap-1 border-b border-dt-border px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Signup map</h3>
-            <p className="text-[11px] text-white/40">Where DameTime fans are signing up from</p>
+            <p className="text-[11px] text-white/40">Where Sloane Glo fans are signing up from</p>
           </div>
           <div className="inline-flex items-center gap-1.5 text-[11px] text-white/45">
             <MapPin size={12} className="text-dt-red" />

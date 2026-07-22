@@ -19,10 +19,10 @@ export const trafficOverTime = [
 ];
 
 export const trafficSources = [
-  { name: "Instagram", value: 47.2, color: "#e50914" },
-  { name: "Facebook", value: 23.6, color: "#ff4444" },
-  { name: "X (Twitter)", value: 17.1, color: "#cc0000" },
-  { name: "YouTube", value: 12.2, color: "#990000" },
+  { name: "Instagram", value: 47.2, color: "#8FE3B8" },
+  { name: "Facebook", value: 23.6, color: "#A8F0CC" },
+  { name: "X (Twitter)", value: 17.1, color: "#7DCEA0" },
+  { name: "YouTube", value: 12.2, color: "#5CBF8F" },
 ];
 
 export const audienceSnapshot = [
@@ -35,7 +35,7 @@ export const audienceSnapshot = [
 ];
 
 export const liveActivity = [
-  { user: "Instagram", action: "Dame X launch post — 45.7K likes", time: "2s ago", avatar: "IG" },
+  { user: "Instagram", action: "Sloane Glo launch post — 45.7K likes", time: "2s ago", avatar: "IG" },
   { user: "X", action: "Y.A.G.I. mixtape announcement trending", time: "14s ago", avatar: "X" },
   { user: "YouTube", action: "Gimme Some Love — 169K views", time: "28s ago", avatar: "YT" },
   { user: "Facebook", action: "YAGI Mixtape post — 362 likes", time: "45s ago", avatar: "FB" },
@@ -45,7 +45,7 @@ export const liveActivity = [
 
 export const recentContent = [
   {
-    title: "Dame X is here. Shop now.",
+    title: "Sloane Glo is here.",
     type: "Video",
     status: "Published",
     published: "Recent",
@@ -63,7 +63,7 @@ export const recentContent = [
     thumb: "drop",
   },
   {
-    title: "Dame D.O.L.L.A. - Gimme Some Love",
+    title: "Sloane Stephens. - Gimme Some Love",
     type: "Video",
     status: "Published",
     published: "Nov 15",
@@ -99,7 +99,7 @@ export const recentContent = [
     thumb: "qa",
   },
   {
-    title: "Dame Recovery Mode - Drop 10",
+    title: "Sloane Glo Recovery Mode",
     type: "Video",
     status: "Published",
     published: "Nov 19",
@@ -171,7 +171,7 @@ export const emailSmsGrowth = [
 
 export const topPerforming = [
   { rank: 1, title: "X — viral post", engagement: "303.8K likes", thumb: "drop" },
-  { rank: 2, title: "Instagram — Dame X is here", engagement: "45.7K likes", thumb: "studio" },
+  { rank: 2, title: "Instagram — Sloane Glo is here", engagement: "45.7K likes", thumb: "studio" },
   { rank: 3, title: "YouTube — Gimme Some Love", engagement: "8.8K likes", thumb: "audio" },
   { rank: 4, title: "X — Y.A.G.I. mixtape drop", engagement: "1.8K likes", thumb: "tour" },
   { rank: 5, title: "Facebook — adidas Eurocamp", engagement: "784 likes", thumb: "qa" },

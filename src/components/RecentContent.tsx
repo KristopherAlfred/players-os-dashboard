@@ -55,7 +55,7 @@ function mapExclusiveVideo(item: ExclusiveVideoItem): RecentRow {
     published: formatPublished(item.publishedAt, item.date),
     publishedAt: new Date(item.publishedAt || item.date || 0).getTime() || 0,
     meta: item.duration || "Exclusive",
-    detail: item.description?.trim() || "DameTime exclusive",
+    detail: item.description?.trim() || "Sloane Glo exclusive",
     thumbUrl: resolveVideoAssetUrl(item.thumbnail),
     isVideo: true,
     editPath: "/content/videos",
@@ -90,7 +90,7 @@ function mapNews(item: NewsItem): RecentRow {
     meta: isNewsletter ? "Newsletter" : item.category === "insights" ? "Insight" : "News",
     detail:
       item.description?.trim() ||
-      (item.source === "players_tribune" ? "Players' Tribune" : "DameTime news"),
+      (item.source === "players_tribune" ? "Players' Tribune" : "Sloane Glo news"),
     thumbUrl: resolveNewsAssetUrl(item.thumbnail),
     isVideo: false,
     editPath: "/content/news",
@@ -107,7 +107,7 @@ function mapEvent(item: AppEventItem): RecentRow {
     published: formatPublished(item.publishedAt, item.dateLabel),
     publishedAt: new Date(item.publishedAt || item.deadline || 0).getTime() || 0,
     meta: item.location || item.dateLabel || (isGiveaway ? "Giveaway" : "Event"),
-    detail: item.description?.trim() || item.deadlineDisplay || "DameTime events",
+    detail: item.description?.trim() || item.deadlineDisplay || "Sloane Glo events",
     thumbUrl: resolveEventAssetUrl(item.thumbnail),
     isVideo: false,
     editPath: "/content/events",
@@ -163,7 +163,7 @@ export function RecentContent() {
         setRows(next);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load DameTime content");
+          setError(err instanceof Error ? err.message : "Failed to load Sloane Glo content");
           setRows([]);
         }
       } finally {
@@ -222,7 +222,7 @@ export function RecentContent() {
           <div>
             <h3 className="text-sm font-semibold text-white">Recent Content</h3>
             <p className="mt-0.5 text-[11px] text-white/45">
-              Live from DameTime — YouTube, exclusives, news, and events
+              Live from Sloane Glo — YouTube, exclusives, news, and events
             </p>
           </div>
           {loading ? <Loader2 size={14} className="animate-spin text-dt-red" /> : null}
@@ -330,7 +330,7 @@ export function RecentContent() {
             {loading && rows.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-sm text-dt-muted">
-                  Loading DameTime content…
+                  Loading Sloane Glo content…
                 </td>
               </tr>
             ) : filteredRows.length === 0 ? (

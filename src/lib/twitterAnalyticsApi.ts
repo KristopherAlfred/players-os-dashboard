@@ -65,7 +65,7 @@ function normalizePost(post: {
   return {
     id: post.id,
     text: post.text?.trim() || "Post on X",
-    permalink: post.permalink || `https://x.com/Dame_Lillard/status/${post.id}`,
+    permalink: post.permalink || `https://x.com/sloanestephens/status/${post.id}`,
     createdAt: post.createdAt || new Date().toISOString(),
     likes: Number(post.likes ?? post.stats?.likes ?? 0),
     replies: Number(post.replies ?? post.stats?.replies ?? 0),
@@ -97,10 +97,10 @@ function buildTwitterAnalyticsFromPosts(
     syncedAt: new Date().toISOString(),
     source: "cache",
     profile: {
-      screenName: profile?.screenName ?? "Dame_Lillard",
-      name: profile?.name ?? "Damian Lillard",
-      handle: profile?.handle ?? "@Dame_Lillard",
-      permalink: profile?.permalink ?? "https://x.com/Dame_Lillard",
+      screenName: profile?.screenName ?? "sloanestephens",
+      name: profile?.name ?? "Sloane Stephens",
+      handle: profile?.handle ?? "@sloanestephens",
+      permalink: profile?.permalink ?? "https://x.com/sloanestephens",
       followers,
       followersLabel:
         profile?.followersLabel ??

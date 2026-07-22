@@ -104,8 +104,8 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
         source: data.source,
         channel: {
           id: data.channel.id || "UCIhTfcMzbR5wyNeh57ju0ug",
-          name: data.channel.name || "Damian Lillard",
-          handle: data.channel.handle || "@DamianLillard",
+          name: data.channel.name || "Sloane Stephens",
+          handle: data.channel.handle || "@sloanestephens",
           avatar: data.channel.avatar,
           subscribers: data.channel.subscribers,
           subscribersLabel: data.channel.subscribersLabel,
@@ -263,14 +263,14 @@ function buildYouTubeAnalyticsFromFeed(feed: {
   const avgViews = Math.round(totalViews / videos.length);
   const avgLikes = Math.round(totalLikes / videos.length);
   const subscribers = Number(feed.channel?.subscribers ?? 0);
-  const handle = feed.channel?.handle ?? "@DamianLillard";
+  const handle = feed.channel?.handle ?? "@sloanestephens";
 
   return {
     syncedAt: feed.syncedAt || new Date().toISOString(),
     source: "live",
     channel: {
       id: feed.channel?.id ?? "UCIhTfcMzbR5wyNeh57ju0ug",
-      name: feed.channel?.name ?? "Damian Lillard",
+      name: feed.channel?.name ?? "Sloane Stephens",
       handle,
       permalink: `https://www.youtube.com/${handle.replace(/^@/, "@")}`,
       subscribers,

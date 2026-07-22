@@ -27,7 +27,7 @@ function RedGlowLoader({ className = "" }: { className?: string }) {
         className="h-full w-full animate-spin rounded-full border-2 border-dt-red/25 border-t-dt-red"
         style={{
           filter:
-            "drop-shadow(0 0 6px rgba(229,9,20,0.95)) drop-shadow(0 0 14px rgba(229,9,20,0.55))",
+            "drop-shadow(0 0 6px rgba(143,227,184,0.95)) drop-shadow(0 0 14px rgba(143,227,184,0.55))",
         }}
       />
     </span>
@@ -47,7 +47,7 @@ export function KpiCards() {
             className="dt-surface relative min-w-0 overflow-hidden rounded-lg border border-dt-border bg-dt-card p-3 sm:pr-10 xl:p-4 xl:pr-12"
           >
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-black to-black/95" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,rgba(229,9,20,0.04),transparent_55%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,rgba(143,227,184,0.04),transparent_55%)]" />
             <p className="relative text-[10px] font-medium uppercase tracking-wide text-white xl:text-[11px]">
               {kpi.label}
             </p>

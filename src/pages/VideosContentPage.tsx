@@ -61,8 +61,8 @@ export function VideosContentPage() {
   return (
     <div className="space-y-5">
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative max-w-2xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
               <Film size={12} />
@@ -76,7 +76,7 @@ export function VideosContentPage() {
               YouTube analytics & Exclusive uploads
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-white/65">
-              Same tabs fans use in DameTime — switch to Exclusive to upload clips and track opens once they go live.
+              Same tabs fans use in Sloane Glo — switch to Exclusive to upload clips and track opens once they go live.
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export function VideosContentPage() {
             className="relative grid grid-cols-2 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1"
           >
             <div
-              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/2)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(229,9,20,0.35)] transition-transform duration-300 ease-out"
+              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/2)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(143,227,184,0.35)] transition-transform duration-300 ease-out"
               style={{ transform: `translateX(${activeIndex * 100}%)` }}
               aria-hidden
             />
@@ -134,7 +134,7 @@ function YouTubeVideosPanel() {
         fetchYouTubeAnalytics(),
         fetchDametimeAnalytics().catch(() => null),
       ]);
-      if (!data) throw new Error("Could not load YouTube analytics from DameTime.");
+      if (!data) throw new Error("Could not load YouTube analytics from Sloane Glo.");
       setAnalytics(data);
       setDameAnalytics(dame);
     } catch (err) {
@@ -240,7 +240,7 @@ function YouTubeVideosPanel() {
 
       <Panel title="In-app YouTube clicks">
         <p className="mb-3 text-[11px] text-white/40">
-          Fans tapping Dame’s YouTube videos in the DameTime app — stored in Supabase `fan_events`
+          Fans tapping Sloane’s YouTube videos in the Sloane Glo app — stored in Supabase `fan_events`
         </p>
         {youtubeAppClicks.length === 0 ? (
           <p className="py-6 text-center text-sm text-dt-muted">
@@ -444,7 +444,7 @@ function ExclusiveVideosPanel() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — live in DameTime Exclusive Videos"
+          ? "Published — live in Sloane Glo Exclusive Videos"
           : "Draft saved",
       );
     } catch (err) {
@@ -555,7 +555,7 @@ function ExclusiveVideosPanel() {
         <button
           type="button"
           onClick={startNew}
-          className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)]"
+          className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)]"
         >
           <Plus size={14} /> New exclusive video
         </button>
@@ -565,7 +565,7 @@ function ExclusiveVideosPanel() {
         <StatCard label="Exclusive videos" value={String(stats.total)} />
         <StatCard label="Published" value={String(stats.published)} />
         <StatCard label="Drafts" value={String(stats.drafts)} />
-        <StatCard label="App opens" value={formatMetric(totalOpens)} hint="From DameTime fan_events" />
+        <StatCard label="App opens" value={formatMetric(totalOpens)} hint="From Sloane Glo fan_events" />
       </div>
 
       {error ? (
@@ -583,7 +583,7 @@ function ExclusiveVideosPanel() {
             <div className="border-b border-dt-border px-4 py-3.5">
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">Exclusive performance</h3>
               <p className="text-[11px] text-white/40">
-                Opens of each exclusive video detail page in the DameTime app
+                Opens of each exclusive video detail page in the Sloane Glo app
               </p>
             </div>
             {stats.published === 0 ? (

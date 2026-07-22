@@ -77,8 +77,8 @@ export function ProfilePage() {
     <div className="space-y-5">
       {/* Header card */}
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex items-center gap-4">
             <div className="mb-0 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
               <UserRound size={12} />
@@ -130,8 +130,8 @@ export function ProfilePage() {
               </span>
             </div>
             <div className="text-center">
-              <p className="font-display text-lg font-bold text-white">Damian Lillard</p>
-              <p className="text-xs uppercase tracking-[0.16em] text-white/40">DameTime Admin</p>
+              <p className="font-display text-lg font-bold text-white">Sloane Stephens</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-white/40">Sloane Glo Admin</p>
             </div>
             {!usingDefault ? (
               <button

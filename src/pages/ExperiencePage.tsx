@@ -36,7 +36,7 @@ import { TypographyControls } from "../components/TypographyControls";
 import { DtSelect } from "../components/DtSelect";
 
 const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: typeof Ticket }[] = [
-  { type: "tickets", label: "DameTime Tickets", hint: "Ticket drops", Icon: Ticket },
+  { type: "tickets", label: "Sloane Glo Tickets", hint: "Ticket drops", Icon: Ticket },
   { type: "custom", label: "Custom box", hint: "Any link + art", Icon: LayoutTemplate },
   { type: "videos", label: "Videos", hint: "Exclusive clips", Icon: Film },
   { type: "news", label: "News", hint: "Newsletters", Icon: Newspaper },
@@ -89,7 +89,7 @@ const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
   { id: "lowercase", label: "lowercase", hint: "exclusive videos" },
   { id: "stacked", label: "Stacked words", hint: "One word per line" },
   { id: "single_line", label: "Single line", hint: "No line breaks" },
-  { id: "dame_style", label: "Dame style", hint: "2–3 short caps lines" },
+  { id: "sloane_style", label: "Sloane style", hint: "2–3 short caps lines" },
 ];
 
 function titleLines(title: string) {
@@ -150,7 +150,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
     <div
       className={`relative flex h-full min-h-[112px] overflow-hidden rounded-2xl border transition ${
         selected
-          ? "border-dt-red shadow-[0_0_0_1px_rgba(229,9,20,0.45),0_8px_24px_rgba(229,9,20,0.18)]"
+          ? "border-dt-red shadow-[0_0_0_1px_rgba(143,227,184,0.45),0_8px_24px_rgba(143,227,184,0.18)]"
           : "border-white/10 hover:border-white/25"
       } bg-gradient-to-br from-white/[0.06] to-black/80`}
     >
@@ -366,7 +366,7 @@ export function ExperiencePage() {
       });
       setLayout(published);
       setDirty(false);
-      setStatus("Published to DameTime app home");
+      setStatus("Published to Sloane Glo app home");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Publish failed");
     } finally {
@@ -426,7 +426,7 @@ export function ExperiencePage() {
       <style>{`
         @keyframes exp-phone-glow {
           0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); }
-          50% { box-shadow: 0 0 0 1px rgba(229,9,20,0.25), 0 28px 70px rgba(229,9,20,0.12); }
+          50% { box-shadow: 0 0 0 1px rgba(143,227,184,0.25), 0 28px 70px rgba(143,227,184,0.12); }
         }
         .exp-phone-shell { animation: exp-phone-glow 4.5s ease-in-out infinite; }
         @keyframes exp-spark {
@@ -438,8 +438,8 @@ export function ExperiencePage() {
 
       {/* Header */}
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
@@ -447,7 +447,7 @@ export function ExperiencePage() {
                 Experience builder
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Design the DameTime home experience
+                Design the Sloane Glo home experience
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Drag tiles, swap art, drop in Tickets or custom boxes, generate AI cutouts, then publish straight to the fan app.
@@ -473,7 +473,7 @@ export function ExperiencePage() {
                 type="button"
                 onClick={() => void onPublish()}
                 disabled={saving}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                 Publish to app
@@ -550,7 +550,7 @@ export function ExperiencePage() {
                   onClick={() => setSelectedId(widget.id)}
                   className={`group flex cursor-grab items-center gap-2.5 rounded-xl border px-2.5 py-2.5 transition active:cursor-grabbing ${
                     isSelected
-                      ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(229,9,20,0.2)]"
+                      ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(143,227,184,0.2)]"
                       : isDrop
                         ? "border-dt-red/50 bg-dt-red/10"
                         : "border-white/10 bg-black/25 hover:border-white/20 hover:bg-white/[0.04]"
@@ -598,7 +598,7 @@ export function ExperiencePage() {
                   onClick={() => setAddSize(sizeOption.id)}
                   className={`flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition ${
                     addSize === sizeOption.id
-                      ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(229,9,20,0.25)]"
+                      ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(143,227,184,0.25)]"
                       : "border-white/10 bg-black/25 hover:border-white/25 hover:bg-white/[0.04]"
                   }`}
                 >
@@ -634,7 +634,7 @@ export function ExperiencePage() {
           </div>
         </section>
 
-          <section className="relative overflow-hidden rounded-2xl border border-dt-red/30 bg-dt-card shadow-[0_0_40px_rgba(229,9,20,0.06)]">
+          <section className="relative overflow-hidden rounded-2xl border border-dt-red/30 bg-dt-card shadow-[0_0_40px_rgba(143,227,184,0.06)]">
             <div className="flex items-center gap-2.5 border-b border-white/10 bg-gradient-to-r from-dt-red/15 to-transparent px-4 py-3.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-dt-red/20 text-dt-red">
                 {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="exp-ai-spark" />}
@@ -669,7 +669,7 @@ export function ExperiencePage() {
                 rows={3}
                 disabled={generating}
                 className={fieldClass()}
-                placeholder="Example: Damian Lillard red jersey cutout, transparent background, mobile app tile"
+                placeholder="Example: Sloane Stephens red jersey cutout, transparent background, mobile app tile"
               />
               {selected?.imageSrc ? (
                 <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
@@ -702,7 +702,7 @@ export function ExperiencePage() {
         </div>
 
         {/* Center: phone */}
-        <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
+        <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
           <div className="exp-phone-shell relative w-full max-w-[340px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
             <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />

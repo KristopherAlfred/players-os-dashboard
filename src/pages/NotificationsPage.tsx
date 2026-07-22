@@ -60,7 +60,7 @@ function PreviewToast({ message, pulsing = false }: { message: string; pulsing?:
         className="relative overflow-hidden rounded-[10px] border bg-black"
         style={{
           borderColor: "rgba(227, 24, 55, 0.75)",
-          boxShadow: "inset 0 0 18px rgba(0,0,0,0.45), 0 8px 28px rgba(229,9,20,0.18)",
+          boxShadow: "inset 0 0 18px rgba(0,0,0,0.45), 0 8px 28px rgba(143,227,184,0.18)",
         }}
       >
         <div
@@ -162,7 +162,7 @@ export function NotificationsPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — live in DameTime app toasts"
+          ? "Published — live in Sloane Glo app toasts"
           : "Draft saved",
       );
     } catch (err) {
@@ -238,15 +238,15 @@ export function NotificationsPage() {
         .notif-toast-pulse { animation: notif-toast-pulse 2.4s ease-in-out infinite; }
         @keyframes notif-phone-glow {
           0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); }
-          50% { box-shadow: 0 0 0 1px rgba(229,9,20,0.28), 0 28px 70px rgba(229,9,20,0.14); }
+          50% { box-shadow: 0 0 0 1px rgba(143,227,184,0.28), 0 28px 70px rgba(143,227,184,0.14); }
         }
         .notif-phone-shell { animation: notif-phone-glow 4.5s ease-in-out infinite; }
       `}</style>
 
       {/* Studio header */}
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
@@ -254,7 +254,7 @@ export function NotificationsPage() {
                 In-app toasts
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Schedule DameTime notifications
+                Schedule Sloane Glo notifications
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Write extra messages that pop in the fan app with the same red-gradient toast look — set frequency, duration, and schedule windows.
@@ -281,7 +281,7 @@ export function NotificationsPage() {
                 type="button"
                 onClick={() => void (draft ? saveDraft("published") : startNew())}
                 disabled={saving}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                 {draft ? "Publish to app" : "New notification"}
@@ -339,7 +339,7 @@ export function NotificationsPage() {
                       onClick={() => selectItem(item)}
                       className={`flex w-full gap-3 rounded-xl border p-3 text-left transition ${
                         selectedId === item.id
-                          ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(229,9,20,0.2)]"
+                          ? "border-dt-red/70 bg-dt-red/15 shadow-[inset_0_0_0_1px_rgba(143,227,184,0.2)]"
                           : "border-white/10 bg-black/25 hover:border-white/20 hover:bg-white/[0.04]"
                       }`}
                     >
@@ -385,7 +385,7 @@ export function NotificationsPage() {
         </section>
 
         {/* Phone preview */}
-        <section className="relative flex min-h-[560px] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
+        <section className="relative flex min-h-[560px] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
           {showingExamplePreview ? (
             <div className="relative z-[1] max-w-[320px] rounded-xl border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-center">

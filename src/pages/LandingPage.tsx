@@ -15,7 +15,7 @@ import {
 import { saveDashboardSession, type DashboardRole } from "../lib/dashboardAuth";
 
 const rosterAthletes = [
-  { id: "dame", name: "Damian Lillard", team: "Milwaukee Bucks", league: "NBA" },
+  { id: "sloane", name: "Sloane Stephens", team: "WTA", league: "Tennis" },
   { id: "sabrina", name: "Sabrina Ionescu", team: "New York Liberty", league: "WNBA" },
   { id: "lamar", name: "Lamar Jackson", team: "Baltimore Ravens", league: "NFL" },
   { id: "aaron", name: "A'ja Wilson", team: "Las Vegas Aces", league: "WNBA" },
@@ -76,7 +76,7 @@ export function LandingPage() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#1a0000] to-[#0a0000]" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#220000] to-black" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.98),transparent_40%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.48),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(143,227,184,0.48),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(180,0,0,0.32),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.88),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.45),transparent_70%)]" />

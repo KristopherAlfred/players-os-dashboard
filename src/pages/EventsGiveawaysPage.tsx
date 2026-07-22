@@ -51,7 +51,7 @@ function PosterPreview({
       onClick={onClick}
       className={`relative aspect-[3/4] w-full overflow-hidden rounded-xl border text-left transition ${
         selected
-          ? "border-dt-red shadow-[0_0_0_1px_rgba(229,9,20,0.45),0_8px_24px_rgba(229,9,20,0.18)]"
+          ? "border-dt-red shadow-[0_0_0_1px_rgba(143,227,184,0.45),0_8px_24px_rgba(143,227,184,0.18)]"
           : "border-white/10 hover:border-white/25"
       }`}
     >
@@ -217,7 +217,7 @@ export function EventsGiveawaysPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? `Published — live in DameTime ${payload.type === "giveaway" ? "Giveaways" : "Upcoming"}`
+          ? `Published — live in Sloane Glo ${payload.type === "giveaway" ? "Giveaways" : "Upcoming"}`
           : "Draft saved",
       );
     } catch (err) {
@@ -287,15 +287,15 @@ export function EventsGiveawaysPage() {
       <style>{`
         @keyframes events-phone-glow {
           0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); }
-          50% { box-shadow: 0 0 0 1px rgba(229,9,20,0.28), 0 28px 70px rgba(229,9,20,0.14); }
+          50% { box-shadow: 0 0 0 1px rgba(143,227,184,0.28), 0 28px 70px rgba(143,227,184,0.14); }
         }
         .events-phone-shell { animation: events-phone-glow 4.5s ease-in-out infinite; }
       `}</style>
 
       {/* Header */}
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a0505] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(229,9,20,0.22),transparent_52%)]" />
+        <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
@@ -306,7 +306,7 @@ export function EventsGiveawaysPage() {
                 Publish posters fans unlock in the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Create Upcoming events or Giveaways with thumbnail, deadline, description, and link — they appear in the DameTime events grid after publish.
+                Create Upcoming events or Giveaways with thumbnail, deadline, description, and link — they appear in the Sloane Glo events grid after publish.
               </p>
             </div>
 
@@ -327,7 +327,7 @@ export function EventsGiveawaysPage() {
                 type="button"
                 onClick={() => void (draft ? saveDraft("published") : startNew("event"))}
                 disabled={saving}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(229,9,20,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                 {draft ? "Publish to app" : "New event"}
@@ -469,7 +469,7 @@ export function EventsGiveawaysPage() {
         </section>
 
         {/* Phone preview */}
-        <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(229,9,20,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
+        <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden rounded-2xl border border-dt-border bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.14),transparent_45%),linear-gradient(180deg,#121212_0%,#070707_55%,#050505_100%)] px-4 py-8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-dt-red/10 to-transparent" />
           <div className="events-phone-shell relative w-full max-w-[320px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
             <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />

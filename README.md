@@ -1,10 +1,10 @@
 # Sloane Dashboard
 
-Cloned from Dame Time AMX dashboard. Edit branding, data sources, and env vars for Sloane Stephens — Dame projects are unchanged.
+Cloned from Sloane Glo AMX dashboard. Edit branding, data sources, and env vars for Sloane Stephens — Dame projects are unchanged.
 
-# DAME.TIME Dashboard
+# SLOANE GLO Dashboard
 
-Pixel-faithful recreation of the **DAME.TIME Dashboard Overview** — a dark-themed analytics dashboard for the DameTime content ecosystem.
+Pixel-faithful recreation of the **SLOANE GLO Dashboard Overview** — a dark-themed analytics dashboard for the Sloane Glo content ecosystem.
 
 ![Dashboard preview](./docs/preview.png)
 
@@ -45,12 +45,12 @@ src/
 
 GitHub’s web uploader limits how many files you can add at once and should **never** include `node_modules` (150MB+). Use Git from your terminal instead — only **32 source files** are tracked.
 
-1. On [github.com/new](https://github.com/new), create a repo named `dametime-dashboard` (empty: no README, no .gitignore).
+1. On [github.com/new](https://github.com/new), create a repo named `sloane glo-dashboard` (empty: no README, no .gitignore).
 2. Replace `YOUR_GITHUB_USERNAME` below and run:
 
 ```bash
-cd /Users/demetriwilliams/dametime-dashboard
-git remote add origin https://github.com/YOUR_GITHUB_USERNAME/dametime-dashboard.git
+cd /Users/demetriwilliams/sloane glo-dashboard
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/sloane glo-dashboard.git
 git push -u origin main
 ```
 
@@ -61,7 +61,7 @@ If GitHub asks you to sign in, use a **Personal Access Token** as the password (
 **Option A — GitHub (recommended)**
 
 1. Go to [vercel.com/new](https://vercel.com/new) and sign in with GitHub.
-2. Import **`himdemetrii/dametime-dashboard`**.
+2. Import **`himdemetrii/sloane glo-dashboard`**.
 3. Leave defaults (Vite is auto-detected):
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
@@ -70,12 +70,12 @@ If GitHub asks you to sign in, use a **Personal Access Token** as the password (
 **Option B — CLI**
 
 ```bash
-cd /Users/demetriwilliams/dametime-dashboard
+cd /Users/demetriwilliams/sloane glo-dashboard
 npx vercel
 npx vercel --prod
 ```
 
-Live URL will look like `https://dametime-dashboard.vercel.app` (or a custom name you choose in the Vercel dashboard).
+Live URL will look like `https://sloane glo-dashboard.vercel.app` (or a custom name you choose in the Vercel dashboard).
 
 ## License
 
