@@ -117,7 +117,7 @@ export const DEFAULT_EXPERIENCE_THEME: ExperienceTheme = {
   bgGradientTo: "#05140e",
   bgGradientAngle: 160,
   useGradientBg: true,
-  backgroundImage: "/experience/backgrounds/app-background.png",
+  backgroundImage: "",
   surface: "#0c0c0c",
   card: "#121212",
   border: "rgba(255,255,255,0.12)",

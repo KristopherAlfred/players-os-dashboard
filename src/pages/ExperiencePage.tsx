@@ -45,9 +45,9 @@ import {
   ExperienceBrandPanel,
   ExperienceEffectsPanel,
   ExperiencePagePanel,
-  ExperiencePreviewChrome,
   ExperienceThemePanel,
 } from "../components/experience/ExperienceAdvancedPanels";
+import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
 
 type ExperienceSection =
   | "boxes"
@@ -630,7 +630,7 @@ export function ExperiencePage() {
       </div>
 
       {section !== "boxes" ? (
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
           <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
             <div className="border-b border-dt-border px-4 py-3">
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">
@@ -638,7 +638,7 @@ export function ExperiencePage() {
               </h3>
               <p className="text-[11px] text-white/40">Changes sync to Sloane Glo when you publish</p>
             </div>
-            <div className="p-4">
+            <div className="max-h-[calc(100vh-8rem)] overflow-y-auto p-4">
               {section === "brand" ? (
                 <ExperienceBrandPanel
                   brand={experience.brand}
@@ -662,16 +662,6 @@ export function ExperiencePage() {
                   theme={experience.theme}
                   onChange={(patch) =>
                     patchExperience((prev) => ({ ...prev, theme: { ...prev.theme, ...patch } }))
-                  }
-                  onUploadBackground={(file) =>
-                    void uploadIntoExperience(
-                      (backgroundImage) =>
-                        patchExperience((prev) => ({
-                          ...prev,
-                          theme: { ...prev.theme, backgroundImage },
-                        })),
-                      file,
-                    )
                   }
                 />
               ) : null}
@@ -708,20 +698,7 @@ export function ExperiencePage() {
               ) : null}
             </div>
           </section>
-          <div className="space-y-4">
-            <ExperiencePreviewChrome experience={experience} />
-            <div className="rounded-2xl border border-dt-border bg-dt-card p-4 text-xs text-white/55">
-              <p className="mb-2 flex items-center gap-2 font-semibold text-white">
-                <Palette size={14} className="text-dt-red" /> Studio tips
-              </p>
-              <ul className="space-y-1.5 list-disc pl-4">
-                <li>Pick logos, heroes, and backgrounds from the library — or upload your own.</li>
-                <li>Landing / You&apos;re In / Settings each have their own copy, colors, and art.</li>
-                <li>Home boxes still support per-tile colors and effects.</li>
-                <li>Hit Publish to app to push everything live to Sloane Glo.</li>
-              </ul>
-            </div>
-          </div>
+          <ExperiencePhonePreview experience={experience} mode={section} />
         </div>
       ) : null}
 
