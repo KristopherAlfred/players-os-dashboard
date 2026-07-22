@@ -229,16 +229,16 @@ export function ExperienceBrandPanel({
       />
 
       <AssetPicker
-        label="Pick a logo"
+        label="Pick an AI logo"
         assets={EXPERIENCE_LOGOS}
         value={brand.logoSrc}
         onSelect={(logoSrc) => onChange({ logoSrc, showLogoImage: Boolean(logoSrc) })}
       />
 
-      <Field label="Logo image URL" hint="Or paste any image URL">
+      <Field label="Logo image URL" hint="Custom AI / illustrated mark only — no photo headshots">
         <TextInput value={brand.logoSrc} onChange={(logoSrc) => onChange({ logoSrc })} />
       </Field>
-      <Field label="Upload custom logo">
+      <Field label="Upload custom AI logo">
         <input
           type="file"
           accept="image/*"

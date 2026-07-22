@@ -8,29 +8,34 @@ export type ExperienceAsset = {
 
 export const EXPERIENCE_LOGOS: ExperienceAsset[] = [
   {
-    id: "sloane-avatar",
-    label: "Sloane avatar",
-    src: "/experience/logos/sloane-avatar.png",
+    id: "ai-crown",
+    label: "AI crown",
+    src: "/experience/logos/logo-ai-crown.png",
   },
   {
-    id: "sloane-headshot",
-    label: "Sloane headshot",
-    src: "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png",
+    id: "ai-racquet",
+    label: "AI racquet",
+    src: "/experience/logos/logo-ai-racquet.png",
   },
   {
-    id: "sloane-glo-mark",
-    label: "SG mark",
-    src: "/experience/logos/sloane-glo-mark.svg",
+    id: "ai-letter-s",
+    label: "AI letter S",
+    src: "/experience/logos/logo-ai-letter-s.png",
   },
   {
-    id: "sloane-glo-word",
-    label: "Wordmark art",
-    src: "/experience/logos/sloane-glo-word.svg",
+    id: "ai-sg",
+    label: "AI SG mark",
+    src: "/experience/logos/logo-ai-sg.png",
   },
   {
-    id: "amx-mark",
-    label: "AMX mark",
-    src: "/experience/logos/amx-mark.png",
+    id: "ai-ball",
+    label: "AI tennis ball",
+    src: "/experience/logos/logo-ai-ball.png",
+  },
+  {
+    id: "ai-glow",
+    label: "AI glow orb",
+    src: "/experience/logos/logo-ai-glow.png",
   },
 ];
 
@@ -40,11 +45,6 @@ export const EXPERIENCE_HEROES: ExperienceAsset[] = [
   { id: "trophy", label: "Trophy", src: "/experience/heroes/sloanetrophy.png" },
   { id: "match-ready", label: "Match ready", src: "/experience/heroes/sloanematchready.png" },
   { id: "doc-and-glo", label: "Doc & Glo", src: "/experience/heroes/docandglo.png" },
-  {
-    id: "headshot-hero",
-    label: "Headshot",
-    src: "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png",
-  },
 ];
 
 export const EXPERIENCE_BACKGROUNDS: ExperienceAsset[] = [

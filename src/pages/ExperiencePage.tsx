@@ -955,7 +955,7 @@ export function ExperiencePage() {
                     src={resolveAssetUrl(
                       experience.pages.home.heroImage ||
                         experience.brand.logoSrc ||
-                        "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png",
+                        "/experience/logos/logo-ai-crown.png",
                     )}
                     alt=""
                     className="absolute inset-0 h-full w-full object-cover opacity-80"
