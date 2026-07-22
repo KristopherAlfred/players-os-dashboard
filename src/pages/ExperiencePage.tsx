@@ -8,7 +8,6 @@ import {
   GripVertical,
   ImagePlus,
   Loader2,
-  Music2,
   Newspaper,
   Plus,
   Sparkles,
@@ -41,7 +40,7 @@ const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: type
   { type: "videos", label: "Videos", hint: "Exclusive clips", Icon: Film },
   { type: "news", label: "News", hint: "Newsletters", Icon: Newspaper },
   { type: "events", label: "Events", hint: "Giveaways", Icon: Gift },
-  { type: "music", label: "Music", hint: "D.O.L.L.A", Icon: Music2 },
+  { type: "music", label: "Doc & Glo", hint: "Skincare", Icon: Sparkles },
 ];
 
 /** Mini glyph showing the box footprint inside a 2×2 grid. */
@@ -70,7 +69,7 @@ const typeMeta: Record<HomeWidgetType, { label: string; Icon: typeof Ticket }> =
   videos: { label: "Videos", Icon: Film },
   news: { label: "News", Icon: Newspaper },
   events: { label: "Events", Icon: CalendarDays },
-  music: { label: "Music", Icon: Music2 },
+  music: { label: "Doc & Glo", Icon: Sparkles },
 };
 
 type TitleFilter =

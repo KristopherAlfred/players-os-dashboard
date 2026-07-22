@@ -48,7 +48,7 @@ export const navSections: NavSection[] = [
       { label: "Social", path: "/content/social" },
       { label: "News", path: "/content/news" },
       { label: "Videos", path: "/content/videos" },
-      { label: "Music", path: "/content/music" },
+      { label: "Doc & Glo", path: "/content/doc-and-glo" },
       { label: "Events & Giveaways", path: "/content/events" },
       { label: "Content Calendar", path: "/content/calendar" },
     ],
@@ -122,9 +122,13 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Videos",
     subtitle: "YouTube analytics plus Exclusive uploads — same tabs fans use in Sloane Glo.",
   },
+  "/content/doc-and-glo": {
+    title: "Doc & Glo",
+    subtitle: "Sloane’s skincare line — sync products from the shop and publish them to the app.",
+  },
   "/content/music": {
-    title: "Music",
-    subtitle: "Sloane Stephens Spotify catalog — thumbnails, song links, and videos for the app.",
+    title: "Doc & Glo",
+    subtitle: "Sloane’s skincare line — sync products from the shop and publish them to the app.",
   },
   "/content/events": {
     title: "Events & Giveaways",

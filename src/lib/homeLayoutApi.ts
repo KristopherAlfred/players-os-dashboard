@@ -175,15 +175,15 @@ function presetsFor(id: string, order: number, size: HomeWidgetSize): Record<Exc
     music: {
       id,
       type: "music",
-      title: "DAME\nD.O.L.L.A\nMUSIC",
+      title: "DOC &\nGLO",
       imageSrc: "/images/damedollamusichome.png?v=11",
-      linkTo: "/access/music",
+      linkTo: "/access/doc-and-glo",
       enabled: true,
       order,
       size,
       imageFit: "half",
       cardClassName: "member-card-music-gradient",
-      showMusicBars: true,
+      showMusicBars: false,
     },
   };
 }

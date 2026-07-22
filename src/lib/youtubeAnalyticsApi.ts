@@ -103,7 +103,7 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
         syncedAt: data.syncedAt || new Date().toISOString(),
         source: data.source,
         channel: {
-          id: data.channel.id || "UCIhTfcMzbR5wyNeh57ju0ug",
+          id: data.channel.id || "UCL88E7XtLyJKmLoaGpwxxtQ",
           name: data.channel.name || "Sloane Stephens",
           handle: data.channel.handle || "@sloanestephens",
           avatar: data.channel.avatar,
@@ -269,7 +269,7 @@ function buildYouTubeAnalyticsFromFeed(feed: {
     syncedAt: feed.syncedAt || new Date().toISOString(),
     source: "live",
     channel: {
-      id: feed.channel?.id ?? "UCIhTfcMzbR5wyNeh57ju0ug",
+      id: feed.channel?.id ?? "UCL88E7XtLyJKmLoaGpwxxtQ",
       name: feed.channel?.name ?? "Sloane Stephens",
       handle,
       permalink: `https://www.youtube.com/${handle.replace(/^@/, "@")}`,

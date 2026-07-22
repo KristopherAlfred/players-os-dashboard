@@ -6,7 +6,7 @@ import {
   SocialContentPage,
   NewsContentPage,
   VideosContentPage,
-  MusicContentPage,
+  DocAndGloContentPage,
   EventsGiveawaysPage,
   ContentCalendarPage,
 } from "./pages/ContentPages";
@@ -51,11 +51,12 @@ export default function App() {
           <Route path="content/social" element={<SocialContentPage />} />
           <Route path="content/news" element={<NewsContentPage />} />
           <Route path="content/videos" element={<VideosContentPage />} />
-          <Route path="content/music" element={<MusicContentPage />} />
+          <Route path="content/doc-and-glo" element={<DocAndGloContentPage />} />
+          <Route path="content/music" element={<Navigate to="/content/doc-and-glo" replace />} />
           <Route path="content/events" element={<EventsGiveawaysPage />} />
           <Route path="content/all" element={<Navigate to="/content/social" replace />} />
           <Route path="content/media" element={<Navigate to="/content/videos" replace />} />
-          <Route path="content/playlists" element={<Navigate to="/content/music" replace />} />
+          <Route path="content/playlists" element={<Navigate to="/content/doc-and-glo" replace />} />
           <Route path="content/upload" element={<Navigate to="/experience" replace />} />
           <Route path="athletes/hub" element={<Navigate to="/experience" replace />} />
           <Route path="live" element={<LivePage />} />
