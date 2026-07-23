@@ -1111,6 +1111,36 @@ export function ExperiencePage() {
                 Drag boxes to rearrange · tap to edit
               </p>
             </div>
+            <div className="border-t border-white/10 bg-[#0a0a0a] px-1 pb-3 pt-2">
+              <div className="grid grid-cols-5 gap-0.5">
+                {(
+                  [
+                    { label: "HOME", active: true },
+                    { label: "SOCIAL", active: false },
+                    { label: "VIDEOS", active: false },
+                    { label: "NEWS", active: false },
+                    { label: "PROFILE", active: false },
+                  ] as const
+                ).map((tab) => (
+                  <div key={tab.label} className="flex flex-col items-center gap-0.5 px-0.5 py-1">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${tab.active ? "bg-dt-red" : "bg-white/25"}`}
+                      aria-hidden
+                    />
+                    <span
+                      className={`font-display text-[7px] tracking-[0.12em] ${
+                        tab.active ? "text-dt-red" : "text-white/45"
+                      }`}
+                    >
+                      {tab.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-1.5 text-center text-[8px] text-white/25">
+                Bottom bar stays the same across the app (not edited here)
+              </p>
+            </div>
           </div>
         </section>
 
@@ -1158,6 +1188,58 @@ export function ExperiencePage() {
                 </div>
 
                 <div className="space-y-4 overflow-y-auto p-5">
+                  <div className="rounded-xl border border-dt-red/35 bg-dt-red/10 p-3.5">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-dt-red">
+                      When fans tap this box
+                    </p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-white/55">
+                      Set where the box goes. To change the videos list, news posts, events, or Doc &amp; Glo
+                      content inside that page, use Content in the left sidebar (or the link below).
+                    </p>
+                    <label className="mt-3 block space-y-1.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
+                        Opens this destination
+                      </span>
+                      <input
+                        value={selected.linkTo}
+                        onChange={(e) => patchSelected({ linkTo: e.target.value })}
+                        className={fieldClass()}
+                        placeholder="/access/videos"
+                      />
+                    </label>
+                    {selected.type === "news" ||
+                    selected.type === "videos" ||
+                    selected.type === "music" ||
+                    selected.type === "events" ? (
+                      <Link
+                        to={
+                          selected.type === "news"
+                            ? "/content/news"
+                            : selected.type === "videos"
+                              ? "/content/videos"
+                              : selected.type === "music"
+                                ? "/content/doc-and-glo"
+                                : "/content/events"
+                        }
+                        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-dt-red/50 bg-dt-red/20 px-3 py-2.5 text-[12px] font-semibold text-dt-red hover:bg-dt-red/30"
+                      >
+                        <ExternalLink size={13} />
+                        Edit what’s inside{" "}
+                        {selected.type === "news"
+                          ? "News"
+                          : selected.type === "videos"
+                            ? "Videos"
+                            : selected.type === "music"
+                              ? "Doc & Glo"
+                              : "Events"}
+                      </Link>
+                    ) : (
+                      <p className="mt-2 text-[11px] text-white/40">
+                        Custom / tickets boxes only need a link above (app path or full URL).
+                      </p>
+                    )}
+                  </div>
+
                   <label className="block space-y-1.5">
                     <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
                       Title <span className="normal-case tracking-normal text-white/30">(new lines OK)</span>
@@ -1197,40 +1279,6 @@ export function ExperiencePage() {
                     <p className="text-[11px] text-white/35">
                       Instantly restyle the title wording. Use Undo if you want the previous version back.
                     </p>
-                  </label>
-
-                  <label className="block space-y-1.5">
-                    <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
-                      Link (path or URL)
-                    </span>
-                    <input
-                      value={selected.linkTo}
-                      onChange={(e) => patchSelected({ linkTo: e.target.value })}
-                      className={fieldClass()}
-                    />
-                    <p className="text-[11px] text-white/35">
-                      Where fans go when they tap this box.
-                    </p>
-                    {selected.type === "news" ||
-                    selected.type === "videos" ||
-                    selected.type === "music" ||
-                    selected.type === "events" ? (
-                      <Link
-                        to={
-                          selected.type === "news"
-                            ? "/content/news"
-                            : selected.type === "videos"
-                              ? "/content/videos"
-                              : selected.type === "music"
-                                ? "/content/doc-and-glo"
-                                : "/content/events"
-                        }
-                        className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-dt-red hover:underline"
-                      >
-                        <ExternalLink size={12} />
-                        Edit the content inside this destination
-                      </Link>
-                    ) : null}
                   </label>
 
                   <div className="grid grid-cols-2 gap-3">
