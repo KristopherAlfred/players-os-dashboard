@@ -149,6 +149,7 @@ function DraggableStageItem({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
+      onClick={(e) => e.stopPropagation()}
       className={`cursor-grab touch-none active:cursor-grabbing ${
         selected
           ? "outline outline-1 outline-dashed outline-white/55 outline-offset-2"
@@ -248,12 +249,20 @@ function PageFreeformPreview({
   onRemoveStamp?: (stampId: string) => void;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [wordChip, setWordChip] = useState(0);
   const [showUnlock, setShowUnlock] = useState(false);
   const selected = selectedId ? getStageItem(page, selectedId) : null;
   const scale = (page.heroScale || 100) / 100;
   const brand = experience.brand;
   const stageIds = (page.stage?.length ? page.stage : DEFAULT_LANDING_STAGE).map((item) => item.id);
   const showLandingChrome = pageKey === "landing";
+
+  const selectStageItem = useCallback((id: string) => {
+    setSelectedId((prev) => {
+      if (prev !== id) setWordChip(0);
+      return id;
+    });
+  }, []);
 
   const patchItem = useCallback(
     (id: string, patch: Partial<ExperienceStageItem>) => {
@@ -354,6 +363,12 @@ function PageFreeformPreview({
           fallbackColor={page.accentColor}
           className="text-center text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em]"
           style={stageGlowStyle(item, "text")}
+          interactive
+          activeIndex={selectedId === id ? wordChip : undefined}
+          onWordClick={(chip) => {
+            selectStageItem(id);
+            setWordChip(chip);
+          }}
         />
       );
     } else if (role === "headline") {
@@ -364,6 +379,12 @@ function PageFreeformPreview({
           fallbackColor="#FFFFFF"
           className="text-center font-display text-xl text-white"
           style={stageGlowStyle(item, "text")}
+          interactive
+          activeIndex={selectedId === id ? wordChip : undefined}
+          onWordClick={(chip) => {
+            selectStageItem(id);
+            setWordChip(chip);
+          }}
         />
       );
     } else if (role === "body") {
@@ -373,6 +394,12 @@ function PageFreeformPreview({
           fallbackColor="rgba(255,255,255,0.65)"
           className="text-center text-[11px] leading-relaxed text-white/65"
           style={stageGlowStyle(item, "text")}
+          interactive
+          activeIndex={selectedId === id ? wordChip : undefined}
+          onWordClick={(chip) => {
+            selectStageItem(id);
+            setWordChip(chip);
+          }}
         />
       );
     } else if (role === "cta") {
@@ -411,7 +438,7 @@ function PageFreeformPreview({
         key={id}
         item={item}
         selected={selectedId === id}
-        onSelect={() => setSelectedId(id)}
+        onSelect={() => selectStageItem(id)}
         onMove={(x, y) => patchItem(id, { x, y })}
       >
         {body}
@@ -420,7 +447,7 @@ function PageFreeformPreview({
   };
 
   return (
-    <PhoneFrame label={label} hint="Drag logo & words separately · tap stamp tray to place logos">
+    <PhoneFrame label={label} hint="Drag logo & words separately · tap a word to style it">
       <div
         className="relative h-[560px] w-full"
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
@@ -547,7 +574,9 @@ function PageFreeformPreview({
           {selected && selectedId && (stageItemRole(selected) === "headline" || stageItemRole(selected) === "subhead" || stageItemRole(selected) === "body") ? (
             <WordStyleEditor
               label={`Style ${stageItemRole(selected)} words`}
-              hint="Tap a word to change only that word"
+              hint="Tap a word on the phone or below to change only that word"
+              selectedChip={wordChip}
+              onSelectedChipChange={setWordChip}
               plain={
                 stageItemRole(selected) === "headline"
                   ? page.headline

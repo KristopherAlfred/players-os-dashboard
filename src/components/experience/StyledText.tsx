@@ -42,24 +42,52 @@ export function StyledTextRuns({
   className,
   style,
   as: Tag = "p",
+  interactive = false,
+  activeIndex,
+  onWordClick,
 }: {
   runs: ExperienceTextRun[];
   fallbackColor?: string;
   className?: string;
   style?: CSSProperties;
   as?: "p" | "h1" | "h2" | "span" | "div";
+  interactive?: boolean;
+  activeIndex?: number;
+  onWordClick?: (editableChipIndex: number, runIndex: number) => void;
 }) {
+  let editableChip = -1;
   return (
     <Tag className={className} style={style}>
-      {runs.map((run, i) =>
-        run.text === "\n" ? (
-          <br key={`br-${i}`} />
-        ) : (
+      {runs.map((run, i) => {
+        if (run.text === "\n") return <br key={`br-${i}`} />;
+        const isWord = run.text.trim().length > 0;
+        const chip = isWord ? ++editableChip : -1;
+        const active = interactive && chip >= 0 && chip === activeIndex;
+        if (interactive && isWord && onWordClick) {
+          return (
+            <button
+              key={`${run.text}-${i}`}
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onWordClick(chip, i);
+              }}
+              className={`rounded-sm px-0.5 transition ${
+                active ? "bg-white/20 ring-1 ring-white/50" : "hover:bg-white/10"
+              }`}
+              style={textRunCss(run, fallbackColor)}
+            >
+              {run.text}
+            </button>
+          );
+        }
+        return (
           <span key={`${run.text}-${i}`} style={textRunCss(run, fallbackColor)}>
             {run.text}
           </span>
-        ),
-      )}
+        );
+      })}
     </Tag>
   );
 }
@@ -71,6 +99,8 @@ type WordStyleEditorProps = {
   onChangePlain: (plain: string) => void;
   onChangeRuns: (runs: ExperienceTextRun[]) => void;
   hint?: string;
+  selectedChip?: number;
+  onSelectedChipChange?: (chip: number) => void;
 };
 
 export function WordStyleEditor({
@@ -80,6 +110,8 @@ export function WordStyleEditor({
   onChangePlain,
   onChangeRuns,
   hint,
+  selectedChip: selectedChipProp,
+  onSelectedChipChange,
 }: WordStyleEditorProps) {
   const liveRuns =
     runs?.length && plainFromRuns(runs) === plain ? runs : syncTextRuns(plain, runs);
@@ -87,7 +119,9 @@ export function WordStyleEditor({
     .map((run, index) => ({ run, index }))
     .filter(({ run }) => run.text.trim().length > 0);
 
-  const [selectedChip, setSelectedChip] = useState(0);
+  const [selectedChipLocal, setSelectedChipLocal] = useState(0);
+  const selectedChip = selectedChipProp ?? selectedChipLocal;
+  const setSelectedChip = onSelectedChipChange ?? setSelectedChipLocal;
   const safeChip = Math.min(selectedChip, Math.max(0, editable.length - 1));
   const selectedIdx = editable[safeChip]?.index ?? -1;
   const selectedRun = selectedIdx >= 0 ? liveRuns[selectedIdx] : null;
@@ -103,7 +137,11 @@ export function WordStyleEditor({
   }
 
   return (
-    <div className="space-y-2 rounded-xl border border-white/10 bg-black/30 p-3">
+    <div
+      className="space-y-2 rounded-xl border border-white/10 bg-black/30 p-3"
+      onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">{label}</p>
       {hint ? <p className="text-[10px] text-white/40">{hint}</p> : null}
       <textarea
