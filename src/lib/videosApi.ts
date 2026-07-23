@@ -89,7 +89,7 @@ export function createEmptyVideoItem(): ExclusiveVideoItem {
     id: `exclusive-${now.getTime().toString(36)}`,
     title: "",
     description: "",
-    thumbnail: "/images/dameexclusive.png",
+    thumbnail: "",
     videoUrl: "",
     duration: "",
     date: now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),

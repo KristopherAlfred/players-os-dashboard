@@ -119,10 +119,7 @@ export function NewsContentPage() {
 
   async function saveDraft(nextStatus?: NewsStatus) {
     if (!draft) return;
-    if (!draft.title.trim()) {
-      setError("Title is required");
-      return;
-    }
+    const title = draft.title.trim() || "Untitled newsletter";
 
     setSaving(true);
     setError(null);
@@ -130,10 +127,11 @@ export function NewsContentPage() {
     try {
       const payload: NewsItem = {
         ...draft,
-        title: draft.title.trim(),
+        title,
         description: draft.description.trim(),
         body: draft.body.trim(),
         href: draft.href.trim(),
+        thumbnail: draft.thumbnail || "",
         status: nextStatus ?? draft.status,
         publishedAt: nextStatus === "published" ? new Date().toISOString() : draft.publishedAt,
         date:
@@ -152,7 +150,12 @@ export function NewsContentPage() {
           : "Draft saved",
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
+      const message = err instanceof Error ? err.message : "Save failed";
+      setError(
+        /413|too large|payload|entity too large/i.test(message)
+          ? "Image is too large for upload. Try a smaller JPG/PNG (under ~2MB)."
+          : message,
+      );
     } finally {
       setSaving(false);
     }

@@ -48,6 +48,10 @@ import {
   ExperienceThemePanel,
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
+import {
+  ExperienceContentStudio,
+  type ExperienceContentKind,
+} from "../components/experience/ExperienceContentStudio";
 
 type ExperienceSection =
   | "boxes"
@@ -280,6 +284,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
 export function ExperiencePage() {
   const [layout, setLayout] = useState<HomeLayout | null>(null);
   const [section, setSection] = useState<ExperienceSection>("brand");
+  const [contentStudio, setContentStudio] = useState<ExperienceContentKind | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -630,7 +635,10 @@ export function ExperiencePage() {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setSection(item.id)}
+                onClick={() => {
+                  setSection(item.id);
+                  setContentStudio(null);
+                }}
                 className={`rounded-xl px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] transition ${
                   active
                     ? "bg-dt-red text-white shadow-[0_8px_24px_rgba(143,227,184,0.28)]"
@@ -809,7 +817,11 @@ export function ExperiencePage() {
         </div>
       ) : null}
 
-      {section === "boxes" ? (
+      {section === "boxes" && contentStudio ? (
+        <ExperienceContentStudio kind={contentStudio} onBack={() => setContentStudio(null)} />
+      ) : null}
+
+      {section === "boxes" && !contentStudio ? (
       <div className="grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)_minmax(400px,440px)]">
         {/* Left: Home boxes + AI studio */}
         <div className="flex min-w-0 flex-col gap-4">
@@ -1193,8 +1205,8 @@ export function ExperiencePage() {
                       When fans tap this box
                     </p>
                     <p className="mt-1 text-[11px] leading-relaxed text-white/55">
-                      Set where the box goes. To change the videos list, news posts, events, or Doc &amp; Glo
-                      content inside that page, use Content in the left sidebar (or the link below).
+                      Set where the box goes. For Videos and News, edit the inside content right here on the phone —
+                      you won’t leave Experience.
                     </p>
                     <label className="mt-3 block space-y-1.5">
                       <span className="text-[11px] font-medium uppercase tracking-wide text-white/45">
@@ -1211,28 +1223,24 @@ export function ExperiencePage() {
                     selected.type === "videos" ||
                     selected.type === "music" ||
                     selected.type === "events" ? (
-                      <Link
-                        to={
-                          selected.type === "news"
-                            ? "/content/news"
-                            : selected.type === "videos"
-                              ? "/content/videos"
-                              : selected.type === "music"
-                                ? "/content/doc-and-glo"
-                                : "/content/events"
-                        }
-                        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-dt-red/50 bg-dt-red/20 px-3 py-2.5 text-[12px] font-semibold text-dt-red hover:bg-dt-red/30"
-                      >
-                        <ExternalLink size={13} />
-                        Edit what’s inside{" "}
-                        {selected.type === "news"
-                          ? "News"
-                          : selected.type === "videos"
-                            ? "Videos"
-                            : selected.type === "music"
-                              ? "Doc & Glo"
-                              : "Events"}
-                      </Link>
+                      selected.type === "news" || selected.type === "videos" ? (
+                        <button
+                          type="button"
+                          onClick={() => setContentStudio(selected.type === "news" ? "news" : "videos")}
+                          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-dt-red/50 bg-dt-red/20 px-3 py-2.5 text-[12px] font-semibold text-dt-red hover:bg-dt-red/30"
+                        >
+                          <ExternalLink size={13} />
+                          Edit what’s inside {selected.type === "news" ? "News" : "Videos"} on the phone
+                        </button>
+                      ) : (
+                        <Link
+                          to={selected.type === "music" ? "/content/doc-and-glo" : "/content/events"}
+                          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-dt-red/50 bg-dt-red/20 px-3 py-2.5 text-[12px] font-semibold text-dt-red hover:bg-dt-red/30"
+                        >
+                          <ExternalLink size={13} />
+                          Edit what’s inside {selected.type === "music" ? "Doc & Glo" : "Events"}
+                        </Link>
+                      )
                     ) : (
                       <p className="mt-2 text-[11px] text-white/40">
                         Custom / tickets boxes only need a link above (app path or full URL).

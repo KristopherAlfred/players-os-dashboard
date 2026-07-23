@@ -92,7 +92,7 @@ export function createEmptyNewsItem(category: NewsCategory = "newsletters"): New
     title: "",
     description: "",
     body: "",
-    thumbnail: "/images/damecity.png",
+    thumbnail: "",
     date: now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     publishedAt: now.toISOString(),
     category,
