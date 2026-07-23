@@ -100,6 +100,16 @@ export type ExperienceStamp = {
   src: string;
 };
 
+
+export type ExperienceTextRun = {
+  text: string;
+  color?: string;
+  fontFamily?: TitleFontFamily;
+  /** Font size in px */
+  fontSize?: number;
+};
+
+
 export type ExperiencePageConfig = {
   backgroundColor: string;
   backgroundGradientFrom: string;
@@ -119,6 +129,10 @@ export type ExperiencePageConfig = {
   heroScale: number;
   heroFit: "contain" | "cover";
   heroPosition: string;
+  /** Content studio: green/hero band height in px */
+  heroBandHeight: number;
+  /** Content studio: vertical offset of tabs+list under the hero (px, can be negative) */
+  contentOffsetY: number;
   /** stack = classic flow; freeform = drag/overlap on phone canvas */
   layoutMode: "stack" | "freeform";
   stage: ExperienceStageItem[];
@@ -126,6 +140,17 @@ export type ExperiencePageConfig = {
   loaderLabel?: string;
   title?: string;
   logoutLabel?: string;
+  /** Join / unlock slide-in copy & style (landing) */
+  unlockHeadline: string;
+  unlockBody: string;
+  unlockFooter: string;
+  unlockGlowColor: string;
+  unlockPanelBorderColor: string;
+  unlockPanelBgFrom: string;
+  unlockPanelBgTo: string;
+  headlineRuns: ExperienceTextRun[];
+  subheadRuns: ExperienceTextRun[];
+  bodyRuns: ExperienceTextRun[];
 };
 
 export type ExperiencePages = {
@@ -340,9 +365,21 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     heroScale: 100,
     heroFit: "contain",
     heroPosition: "right center",
+    heroBandHeight: 220,
+    contentOffsetY: 0,
     layoutMode: "freeform",
     stage: DEFAULT_LANDING_STAGE.map((item) => ({ ...item })),
     effectPreset: "soft",
+    unlockHeadline: "",
+    unlockBody: "",
+    unlockFooter: "100% Private · No Spam · You're in control",
+    unlockGlowColor: "#ED0000",
+    unlockPanelBorderColor: "#8C0000",
+    unlockPanelBgFrom: "rgba(18, 18, 18, 0.97)",
+    unlockPanelBgTo: "rgba(6, 6, 6, 0.98)",
+    headlineRuns: [],
+    subheadRuns: [],
+    bodyRuns: [],
     ...partial,
   };
 }
@@ -422,6 +459,55 @@ export function stageItemCss(item: ExperienceStageItem): Record<string, string |
   return css;
 }
 
+
+export function tokenizeStyledText(text: string): string[] {
+  return String(text || "").split(/(\s+)/).filter((t) => t.length > 0);
+}
+
+export function plainFromRuns(runs: ExperienceTextRun[]): string {
+  return (runs || []).map((r) => r.text).join("");
+}
+
+export function syncTextRuns(plain: string, prev?: ExperienceTextRun[] | null): ExperienceTextRun[] {
+  const tokens = tokenizeStyledText(plain);
+  if (!tokens.length) return [];
+  if (!prev?.length) return tokens.map((text) => ({ text }));
+  const pool = prev.map((r) => ({ ...r }));
+  return tokens.map((text) => {
+    const idx = pool.findIndex((r) => r.text === text);
+    if (idx >= 0) {
+      const match = pool.splice(idx, 1)[0];
+      return { ...match, text };
+    }
+    return { text };
+  });
+}
+
+export function normalizeTextRuns(raw: unknown, plain: string): ExperienceTextRun[] {
+  if (!Array.isArray(raw)) return syncTextRuns(plain);
+  const parsed: ExperienceTextRun[] = [];
+  for (const row of raw) {
+    if (!row || typeof row !== "object") continue;
+    const r = row as Partial<ExperienceTextRun>;
+    const text = typeof r.text === "string" ? r.text : "";
+    if (!text) continue;
+    const fontFamily = normalizeTitleFontFamily(r.fontFamily);
+    const fontSize =
+      typeof r.fontSize === "number" && Number.isFinite(r.fontSize)
+        ? Math.max(8, Math.min(72, Math.round(r.fontSize)))
+        : undefined;
+    const color = typeof r.color === "string" && r.color.trim() ? r.color.trim() : undefined;
+    parsed.push({
+      text,
+      ...(color ? { color } : {}),
+      ...(fontFamily ? { fontFamily } : {}),
+      ...(fontSize ? { fontSize } : {}),
+    });
+  }
+  return syncTextRuns(plain, parsed);
+}
+
+
 export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
   landing: pageDefaults({
     headline: "Join Sloane Glo",
@@ -432,6 +518,13 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     titleImage: "",
     backgroundImage: "",
     effectPreset: "glow",
+    unlockHeadline: "JOIN SLOANE GLO",
+    unlockBody: "Exclusive drops, early access, giveaways, content, and real connection with Sloane and fans.",
+    unlockFooter: "100% Private · No Spam · You're in control",
+    unlockGlowColor: "#ED0000",
+    unlockPanelBorderColor: "#8C0000",
+    unlockPanelBgFrom: "rgba(18, 18, 18, 0.97)",
+    unlockPanelBgTo: "rgba(6, 6, 6, 0.98)",
   }),
   youreIn: pageDefaults({
     headline: "You're in",
@@ -604,12 +697,24 @@ export function normalizeExperiencePage(
     heroScale: Math.max(40, Math.min(180, asNumber(p.heroScale, fallback.heroScale ?? 100))),
     heroFit: p.heroFit === "cover" ? "cover" : "contain",
     heroPosition: asString(p.heroPosition, fallback.heroPosition || "right center"),
+    heroBandHeight: Math.max(120, Math.min(420, asNumber(p.heroBandHeight, fallback.heroBandHeight ?? 220))),
+    contentOffsetY: Math.max(-160, Math.min(240, asNumber(p.contentOffsetY, fallback.contentOffsetY ?? 0))),
     layoutMode: p.layoutMode === "stack" ? "stack" : "freeform",
     stage: normalizeStage(p.stage, fallback.stage),
     effectPreset: normalizeEffectPreset(p.effectPreset, fallback.effectPreset),
     loaderLabel: asString(p.loaderLabel, fallback.loaderLabel || ""),
     title: asString(p.title, fallback.title || ""),
     logoutLabel: asString(p.logoutLabel, fallback.logoutLabel || ""),
+    unlockHeadline: asString(p.unlockHeadline, fallback.unlockHeadline || ""),
+    unlockBody: asString(p.unlockBody, fallback.unlockBody || ""),
+    unlockFooter: asString(p.unlockFooter, fallback.unlockFooter || "100% Private · No Spam · You're in control"),
+    unlockGlowColor: asString(p.unlockGlowColor, fallback.unlockGlowColor || "#ED0000"),
+    unlockPanelBorderColor: asString(p.unlockPanelBorderColor, fallback.unlockPanelBorderColor || "#8C0000"),
+    unlockPanelBgFrom: asString(p.unlockPanelBgFrom, fallback.unlockPanelBgFrom || "rgba(18, 18, 18, 0.97)"),
+    unlockPanelBgTo: asString(p.unlockPanelBgTo, fallback.unlockPanelBgTo || "rgba(6, 6, 6, 0.98)"),
+    headlineRuns: normalizeTextRuns(p.headlineRuns, asString(p.headline, fallback.headline)),
+    subheadRuns: normalizeTextRuns(p.subheadRuns, asString(p.subhead, fallback.subhead)),
+    bodyRuns: normalizeTextRuns(p.bodyRuns, asString(p.body, fallback.body)),
   };
 }
 

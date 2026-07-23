@@ -197,9 +197,11 @@ function textBoxStyle(item: ExperienceStageItem): CSSProperties {
 function FreeformContentStage({
   page,
   onPatchPage,
+  height,
 }: {
   page: ExperiencePageConfig;
   onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
+  height: number;
 }) {
   const patchItem = useCallback(
     (id: string, patch: Partial<ExperienceStageItem>) => {
@@ -212,8 +214,11 @@ function FreeformContentStage({
 
   return (
     <div
-      className="relative mx-1 mb-2 h-[220px] shrink-0 overflow-hidden rounded-xl"
-      style={{ background: pageBackgroundCss(page) || "#050505" }}
+      className="relative mx-1 shrink-0 overflow-hidden rounded-xl"
+      style={{
+        height,
+        background: pageBackgroundCss(page) || "#050505",
+      }}
     >
       {CONTENT_STAGE_IDS.map((id) => {
         const item = getStageItem(page, id);
@@ -228,7 +233,7 @@ function FreeformContentStage({
                 src={resolveExperiencePreviewUrl(page.heroImage)}
                 alt=""
                 draggable={false}
-                className="w-full object-contain"
+                className="w-full bg-transparent object-contain"
                 style={{
                   transform: scale !== 1 ? `scale(${scale})` : undefined,
                   transformOrigin: "center center",
@@ -303,10 +308,87 @@ function ContentPhonePreview({
   activeTab: PhoneTab;
   children: ReactNode;
 }) {
+  const heroH = page.heroBandHeight || 220;
+  const contentOffset = page.contentOffsetY ?? 0;
+  const resizeDrag = useRef<{ startY: number; startH: number } | null>(null);
+  const offsetDrag = useRef<{ startY: number; startOffset: number } | null>(null);
+
   return (
     <PhoneChrome activeTab={activeTab}>
-      <FreeformContentStage page={page} onPatchPage={onPatchPage} />
-      <div className="space-y-1.5 px-2 pb-2">{children}</div>
+      <div className="relative">
+        <FreeformContentStage page={page} onPatchPage={onPatchPage} height={heroH} />
+        <div
+          role="separator"
+          aria-label="Drag to resize hero band"
+          title="Drag to resize green hero band"
+          className="absolute left-1 right-1 z-30 flex h-4 -translate-y-1/2 cursor-ns-resize items-center justify-center"
+          style={{ top: heroH }}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resizeDrag.current = { startY: e.clientY, startH: heroH };
+            e.currentTarget.setPointerCapture(e.pointerId);
+          }}
+          onPointerMove={(e) => {
+            if (!resizeDrag.current) return;
+            const next = Math.max(
+              120,
+              Math.min(420, resizeDrag.current.startH + (e.clientY - resizeDrag.current.startY)),
+            );
+            onPatchPage({ heroBandHeight: Math.round(next) });
+          }}
+          onPointerUp={(e) => {
+            resizeDrag.current = null;
+            try {
+              e.currentTarget.releasePointerCapture(e.pointerId);
+            } catch {
+              /* ignore */
+            }
+          }}
+        >
+          <span className="h-1 w-12 rounded-full bg-[#8FE3B8]/80 shadow-[0_0_8px_rgba(143,227,184,0.6)]" />
+        </div>
+
+        <div
+          className="relative z-10 space-y-1.5 px-2 pb-2"
+          style={{ marginTop: contentOffset }}
+        >
+          <div
+            role="presentation"
+            title="Drag to move tabs & list"
+            className="mb-1 flex cursor-grab items-center justify-center gap-1 rounded-md border border-dashed border-white/20 bg-black/40 py-1 active:cursor-grabbing"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              offsetDrag.current = { startY: e.clientY, startOffset: contentOffset };
+              e.currentTarget.setPointerCapture(e.pointerId);
+            }}
+            onPointerMove={(e) => {
+              if (!offsetDrag.current) return;
+              const next = Math.max(
+                -160,
+                Math.min(240, offsetDrag.current.startOffset + (e.clientY - offsetDrag.current.startY)),
+              );
+              onPatchPage({ contentOffsetY: Math.round(next) });
+            }}
+            onPointerUp={(e) => {
+              offsetDrag.current = null;
+              try {
+                e.currentTarget.releasePointerCapture(e.pointerId);
+              } catch {
+                /* ignore */
+              }
+            }}
+          >
+            <span className="text-[8px] font-semibold uppercase tracking-wide text-white/45">
+              Drag tabs · offset {contentOffset}px
+            </span>
+          </div>
+          {children}
+        </div>
+      </div>
+      <p className="px-2 pb-1 text-center text-[8px] text-white/30">
+        Green handle = hero height · dashed bar = tabs position
+      </p>
     </PhoneChrome>
   );
 }
@@ -524,9 +606,20 @@ function PageChromeEditor({
           </div>
         </div>
         <div className="sm:col-span-2 rounded-xl border border-white/10 p-3">
-          <p className="text-[11px] text-white/45">Hero art (floating athlete cutout — not page background)</p>
+          <p className="text-[11px] text-white/45">
+            Hero art (PNG cutouts keep transparency — green band shows through)
+          </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <div className="h-20 w-20 overflow-hidden rounded-lg bg-black/40">
+            <div
+              className="h-20 w-20 overflow-hidden rounded-lg"
+              style={{
+                backgroundImage:
+                  "linear-gradient(45deg,#2a2a2a 25%,transparent 25%),linear-gradient(-45deg,#2a2a2a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#2a2a2a 75%),linear-gradient(-45deg,transparent 75%,#2a2a2a 75%)",
+                backgroundSize: "12px 12px",
+                backgroundPosition: "0 0,0 6px,6px -6px,-6px 0",
+                backgroundColor: "#1a1a1a",
+              }}
+            >
               {page.heroImage ? (
                 <img src={resolveExperiencePreviewUrl(page.heroImage)} alt="" className="h-full w-full object-contain" />
               ) : (
@@ -536,7 +629,7 @@ function PageChromeEditor({
             <div className="min-w-[140px] flex-1 space-y-2">
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs text-white/80">
                 <Upload size={13} /> Upload hero art
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => void onHeroUpload(e.target.files?.[0] ?? null)} />
+                <input type="file" accept="image/png,image/webp,image/*" className="hidden" onChange={(e) => void onHeroUpload(e.target.files?.[0] ?? null)} />
               </label>
               {page.heroImage ? (
                 <button type="button" onClick={() => onPatchPage({ heroImage: "" })} className="text-[10px] text-red-200/80 underline-offset-2 hover:underline">
@@ -557,6 +650,28 @@ function PageChromeEditor({
                       stage: upsertStageItem(page, { id: "titleArt", scale: heroScale }),
                     });
                   }}
+                  className="w-full"
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-[10px] text-white/40">Hero band height {page.heroBandHeight || 220}px</span>
+                <input
+                  type="range"
+                  min={120}
+                  max={420}
+                  value={page.heroBandHeight || 220}
+                  onChange={(e) => onPatchPage({ heroBandHeight: Number(e.target.value) })}
+                  className="w-full"
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-[10px] text-white/40">Tabs / list offset {page.contentOffsetY ?? 0}px</span>
+                <input
+                  type="range"
+                  min={-160}
+                  max={240}
+                  value={page.contentOffsetY ?? 0}
+                  onChange={(e) => onPatchPage({ contentOffsetY: Number(e.target.value) })}
                   className="w-full"
                 />
               </label>
@@ -590,10 +705,11 @@ function readFileAsDataUrl(file: File): Promise<string> {
   });
 }
 
-/** Shrink image uploads so Vercel/API body limits don't kill saves. */
+/** Shrink image uploads so Vercel/API body limits don't kill saves. Keeps PNG/WebP alpha. */
 async function compressImageFile(file: File, maxEdge = 1280, quality = 0.72): Promise<string> {
   if (!file.type.startsWith("image/")) return readFileAsDataUrl(file);
   const dataUrl = await readFileAsDataUrl(file);
+  const keepAlpha = file.type === "image/png" || file.type === "image/webp" || file.type === "image/gif";
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -603,14 +719,19 @@ async function compressImageFile(file: File, maxEdge = 1280, quality = 0.72): Pr
       const canvas = document.createElement("canvas");
       canvas.width = w;
       canvas.height = h;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { alpha: true });
       if (!ctx) {
         resolve(dataUrl);
         return;
       }
+      ctx.clearRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
       try {
-        resolve(canvas.toDataURL("image/jpeg", quality));
+        if (keepAlpha) {
+          resolve(canvas.toDataURL("image/png"));
+        } else {
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        }
       } catch {
         resolve(dataUrl);
       }

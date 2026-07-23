@@ -17,6 +17,7 @@ import {
 } from "../../lib/experienceAssets";
 import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
 import { TintedBrandLogo } from "./TintedBrandLogo";
+import { WordStyleEditor, runsForPageField } from "./StyledText";
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -629,25 +630,29 @@ export function ExperiencePagePanel({
         </Field>
       </div>
 
-      <Field label="Headline">
-        <TextInput value={page.headline} onChange={(headline) => onChange({ headline })} />
-      </Field>
-      <Field label="Subhead" hint="Use \\n for line breaks">
-        <textarea
-          value={page.subhead}
-          onChange={(e) => onChange({ subhead: e.target.value })}
-          rows={3}
-          className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-        />
-      </Field>
-      <Field label="Body copy">
-        <textarea
-          value={page.body}
-          onChange={(e) => onChange({ body: e.target.value })}
-          rows={3}
-          className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
-        />
-      </Field>
+      <WordStyleEditor
+        label="Headline · style each word"
+        hint='Type the line, then tap a word (e.g. GLO) to change only that word’s color, font, or size'
+        plain={page.headline}
+        runs={runsForPageField(page, "headline")}
+        onChangePlain={(headline) => onChange({ headline })}
+        onChangeRuns={(headlineRuns) => onChange({ headlineRuns })}
+      />
+      <WordStyleEditor
+        label="Subhead · style each word"
+        hint="Use Enter / \\n for line breaks in the text box"
+        plain={page.subhead}
+        runs={runsForPageField(page, "subhead")}
+        onChangePlain={(subhead) => onChange({ subhead })}
+        onChangeRuns={(subheadRuns) => onChange({ subheadRuns })}
+      />
+      <WordStyleEditor
+        label="Body · style each word"
+        plain={page.body}
+        runs={runsForPageField(page, "body")}
+        onChangePlain={(body) => onChange({ body })}
+        onChangeRuns={(bodyRuns) => onChange({ bodyRuns })}
+      />
       <Field label="CTA label">
         <TextInput value={page.ctaLabel} onChange={(ctaLabel) => onChange({ ctaLabel })} />
       </Field>

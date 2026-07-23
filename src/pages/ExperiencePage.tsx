@@ -46,6 +46,7 @@ import {
   ExperienceEffectsPanel,
   ExperiencePagePanel,
   ExperienceThemePanel,
+  BrandHeaderFields,
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
 import {
@@ -719,6 +720,10 @@ export function ExperiencePage() {
                       section === "homePage" ? "home" : section
                     ]
                   }
+                  brand={experience.brand}
+                  onChangeBrand={(patch) =>
+                    patchExperience((prev) => ({ ...prev, brand: { ...prev.brand, ...patch } }))
+                  }
                   onChange={(patch) =>
                     patchPage(section === "homePage" ? "home" : section, patch)
                   }
@@ -744,6 +749,9 @@ export function ExperiencePage() {
                   : section === "homePage"
                     ? "home"
                     : "landing"
+            }
+            onPatchBrand={(patch) =>
+              patchExperience((prev) => ({ ...prev, brand: { ...prev.brand, ...patch } }))
             }
             onPatchPage={(patch) =>
               patchPage(
@@ -860,6 +868,15 @@ export function ExperiencePage() {
               />
               Hero
             </label>
+          </div>
+
+          <div className="border-b border-dt-border p-3">
+            <BrandHeaderFields
+              brand={experience.brand}
+              onChange={(patch) =>
+                patchExperience((prev) => ({ ...prev, brand: { ...prev.brand, ...patch } }))
+              }
+            />
           </div>
 
           <ul className="space-y-2 p-3">
@@ -1043,6 +1060,7 @@ export function ExperiencePage() {
           <div className="exp-phone-shell relative w-full max-w-[340px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
             <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
             <div className="border-b border-white/10 bg-[#0d0d0d] px-4 pb-3 pt-8 text-center">
+              <p className="mb-1 text-[8px] uppercase tracking-[0.18em] text-dt-red/90">Editable · top header</p>
               <p
                 className="text-[10px] font-semibold tracking-[0.28em]"
                 style={{ color: experience.brand.wordmarkColor }}

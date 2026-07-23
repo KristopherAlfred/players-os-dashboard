@@ -22,6 +22,7 @@ import {
 } from "../../lib/experienceConfig";
 import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
 import { TintedBrandLogo } from "./TintedBrandLogo";
+import { StyledTextRuns, WordStyleEditor, runsForPageField } from "./StyledText";
 
 export type PhonePreviewMode =
   | "brand"
@@ -249,7 +250,6 @@ function PageFreeformPreview({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showUnlock, setShowUnlock] = useState(false);
   const selected = selectedId ? getStageItem(page, selectedId) : null;
-  const lines = (page.subhead || "THE OFFICIAL\nCOMMUNITY").split("\n");
   const scale = (page.heroScale || 100) / 100;
   const brand = experience.brand;
   const stageIds = (page.stage?.length ? page.stage : DEFAULT_LANDING_STAGE).map((item) => item.id);
@@ -349,29 +349,31 @@ function PageFreeformPreview({
       );
     } else if (role === "subhead") {
       body = (
-        <p
+        <StyledTextRuns
+          runs={runsForPageField(page, "subhead")}
+          fallbackColor={page.accentColor}
           className="text-center text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em]"
-          style={{ color: page.accentColor, ...stageGlowStyle(item, "text") }}
-        >
-          {lines.map((line, i) => (
-            <span key={`${line}-${i}`}>
-              {line}
-              {i < lines.length - 1 ? <br /> : null}
-            </span>
-          ))}
-        </p>
+          style={stageGlowStyle(item, "text")}
+        />
       );
     } else if (role === "headline") {
       body = (
-        <p className="text-center font-display text-xl text-white" style={stageGlowStyle(item, "text")}>
-          {page.headline || page.title || "Headline"}
-        </p>
+        <StyledTextRuns
+          as="p"
+          runs={runsForPageField(page, "headline")}
+          fallbackColor="#FFFFFF"
+          className="text-center font-display text-xl text-white"
+          style={stageGlowStyle(item, "text")}
+        />
       );
     } else if (role === "body") {
       body = (
-        <p className="text-center text-[11px] leading-relaxed text-white/65" style={stageGlowStyle(item, "text")}>
-          {page.body}
-        </p>
+        <StyledTextRuns
+          runs={runsForPageField(page, "body")}
+          fallbackColor="rgba(255,255,255,0.65)"
+          className="text-center text-[11px] leading-relaxed text-white/65"
+          style={stageGlowStyle(item, "text")}
+        />
       );
     } else if (role === "cta") {
       if (!showLandingChrome) return null;
@@ -541,6 +543,39 @@ function PageFreeformPreview({
                 </>
               )}
             </div>
+          ) : null}
+          {selected && selectedId && (stageItemRole(selected) === "headline" || stageItemRole(selected) === "subhead" || stageItemRole(selected) === "body") ? (
+            <WordStyleEditor
+              label={`Style ${stageItemRole(selected)} words`}
+              hint="Tap a word to change only that word"
+              plain={
+                stageItemRole(selected) === "headline"
+                  ? page.headline
+                  : stageItemRole(selected) === "subhead"
+                    ? page.subhead
+                    : page.body
+              }
+              runs={runsForPageField(
+                page,
+                stageItemRole(selected) === "headline"
+                  ? "headline"
+                  : stageItemRole(selected) === "subhead"
+                    ? "subhead"
+                    : "body",
+              )}
+              onChangePlain={(value) => {
+                const role = stageItemRole(selected);
+                if (role === "headline") onPatchPage({ headline: value });
+                else if (role === "subhead") onPatchPage({ subhead: value });
+                else onPatchPage({ body: value });
+              }}
+              onChangeRuns={(runs) => {
+                const role = stageItemRole(selected);
+                if (role === "headline") onPatchPage({ headlineRuns: runs });
+                else if (role === "subhead") onPatchPage({ subheadRuns: runs });
+                else onPatchPage({ bodyRuns: runs });
+              }}
+            />
           ) : null}
           {selected && selectedId ? (
             <>
