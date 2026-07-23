@@ -37,7 +37,7 @@ import {
   type HomeWidgetType,
 } from "../lib/homeLayoutApi";
 import type { ExperienceConfig, ExperiencePageConfig, WidgetVisualStyle } from "../lib/experienceConfig";
-import { widgetStyleCss } from "../lib/experienceConfig";
+import { createStampFromBrand, placeStampOnPage, widgetStyleCss } from "../lib/experienceConfig";
 import { titleTypographyStyle } from "../lib/typography";
 import { TypographyControls } from "../components/TypographyControls";
 import { DtSelect } from "../components/DtSelect";
@@ -670,6 +670,18 @@ export function ExperiencePage() {
                       file,
                     )
                   }
+                  onSaveLogoStamp={() => {
+                    const stamp = createStampFromBrand(experience.brand);
+                    if (!stamp) {
+                      setStatus("Pick a logo first, then save it as a stamp");
+                      return;
+                    }
+                    patchExperience((prev) => {
+                      if ((prev.stamps || []).some((s) => s.src === stamp.src)) return prev;
+                      return { ...prev, stamps: [...(prev.stamps || []), stamp] };
+                    });
+                    setStatus("Logo saved — click it on any page to place it");
+                  }}
                 />
               ) : null}
               {section === "theme" ? (
@@ -716,7 +728,83 @@ export function ExperiencePage() {
           <ExperiencePhonePreview
             experience={experience}
             mode={section}
-            onPatchPage={(patch) => patchPage("landing", patch)}
+            pageKey={
+              section === "youreIn"
+                ? "youreIn"
+                : section === "settings"
+                  ? "settings"
+                  : section === "homePage"
+                    ? "home"
+                    : "landing"
+            }
+            onPatchPage={(patch) =>
+              patchPage(
+                section === "youreIn"
+                  ? "youreIn"
+                  : section === "settings"
+                    ? "settings"
+                    : section === "homePage"
+                      ? "home"
+                      : "landing",
+                patch,
+              )
+            }
+            onSaveLogo={() => {
+              const stamp = createStampFromBrand(experience.brand);
+              if (!stamp) {
+                setStatus("Pick a logo first, then save it as a stamp");
+                return;
+              }
+              patchExperience((prev) => {
+                if ((prev.stamps || []).some((s) => s.src === stamp.src)) {
+                  return prev;
+                }
+                return { ...prev, stamps: [...(prev.stamps || []), stamp] };
+              });
+              setStatus("Logo saved — click it on any page to place it");
+            }}
+            onPlaceStamp={(stampId) => {
+              const pageKey =
+                section === "youreIn"
+                  ? "youreIn"
+                  : section === "settings"
+                    ? "settings"
+                    : section === "homePage"
+                      ? "home"
+                      : "landing";
+              const stamp = (experience.stamps || []).find((s) => s.id === stampId);
+              if (!stamp) return;
+              patchPage(pageKey, {
+                layoutMode: "freeform",
+                stage: placeStampOnPage(experience.pages[pageKey], stamp),
+              });
+              setStatus(`Placed logo on ${pageKey === "youreIn" ? "You're In" : pageKey}`);
+            }}
+            onRemoveStamp={(stampId) => {
+              patchExperience((prev) => ({
+                ...prev,
+                stamps: (prev.stamps || []).filter((s) => s.id !== stampId),
+                pages: {
+                  ...prev.pages,
+                  landing: {
+                    ...prev.pages.landing,
+                    stage: (prev.pages.landing.stage || []).filter((item) => item.stampId !== stampId),
+                  },
+                  youreIn: {
+                    ...prev.pages.youreIn,
+                    stage: (prev.pages.youreIn.stage || []).filter((item) => item.stampId !== stampId),
+                  },
+                  settings: {
+                    ...prev.pages.settings,
+                    stage: (prev.pages.settings.stage || []).filter((item) => item.stampId !== stampId),
+                  },
+                  home: {
+                    ...prev.pages.home,
+                    stage: (prev.pages.home.stage || []).filter((item) => item.stampId !== stampId),
+                  },
+                },
+              }));
+            }}
           />
         </div>
       ) : null}

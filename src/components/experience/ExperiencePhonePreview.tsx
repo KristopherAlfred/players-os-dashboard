@@ -1,16 +1,21 @@
 import { useCallback, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import type {
+  ExperienceBuiltinStageId,
   ExperienceConfig,
   ExperiencePageConfig,
   ExperienceStageItem,
-  ExperienceStageItemId,
+  ExperienceStamp,
 } from "../../lib/experienceConfig";
 import {
   DEFAULT_LANDING_STAGE,
+  createStampFromBrand,
   getStageItem,
   pageBackgroundCss,
+  placeStampOnPage,
+  removeStageItem,
   stageGlowStyle,
   stageItemCss,
+  stageItemRole,
   themeBackgroundCss,
   upsertStageItem,
 } from "../../lib/experienceConfig";
@@ -27,8 +32,12 @@ export type PhonePreviewMode =
   | "homePage"
   | "boxes";
 
-const STAGE_LABELS: Record<ExperienceStageItemId, string> = {
-  brand: "Brand",
+export type ExperiencePageKey = keyof ExperienceConfig["pages"];
+
+const STAGE_LABELS: Record<ExperienceBuiltinStageId, string> = {
+  logo: "Logo",
+  wordmark: "Wordmark",
+  tagline: "Tagline",
   hero: "Hero image",
   titleArt: "Title art",
   subhead: "Subhead",
@@ -148,21 +157,100 @@ function DraggableStageItem({
   );
 }
 
-function LandingFreeformPreview({
+function StampTray({
   experience,
-  onPatchPage,
+  onSaveLogo,
+  onPlaceStamp,
+  onRemoveStamp,
 }: {
   experience: ExperienceConfig;
-  onPatchPage?: (patch: Partial<ExperiencePageConfig>) => void;
+  onSaveLogo?: () => void;
+  onPlaceStamp?: (stampId: string) => void;
+  onRemoveStamp?: (stampId: string) => void;
 }) {
-  const page = experience.pages.landing;
-  const [selectedId, setSelectedId] = useState<ExperienceStageItemId>("headline");
+  const stamps = experience.stamps || [];
+  return (
+    <div className="space-y-2 border-t border-white/10 bg-black/85 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-red">Logo stamps</p>
+        {onSaveLogo ? (
+          <button
+            type="button"
+            onClick={onSaveLogo}
+            disabled={!experience.brand.logoSrc}
+            className="rounded-lg border border-dt-red/50 bg-dt-red/15 px-2 py-1 text-[10px] font-semibold text-dt-red disabled:opacity-40"
+          >
+            Save current logo
+          </button>
+        ) : null}
+      </div>
+      <p className="text-[9px] text-white/40">Click a stamp to drop it on this page — works from any section.</p>
+      {stamps.length === 0 ? (
+        <p className="text-[10px] text-white/35">No saved logos yet. Save the brand logo to reuse it anywhere.</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {stamps.map((stamp) => (
+            <div key={stamp.id} className="relative">
+              <button
+                type="button"
+                title={`Place ${stamp.label}`}
+                onClick={() => onPlaceStamp?.(stamp.id)}
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/50 hover:border-dt-red/60"
+              >
+                <TintedBrandLogo
+                  src={resolveExperiencePreviewUrl(stamp.src)}
+                  color={experience.brand.logoColor}
+                  tint={experience.brand.logoTint !== false}
+                  size={36}
+                />
+              </button>
+              {onRemoveStamp ? (
+                <button
+                  type="button"
+                  aria-label={`Remove ${stamp.label}`}
+                  onClick={() => onRemoveStamp(stamp.id)}
+                  className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] text-white/70 ring-1 ring-white/20"
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PageFreeformPreview({
+  experience,
+  page,
+  pageKey,
+  label,
+  onPatchPage,
+  onSaveLogo,
+  onPlaceStamp,
+  onRemoveStamp,
+}: {
+  experience: ExperienceConfig;
+  page: ExperiencePageConfig;
+  pageKey: ExperiencePageKey;
+  label: string;
+  onPatchPage?: (patch: Partial<ExperiencePageConfig>) => void;
+  onSaveLogo?: () => void;
+  onPlaceStamp?: (stampId: string) => void;
+  onRemoveStamp?: (stampId: string) => void;
+}) {
+  const [selectedId, setSelectedId] = useState<string>("logo");
   const selected = getStageItem(page, selectedId);
   const lines = (page.subhead || "THE OFFICIAL\nCOMMUNITY").split("\n");
   const scale = (page.heroScale || 100) / 100;
+  const brand = experience.brand;
+  const stageIds = (page.stage?.length ? page.stage : DEFAULT_LANDING_STAGE).map((item) => item.id);
+  const showLandingChrome = pageKey === "landing";
 
   const patchItem = useCallback(
-    (id: ExperienceStageItemId, patch: Partial<ExperienceStageItem>) => {
+    (id: string, patch: Partial<ExperienceStageItem>) => {
       if (!onPatchPage) return;
       onPatchPage({
         layoutMode: "freeform",
@@ -172,16 +260,56 @@ function LandingFreeformPreview({
     [onPatchPage, page],
   );
 
-  const renderItem = (id: ExperienceStageItemId) => {
+  const selectedLabel = (() => {
+    const role = stageItemRole(selected);
+    if (role === "stamp") {
+      const stamp = (experience.stamps || []).find((s) => s.id === selected.stampId);
+      return stamp?.label ? `Stamp · ${stamp.label}` : "Stamp";
+    }
+    return STAGE_LABELS[role];
+  })();
+
+  const renderItem = (id: string) => {
     const item = getStageItem(page, id);
+    const role = stageItemRole(item);
     let body: ReactNode = null;
-    if (id === "brand") {
+
+    if (role === "logo") {
+      if (!brand.showLogoImage || !brand.logoSrc) {
+        body = (
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-white/30 text-[8px] text-white/35">
+            Logo
+          </div>
+        );
+      } else {
+        body = (
+          <div style={stageGlowStyle(item, "box")}>
+            <TintedBrandLogo
+              src={resolveExperiencePreviewUrl(brand.logoSrc)}
+              color={brand.logoColor}
+              tint={brand.logoTint !== false}
+              size={40}
+            />
+          </div>
+        );
+      }
+    } else if (role === "wordmark") {
       body = (
-        <div style={stageGlowStyle(item, "box")}>
-          <BrandMark experience={experience} />
-        </div>
+        <p
+          className="truncate text-[12px] font-bold tracking-[0.16em]"
+          style={{ color: brand.wordmarkColor, ...stageGlowStyle(item, "text") }}
+        >
+          {brand.wordmark || "YOUR BRAND"}
+        </p>
       );
-    } else if (id === "hero") {
+    } else if (role === "tagline") {
+      body = (
+        <p className="truncate text-[9px]" style={{ color: brand.taglineColor, ...stageGlowStyle(item, "text") }}>
+          {brand.tagline || "Tagline"}
+        </p>
+      );
+    } else if (role === "hero") {
+      if (!showLandingChrome) return null;
       body = page.heroImage ? (
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
@@ -201,8 +329,8 @@ function LandingFreeformPreview({
           <span className="text-[9px] text-white/35">Hero placement</span>
         </div>
       );
-    } else if (id === "titleArt") {
-      if (!page.titleImage) return null;
+    } else if (role === "titleArt") {
+      if (!showLandingChrome || !page.titleImage) return null;
       body = (
         <img
           src={resolveExperiencePreviewUrl(page.titleImage)}
@@ -212,7 +340,7 @@ function LandingFreeformPreview({
           style={stageGlowStyle(item, "image")}
         />
       );
-    } else if (id === "subhead") {
+    } else if (role === "subhead") {
       body = (
         <p
           className="text-center text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em]"
@@ -226,19 +354,20 @@ function LandingFreeformPreview({
           ))}
         </p>
       );
-    } else if (id === "headline") {
+    } else if (role === "headline") {
       body = (
         <p className="text-center font-display text-xl text-white" style={stageGlowStyle(item, "text")}>
-          {page.headline || "Join the circle"}
+          {page.headline || page.title || "Headline"}
         </p>
       );
-    } else if (id === "body") {
+    } else if (role === "body") {
       body = (
         <p className="text-center text-[11px] leading-relaxed text-white/65" style={stageGlowStyle(item, "text")}>
           {page.body}
         </p>
       );
-    } else if (id === "cta") {
+    } else if (role === "cta") {
+      if (!showLandingChrome) return null;
       body = (
         <button
           type="button"
@@ -252,6 +381,19 @@ function LandingFreeformPreview({
         >
           {page.ctaLabel || "Join My Circle →"}
         </button>
+      );
+    } else if (role === "stamp") {
+      const stamp = (experience.stamps || []).find((s) => s.id === item.stampId);
+      if (!stamp?.src) return null;
+      body = (
+        <div style={stageGlowStyle(item, "box")}>
+          <TintedBrandLogo
+            src={resolveExperiencePreviewUrl(stamp.src)}
+            color={brand.logoColor}
+            tint={brand.logoTint !== false}
+            size={44}
+          />
+        </div>
       );
     }
 
@@ -269,20 +411,17 @@ function LandingFreeformPreview({
   };
 
   return (
-    <PhoneFrame label="Landing" hint="Drag anything · tap to select · edit glow below">
+    <PhoneFrame label={label} hint="Drag logo & words separately · tap stamp tray to place logos">
       <div
         className="relative h-[560px] w-full"
-        style={{ background: pageBackgroundCss(page) }}
-        onPointerDown={() => setSelectedId(selectedId)}
+        style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
       >
-        {(["hero", "titleArt", "subhead", "headline", "body", "cta", "brand"] as ExperienceStageItemId[]).map(
-          renderItem,
-        )}
+        {stageIds.map(renderItem)}
       </div>
       {onPatchPage ? (
         <div className="space-y-2 border-t border-white/10 bg-black/80 p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-red">
-            Selected · {STAGE_LABELS[selectedId]}
+            Selected · {selectedLabel}
           </p>
           <div className="flex flex-wrap gap-2">
             <button
@@ -310,6 +449,18 @@ function LandingFreeformPreview({
             >
               Send back
             </button>
+            {stageItemRole(selected) === "stamp" ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onPatchPage({ stage: removeStageItem(page, selectedId) });
+                  setSelectedId("logo");
+                }}
+                className="rounded-lg border border-white/15 px-2.5 py-1.5 text-[10px] text-red-300/80"
+              >
+                Remove stamp
+              </button>
+            ) : null}
           </div>
           {selected.glow ? (
             <div className="grid grid-cols-2 gap-2">
@@ -340,7 +491,10 @@ function LandingFreeformPreview({
             onClick={() =>
               onPatchPage({
                 layoutMode: "freeform",
-                stage: DEFAULT_LANDING_STAGE.map((item) => ({ ...item })),
+                stage: [
+                  ...DEFAULT_LANDING_STAGE.map((item) => ({ ...item })),
+                  ...(page.stage || []).filter((item) => stageItemRole(item) === "stamp"),
+                ],
               })
             }
             className="text-[10px] text-white/40 underline hover:text-white/70"
@@ -349,69 +503,53 @@ function LandingFreeformPreview({
           </button>
         </div>
       ) : null}
+      <StampTray
+        experience={experience}
+        onSaveLogo={onSaveLogo}
+        onPlaceStamp={onPlaceStamp}
+        onRemoveStamp={onRemoveStamp}
+      />
     </PhoneFrame>
   );
 }
 
-function YoureInPreview({ experience }: { experience: ExperienceConfig }) {
-  const page = experience.pages.youreIn;
+function BoxesStampOnlyPreview({
+  experience,
+  onSaveLogo,
+  onPlaceStamp,
+  onRemoveStamp,
+}: {
+  experience: ExperienceConfig;
+  onSaveLogo?: () => void;
+  onPlaceStamp?: (stampId: string) => void;
+  onRemoveStamp?: (stampId: string) => void;
+}) {
+  const page = experience.pages.home;
+  const bg = pageBackgroundCss({ ...page, backgroundImage: "" }) || themeBackgroundCss({ ...experience.theme, backgroundImage: "" });
   return (
-    <PhoneFrame label="You're In">
-      <div className="flex h-full min-h-[560px] flex-col" style={{ background: pageBackgroundCss(page) }}>
-        <div className="border-b border-white/10 px-4 pb-3 pt-8">
-          <BrandMark experience={experience} />
-        </div>
-        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-          <p className="font-display text-3xl text-white">{page.headline || "You're in"}</p>
-          <p className="mt-2 text-sm" style={{ color: page.accentColor }}>
-            {page.subhead || "Welcome"}
-          </p>
-          <p className="mt-4 text-[12px] text-white/55">{page.body}</p>
-        </div>
-      </div>
-    </PhoneFrame>
-  );
-}
-
-function SettingsPreview({ experience }: { experience: ExperienceConfig }) {
-  const page = experience.pages.settings;
-  return (
-    <PhoneFrame label="Settings">
-      <div className="flex h-full min-h-[560px] flex-col" style={{ background: pageBackgroundCss(page) }}>
-        <div className="border-b border-white/10 px-4 pb-3 pt-8">
-          <BrandMark experience={experience} />
-        </div>
-        <div className="space-y-3 px-4 py-5">
-          <p className="font-display text-lg text-white">{page.title || page.headline || "Account Settings"}</p>
-          <p className="text-[11px] text-white/50">{page.body}</p>
-        </div>
-      </div>
-    </PhoneFrame>
-  );
-}
-
-function HomeChromePreview({ experience }: { experience: ExperienceConfig }) {
-  const { theme, effects, pages } = experience;
-  const page = pages.home;
-  const bg = pageBackgroundCss({ ...page, backgroundImage: "" }) || themeBackgroundCss({ ...theme, backgroundImage: "" });
-  return (
-    <PhoneFrame label="Home">
-      <div className="relative flex h-full min-h-[560px] flex-col" style={{ background: bg, color: theme.text }}>
-        {effects.vignette ? (
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.55))]" />
-        ) : null}
+    <PhoneFrame label="Home boxes" hint="Save / place logo stamps here too — they land on Home">
+      <div className="relative flex h-[560px] flex-col" style={{ background: bg, color: experience.theme.text }}>
         <div className="border-b border-white/10 px-4 pb-3 pt-8">
           <BrandMark experience={experience} />
         </div>
         <div className="relative space-y-2 p-3">
-          <div className="rounded-2xl border border-white/10 p-3" style={{ background: theme.card }}>
-            <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: theme.muted }}>
+          <div className="rounded-2xl border border-white/10 p-3" style={{ background: experience.theme.card }}>
+            <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: experience.theme.muted }}>
               Home
             </p>
             <p className="mt-1 font-display text-base">{page.headline || "Your hub"}</p>
           </div>
+          <p className="px-1 text-[10px] text-white/40">
+            Switch to Home chrome to drag stamps on the page canvas. Tray below still saves logos.
+          </p>
         </div>
       </div>
+      <StampTray
+        experience={experience}
+        onSaveLogo={onSaveLogo}
+        onPlaceStamp={onPlaceStamp}
+        onRemoveStamp={onRemoveStamp}
+      />
     </PhoneFrame>
   );
 }
@@ -430,18 +568,44 @@ const MODE_LABEL: Record<PhonePreviewMode, string> = {
 export function ExperiencePhonePreview({
   experience,
   mode,
+  pageKey,
   onPatchPage,
+  onSaveLogo,
+  onPlaceStamp,
+  onRemoveStamp,
 }: {
   experience: ExperienceConfig;
   mode: PhonePreviewMode;
+  pageKey: ExperiencePageKey;
   onPatchPage?: (patch: Partial<ExperiencePageConfig>) => void;
+  onSaveLogo?: () => void;
+  onPlaceStamp?: (stampId: string) => void;
+  onRemoveStamp?: (stampId: string) => void;
 }) {
-  if (mode === "landing" || mode === "brand" || mode === "theme" || mode === "effects") {
-    return <LandingFreeformPreview experience={experience} onPatchPage={onPatchPage} />;
+  if (mode === "boxes") {
+    return (
+      <BoxesStampOnlyPreview
+        experience={experience}
+        onSaveLogo={onSaveLogo}
+        onPlaceStamp={onPlaceStamp}
+        onRemoveStamp={onRemoveStamp}
+      />
+    );
   }
-  if (mode === "youreIn") return <YoureInPreview experience={experience} />;
-  if (mode === "settings") return <SettingsPreview experience={experience} />;
-  return <HomeChromePreview experience={experience} />;
+
+  return (
+    <PageFreeformPreview
+      experience={experience}
+      page={experience.pages[pageKey]}
+      pageKey={pageKey}
+      label={MODE_LABEL[mode]}
+      onPatchPage={onPatchPage}
+      onSaveLogo={onSaveLogo}
+      onPlaceStamp={onPlaceStamp}
+      onRemoveStamp={onRemoveStamp}
+    />
+  );
 }
 
-export { MODE_LABEL };
+export { MODE_LABEL, createStampFromBrand, placeStampOnPage };
+export type { ExperienceStamp };

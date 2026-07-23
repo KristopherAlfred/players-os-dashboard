@@ -55,8 +55,10 @@ export type ExperienceEffects = {
   glassmorphism: boolean;
 };
 
-export type ExperienceStageItemId =
-  | "brand"
+export type ExperienceBuiltinStageId =
+  | "logo"
+  | "wordmark"
+  | "tagline"
   | "hero"
   | "subhead"
   | "headline"
@@ -64,8 +66,15 @@ export type ExperienceStageItemId =
   | "cta"
   | "titleArt";
 
+/** Built-in stage ids, or stamp instance ids like `stamp_…`. */
+export type ExperienceStageItemId = ExperienceBuiltinStageId | (string & {});
+
 export type ExperienceStageItem = {
-  id: ExperienceStageItemId;
+  id: string;
+  /** Built-in role, or "stamp" for reusable logo placements. Defaults to id when builtin. */
+  role?: ExperienceBuiltinStageId | "stamp";
+  /** When role is stamp, points at ExperienceStamp.id */
+  stampId?: string;
   /** Percent of stage width (0–100) */
   x: number;
   /** Percent of stage height (0–100) */
@@ -76,6 +85,13 @@ export type ExperienceStageItem = {
   glow: boolean;
   glowColor: string;
   glowIntensity: number;
+};
+
+/** Saved reusable logos you can drop on any page. */
+export type ExperienceStamp = {
+  id: string;
+  label: string;
+  src: string;
 };
 
 export type ExperiencePageConfig = {
@@ -129,6 +145,8 @@ export type ExperienceConfig = {
   theme: ExperienceTheme;
   effects: ExperienceEffects;
   pages: ExperiencePages;
+  /** Reusable logo stamps — click to place on the current page */
+  stamps: ExperienceStamp[];
 };
 
 export const DEFAULT_EXPERIENCE_BRAND: ExperienceBrand = {
@@ -181,8 +199,10 @@ export const DEFAULT_EXPERIENCE_EFFECTS: ExperienceEffects = {
   glassmorphism: true,
 };
 
-export const STAGE_ITEM_IDS: ExperienceStageItemId[] = [
-  "brand",
+export const STAGE_ITEM_IDS: ExperienceBuiltinStageId[] = [
+  "logo",
+  "wordmark",
+  "tagline",
   "hero",
   "titleArt",
   "subhead",
@@ -192,7 +212,9 @@ export const STAGE_ITEM_IDS: ExperienceStageItemId[] = [
 ];
 
 export const DEFAULT_LANDING_STAGE: ExperienceStageItem[] = [
-  { id: "brand", x: 4, y: 5, w: 70, z: 20, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
+  { id: "logo", x: 4, y: 4, w: 14, z: 22, glow: true, glowColor: "#8FE3B8", glowIntensity: 40 },
+  { id: "wordmark", x: 20, y: 5, w: 55, z: 21, glow: false, glowColor: "#FFFFFF", glowIntensity: 30 },
+  { id: "tagline", x: 20, y: 9.5, w: 55, z: 20, glow: false, glowColor: "#8FE3B8", glowIntensity: 30 },
   { id: "hero", x: 8, y: 16, w: 84, z: 5, glow: true, glowColor: "#8FE3B8", glowIntensity: 35 },
   { id: "titleArt", x: 10, y: 48, w: 70, z: 12, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
   { id: "subhead", x: 8, y: 52, w: 84, z: 14, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
@@ -200,6 +222,52 @@ export const DEFAULT_LANDING_STAGE: ExperienceStageItem[] = [
   { id: "body", x: 8, y: 70, w: 84, z: 13, glow: false, glowColor: "#8FE3B8", glowIntensity: 30 },
   { id: "cta", x: 8, y: 84, w: 84, z: 18, glow: true, glowColor: "#8FE3B8", glowIntensity: 45 },
 ];
+
+export function isBuiltinStageId(id: string): id is ExperienceBuiltinStageId {
+  return (STAGE_ITEM_IDS as string[]).includes(id);
+}
+
+export function stageItemRole(item: ExperienceStageItem): ExperienceBuiltinStageId | "stamp" {
+  if (item.role === "stamp" || item.stampId || String(item.id).startsWith("stamp_")) return "stamp";
+  if (item.role && isBuiltinStageId(item.role)) return item.role;
+  if (isBuiltinStageId(item.id)) return item.id;
+  return "stamp";
+}
+
+export function createStampId() {
+  return `stamp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+export function createStampFromBrand(brand: ExperienceBrand): ExperienceStamp | null {
+  if (!brand.logoSrc) return null;
+  return {
+    id: createStampId(),
+    label: brand.wordmark?.trim() || "Logo",
+    src: brand.logoSrc,
+  };
+}
+
+export function placeStampOnPage(
+  page: ExperiencePageConfig,
+  stamp: ExperienceStamp,
+  spot?: { x?: number; y?: number },
+): ExperienceStageItem[] {
+  const base = (page.stage?.length ? page.stage : DEFAULT_LANDING_STAGE).map((item) => ({ ...item }));
+  const count = base.filter((item) => stageItemRole(item) === "stamp").length;
+  base.push({
+    id: createStampId(),
+    role: "stamp",
+    stampId: stamp.id,
+    x: Math.min(80, spot?.x ?? 8 + (count % 4) * 6),
+    y: Math.min(80, spot?.y ?? 14 + Math.floor(count / 4) * 8),
+    w: 16,
+    z: 28 + count,
+    glow: true,
+    glowColor: "#8FE3B8",
+    glowIntensity: 40,
+  });
+  return base;
+}
 
 function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePageConfig {
   return {
@@ -229,22 +297,44 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
 
 export function getStageItem(
   page: ExperiencePageConfig,
-  id: ExperienceStageItemId,
+  id: string,
 ): ExperienceStageItem {
   const found = (page.stage || []).find((item) => item.id === id);
-  const fallback = DEFAULT_LANDING_STAGE.find((item) => item.id === id)!;
-  return found ? { ...fallback, ...found } : { ...fallback };
+  if (found) {
+    const fallback = isBuiltinStageId(id)
+      ? DEFAULT_LANDING_STAGE.find((item) => item.id === id)
+      : undefined;
+    return fallback ? { ...fallback, ...found } : { ...found };
+  }
+  const fallback = DEFAULT_LANDING_STAGE.find((item) => item.id === id);
+  if (fallback) return { ...fallback };
+  return {
+    id,
+    role: "stamp",
+    x: 10,
+    y: 10,
+    w: 16,
+    z: 20,
+    glow: false,
+    glowColor: "#8FE3B8",
+    glowIntensity: 40,
+  };
 }
 
 export function upsertStageItem(
   page: ExperiencePageConfig,
-  patch: Partial<ExperienceStageItem> & { id: ExperienceStageItemId },
+  patch: Partial<ExperienceStageItem> & { id: string },
 ): ExperienceStageItem[] {
   const base = (page.stage?.length ? page.stage : DEFAULT_LANDING_STAGE).map((item) => ({ ...item }));
   const idx = base.findIndex((item) => item.id === patch.id);
   if (idx >= 0) base[idx] = { ...base[idx], ...patch };
   else base.push({ ...getStageItem(page, patch.id), ...patch });
   return base;
+}
+
+export function removeStageItem(page: ExperiencePageConfig, id: string): ExperienceStageItem[] {
+  const base = (page.stage?.length ? page.stage : DEFAULT_LANDING_STAGE).map((item) => ({ ...item }));
+  return base.filter((item) => item.id !== id);
 }
 
 export function stageGlowStyle(item: ExperienceStageItem, kind: "text" | "image" | "box" = "text") {
@@ -309,6 +399,7 @@ export const DEFAULT_EXPERIENCE_CONFIG: ExperienceConfig = {
   theme: DEFAULT_EXPERIENCE_THEME,
   effects: DEFAULT_EXPERIENCE_EFFECTS,
   pages: DEFAULT_EXPERIENCE_PAGES,
+  stamps: [],
 };
 
 function asString(value: unknown, fallback = "") {
@@ -433,33 +524,99 @@ export function normalizeExperiencePage(
   };
 }
 
+function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceStageItem): ExperienceStageItem {
+  const role = stageItemRole({ ...prev, ...row, id: String(row.id || prev.id) });
+  return {
+    id: String(row.id || prev.id),
+    role,
+    stampId: role === "stamp" ? asString(row.stampId, prev.stampId || "") || undefined : undefined,
+    x: Math.max(0, Math.min(95, asNumber(row.x, prev.x))),
+    y: Math.max(0, Math.min(95, asNumber(row.y, prev.y))),
+    w: Math.max(8, Math.min(100, asNumber(row.w, prev.w))),
+    z: Math.max(0, Math.min(100, asNumber(row.z, prev.z))),
+    glow: asBool(row.glow, prev.glow),
+    glowColor: asString(row.glowColor, prev.glowColor),
+    glowIntensity: Math.max(0, Math.min(100, asNumber(row.glowIntensity, prev.glowIntensity))),
+  };
+}
+
+function migrateLegacyBrandStage(list: unknown[]): ExperienceStageItem[] {
+  const rows = list.filter((item) => item && typeof item === "object") as Partial<ExperienceStageItem>[];
+  const brand = rows.find((item) => String(item.id) === "brand");
+  if (!brand) return [];
+  const hasLogo = rows.some((item) => String(item.id) === "logo");
+  if (hasLogo) return [];
+  const x = asNumber(brand.x, 4);
+  const y = asNumber(brand.y, 4);
+  const glow = asBool(brand.glow, true);
+  const glowColor = asString(brand.glowColor, "#8FE3B8");
+  const glowIntensity = asNumber(brand.glowIntensity, 40);
+  const z = asNumber(brand.z, 20);
+  return [
+    { id: "logo", x, y, w: 14, z: z + 2, glow, glowColor, glowIntensity },
+    { id: "wordmark", x: Math.min(80, x + 16), y: y + 1, w: 55, z: z + 1, glow: false, glowColor: "#FFFFFF", glowIntensity: 30 },
+    { id: "tagline", x: Math.min(80, x + 16), y: y + 5.5, w: 55, z, glow: false, glowColor, glowIntensity: 30 },
+  ];
+}
+
 function normalizeStage(raw: unknown, fallback: ExperienceStageItem[]): ExperienceStageItem[] {
   const list = Array.isArray(raw) ? raw : fallback;
-  const byId = new Map<ExperienceStageItemId, ExperienceStageItem>();
+  const byId = new Map<string, ExperienceStageItem>();
   for (const item of DEFAULT_LANDING_STAGE) byId.set(item.id, { ...item });
   for (const item of fallback || []) {
-    if (item?.id && STAGE_ITEM_IDS.includes(item.id)) {
+    if (item?.id && isBuiltinStageId(item.id)) {
       byId.set(item.id, { ...byId.get(item.id)!, ...item });
     }
   }
+  for (const migrated of migrateLegacyBrandStage(list)) {
+    byId.set(migrated.id, migrated);
+  }
+  const stamps: ExperienceStageItem[] = [];
   for (const item of list) {
     if (!item || typeof item !== "object") continue;
-    const id = String((item as ExperienceStageItem).id) as ExperienceStageItemId;
-    if (!STAGE_ITEM_IDS.includes(id)) continue;
-    const prev = byId.get(id) || DEFAULT_LANDING_STAGE.find((d) => d.id === id)!;
     const row = item as Partial<ExperienceStageItem>;
-    byId.set(id, {
-      id,
-      x: Math.max(0, Math.min(95, asNumber(row.x, prev.x))),
-      y: Math.max(0, Math.min(95, asNumber(row.y, prev.y))),
-      w: Math.max(10, Math.min(100, asNumber(row.w, prev.w))),
-      z: Math.max(0, Math.min(100, asNumber(row.z, prev.z))),
-      glow: asBool(row.glow, prev.glow),
-      glowColor: asString(row.glowColor, prev.glowColor),
-      glowIntensity: Math.max(0, Math.min(100, asNumber(row.glowIntensity, prev.glowIntensity))),
+    const id = String(row.id || "");
+    if (!id || id === "brand") continue;
+    if (isBuiltinStageId(id)) {
+      const prev = byId.get(id) || DEFAULT_LANDING_STAGE.find((d) => d.id === id)!;
+      byId.set(id, normalizeStageItem(row, prev));
+      continue;
+    }
+    if (stageItemRole({ ...(row as ExperienceStageItem), id }) === "stamp") {
+      stamps.push(
+        normalizeStageItem(row, {
+          id,
+          role: "stamp",
+          stampId: asString(row.stampId, ""),
+          x: 10,
+          y: 10,
+          w: 16,
+          z: 28,
+          glow: true,
+          glowColor: "#8FE3B8",
+          glowIntensity: 40,
+        }),
+      );
+    }
+  }
+  return [...STAGE_ITEM_IDS.map((id) => byId.get(id)!).filter(Boolean), ...stamps];
+}
+
+export function normalizeExperienceStamps(raw: unknown): ExperienceStamp[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ExperienceStamp[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const row = item as Partial<ExperienceStamp>;
+    const src = asString(row.src, "");
+    if (!src) continue;
+    out.push({
+      id: asString(row.id, createStampId()),
+      label: asString(row.label, "Logo"),
+      src,
     });
   }
-  return STAGE_ITEM_IDS.map((id) => byId.get(id)!).filter(Boolean);
+  return out;
 }
 
 export function normalizeExperiencePages(raw: unknown): ExperiencePages {
@@ -479,6 +636,7 @@ export function normalizeExperienceConfig(raw: unknown): ExperienceConfig {
     theme: normalizeExperienceTheme(c.theme),
     effects: normalizeExperienceEffects(c.effects),
     pages: normalizeExperiencePages(c.pages),
+    stamps: normalizeExperienceStamps(c.stamps),
   };
 }
 

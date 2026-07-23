@@ -223,10 +223,12 @@ export function ExperienceBrandPanel({
   brand,
   onChange,
   onUploadLogo,
+  onSaveLogoStamp,
 }: {
   brand: ExperienceBrand;
   onChange: (patch: Partial<ExperienceBrand>) => void;
   onUploadLogo: (file: File | null) => void;
+  onSaveLogoStamp?: () => void;
 }) {
   return (
     <div className="space-y-4">
@@ -250,6 +252,19 @@ export function ExperienceBrandPanel({
             </p>
           </div>
         </div>
+        <p className="mt-3 text-[11px] text-white/45">
+          On the phone, drag the logo, wordmark, and tagline separately. Save the logo as a stamp to drop it on any page.
+        </p>
+        {onSaveLogoStamp ? (
+          <button
+            type="button"
+            onClick={onSaveLogoStamp}
+            disabled={!brand.logoSrc}
+            className="mt-3 rounded-lg border border-dt-red/50 bg-dt-red/15 px-3 py-2 text-xs font-semibold text-dt-red disabled:opacity-40"
+          >
+            Save logo as stamp
+          </button>
+        ) : null}
       </div>
 
       <Toggle
