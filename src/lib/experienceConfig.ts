@@ -85,6 +85,12 @@ export type ExperienceStageItem = {
   glow: boolean;
   glowColor: string;
   glowIntensity: number;
+  /** Display scale percent (40–200), default 100 */
+  scale?: number;
+  hidden?: boolean;
+  fillFrom?: string;
+  fillTo?: string;
+  borderColor?: string;
 };
 
 /** Saved reusable logos you can drop on any page. */
@@ -214,6 +220,49 @@ export const STAGE_ITEM_IDS: ExperienceBuiltinStageId[] = [
   "cta",
 ];
 
+export const DEFAULT_CONTENT_STAGE: ExperienceStageItem[] = [
+  { id: "titleArt", x: 55, y: 8, w: 42, z: 8, scale: 100, glow: true, glowColor: "#8FE3B8", glowIntensity: 40 },
+  {
+    id: "headline",
+    x: 4,
+    y: 6,
+    w: 50,
+    z: 12,
+    glow: false,
+    glowColor: "#FFFFFF",
+    glowIntensity: 30,
+    fillFrom: "rgba(0,0,0,0.55)",
+    fillTo: "rgba(0,0,0,0.2)",
+    borderColor: "rgba(143,227,184,0.45)",
+  },
+  {
+    id: "subhead",
+    x: 4,
+    y: 16,
+    w: 50,
+    z: 11,
+    glow: false,
+    glowColor: "#8FE3B8",
+    glowIntensity: 30,
+    fillFrom: "rgba(0,0,0,0.5)",
+    fillTo: "rgba(0,0,0,0.15)",
+    borderColor: "rgba(143,227,184,0.35)",
+  },
+  {
+    id: "body",
+    x: 4,
+    y: 22,
+    w: 55,
+    z: 10,
+    glow: false,
+    glowColor: "#8FE3B8",
+    glowIntensity: 30,
+    fillFrom: "rgba(0,0,0,0.45)",
+    fillTo: "rgba(0,0,0,0.12)",
+    borderColor: "rgba(255,255,255,0.12)",
+  },
+];
+
 export const DEFAULT_LANDING_STAGE: ExperienceStageItem[] = [
   { id: "logo", x: 4, y: 4, w: 14, z: 22, glow: true, glowColor: "#8FE3B8", glowIntensity: 40 },
   { id: "wordmark", x: 20, y: 5, w: 55, z: 21, glow: false, glowColor: "#FFFFFF", glowIntensity: 30 },
@@ -305,11 +354,14 @@ export function getStageItem(
   const found = (page.stage || []).find((item) => item.id === id);
   if (found) {
     const fallback = isBuiltinStageId(id)
-      ? DEFAULT_LANDING_STAGE.find((item) => item.id === id)
+      ? DEFAULT_CONTENT_STAGE.find((item) => item.id === id) ||
+        DEFAULT_LANDING_STAGE.find((item) => item.id === id)
       : undefined;
     return fallback ? { ...fallback, ...found } : { ...found };
   }
-  const fallback = DEFAULT_LANDING_STAGE.find((item) => item.id === id);
+  const fallback =
+    DEFAULT_CONTENT_STAGE.find((item) => item.id === id) ||
+    DEFAULT_LANDING_STAGE.find((item) => item.id === id);
   if (fallback) return { ...fallback };
   return {
     id,
@@ -355,13 +407,19 @@ export function stageGlowStyle(item: ExperienceStageItem, kind: "text" | "image"
 }
 
 export function stageItemCss(item: ExperienceStageItem): Record<string, string | number> {
-  return {
+  const scalePct = item.scale != null ? Math.max(40, Math.min(200, item.scale)) : 100;
+  const css: Record<string, string | number> = {
     position: "absolute",
     left: `${item.x}%`,
     top: `${item.y}%`,
     width: `${item.w || 80}%`,
     zIndex: item.z,
   };
+  if (scalePct !== 100) {
+    css.transform = `scale(${scalePct / 100})`;
+    css.transformOrigin = "top left";
+  }
+  return css;
 }
 
 export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
@@ -401,6 +459,8 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     body: "Clips, YouTube uploads, and members-only video.",
     accentColor: "#8FE3B8",
     effectPreset: "glow",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
   }),
   news: pageDefaults({
     headline: "Latest News",
@@ -408,6 +468,8 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     body: "Newsletters and insights for the circle.",
     accentColor: "#8FE3B8",
     effectPreset: "soft",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
   }),
   docAndGlo: pageDefaults({
     headline: "Clean body care for bodies in motion",
@@ -416,6 +478,8 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     accentColor: "#8FE3B8",
     ctaLabel: "Shop Doc & Glo",
     effectPreset: "glass",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
   }),
 };
 
@@ -562,6 +626,11 @@ function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceS
     glow: asBool(row.glow, prev.glow),
     glowColor: asString(row.glowColor, prev.glowColor),
     glowIntensity: Math.max(0, Math.min(100, asNumber(row.glowIntensity, prev.glowIntensity))),
+    scale: Math.max(40, Math.min(200, asNumber(row.scale, prev.scale ?? 100))),
+    hidden: asBool(row.hidden, prev.hidden ?? false),
+    fillFrom: asString(row.fillFrom, prev.fillFrom ?? ""),
+    fillTo: asString(row.fillTo, prev.fillTo ?? ""),
+    borderColor: asString(row.borderColor, prev.borderColor ?? ""),
   };
 }
 

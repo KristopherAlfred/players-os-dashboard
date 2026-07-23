@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
 import {
   ArrowLeft,
   Film,
@@ -11,9 +20,16 @@ import {
   Upload,
 } from "lucide-react";
 import {
+  getStageItem,
   pageBackgroundCss,
+  stageGlowStyle,
+  stageItemCss,
+  upsertStageItem,
   type ExperiencePageConfig,
+  type ExperienceStageItem,
 } from "../../lib/experienceConfig";
+import { GRADIENT_BACKGROUND_PRESETS, type GradientBackgroundPreset } from "../../lib/experienceAssets";
+import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
 import {
   createEmptyDocAndGloProduct,
   fetchDocAndGloFeed,
@@ -65,44 +81,31 @@ function formatViews(count?: number) {
   return `${count.toLocaleString()} views`;
 }
 
-function PhoneChrome({
-  title,
-  activeTab,
-  contentStyle,
-  children,
-}: {
-  title: string;
-  activeTab: PhoneTab;
-  contentStyle?: CSSProperties;
-  children: ReactNode;
-}) {
+const CONTENT_STAGE_IDS = ["titleArt", "headline", "subhead", "body"] as const;
+
+const CONTENT_STAGE_LABELS: Record<(typeof CONTENT_STAGE_IDS)[number], string> = {
+  titleArt: "Hero art",
+  headline: "Headline box",
+  subhead: "Subhead box",
+  body: "Body box",
+};
+
+function PhoneChrome({ activeTab, children }: { activeTab: PhoneTab; children: ReactNode }) {
   return (
-    <div className="sticky top-4 self-start">
-      <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">
-        Live phone · {title}
-      </p>
+    <div className="sticky top-4 self-start xl:order-2">
       <div className="relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black shadow-[0_0_48px_rgba(143,227,184,0.12)]">
         <div className="pointer-events-none absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
-        <div className="border-b border-white/10 bg-[#0d0d0d] px-4 pb-2.5 pt-8 text-center">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-white">SLOANE GLO</p>
-          <p className="mt-0.5 text-[9px] text-[#8FE3B8]">{title}</p>
-        </div>
-        <div
-          className="h-[420px] overflow-y-auto px-2.5 py-2"
-          style={{ background: contentStyle?.background ?? "#050505", ...contentStyle }}
-        >
-          {children}
-        </div>
+        <div className="h-[420px] overflow-y-auto bg-[#050505] pt-8">{children}</div>
         <div className="border-t border-white/10 bg-[#0a0a0a] px-1 pb-3 pt-2">
           <div className="grid grid-cols-5">
             {PHONE_TABS.map((tab) => (
               <div key={tab} className="flex flex-col items-center gap-0.5 py-1">
                 <span
-                  className={`h-1.5 w-1.5 rounded-full ${tab === activeTab ? "bg-dt-red" : "bg-white/25"}`}
+                  className={`h-1.5 w-1.5 rounded-full ${tab === activeTab ? "bg-[#8FE3B8]" : "bg-white/25"}`}
                 />
                 <span
                   className={`font-display text-[7px] tracking-[0.1em] ${
-                    tab === activeTab ? "text-dt-red" : "text-white/45"
+                    tab === activeTab ? "text-[#8FE3B8]" : "text-white/45"
                   }`}
                 >
                   {tab}
@@ -113,6 +116,461 @@ function PhoneChrome({
         </div>
       </div>
     </div>
+  );
+}
+
+function DraggableStageItem({
+  item,
+  onMove,
+  children,
+}: {
+  item: ExperienceStageItem;
+  onMove: (x: number, y: number) => void;
+  children: ReactNode;
+}) {
+  const drag = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const parent = e.currentTarget.parentElement;
+    if (!parent) return;
+    drag.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: item.x,
+      origY: item.y,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!drag.current) return;
+    const parent = e.currentTarget.parentElement;
+    if (!parent) return;
+    const rect = parent.getBoundingClientRect();
+    const dx = ((e.clientX - drag.current.startX) / rect.width) * 100;
+    const dy = ((e.clientY - drag.current.startY) / rect.height) * 100;
+    onMove(
+      Math.max(0, Math.min(90, drag.current.origX + dx)),
+      Math.max(0, Math.min(92, drag.current.origY + dy)),
+    );
+  };
+
+  const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    drag.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  return (
+    <div
+      role="presentation"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      className="cursor-grab touch-none active:cursor-grabbing hover:outline hover:outline-1 hover:outline-white/25"
+      style={stageItemCss(item) as CSSProperties}
+    >
+      {children}
+    </div>
+  );
+}
+
+function textBoxStyle(item: ExperienceStageItem): CSSProperties {
+  const background =
+    item.fillFrom && item.fillTo
+      ? `linear-gradient(135deg, ${item.fillFrom}, ${item.fillTo})`
+      : "rgba(0,0,0,0.45)";
+  return {
+    background,
+    border: `1px solid ${item.borderColor || "rgba(255,255,255,0.12)"}`,
+    borderRadius: 10,
+    padding: "4px 6px",
+  };
+}
+
+function FreeformContentStage({
+  page,
+  onPatchPage,
+}: {
+  page: ExperiencePageConfig;
+  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
+}) {
+  const patchItem = useCallback(
+    (id: string, patch: Partial<ExperienceStageItem>) => {
+      onPatchPage({ stage: upsertStageItem(page, { id, ...patch }) });
+    },
+    [onPatchPage, page],
+  );
+
+  const subLines = (page.subhead || "").split("\n");
+
+  return (
+    <div
+      className="relative mx-1 mb-2 h-[220px] shrink-0 overflow-hidden rounded-xl"
+      style={{ background: pageBackgroundCss(page) || "#050505" }}
+    >
+      {CONTENT_STAGE_IDS.map((id) => {
+        const item = getStageItem(page, id);
+        if (item.hidden) return null;
+
+        if (id === "titleArt") {
+          if (!page.heroImage) return null;
+          const scale = (item.scale ?? page.heroScale ?? 100) / 100;
+          return (
+            <DraggableStageItem key={id} item={item} onMove={(x, y) => patchItem(id, { x, y })}>
+              <img
+                src={resolveExperiencePreviewUrl(page.heroImage)}
+                alt=""
+                draggable={false}
+                className="w-full object-contain"
+                style={{
+                  transform: scale !== 1 ? `scale(${scale})` : undefined,
+                  transformOrigin: "center center",
+                  ...stageGlowStyle(item, "image"),
+                }}
+              />
+            </DraggableStageItem>
+          );
+        }
+
+        if (id === "headline") {
+          if (!page.headline.trim()) return null;
+          return (
+            <DraggableStageItem key={id} item={item} onMove={(x, y) => patchItem(id, { x, y })}>
+              <p
+                className="font-display text-[11px] font-extrabold leading-tight text-white"
+                style={{ ...textBoxStyle(item), ...stageGlowStyle(item, "text") }}
+              >
+                {page.headline}
+              </p>
+            </DraggableStageItem>
+          );
+        }
+
+        if (id === "subhead") {
+          if (!page.subhead.trim()) return null;
+          return (
+            <DraggableStageItem key={id} item={item} onMove={(x, y) => patchItem(id, { x, y })}>
+              <p
+                className="text-[8px] font-semibold uppercase leading-snug tracking-[0.1em]"
+                style={{ ...textBoxStyle(item), color: page.accentColor, ...stageGlowStyle(item, "text") }}
+              >
+                {subLines.map((line, i) => (
+                  <span key={`${line}-${i}`}>
+                    {line}
+                    {i < subLines.length - 1 ? <br /> : null}
+                  </span>
+                ))}
+              </p>
+            </DraggableStageItem>
+          );
+        }
+
+        if (id === "body") {
+          if (!page.body.trim()) return null;
+          return (
+            <DraggableStageItem key={id} item={item} onMove={(x, y) => patchItem(id, { x, y })}>
+              <p
+                className="text-[8px] leading-snug text-white/70"
+                style={{ ...textBoxStyle(item), ...stageGlowStyle(item, "text") }}
+              >
+                {page.body}
+              </p>
+            </DraggableStageItem>
+          );
+        }
+
+        return null;
+      })}
+    </div>
+  );
+}
+
+function ContentPhonePreview({
+  page,
+  onPatchPage,
+  activeTab,
+  children,
+}: {
+  page: ExperiencePageConfig;
+  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
+  activeTab: PhoneTab;
+  children: ReactNode;
+}) {
+  return (
+    <PhoneChrome activeTab={activeTab}>
+      <FreeformContentStage page={page} onPatchPage={onPatchPage} />
+      <div className="space-y-1.5 px-2 pb-2">{children}</div>
+    </PhoneChrome>
+  );
+}
+
+function matchGradientPresetId(page: ExperiencePageConfig): string | undefined {
+  return GRADIENT_BACKGROUND_PRESETS.find(
+    (preset) =>
+      preset.useGradientBg === page.useGradientBg &&
+      !page.backgroundImage &&
+      preset.backgroundColor === page.backgroundColor &&
+      preset.backgroundGradientFrom === page.backgroundGradientFrom &&
+      preset.backgroundGradientTo === page.backgroundGradientTo,
+  )?.id;
+}
+
+function StageItemControls({
+  page,
+  stageId,
+  onPatchPage,
+  onClearText,
+}: {
+  page: ExperiencePageConfig;
+  stageId: (typeof CONTENT_STAGE_IDS)[number];
+  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
+  onClearText?: () => void;
+}) {
+  const item = getStageItem(page, stageId);
+  const patchItem = (patch: Partial<ExperienceStageItem>) => {
+    onPatchPage({ stage: upsertStageItem(page, { id: stageId, ...patch }) });
+  };
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/30 p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#8FE3B8]">
+        {CONTENT_STAGE_LABELS[stageId]}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => patchItem({ glow: !item.glow })}
+          className={`rounded-lg border px-2 py-1 text-[10px] ${
+            item.glow ? "border-[#8FE3B8]/50 bg-[#8FE3B8]/15 text-[#8FE3B8]" : "border-white/15 text-white/60"
+          }`}
+        >
+          Glow
+        </button>
+        <button type="button" onClick={() => patchItem({ z: Math.min(100, item.z + 1) })} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] text-white/70">
+          Forward
+        </button>
+        <button type="button" onClick={() => patchItem({ z: Math.max(0, item.z - 1) })} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] text-white/70">
+          Back
+        </button>
+        <button type="button" onClick={() => patchItem({ hidden: !item.hidden })} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] text-white/70">
+          {item.hidden ? "Show" : "Hide"}
+        </button>
+        {onClearText ? (
+          <button type="button" onClick={onClearText} className="rounded-lg border border-red-500/30 px-2 py-1 text-[10px] text-red-200/90">
+            Clear text
+          </button>
+        ) : null}
+      </div>
+      <label className="mt-2 block space-y-1">
+        <span className="text-[10px] text-white/40">Width {item.w}%</span>
+        <input
+          type="range"
+          min={12}
+          max={92}
+          value={item.w}
+          onChange={(e) => patchItem({ w: Number(e.target.value) })}
+          className="w-full"
+        />
+      </label>
+      {stageId !== "titleArt" ? (
+        <div className="mt-2 grid gap-2 sm:grid-cols-3">
+          <label className="block space-y-1">
+            <span className="text-[10px] text-white/40">Fill from</span>
+            <input value={item.fillFrom || ""} onChange={(e) => patchItem({ fillFrom: e.target.value })} className={`${fieldClass()} text-[10px]`} />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-[10px] text-white/40">Fill to</span>
+            <input value={item.fillTo || ""} onChange={(e) => patchItem({ fillTo: e.target.value })} className={`${fieldClass()} text-[10px]`} />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-[10px] text-white/40">Border</span>
+            <input value={item.borderColor || ""} onChange={(e) => patchItem({ borderColor: e.target.value })} className={`${fieldClass()} text-[10px]`} />
+          </label>
+        </div>
+      ) : null}
+      {item.glow ? (
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <label className="block space-y-1">
+            <span className="text-[10px] text-white/40">Glow color</span>
+            <input
+              type="color"
+              value={item.glowColor?.slice(0, 7) || "#8FE3B8"}
+              onChange={(e) => patchItem({ glowColor: e.target.value })}
+              className="h-9 w-full cursor-pointer rounded border border-white/15 bg-transparent"
+            />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-[10px] text-white/40">Intensity {item.glowIntensity}</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={item.glowIntensity}
+              onChange={(e) => patchItem({ glowIntensity: Number(e.target.value) })}
+              className="w-full"
+            />
+          </label>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function PageChromeEditor({
+  page,
+  onPatchPage,
+}: {
+  page: ExperiencePageConfig;
+  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
+}) {
+  const presetId = matchGradientPresetId(page);
+
+  function applyPreset(preset: GradientBackgroundPreset) {
+    onPatchPage({
+      useGradientBg: true,
+      backgroundImage: "",
+      backgroundColor: preset.backgroundColor,
+      backgroundGradientFrom: preset.backgroundGradientFrom,
+      backgroundGradientTo: preset.backgroundGradientTo,
+    });
+  }
+
+  async function onHeroUpload(file: File | null) {
+    if (!file) return;
+    try {
+      const heroImage = await compressImageFile(file);
+      onPatchPage({ heroImage });
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+      <div className="border-b border-dt-border px-4 py-3">
+        <h3 className="font-display text-sm font-semibold text-white">Page chrome</h3>
+        <p className="mt-0.5 text-[11px] text-white/40">Gradient background, copy, and draggable hero art on the phone</p>
+      </div>
+      <div className="grid gap-3 p-4 sm:grid-cols-2">
+        <label className="block space-y-1 sm:col-span-2">
+          <span className="text-[11px] text-white/45">Headline</span>
+          <input value={page.headline} onChange={(e) => onPatchPage({ headline: e.target.value })} className={fieldClass()} placeholder="Empty hides on phone" />
+        </label>
+        <label className="block space-y-1 sm:col-span-2">
+          <span className="text-[11px] text-white/45">Subhead</span>
+          <input value={page.subhead} onChange={(e) => onPatchPage({ subhead: e.target.value })} className={fieldClass()} placeholder="Empty hides on phone" />
+        </label>
+        <label className="block space-y-1 sm:col-span-2">
+          <span className="text-[11px] text-white/45">Body</span>
+          <textarea
+            value={page.body}
+            onChange={(e) => onPatchPage({ body: e.target.value })}
+            rows={3}
+            className={fieldClass()}
+            placeholder="Empty hides on phone"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-[11px] text-white/45">Accent</span>
+          <PageColorInput value={page.accentColor} onChange={(accentColor) => onPatchPage({ accentColor })} />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-[11px] text-white/45">Solid fallback</span>
+          <PageColorInput value={page.backgroundColor} onChange={(backgroundColor) => onPatchPage({ backgroundColor })} />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-[11px] text-white/45">Gradient from</span>
+          <PageColorInput
+            value={page.backgroundGradientFrom}
+            onChange={(backgroundGradientFrom) => onPatchPage({ backgroundGradientFrom, useGradientBg: true, backgroundImage: "" })}
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-[11px] text-white/45">Gradient to</span>
+          <PageColorInput
+            value={page.backgroundGradientTo}
+            onChange={(backgroundGradientTo) => onPatchPage({ backgroundGradientTo, useGradientBg: true, backgroundImage: "" })}
+          />
+        </label>
+        <div className="space-y-2 sm:col-span-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">Background preset</p>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {GRADIENT_BACKGROUND_PRESETS.map((preset) => {
+              const active = presetId === preset.id;
+              const swatch = preset.useGradientBg
+                ? `linear-gradient(${preset.angle}deg, ${preset.backgroundGradientFrom}, ${preset.backgroundGradientVia}, ${preset.backgroundGradientTo})`
+                : preset.backgroundColor;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => applyPreset(preset)}
+                  className={`overflow-hidden rounded-xl border text-left transition ${
+                    active ? "border-[#8FE3B8] ring-2 ring-[#8FE3B8]/40" : "border-dt-border hover:border-white/30"
+                  }`}
+                >
+                  <div className="aspect-[4/3] w-full" style={{ background: swatch }} />
+                  <p className="truncate px-2 py-1 text-[10px] text-white/75">{preset.label}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="sm:col-span-2 rounded-xl border border-white/10 p-3">
+          <p className="text-[11px] text-white/45">Hero art (floating athlete cutout — not page background)</p>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <div className="h-20 w-20 overflow-hidden rounded-lg bg-black/40">
+              {page.heroImage ? (
+                <img src={resolveExperiencePreviewUrl(page.heroImage)} alt="" className="h-full w-full object-contain" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-[10px] text-white/30">None</div>
+              )}
+            </div>
+            <div className="min-w-[140px] flex-1 space-y-2">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs text-white/80">
+                <Upload size={13} /> Upload hero art
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => void onHeroUpload(e.target.files?.[0] ?? null)} />
+              </label>
+              {page.heroImage ? (
+                <button type="button" onClick={() => onPatchPage({ heroImage: "" })} className="text-[10px] text-red-200/80 underline-offset-2 hover:underline">
+                  Remove hero art
+                </button>
+              ) : null}
+              <label className="block space-y-1">
+                <span className="text-[10px] text-white/40">Hero scale {page.heroScale}%</span>
+                <input
+                  type="range"
+                  min={40}
+                  max={180}
+                  value={page.heroScale}
+                  onChange={(e) => {
+                    const heroScale = Number(e.target.value);
+                    onPatchPage({
+                      heroScale,
+                      stage: upsertStageItem(page, { id: "titleArt", scale: heroScale }),
+                    });
+                  }}
+                  className="w-full"
+                />
+              </label>
+            </div>
+          </div>
+          <StageItemControls page={page} stageId="titleArt" onPatchPage={onPatchPage} />
+        </div>
+        <div className="space-y-2 sm:col-span-2">
+          <StageItemControls page={page} stageId="headline" onPatchPage={onPatchPage} onClearText={() => onPatchPage({ headline: "" })} />
+          <StageItemControls page={page} stageId="subhead" onPatchPage={onPatchPage} onClearText={() => onPatchPage({ subhead: "" })} />
+          <StageItemControls page={page} stageId="body" onPatchPage={onPatchPage} onClearText={() => onPatchPage({ body: "" })} />
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -177,122 +635,6 @@ function PageColorInput({ value, onChange }: { value: string; onChange: (value: 
   );
 }
 
-function PageChromeEditor({
-  page,
-  onPatchPage,
-}: {
-  page: ExperiencePageConfig;
-  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
-}) {
-  async function onBgUpload(file: File | null) {
-    if (!file) return;
-    try {
-      const backgroundImage = await compressImageFile(file);
-      onPatchPage({ backgroundImage, useGradientBg: false });
-    } catch {
-      // parent studio surfaces errors if needed
-    }
-  }
-
-  return (
-    <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-      <div className="border-b border-dt-border px-4 py-3">
-        <h3 className="font-display text-sm font-semibold text-white">Page chrome</h3>
-        <p className="mt-0.5 text-[11px] text-white/40">Headline, copy, and background fans see on this tab</p>
-      </div>
-      <div className="grid gap-3 p-4 sm:grid-cols-2">
-        <label className="block space-y-1 sm:col-span-2">
-          <span className="text-[11px] text-white/45">Headline</span>
-          <input value={page.headline} onChange={(e) => onPatchPage({ headline: e.target.value })} className={fieldClass()} />
-        </label>
-        <label className="block space-y-1 sm:col-span-2">
-          <span className="text-[11px] text-white/45">Subhead</span>
-          <input value={page.subhead} onChange={(e) => onPatchPage({ subhead: e.target.value })} className={fieldClass()} />
-        </label>
-        <label className="block space-y-1 sm:col-span-2">
-          <span className="text-[11px] text-white/45">Body</span>
-          <textarea
-            value={page.body}
-            onChange={(e) => onPatchPage({ body: e.target.value })}
-            rows={3}
-            className={fieldClass()}
-          />
-        </label>
-        <label className="block space-y-1">
-          <span className="text-[11px] text-white/45">Accent</span>
-          <PageColorInput value={page.accentColor} onChange={(accentColor) => onPatchPage({ accentColor })} />
-        </label>
-        <label className="block space-y-1">
-          <span className="text-[11px] text-white/45">Background</span>
-          <PageColorInput value={page.backgroundColor} onChange={(backgroundColor) => onPatchPage({ backgroundColor })} />
-        </label>
-        <label className="flex items-center gap-2 sm:col-span-2">
-          <input
-            type="checkbox"
-            checked={page.useGradientBg}
-            onChange={(e) =>
-              onPatchPage({
-                useGradientBg: e.target.checked,
-                backgroundImage: e.target.checked ? "" : page.backgroundImage,
-              })
-            }
-            className="accent-dt-red"
-          />
-          <span className="text-xs text-white/70">Gradient background</span>
-        </label>
-        {page.useGradientBg ? (
-          <>
-            <label className="block space-y-1">
-              <span className="text-[11px] text-white/45">Gradient from</span>
-              <PageColorInput
-                value={page.backgroundGradientFrom}
-                onChange={(backgroundGradientFrom) => onPatchPage({ backgroundGradientFrom })}
-              />
-            </label>
-            <label className="block space-y-1">
-              <span className="text-[11px] text-white/45">Gradient to</span>
-              <PageColorInput
-                value={page.backgroundGradientTo}
-                onChange={(backgroundGradientTo) => onPatchPage({ backgroundGradientTo })}
-              />
-            </label>
-          </>
-        ) : null}
-        <label className="block space-y-1 sm:col-span-2">
-          <span className="text-[11px] text-white/45">Background image URL</span>
-          <input
-            value={page.backgroundImage.startsWith("data:") ? "(uploaded image)" : page.backgroundImage}
-            onChange={(e) => {
-              if (!e.target.value.startsWith("(")) onPatchPage({ backgroundImage: e.target.value, useGradientBg: false });
-            }}
-            className={fieldClass()}
-            placeholder="https://… or upload below"
-          />
-        </label>
-        <div className="sm:col-span-2">
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs text-white/80">
-            <Upload size={13} /> Upload background
-            <input type="file" accept="image/*" className="hidden" onChange={(e) => void onBgUpload(e.target.files?.[0] ?? null)} />
-          </label>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PageHeroBlock({ page }: { page: ExperiencePageConfig }) {
-  return (
-    <div
-      className="mb-2 rounded-xl border border-white/10 px-3 py-3"
-      style={{ borderColor: `${page.accentColor}44` }}
-    >
-      <p className="font-display text-sm font-extrabold tracking-wide text-white">{page.headline || "Headline"}</p>
-      {page.subhead ? <p className="mt-0.5 text-[10px]" style={{ color: page.accentColor }}>{page.subhead}</p> : null}
-      {page.body ? <p className="mt-1 line-clamp-2 text-[9px] text-white/50">{page.body}</p> : null}
-    </div>
-  );
-}
-
 type StudioBaseProps = {
   onBack: () => void;
   page: ExperiencePageConfig;
@@ -301,32 +643,31 @@ type StudioBaseProps = {
 
 function NewsPhonePreview({
   page,
+  onPatchPage,
   items,
   selectedId,
 }: {
   page: ExperiencePageConfig;
+  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
   items: NewsItem[];
   selectedId: string | null;
 }) {
   const published = items.filter((i) => i.status === "published");
   const list = published.length ? published : items.slice(0, 6);
-  const bg = pageBackgroundCss(page);
   return (
-    <PhoneChrome title="News" activeTab="NEWS" contentStyle={{ background: bg || "#050505" }}>
-      <PageHeroBlock page={page} />
+    <ContentPhonePreview page={page} onPatchPage={onPatchPage} activeTab="NEWS">
       {list.length === 0 ? (
         <div className="rounded-xl border border-dashed border-white/15 px-3 py-8 text-center text-[11px] text-white/35">
           No newsletters yet
         </div>
       ) : (
-        <div className="space-y-1.5">
-          {list.map((item) => (
-            <div
-              key={item.id}
-              className={`flex gap-2 rounded-xl border p-2 ${
-                item.id === selectedId ? "border-dt-red/60 bg-dt-red/10" : "border-white/10 bg-white/[0.03]"
-              }`}
-            >
+        list.map((item) => (
+          <div
+            key={item.id}
+            className={`flex gap-2 rounded-xl border p-2 ${
+              item.id === selectedId ? "border-white/25 bg-white/[0.06]" : "border-white/10 bg-white/[0.03]"
+            }`}
+          >
               <div className="h-12 w-16 shrink-0 overflow-hidden rounded-md bg-black/50">
                 {item.thumbnail ? (
                   <img src={resolveNewsAssetUrl(item.thumbnail)} alt="" className="h-full w-full object-cover" />
@@ -341,10 +682,9 @@ function NewsPhonePreview({
                 </p>
               </div>
             </div>
-          ))}
-        </div>
+          ))
       )}
-    </PhoneChrome>
+    </ContentPhonePreview>
   );
 }
 
@@ -467,9 +807,10 @@ function NewsStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
     <div className="space-y-4">
       <StudioHeader onBack={onBack} label="News" />
       <Alerts error={error} status={status} />
-      <PageChromeEditor page={page} onPatchPage={onPatchPage} />
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <EditorPanel
+        <div className="space-y-4 xl:order-1">
+          <PageChromeEditor page={page} onPatchPage={onPatchPage} />
+          <EditorPanel
           icon={<Newspaper size={15} className="text-dt-red" />}
           title="Newsletter editor"
           onNew={startNew}
@@ -519,7 +860,8 @@ function NewsStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
             </>
           ) : null}
         </EditorPanel>
-        <NewsPhonePreview page={page} items={previewItems} selectedId={draft?.id ?? null} />
+        </div>
+        <NewsPhonePreview page={page} onPatchPage={onPatchPage} items={previewItems} selectedId={draft?.id ?? null} />
       </div>
     </div>
   );
@@ -529,24 +871,24 @@ type YouTubePreviewVideo = { id: string; title: string; viewCount?: number };
 
 function VideosPhonePreview({
   page,
+  onPatchPage,
   videoTab,
   youtubeVideos,
   exclusiveItems,
   selectedId,
 }: {
   page: ExperiencePageConfig;
+  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
   videoTab: "youtube" | "exclusive";
   youtubeVideos: YouTubePreviewVideo[];
   exclusiveItems: ExclusiveVideoItem[];
   selectedId: string | null;
 }) {
-  const bg = pageBackgroundCss(page);
   const published = exclusiveItems.filter((i) => i.status === "published");
   const exclusiveList = published.length ? published : exclusiveItems.slice(0, 6);
 
   return (
-    <PhoneChrome title="Videos" activeTab="VIDEOS" contentStyle={{ background: bg || "#050505" }}>
-      <PageHeroBlock page={page} />
+    <ContentPhonePreview page={page} onPatchPage={onPatchPage} activeTab="VIDEOS">
       <div className="mb-2 grid grid-cols-2 gap-1 rounded-xl border border-white/10 bg-black/40 p-1">
         <div
           className={`rounded-lg px-2 py-1.5 text-center text-[9px] font-bold tracking-wide ${
@@ -593,7 +935,7 @@ function VideosPhonePreview({
             <div
               key={item.id}
               className={`flex gap-2 rounded-xl border p-2 ${
-                item.id === selectedId ? "border-dt-red/60 bg-dt-red/10" : "border-white/10 bg-white/[0.03]"
+                item.id === selectedId ? "border-white/25 bg-white/[0.06]" : "border-white/10 bg-white/[0.03]"
               }`}
             >
               <div className="h-12 w-16 shrink-0 overflow-hidden rounded-md bg-black/50">
@@ -611,7 +953,7 @@ function VideosPhonePreview({
           ))}
         </div>
       )}
-    </PhoneChrome>
+    </ContentPhonePreview>
   );
 }
 
@@ -764,7 +1106,6 @@ function VideosStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
     <div className="space-y-4">
       <StudioHeader onBack={onBack} label="Videos" />
       <Alerts error={error} status={status} />
-      <PageChromeEditor page={page} onPatchPage={onPatchPage} />
 
       <div className="flex gap-2">
         {(["youtube", "exclusive"] as const).map((tab) => (
@@ -781,113 +1122,107 @@ function VideosStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
         ))}
       </div>
 
-      {videoTab === "youtube" ? (
-        <section className="rounded-2xl border border-dt-border bg-dt-card p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-sm font-semibold text-white">YouTube channel</p>
-              <p className="text-xs text-white/45">{youtubeHandle}</p>
-            </div>
-            <button
-              type="button"
-              disabled={youtubeSyncing}
-              onClick={() => void refreshYouTube()}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs text-white/80 disabled:opacity-50"
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="space-y-4 xl:order-1">
+          <PageChromeEditor page={page} onPatchPage={onPatchPage} />
+          {videoTab === "youtube" ? (
+            <section className="rounded-2xl border border-dt-border bg-dt-card p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold text-white">YouTube channel</p>
+                  <p className="text-xs text-white/45">{youtubeHandle}</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={youtubeSyncing}
+                  onClick={() => void refreshYouTube()}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs text-white/80 disabled:opacity-50"
+                >
+                  {youtubeSyncing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                  Sync / Refresh
+                </button>
+              </div>
+              <p className="mt-3 text-[11px] text-white/40">
+                Fan app Videos tab shows this list on YouTube — exclusive uploads are edited under EXCLUSIVE.
+              </p>
+            </section>
+          ) : (
+            <EditorPanel
+              icon={<Film size={15} className="text-dt-red" />}
+              title="Exclusive video editor"
+              onNew={startNew}
+              newLabel="New video"
+              items={items}
+              selectedId={draft?.id ?? null}
+              onSelect={(item) => {
+                setDraft({ ...item });
+                setStatus(null);
+                setError(null);
+              }}
+              itemLabel={(item) => item.title || "Untitled"}
+              itemMeta={(item) => item.status}
+              emptyEditor={!draft ? <p className="text-sm text-white/45">Create a video to get started.</p> : null}
             >
-              {youtubeSyncing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-              Sync / Refresh
-            </button>
-          </div>
-          <p className="mt-3 text-[11px] text-white/40">
-            Fan app Videos tab shows this list on YouTube — exclusive uploads are edited under EXCLUSIVE.
-          </p>
-        </section>
-      ) : (
-        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
-          <EditorPanel
-            icon={<Film size={15} className="text-dt-red" />}
-            title="Exclusive video editor"
-            onNew={startNew}
-            newLabel="New video"
-            items={items}
-            selectedId={draft?.id ?? null}
-            onSelect={(item) => {
-              setDraft({ ...item });
-              setStatus(null);
-              setError(null);
-            }}
-            itemLabel={(item) => item.title || "Untitled"}
-            itemMeta={(item) => item.status}
-            emptyEditor={!draft ? <p className="text-sm text-white/45">Create a video to get started.</p> : null}
-          >
-            {draft ? (
-              <>
-                <SaveRow saving={saving} onDraft={() => void saveDraft("draft")} onPublish={() => void saveDraft("published")} onDelete={() => void removeItem()} />
-                <label className="block space-y-1">
-                  <span className="text-[11px] text-white/45">Title</span>
-                  <input value={draft.title} onChange={(e) => patchDraft({ title: e.target.value })} className={fieldClass()} />
-                </label>
-                <label className="block space-y-1">
-                  <span className="text-[11px] text-white/45">Video URL</span>
-                  <input
-                    value={draft.videoUrl.startsWith("data:") ? "(uploaded video file)" : draft.videoUrl}
-                    onChange={(e) => {
-                      if (!e.target.value.startsWith("(")) patchDraft({ videoUrl: e.target.value });
-                    }}
-                    className={fieldClass()}
-                    placeholder="https://youtube.com/watch?v=… or mp4 URL"
+              {draft ? (
+                <>
+                  <SaveRow saving={saving} onDraft={() => void saveDraft("draft")} onPublish={() => void saveDraft("published")} onDelete={() => void removeItem()} />
+                  <label className="block space-y-1">
+                    <span className="text-[11px] text-white/45">Title</span>
+                    <input value={draft.title} onChange={(e) => patchDraft({ title: e.target.value })} className={fieldClass()} />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[11px] text-white/45">Video URL</span>
+                    <input
+                      value={draft.videoUrl.startsWith("data:") ? "(uploaded video file)" : draft.videoUrl}
+                      onChange={(e) => {
+                        if (!e.target.value.startsWith("(")) patchDraft({ videoUrl: e.target.value });
+                      }}
+                      className={fieldClass()}
+                      placeholder="https://youtube.com/watch?v=… or mp4 URL"
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[11px] text-white/45">Description</span>
+                    <textarea value={draft.description} onChange={(e) => patchDraft({ description: e.target.value })} rows={3} className={fieldClass()} />
+                  </label>
+                  <ThumbUpload
+                    src={draft.thumbnail ? resolveVideoAssetUrl(draft.thumbnail) : ""}
+                    onUpload={(f) => void onThumbUpload(f)}
                   />
-                </label>
-                <label className="block space-y-1">
-                  <span className="text-[11px] text-white/45">Description</span>
-                  <textarea value={draft.description} onChange={(e) => patchDraft({ description: e.target.value })} rows={3} className={fieldClass()} />
-                </label>
-                <ThumbUpload
-                  src={draft.thumbnail ? resolveVideoAssetUrl(draft.thumbnail) : ""}
-                  onUpload={(f) => void onThumbUpload(f)}
-                />
-              </>
-            ) : null}
-          </EditorPanel>
-          <VideosPhonePreview
-            page={page}
-            videoTab={videoTab}
-            youtubeVideos={youtubeVideos}
-            exclusiveItems={previewExclusive}
-            selectedId={draft?.id ?? null}
-          />
+                </>
+              ) : null}
+            </EditorPanel>
+          )}
         </div>
-      )}
-
-      {videoTab === "youtube" ? (
         <VideosPhonePreview
           page={page}
-          videoTab="youtube"
+          onPatchPage={onPatchPage}
+          videoTab={videoTab}
           youtubeVideos={youtubeVideos}
           exclusiveItems={previewExclusive}
-          selectedId={null}
+          selectedId={draft?.id ?? null}
         />
-      ) : null}
+      </div>
     </div>
   );
 }
 
 function DocAndGloPhonePreview({
   page,
+  onPatchPage,
   products,
   selectedId,
 }: {
   page: ExperiencePageConfig;
+  onPatchPage: (patch: Partial<ExperiencePageConfig>) => void;
   products: DocAndGloProduct[];
   selectedId: string | null;
 }) {
-  const bg = pageBackgroundCss(page);
   const visible = products.filter((p) => p.enabled && p.status === "published").slice(0, 8);
   const list = visible.length ? visible : products.filter((p) => p.enabled).slice(0, 8);
 
   return (
-    <PhoneChrome title="Doc & Glo" activeTab="HOME" contentStyle={{ background: bg || "#050505" }}>
-      <PageHeroBlock page={page} />
+    <ContentPhonePreview page={page} onPatchPage={onPatchPage} activeTab="HOME">
       {list.length === 0 ? (
         <div className="rounded-xl border border-dashed border-white/15 px-3 py-8 text-center text-[11px] text-white/35">
           No products yet
@@ -898,7 +1233,7 @@ function DocAndGloPhonePreview({
             <div
               key={item.id}
               className={`overflow-hidden rounded-lg border ${
-                item.id === selectedId ? "border-dt-red/60 bg-dt-red/10" : "border-white/10 bg-white/[0.04]"
+                item.id === selectedId ? "border-white/25 bg-white/[0.06]" : "border-white/10 bg-white/[0.04]"
               }`}
             >
               <div className="aspect-square bg-black/40">
@@ -916,7 +1251,7 @@ function DocAndGloPhonePreview({
           ))}
         </div>
       )}
-    </PhoneChrome>
+    </ContentPhonePreview>
   );
 }
 
@@ -1046,7 +1381,6 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
     <div className="space-y-4">
       <StudioHeader onBack={onBack} label="Doc & Glo" />
       <Alerts error={error} status={status} />
-      <PageChromeEditor page={page} onPatchPage={onPatchPage} />
 
       <div className="flex flex-wrap gap-2">
         <button
@@ -1069,7 +1403,9 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
       </div>
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <EditorPanel
+        <div className="space-y-4 xl:order-1">
+          <PageChromeEditor page={page} onPatchPage={onPatchPage} />
+          <EditorPanel
           icon={<ShoppingBag size={15} className="text-dt-red" />}
           title="Product editor"
           onNew={startNew}
@@ -1140,7 +1476,13 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
             </>
           ) : null}
         </EditorPanel>
-        <DocAndGloPhonePreview page={page} products={previewProducts} selectedId={draft?.id ?? null} />
+        </div>
+        <DocAndGloPhonePreview
+          page={page}
+          onPatchPage={onPatchPage}
+          products={previewProducts}
+          selectedId={draft?.id ?? null}
+        />
       </div>
     </div>
   );
