@@ -12,8 +12,9 @@ const NAMED_COLORS = [
   { name: "Mint", value: "#8FE3B8" },
   { name: "Bright mint", value: "#95E4CA" },
   { name: "Gold", value: "#D4AF37" },
-  { name: "Red", value: "#ED0000" },
+  { name: "Hot pink", value: "#FF2D95" },
   { name: "Pink", value: "#FF6B9D" },
+  { name: "Red", value: "#ED0000" },
   { name: "Black", value: "#000000" },
   { name: "Soft gray", value: "#A3A3A3" },
 ] as const;

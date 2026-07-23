@@ -461,7 +461,7 @@ function PageFreeformPreview({
               style={{
                 borderColor: page.unlockPanelBorderColor || "#8C0000",
                 background: `linear-gradient(165deg, ${page.unlockPanelBgFrom || "rgba(18,18,18,0.97)"} 0%, ${page.unlockPanelBgTo || "rgba(6,6,6,0.98)"} 100%)`,
-                boxShadow: `0 0 18px ${page.unlockGlowColor || "#ED0000"}66`,
+                boxShadow: `0 0 18px ${page.unlockGlowColor || "#8FE3B8"}66`,
               }}
             >
               <div
@@ -476,8 +476,8 @@ function PageFreeformPreview({
               <p
                 className="mt-1.5 text-center text-[9px] leading-relaxed text-white"
                 style={{
-                  textShadow: `0 0 6px ${page.unlockGlowColor || "#ED0000"}`,
-                  WebkitTextStroke: `0.35px ${page.unlockGlowColor || "#ED0000"}`,
+                  textShadow: `0 0 6px ${page.unlockGlowColor || "#8FE3B8"}`,
+                  WebkitTextStroke: `0.35px ${page.unlockGlowColor || "#8FE3B8"}`,
                 }}
               >
                 {page.unlockBody || page.body}
@@ -498,7 +498,7 @@ function PageFreeformPreview({
               </div>
               <p
                 className="mt-2.5 text-center text-[8px] text-white/90"
-                style={{ textShadow: `0 0 5px ${page.unlockGlowColor || "#ED0000"}` }}
+                style={{ textShadow: `0 0 5px ${page.unlockGlowColor || "#8FE3B8"}` }}
               >
                 {page.unlockFooter || "100% Private · No Spam · You're in control"}
               </p>

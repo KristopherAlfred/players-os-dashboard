@@ -57,8 +57,9 @@ function ColorInput({ value, onChange }: { value: string; onChange: (value: stri
     { name: "Black", value: "#000000" },
     { name: "Charcoal", value: "#1A1A1A" },
     { name: "Gold", value: "#D4AF37" },
-    { name: "Red", value: "#ED0000" },
+    { name: "Hot pink", value: "#FF2D95" },
     { name: "Pink", value: "#FF6B9D" },
+    { name: "Red", value: "#ED0000" },
   ] as const;
 
   const normalized = (value || "").trim().toUpperCase();
@@ -657,6 +658,71 @@ export function ExperiencePagePanel({
       {pageKey === "landing" ? (
         <div className="space-y-3 rounded-xl border border-dt-border p-3">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
+            Landing social proof · Follow Sloane
+          </p>
+          <Field label="Fans box title">
+            <TextInput
+              value={page.fansProofTitle || ""}
+              onChange={(fansProofTitle) => onChange({ fansProofTitle })}
+            />
+          </Field>
+          <Field label="Fans box body">
+            <TextInput
+              value={page.fansProofBody || ""}
+              onChange={(fansProofBody) => onChange({ fansProofBody })}
+            />
+          </Field>
+          <Field label="Follow section title">
+            <TextInput value={page.followTitle || ""} onChange={(followTitle) => onChange({ followTitle })} />
+          </Field>
+          <Field label="Footer line" hint='Tip: put GLO in caps — it renders hot pink on the app'>
+            <TextInput value={page.footerLine || ""} onChange={(footerLine) => onChange({ footerLine })} />
+          </Field>
+          <div className="space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Social stats row</p>
+            {(page.landingSocials || []).map((stat, index) => (
+              <div key={stat.id} className="grid gap-2 rounded-lg border border-white/10 p-2 sm:grid-cols-4">
+                <Field label={`${stat.icon} count`}>
+                  <TextInput
+                    value={stat.count}
+                    onChange={(count) => {
+                      const landingSocials = [...(page.landingSocials || [])];
+                      landingSocials[index] = { ...landingSocials[index], count };
+                      onChange({ landingSocials });
+                    }}
+                  />
+                </Field>
+                <Field label="Unit">
+                  <TextInput
+                    value={stat.unit}
+                    onChange={(unit) => {
+                      const landingSocials = [...(page.landingSocials || [])];
+                      landingSocials[index] = { ...landingSocials[index], unit };
+                      onChange({ landingSocials });
+                    }}
+                  />
+                </Field>
+                <Field label="URL" hint="Opens from the landing strip">
+                  <TextInput
+                    value={stat.url}
+                    onChange={(url) => {
+                      const landingSocials = [...(page.landingSocials || [])];
+                      landingSocials[index] = { ...landingSocials[index], url };
+                      onChange({ landingSocials });
+                    }}
+                    className="font-mono text-[11px]"
+                  />
+                </Field>
+                <div className="flex items-end pb-1 text-[10px] text-white/35">{stat.id}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {pageKey === "landing" ? (
+        <div className="space-y-3 rounded-xl border border-dt-border p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
             Join / unlock slide-in
           </p>
           <p className="text-[11px] text-white/40">
@@ -686,7 +752,7 @@ export function ExperiencePagePanel({
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Glow color">
               <ColorInput
-                value={page.unlockGlowColor || "#ED0000"}
+                value={page.unlockGlowColor || "#8FE3B8"}
                 onChange={(unlockGlowColor) => onChange({ unlockGlowColor })}
               />
             </Field>
@@ -715,9 +781,14 @@ export function ExperiencePagePanel({
       ) : null}
 
       {pageKey === "youreIn" ? (
-        <Field label="Loader label">
-          <TextInput value={page.loaderLabel || ""} onChange={(loaderLabel) => onChange({ loaderLabel })} />
-        </Field>
+        <>
+          <Field label="Welcome title" hint='Shown under the checkmark — put Glo in the line for hot pink'>
+            <TextInput value={page.subhead || ""} onChange={(subhead) => onChange({ subhead })} />
+          </Field>
+          <Field label="Loader label">
+            <TextInput value={page.loaderLabel || ""} onChange={(loaderLabel) => onChange({ loaderLabel })} />
+          </Field>
+        </>
       ) : null}
       {pageKey === "settings" ? (
         <>

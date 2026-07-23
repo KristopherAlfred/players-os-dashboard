@@ -1,5 +1,15 @@
 import type { TitleFontFamily } from "./typography";
 import { normalizeTitleFontFamily } from "./typography";
+import {
+  DEFAULT_FANS_PROOF_BODY,
+  DEFAULT_FANS_PROOF_TITLE,
+  DEFAULT_FOLLOW_TITLE,
+  DEFAULT_FOOTER_LINE,
+  DEFAULT_LANDING_SOCIALS,
+  HOT_PINK,
+  normalizeLandingSocials,
+  type LandingSocialStat,
+} from "./landingSocials";
 
 export type ExperienceEffectPreset = "none" | "glow" | "shimmer" | "glass" | "neon" | "burst" | "rays" | "soft";
 
@@ -148,6 +158,11 @@ export type ExperiencePageConfig = {
   unlockPanelBorderColor: string;
   unlockPanelBgFrom: string;
   unlockPanelBgTo: string;
+  fansProofTitle: string;
+  fansProofBody: string;
+  followTitle: string;
+  footerLine: string;
+  landingSocials: LandingSocialStat[];
   headlineRuns: ExperienceTextRun[];
   subheadRuns: ExperienceTextRun[];
   bodyRuns: ExperienceTextRun[];
@@ -373,10 +388,15 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     unlockHeadline: "",
     unlockBody: "",
     unlockFooter: "100% Private · No Spam · You're in control",
-    unlockGlowColor: "#ED0000",
-    unlockPanelBorderColor: "#8C0000",
-    unlockPanelBgFrom: "rgba(18, 18, 18, 0.97)",
-    unlockPanelBgTo: "rgba(6, 6, 6, 0.98)",
+    unlockGlowColor: "#8FE3B8",
+    unlockPanelBorderColor: "#2a5c44",
+    unlockPanelBgFrom: "rgba(8, 28, 18, 0.97)",
+    unlockPanelBgTo: "rgba(4, 12, 8, 0.98)",
+    fansProofTitle: DEFAULT_FANS_PROOF_TITLE,
+    fansProofBody: DEFAULT_FANS_PROOF_BODY,
+    followTitle: DEFAULT_FOLLOW_TITLE,
+    footerLine: DEFAULT_FOOTER_LINE,
+    landingSocials: DEFAULT_LANDING_SOCIALS.map((s) => ({ ...s })),
     headlineRuns: [],
     subheadRuns: [],
     bodyRuns: [],
@@ -510,29 +530,43 @@ export function normalizeTextRuns(raw: unknown, plain: string): ExperienceTextRu
 
 export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
   landing: pageDefaults({
-    headline: "Join Sloane Glo",
+    headline: 'Sloane "GLO" Stephens.',
     subhead: "THE OFFICIAL\nSLOANE GLO\nCOMMUNITY",
     body: "Exclusive drops, early access, giveaways, content, and real connection with Sloane and fans.",
     ctaLabel: "Join My Circle →",
-    heroImage: "",
+    heroImage: "/images/sloane/sloanefistpump.png",
     titleImage: "",
     backgroundImage: "",
     effectPreset: "glow",
     unlockHeadline: "JOIN SLOANE GLO",
     unlockBody: "Exclusive drops, early access, giveaways, content, and real connection with Sloane and fans.",
     unlockFooter: "100% Private · No Spam · You're in control",
-    unlockGlowColor: "#ED0000",
-    unlockPanelBorderColor: "#8C0000",
-    unlockPanelBgFrom: "rgba(18, 18, 18, 0.97)",
-    unlockPanelBgTo: "rgba(6, 6, 6, 0.98)",
+    unlockGlowColor: "#8FE3B8",
+    unlockPanelBorderColor: "#2a5c44",
+    unlockPanelBgFrom: "rgba(8, 28, 18, 0.97)",
+    unlockPanelBgTo: "rgba(4, 12, 8, 0.98)",
+    fansProofTitle: DEFAULT_FANS_PROOF_TITLE,
+    fansProofBody: DEFAULT_FANS_PROOF_BODY,
+    followTitle: DEFAULT_FOLLOW_TITLE,
+    footerLine: DEFAULT_FOOTER_LINE,
+    headlineRuns: [
+      { text: "Sloane " },
+      { text: '"', color: "#FFFFFF" },
+      { text: "GLO", color: HOT_PINK, fontSize: 36 },
+      { text: '"', color: "#FFFFFF" },
+      { text: " Stephens." },
+    ],
   }),
   youreIn: pageDefaults({
     headline: "You're in",
-    subhead: "Welcome to Sloane Glo",
+    subhead: "Welcome to the Glo Circle",
     body: "We're preparing your experience…",
     loaderLabel: "Preparing your experience...",
+    accentColor: "#8FE3B8",
     effectPreset: "burst",
     ctaLabel: "Enter",
+    useGradientBg: false,
+    backgroundImage: "",
   }),
     settings: pageDefaults({
       title: "Account Settings",
@@ -708,10 +742,15 @@ export function normalizeExperiencePage(
     unlockHeadline: asString(p.unlockHeadline, fallback.unlockHeadline || ""),
     unlockBody: asString(p.unlockBody, fallback.unlockBody || ""),
     unlockFooter: asString(p.unlockFooter, fallback.unlockFooter || "100% Private · No Spam · You're in control"),
-    unlockGlowColor: asString(p.unlockGlowColor, fallback.unlockGlowColor || "#ED0000"),
-    unlockPanelBorderColor: asString(p.unlockPanelBorderColor, fallback.unlockPanelBorderColor || "#8C0000"),
-    unlockPanelBgFrom: asString(p.unlockPanelBgFrom, fallback.unlockPanelBgFrom || "rgba(18, 18, 18, 0.97)"),
-    unlockPanelBgTo: asString(p.unlockPanelBgTo, fallback.unlockPanelBgTo || "rgba(6, 6, 6, 0.98)"),
+    unlockGlowColor: asString(p.unlockGlowColor, fallback.unlockGlowColor || "#8FE3B8"),
+    unlockPanelBorderColor: asString(p.unlockPanelBorderColor, fallback.unlockPanelBorderColor || "#2a5c44"),
+    unlockPanelBgFrom: asString(p.unlockPanelBgFrom, fallback.unlockPanelBgFrom || "rgba(8, 28, 18, 0.97)"),
+    unlockPanelBgTo: asString(p.unlockPanelBgTo, fallback.unlockPanelBgTo || "rgba(4, 12, 8, 0.98)"),
+    fansProofTitle: asString(p.fansProofTitle, fallback.fansProofTitle || DEFAULT_FANS_PROOF_TITLE),
+    fansProofBody: asString(p.fansProofBody, fallback.fansProofBody || DEFAULT_FANS_PROOF_BODY),
+    followTitle: asString(p.followTitle, fallback.followTitle || DEFAULT_FOLLOW_TITLE),
+    footerLine: asString(p.footerLine, fallback.footerLine || DEFAULT_FOOTER_LINE),
+    landingSocials: normalizeLandingSocials(p.landingSocials ?? fallback.landingSocials),
     headlineRuns: normalizeTextRuns(p.headlineRuns, asString(p.headline, fallback.headline)),
     subheadRuns: normalizeTextRuns(p.subheadRuns, asString(p.subhead, fallback.subhead)),
     bodyRuns: normalizeTextRuns(p.bodyRuns, asString(p.body, fallback.body)),
