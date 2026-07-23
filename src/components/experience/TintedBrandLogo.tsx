@@ -11,8 +11,8 @@ type TintedBrandLogoProps = {
 };
 
 /**
- * Recolors illustrated / AI logos via CSS mask.
- * Best with marks on transparent or black backgrounds.
+ * Recolors illustrated / AI logos via CSS mask (alpha).
+ * Best with marks on transparent backgrounds — use drop-shadow so glow follows the shape.
  */
 export function TintedBrandLogo({
   src,
@@ -35,7 +35,8 @@ export function TintedBrandLogo({
           width: dim,
           height: dim,
           objectFit: "contain",
-          boxShadow: `0 0 16px ${color}66`,
+          filter: `drop-shadow(0 0 10px ${color}66)`,
+          background: "transparent",
           ...style,
         }}
       />
@@ -46,23 +47,26 @@ export function TintedBrandLogo({
     <span
       className={className}
       aria-hidden
-      style={{
-        display: "inline-block",
-        width: dim,
-        height: dim,
-        flexShrink: 0,
-        backgroundColor: color,
-        WebkitMaskImage: `url(${src})`,
-        WebkitMaskSize: "contain",
-        WebkitMaskRepeat: "no-repeat",
-        WebkitMaskPosition: "center",
-        maskImage: `url(${src})`,
-        maskSize: "contain",
-        maskRepeat: "no-repeat",
-        maskPosition: "center",
-        boxShadow: `0 0 16px ${color}88`,
-        ...style,
-      }}
+      style={
+        {
+          display: "inline-block",
+          width: dim,
+          height: dim,
+          flexShrink: 0,
+          backgroundColor: color,
+          WebkitMaskImage: `url(${src})`,
+          WebkitMaskSize: "contain",
+          WebkitMaskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskImage: `url(${src})`,
+          maskSize: "contain",
+          maskRepeat: "no-repeat",
+          maskPosition: "center",
+          maskMode: "alpha",
+          filter: `drop-shadow(0 0 10px ${color}88)`,
+          ...style,
+        } as CSSProperties
+      }
     />
   );
 }

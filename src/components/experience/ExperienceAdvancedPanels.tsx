@@ -351,10 +351,10 @@ export function ExperienceBrandPanel({
       <Field label="Logo image URL" hint="Or upload your own mark">
         <TextInput value={brand.logoSrc} onChange={(logoSrc) => onChange({ logoSrc })} />
       </Field>
-      <Field label="Upload logo">
+      <Field label="Upload logo" hint="PNG with transparency works best — black backgrounds are cleared automatically">
         <input
           type="file"
-          accept="image/*"
+          accept="image/png,image/webp,image/svg+xml,image/*"
           onChange={(e) => onUploadLogo(e.target.files?.[0] ?? null)}
           className="block w-full text-xs text-white/70"
         />
@@ -364,7 +364,7 @@ export function ExperienceBrandPanel({
         onChange={(logoTint) => onChange({ logoTint })}
         label="Tint logo with color below"
       />
-      <Field label="Logo color" hint="Recolors illustrated / AI logos (turn tint off for photo uploads)">
+      <Field label="Logo color" hint="Recolors transparent marks (turn tint off for full-color photos)">
         <ColorInput value={brand.logoColor} onChange={(logoColor) => onChange({ logoColor })} />
       </Field>
       <Field label="Wordmark font">

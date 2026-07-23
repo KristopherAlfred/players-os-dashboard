@@ -38,6 +38,7 @@ import {
 } from "../lib/homeLayoutApi";
 import type { ExperienceConfig, ExperiencePageConfig, WidgetVisualStyle } from "../lib/experienceConfig";
 import { createStampFromBrand, placeStampOnPage, widgetStyleCss } from "../lib/experienceConfig";
+import { makeLogoBackgroundTransparent } from "../lib/logoTransparency";
 import { titleTypographyStyle } from "../lib/typography";
 import { TypographyControls } from "../components/TypographyControls";
 import { DtSelect } from "../components/DtSelect";
@@ -367,10 +368,13 @@ export function ExperiencePage() {
   async function uploadIntoExperience(
     apply: (dataUrl: string) => void,
     file: File | null,
+    options?: { punchBlackBackground?: boolean },
   ) {
     if (!file) return;
     try {
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = options?.punchBlackBackground
+        ? await makeLogoBackgroundTransparent(file)
+        : await readFileAsDataUrl(file);
       apply(dataUrl);
       setStatus("Image uploaded");
     } catch (err) {
@@ -674,9 +678,10 @@ export function ExperiencePage() {
                       (logoSrc) =>
                         patchExperience((prev) => ({
                           ...prev,
-                          brand: { ...prev.brand, logoSrc, showLogoImage: true },
+                          brand: { ...prev.brand, logoSrc, showLogoImage: true, logoTint: true },
                         })),
                       file,
+                      { punchBlackBackground: true },
                     )
                   }
                   onSaveLogoStamp={() => {

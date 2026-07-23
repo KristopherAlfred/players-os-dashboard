@@ -574,7 +574,7 @@ function PageFreeformPreview({
           {selected && selectedId && (stageItemRole(selected) === "headline" || stageItemRole(selected) === "subhead" || stageItemRole(selected) === "body") ? (
             <WordStyleEditor
               label={`Style ${stageItemRole(selected)} words`}
-              hint="Tap a word on the phone or below to change only that word"
+              hint="Type new words above, or rename one word below — then style color/font/size"
               selectedChip={wordChip}
               onSelectedChipChange={setWordChip}
               plain={
