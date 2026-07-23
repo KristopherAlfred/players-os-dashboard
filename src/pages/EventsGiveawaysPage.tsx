@@ -474,7 +474,7 @@ export function EventsGiveawaysPage() {
           <div className="events-phone-shell relative w-full max-w-[320px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black">
             <div className="absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
             <div className="border-b border-white/10 bg-[#0d0d0d] px-4 pb-3 pt-8 text-center">
-              <p className="text-[10px] font-semibold tracking-[0.28em] text-white/55">DAME EVENTS</p>
+              <p className="text-[10px] font-semibold tracking-[0.28em] text-white/55">EVENTS</p>
             </div>
             <div className="space-y-2 bg-[radial-gradient(circle_at_top,_#321018_0%,_#0a0a0a_52%)] p-3 pb-5">
               <div className="flex rounded-full border border-white/10 bg-black/40 p-1">
@@ -499,7 +499,7 @@ export function EventsGiveawaysPage() {
                       key={i}
                       className="flex aspect-[3/4] items-center justify-center rounded-xl border border-white/10 bg-black/40 px-2 text-center text-[10px] font-semibold text-white/45"
                     >
-                      {previewTab === "giveaways" ? "DAME Giveaways soon!" : "No events now"}
+                      {previewTab === "giveaways" ? "Giveaways soon!" : "No events now"}
                     </div>
                   ))}
                 </div>

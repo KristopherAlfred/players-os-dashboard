@@ -127,6 +127,9 @@ export type ExperiencePages = {
   youreIn: ExperiencePageConfig;
   settings: ExperiencePageConfig;
   home: ExperiencePageConfig;
+  videos: ExperiencePageConfig;
+  news: ExperiencePageConfig;
+  docAndGlo: ExperiencePageConfig;
 };
 
 export type WidgetVisualStyle = {
@@ -392,6 +395,28 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     body: "Your Sloane Glo hub",
     effectPreset: "soft",
   }),
+  videos: pageDefaults({
+    headline: "Exclusive Videos",
+    subhead: "YOUTUBE · EXCLUSIVE",
+    body: "Clips, YouTube uploads, and members-only video.",
+    accentColor: "#8FE3B8",
+    effectPreset: "glow",
+  }),
+  news: pageDefaults({
+    headline: "Latest News",
+    subhead: "NEWSLETTERS · INSIGHTS",
+    body: "Newsletters and insights for the circle.",
+    accentColor: "#8FE3B8",
+    effectPreset: "soft",
+  }),
+  docAndGlo: pageDefaults({
+    headline: "Clean body care for bodies in motion",
+    subhead: "DOC & GLO",
+    body: "Sloane Stephens' vegan, cruelty-free skincare — curated for Sloane Glo fans.",
+    accentColor: "#8FE3B8",
+    ctaLabel: "Shop Doc & Glo",
+    effectPreset: "glass",
+  }),
 };
 
 export const DEFAULT_EXPERIENCE_CONFIG: ExperienceConfig = {
@@ -626,6 +651,9 @@ export function normalizeExperiencePages(raw: unknown): ExperiencePages {
     youreIn: normalizeExperiencePage(p.youreIn, DEFAULT_EXPERIENCE_PAGES.youreIn),
     settings: normalizeExperiencePage(p.settings, DEFAULT_EXPERIENCE_PAGES.settings),
     home: normalizeExperiencePage(p.home, DEFAULT_EXPERIENCE_PAGES.home),
+    videos: normalizeExperiencePage(p.videos, DEFAULT_EXPERIENCE_PAGES.videos),
+    news: normalizeExperiencePage(p.news, DEFAULT_EXPERIENCE_PAGES.news),
+    docAndGlo: normalizeExperiencePage(p.docAndGlo, DEFAULT_EXPERIENCE_PAGES.docAndGlo),
   };
 }
 

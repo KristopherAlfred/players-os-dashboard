@@ -818,7 +818,23 @@ export function ExperiencePage() {
       ) : null}
 
       {section === "boxes" && contentStudio ? (
-        <ExperienceContentStudio kind={contentStudio} onBack={() => setContentStudio(null)} />
+        <ExperienceContentStudio
+          kind={contentStudio}
+          onBack={() => setContentStudio(null)}
+          page={
+            contentStudio === "videos"
+              ? experience.pages.videos
+              : contentStudio === "news"
+                ? experience.pages.news
+                : experience.pages.docAndGlo
+          }
+          onPatchPage={(patch) =>
+            patchPage(
+              contentStudio === "videos" ? "videos" : contentStudio === "news" ? "news" : "docAndGlo",
+              patch,
+            )
+          }
+        />
       ) : null}
 
       {section === "boxes" && !contentStudio ? (
@@ -1223,22 +1239,36 @@ export function ExperiencePage() {
                     selected.type === "videos" ||
                     selected.type === "music" ||
                     selected.type === "events" ? (
-                      selected.type === "news" || selected.type === "videos" ? (
+                      selected.type === "news" || selected.type === "videos" || selected.type === "music" ? (
                         <button
                           type="button"
-                          onClick={() => setContentStudio(selected.type === "news" ? "news" : "videos")}
+                          onClick={() =>
+                            setContentStudio(
+                              selected.type === "news"
+                                ? "news"
+                                : selected.type === "videos"
+                                  ? "videos"
+                                  : "docAndGlo",
+                            )
+                          }
                           className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-dt-red/50 bg-dt-red/20 px-3 py-2.5 text-[12px] font-semibold text-dt-red hover:bg-dt-red/30"
                         >
                           <ExternalLink size={13} />
-                          Edit what’s inside {selected.type === "news" ? "News" : "Videos"} on the phone
+                          Edit what’s inside{" "}
+                          {selected.type === "news"
+                            ? "News"
+                            : selected.type === "videos"
+                              ? "Videos"
+                              : "Doc & Glo"}{" "}
+                          on the phone
                         </button>
                       ) : (
                         <Link
-                          to={selected.type === "music" ? "/content/doc-and-glo" : "/content/events"}
+                          to="/content/events"
                           className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-dt-red/50 bg-dt-red/20 px-3 py-2.5 text-[12px] font-semibold text-dt-red hover:bg-dt-red/30"
                         >
                           <ExternalLink size={13} />
-                          Edit what’s inside {selected.type === "music" ? "Doc & Glo" : "Events"}
+                          Edit what’s inside Events on the phone
                         </Link>
                       )
                     ) : (

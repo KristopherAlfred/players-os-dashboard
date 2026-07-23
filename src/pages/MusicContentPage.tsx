@@ -518,7 +518,7 @@ export function MusicContentPage() {
             <div className="relative min-h-[560px] bg-gradient-to-b from-[#2a0a0a] via-black to-black px-4 pb-6 pt-8">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.35),transparent_55%)]" />
               <div className="relative">
-                <p className="font-display text-[0.7rem] font-extrabold tracking-[0.18em] text-white/55">DAME D.O.L.L.A</p>
+                <p className="font-display text-[0.7rem] font-extrabold tracking-[0.18em] text-white/55">DOC & GLO</p>
                 <h3 className="mt-1 font-display text-2xl font-extrabold tracking-[0.06em] text-white">MUSIC</h3>
                 <p className="mt-5 font-display text-[0.78rem] font-extrabold tracking-[0.1em] text-white">Top songs</p>
                 <div className="mt-2 space-y-1.5">

@@ -105,6 +105,15 @@ export type DocAndGloCatalogResult = {
   count: number;
 };
 
+export async function syncDocAndGloCatalog(): Promise<{ feed: DocAndGloFeed; synced: number }> {
+  if (!getAdminSecret()) throw new Error("Set VITE_ADMIN_EXPORT_SECRET to sync Doc & Glo");
+  const data = (await feedRequest({
+    method: "POST",
+    body: JSON.stringify({ action: "sync-catalog" }),
+  })) as { feed: DocAndGloFeed; synced?: number };
+  return { feed: data.feed, synced: data.synced ?? data.feed.items.length };
+}
+
 export async function fetchDocAndGloCatalog(refresh = false): Promise<DocAndGloCatalogResult> {
   const url = `${getApiBase()}/api/admin/analytics?view=doc-and-glo-catalog${refresh ? "&refresh=1" : ""}`;
   const response = await fetch(url);

@@ -490,7 +490,7 @@ export function LivePage() {
                 If you hit <span className="font-semibold text-white">Yes</span>, your camera will start broadcasting on Sloane Glo right away.
               </p>
               <p>
-                Fans will see <span className="font-semibold text-dt-green">DAME LIVE NOW</span> on the home screen and can join your live video and chat.
+                Fans will see <span className="font-semibold text-dt-green">LIVE NOW</span> on the home screen and can join your live video and chat.
               </p>
             </div>
             <div className="flex gap-3 border-t border-dt-border px-5 py-4">
