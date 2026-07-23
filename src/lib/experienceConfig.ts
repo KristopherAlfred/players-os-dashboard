@@ -444,7 +444,7 @@ export function stageGlowStyle(item: ExperienceStageItem, kind: "text" | "image"
 }
 
 export function stageItemCss(item: ExperienceStageItem): Record<string, string | number> {
-  const scalePct = item.scale != null ? Math.max(40, Math.min(200, item.scale)) : 100;
+  const scalePct = item.scale != null ? Math.max(40, Math.min(220, item.scale)) : 100;
   const css: Record<string, string | number> = {
     position: "absolute",
     left: `${item.x}%`,
@@ -731,7 +731,7 @@ function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceS
     glow: asBool(row.glow, prev.glow),
     glowColor: asString(row.glowColor, prev.glowColor),
     glowIntensity: Math.max(0, Math.min(100, asNumber(row.glowIntensity, prev.glowIntensity))),
-    scale: Math.max(40, Math.min(200, asNumber(row.scale, prev.scale ?? 100))),
+    scale: Math.max(40, Math.min(220, asNumber(row.scale, prev.scale ?? 100))),
     hidden: asBool(row.hidden, prev.hidden ?? false),
     fillFrom: asString(row.fillFrom, prev.fillFrom ?? ""),
     fillTo: asString(row.fillTo, prev.fillTo ?? ""),

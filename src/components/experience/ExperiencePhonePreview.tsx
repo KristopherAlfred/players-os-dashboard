@@ -312,7 +312,7 @@ function PageFreeformPreview({
     } else if (role === "wordmark") {
       body = (
         <p
-          className="truncate text-[12px] font-bold tracking-[0.16em]"
+          className="font-bold leading-tight tracking-[0.16em] text-[12px]"
           style={{ color: brand.wordmarkColor, ...stageGlowStyle(item, "text") }}
         >
           {brand.wordmark || "YOUR BRAND"}
@@ -320,7 +320,7 @@ function PageFreeformPreview({
       );
     } else if (role === "tagline") {
       body = (
-        <p className="truncate text-[9px]" style={{ color: brand.taglineColor, ...stageGlowStyle(item, "text") }}>
+        <p className="leading-tight text-[9px]" style={{ color: brand.taglineColor, ...stageGlowStyle(item, "text") }}>
           {brand.tagline || "Tagline"}
         </p>
       );
@@ -569,6 +569,19 @@ function PageFreeformPreview({
                   </label>
                 </>
               )}
+              <label className="block space-y-1">
+                <span className="text-[9px] font-semibold text-dt-red">
+                  Size on phone · {selected.scale ?? 100}%
+                </span>
+                <input
+                  type="range"
+                  min={60}
+                  max={220}
+                  value={selected.scale ?? 100}
+                  onChange={(e) => patchItem(selectedId, { scale: Number(e.target.value) })}
+                  className="w-full"
+                />
+              </label>
             </div>
           ) : null}
           {selected && selectedId && (stageItemRole(selected) === "headline" || stageItemRole(selected) === "subhead" || stageItemRole(selected) === "body") ? (
@@ -608,6 +621,20 @@ function PageFreeformPreview({
           ) : null}
           {selected && selectedId ? (
             <>
+          <label className="block space-y-1 rounded-lg border border-dt-red/40 bg-dt-red/10 px-2.5 py-2">
+            <span className="text-[10px] font-semibold text-dt-red">
+              Size on phone · {selected.scale ?? 100}%
+            </span>
+            <input
+              type="range"
+              min={60}
+              max={220}
+              value={selected.scale ?? 100}
+              onChange={(e) => patchItem(selectedId, { scale: Number(e.target.value) })}
+              className="w-full"
+            />
+            <span className="text-[9px] text-white/45">Drag to make this bigger or smaller on the phone</span>
+          </label>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
