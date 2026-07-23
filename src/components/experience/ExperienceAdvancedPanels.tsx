@@ -47,15 +47,47 @@ function TextInput({
 }
 
 function ColorInput({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const NAMED_COLORS = [
+    { name: "White", value: "#FFFFFF" },
+    { name: "Soft white", value: "#F5F5F5" },
+    { name: "Mint", value: "#8FE3B8" },
+    { name: "Bright mint", value: "#95E4CA" },
+    { name: "Deep green", value: "#04140C" },
+    { name: "Black", value: "#000000" },
+    { name: "Charcoal", value: "#1A1A1A" },
+    { name: "Gold", value: "#D4AF37" },
+    { name: "Red", value: "#ED0000" },
+    { name: "Pink", value: "#FF6B9D" },
+  ] as const;
+
+  const normalized = (value || "").trim().toUpperCase();
+  const matched = NAMED_COLORS.find((c) => c.value.toUpperCase() === normalized);
+  const selectValue = matched?.value ?? "__custom__";
+
   return (
     <div className="flex items-center gap-2">
       <input
         type="color"
         value={value?.startsWith("#") && value.length >= 7 ? value.slice(0, 7) : "#8FE3B8"}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value.toUpperCase())}
         className="h-10 w-12 cursor-pointer rounded border border-dt-border bg-transparent"
+        title="Pick a color"
       />
-      <TextInput value={value} onChange={onChange} className="font-mono text-xs" />
+      <select
+        value={selectValue}
+        onChange={(e) => {
+          if (e.target.value === "__custom__") return;
+          onChange(e.target.value);
+        }}
+        className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-white/40"
+      >
+        {NAMED_COLORS.map((c) => (
+          <option key={c.value} value={c.value}>
+            {c.name}
+          </option>
+        ))}
+        <option value="__custom__">{matched ? "Custom…" : `Custom (${normalized || "—"})`}</option>
+      </select>
     </div>
   );
 }
@@ -219,6 +251,39 @@ const EFFECT_OPTIONS: { id: ExperienceEffectPreset; label: string }[] = [
   { id: "rays", label: "Rays" },
 ];
 
+export function BrandHeaderFields({
+  brand,
+  onChange,
+}: {
+  brand: ExperienceBrand;
+  onChange: (patch: Partial<ExperienceBrand>) => void;
+}) {
+  return (
+    <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+          Top header · wordmark & tagline
+        </p>
+        <p className="mt-1 text-[11px] text-white/45">
+          Edit the bar at the top of the phone. Same brand on every screen.
+        </p>
+      </div>
+      <Field label="Wordmark (title)">
+        <TextInput value={brand.wordmark} onChange={(wordmark) => onChange({ wordmark })} />
+      </Field>
+      <Field label="Wordmark color">
+        <ColorInput value={brand.wordmarkColor} onChange={(wordmarkColor) => onChange({ wordmarkColor })} />
+      </Field>
+      <Field label="Tagline">
+        <TextInput value={brand.tagline} onChange={(tagline) => onChange({ tagline })} />
+      </Field>
+      <Field label="Tagline color">
+        <ColorInput value={brand.taglineColor} onChange={(taglineColor) => onChange({ taglineColor })} />
+      </Field>
+    </div>
+  );
+}
+
 export function ExperienceBrandPanel({
   brand,
   onChange,
@@ -232,6 +297,8 @@ export function ExperienceBrandPanel({
 }) {
   return (
     <div className="space-y-4">
+      <BrandHeaderFields brand={brand} onChange={onChange} />
+
       <div className="rounded-xl border border-dt-border bg-black/30 p-4">
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dt-red">Live logo preview</p>
         <div className="flex items-center gap-3">
@@ -299,23 +366,11 @@ export function ExperienceBrandPanel({
       <Field label="Logo color" hint="Recolors illustrated / AI logos (turn tint off for photo uploads)">
         <ColorInput value={brand.logoColor} onChange={(logoColor) => onChange({ logoColor })} />
       </Field>
-      <Field label="Wordmark text (under / beside logo)">
-        <TextInput value={brand.wordmark} onChange={(wordmark) => onChange({ wordmark })} />
-      </Field>
-      <Field label="Wordmark color">
-        <ColorInput value={brand.wordmarkColor} onChange={(wordmarkColor) => onChange({ wordmarkColor })} />
-      </Field>
       <Field label="Wordmark font">
         <FontSelect
           value={brand.wordmarkFontFamily}
           onChange={(wordmarkFontFamily) => onChange({ wordmarkFontFamily })}
         />
-      </Field>
-      <Field label="Tagline under logo">
-        <TextInput value={brand.tagline} onChange={(tagline) => onChange({ tagline })} />
-      </Field>
-      <Field label="Tagline color">
-        <ColorInput value={brand.taglineColor} onChange={(taglineColor) => onChange({ taglineColor })} />
       </Field>
     </div>
   );
@@ -485,14 +540,19 @@ export function ExperiencePagePanel({
   page,
   onChange,
   onUpload,
+  brand,
+  onChangeBrand,
 }: {
   pageKey: keyof ExperiencePages;
   page: ExperiencePageConfig;
   onChange: (patch: Partial<ExperiencePageConfig>) => void;
   onUpload: (field: "backgroundImage" | "heroImage" | "titleImage", file: File | null) => void;
+  brand?: ExperienceBrand;
+  onChangeBrand?: (patch: Partial<ExperienceBrand>) => void;
 }) {
   return (
     <div className="space-y-4">
+      {brand && onChangeBrand ? <BrandHeaderFields brand={brand} onChange={onChangeBrand} /> : null}
       <p className="text-xs text-white/45">
         {pageKey === "home" ? (
           <>
@@ -591,6 +651,66 @@ export function ExperiencePagePanel({
       <Field label="CTA label">
         <TextInput value={page.ctaLabel} onChange={(ctaLabel) => onChange({ ctaLabel })} />
       </Field>
+
+      {pageKey === "landing" ? (
+        <div className="space-y-3 rounded-xl border border-dt-border p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
+            Join / unlock slide-in
+          </p>
+          <p className="text-[11px] text-white/40">
+            Copy and glow for the Continue with X / Google / Apple panel. Social buttons are mocked in the
+            fan app for now — they just let fans in.
+          </p>
+          <Field label="Unlock headline">
+            <TextInput
+              value={page.unlockHeadline || ""}
+              onChange={(unlockHeadline) => onChange({ unlockHeadline })}
+            />
+          </Field>
+          <Field label="Unlock body">
+            <textarea
+              value={page.unlockBody || ""}
+              onChange={(e) => onChange({ unlockBody: e.target.value })}
+              rows={3}
+              className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none"
+            />
+          </Field>
+          <Field label="Unlock footer">
+            <TextInput
+              value={page.unlockFooter || ""}
+              onChange={(unlockFooter) => onChange({ unlockFooter })}
+            />
+          </Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Glow color">
+              <ColorInput
+                value={page.unlockGlowColor || "#ED0000"}
+                onChange={(unlockGlowColor) => onChange({ unlockGlowColor })}
+              />
+            </Field>
+            <Field label="Panel border">
+              <ColorInput
+                value={page.unlockPanelBorderColor || "#8C0000"}
+                onChange={(unlockPanelBorderColor) => onChange({ unlockPanelBorderColor })}
+              />
+            </Field>
+            <Field label="Panel bg from">
+              <TextInput
+                value={page.unlockPanelBgFrom || ""}
+                onChange={(unlockPanelBgFrom) => onChange({ unlockPanelBgFrom })}
+                className="font-mono text-xs"
+              />
+            </Field>
+            <Field label="Panel bg to">
+              <TextInput
+                value={page.unlockPanelBgTo || ""}
+                onChange={(unlockPanelBgTo) => onChange({ unlockPanelBgTo })}
+                className="font-mono text-xs"
+              />
+            </Field>
+          </div>
+        </div>
+      ) : null}
 
       {pageKey === "youreIn" ? (
         <Field label="Loader label">

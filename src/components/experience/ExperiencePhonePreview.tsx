@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import type {
+  ExperienceBrand,
   ExperienceBuiltinStageId,
   ExperienceConfig,
   ExperiencePageConfig,
@@ -148,7 +149,9 @@ function DraggableStageItem({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       className={`cursor-grab touch-none active:cursor-grabbing ${
-        selected ? "outline outline-2 outline-dt-red outline-offset-2" : "hover:outline hover:outline-1 hover:outline-white/30"
+        selected
+          ? "outline outline-1 outline-dashed outline-white/55 outline-offset-2"
+          : "hover:outline hover:outline-1 hover:outline-dashed hover:outline-white/25"
       }`}
       style={stageItemCss(item) as CSSProperties}
     >
@@ -228,6 +231,7 @@ function PageFreeformPreview({
   pageKey,
   label,
   onPatchPage,
+  onPatchBrand,
   onSaveLogo,
   onPlaceStamp,
   onRemoveStamp,
@@ -237,12 +241,14 @@ function PageFreeformPreview({
   pageKey: ExperiencePageKey;
   label: string;
   onPatchPage?: (patch: Partial<ExperiencePageConfig>) => void;
+  onPatchBrand?: (patch: Partial<ExperienceBrand>) => void;
   onSaveLogo?: () => void;
   onPlaceStamp?: (stampId: string) => void;
   onRemoveStamp?: (stampId: string) => void;
 }) {
-  const [selectedId, setSelectedId] = useState<string>("logo");
-  const selected = getStageItem(page, selectedId);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showUnlock, setShowUnlock] = useState(false);
+  const selected = selectedId ? getStageItem(page, selectedId) : null;
   const lines = (page.subhead || "THE OFFICIAL\nCOMMUNITY").split("\n");
   const scale = (page.heroScale || 100) / 100;
   const brand = experience.brand;
@@ -261,6 +267,7 @@ function PageFreeformPreview({
   );
 
   const selectedLabel = (() => {
+    if (!selected) return "Tap something on the phone to edit";
     const role = stageItemRole(selected);
     if (role === "stamp") {
       const stamp = (experience.stamps || []).find((s) => s.id === selected.stampId);
@@ -415,21 +422,135 @@ function PageFreeformPreview({
       <div
         className="relative h-[560px] w-full"
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
+        onClick={() => setSelectedId(null)}
       >
         {stageIds.map(renderItem)}
+        {showLandingChrome && showUnlock ? (
+          <div className="absolute inset-x-0 bottom-0 z-[120] px-2 pb-2 pt-16">
+            <div
+              className="relative rounded-2xl border px-3 pb-4 pt-6"
+              style={{
+                borderColor: page.unlockPanelBorderColor || "#8C0000",
+                background: `linear-gradient(165deg, ${page.unlockPanelBgFrom || "rgba(18,18,18,0.97)"} 0%, ${page.unlockPanelBgTo || "rgba(6,6,6,0.98)"} 100%)`,
+                boxShadow: `0 0 18px ${page.unlockGlowColor || "#ED0000"}66`,
+              }}
+            >
+              <div
+                className="absolute left-1/2 top-0 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border bg-black text-[10px]"
+                style={{ borderColor: page.accentColor || "#8FE3B8", color: page.accentColor || "#8FE3B8" }}
+              >
+                🔒
+              </div>
+              <p className="text-center font-display text-[13px] tracking-wide text-white">
+                {page.unlockHeadline || page.headline || "JOIN SLOANE GLO"}
+              </p>
+              <p
+                className="mt-1.5 text-center text-[9px] leading-relaxed text-white"
+                style={{
+                  textShadow: `0 0 6px ${page.unlockGlowColor || "#ED0000"}`,
+                  WebkitTextStroke: `0.35px ${page.unlockGlowColor || "#ED0000"}`,
+                }}
+              >
+                {page.unlockBody || page.body}
+              </p>
+              <div className="mt-3 space-y-1.5">
+                {["Continue with X", "Continue with Google", "Continue with Apple"].map((label) => (
+                  <div
+                    key={label}
+                    className={`flex h-8 items-center justify-center rounded-lg border text-[8px] font-semibold uppercase tracking-wide ${
+                      label.includes("Google")
+                        ? "border-white/20 bg-white text-black"
+                        : "border-white/15 bg-black text-white"
+                    }`}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </div>
+              <p
+                className="mt-2.5 text-center text-[8px] text-white/90"
+                style={{ textShadow: `0 0 5px ${page.unlockGlowColor || "#ED0000"}` }}
+              >
+                {page.unlockFooter || "100% Private · No Spam · You're in control"}
+              </p>
+            </div>
+          </div>
+        ) : null}
       </div>
+      {showLandingChrome ? (
+        <div className="border-t border-white/10 bg-black/80 px-3 py-2">
+          <button
+            type="button"
+            onClick={() => setShowUnlock((v) => !v)}
+            className={`w-full rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold ${
+              showUnlock
+                ? "border-dt-red/60 bg-dt-red/15 text-dt-red"
+                : "border-white/15 text-white/60"
+            }`}
+          >
+            {showUnlock ? "Hide unlock slide-in" : "Preview unlock slide-in"}
+          </button>
+        </div>
+      ) : null}
       {onPatchPage ? (
         <div className="space-y-2 border-t border-white/10 bg-black/80 p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-red">
-            Selected · {selectedLabel}
+            {selected ? `Editing · ${selectedLabel}` : selectedLabel}
           </p>
+          {selected && selectedId && onPatchBrand && (stageItemRole(selected) === "wordmark" || stageItemRole(selected) === "tagline") ? (
+            <div className="space-y-2 rounded-lg border border-white/15 bg-white/[0.04] p-2">
+              {stageItemRole(selected) === "wordmark" ? (
+                <>
+                  <label className="block space-y-1">
+                    <span className="text-[9px] text-white/50">Wordmark text</span>
+                    <input
+                      value={brand.wordmark}
+                      onChange={(e) => onPatchBrand({ wordmark: e.target.value })}
+                      className="w-full rounded border border-white/15 bg-black px-2 py-1.5 text-[11px] text-white outline-none"
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[9px] text-white/50">Wordmark color</span>
+                    <input
+                      type="color"
+                      value={brand.wordmarkColor?.slice(0, 7) || "#FFFFFF"}
+                      onChange={(e) => onPatchBrand({ wordmarkColor: e.target.value })}
+                      className="h-8 w-full cursor-pointer rounded border border-white/15 bg-transparent"
+                    />
+                  </label>
+                </>
+              ) : (
+                <>
+                  <label className="block space-y-1">
+                    <span className="text-[9px] text-white/50">Tagline text</span>
+                    <input
+                      value={brand.tagline}
+                      onChange={(e) => onPatchBrand({ tagline: e.target.value })}
+                      className="w-full rounded border border-white/15 bg-black px-2 py-1.5 text-[11px] text-white outline-none"
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[9px] text-white/50">Tagline color</span>
+                    <input
+                      type="color"
+                      value={brand.taglineColor?.slice(0, 7) || "#8FE3B8"}
+                      onChange={(e) => onPatchBrand({ taglineColor: e.target.value })}
+                      className="h-8 w-full cursor-pointer rounded border border-white/15 bg-transparent"
+                    />
+                  </label>
+                </>
+              )}
+            </div>
+          ) : null}
+          {selected && selectedId ? (
+            <>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => patchItem(selectedId, { glow: !selected.glow })}
               className={`rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold ${
                 selected.glow
-                  ? "border-dt-red/60 bg-dt-red/15 text-dt-red"
+                  ? "border-white/40 bg-white/10 text-white"
                   : "border-white/15 text-white/60"
               }`}
             >
@@ -454,13 +575,20 @@ function PageFreeformPreview({
                 type="button"
                 onClick={() => {
                   onPatchPage({ stage: removeStageItem(page, selectedId) });
-                  setSelectedId("logo");
+                  setSelectedId(null);
                 }}
                 className="rounded-lg border border-white/15 px-2.5 py-1.5 text-[10px] text-red-300/80"
               >
                 Remove stamp
               </button>
             ) : null}
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              className="rounded-lg border border-white/15 px-2.5 py-1.5 text-[10px] text-white/50"
+            >
+              Done
+            </button>
           </div>
           {selected.glow ? (
             <div className="grid grid-cols-2 gap-2">
@@ -485,6 +613,8 @@ function PageFreeformPreview({
                 />
               </label>
             </div>
+          ) : null}
+            </>
           ) : null}
           <button
             type="button"
@@ -659,6 +789,7 @@ export function ExperiencePhonePreview({
   mode,
   pageKey,
   onPatchPage,
+  onPatchBrand,
   onSaveLogo,
   onPlaceStamp,
   onRemoveStamp,
@@ -667,6 +798,7 @@ export function ExperiencePhonePreview({
   mode: PhonePreviewMode;
   pageKey: ExperiencePageKey;
   onPatchPage?: (patch: Partial<ExperiencePageConfig>) => void;
+  onPatchBrand?: (patch: Partial<ExperienceBrand>) => void;
   onSaveLogo?: () => void;
   onPlaceStamp?: (stampId: string) => void;
   onRemoveStamp?: (stampId: string) => void;
@@ -692,6 +824,7 @@ export function ExperiencePhonePreview({
       pageKey={pageKey}
       label={MODE_LABEL[mode]}
       onPatchPage={onPatchPage}
+      onPatchBrand={onPatchBrand}
       onSaveLogo={onSaveLogo}
       onPlaceStamp={onPlaceStamp}
       onRemoveStamp={onRemoveStamp}

@@ -35,7 +35,6 @@ export function TintedBrandLogo({
           width: dim,
           height: dim,
           objectFit: "contain",
-          borderRadius: "999px",
           boxShadow: `0 0 16px ${color}66`,
           ...style,
         }}
@@ -61,7 +60,6 @@ export function TintedBrandLogo({
         maskSize: "contain",
         maskRepeat: "no-repeat",
         maskPosition: "center",
-        borderRadius: "999px",
         boxShadow: `0 0 16px ${color}88`,
         ...style,
       }}
