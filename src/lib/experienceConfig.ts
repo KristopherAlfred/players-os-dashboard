@@ -55,6 +55,29 @@ export type ExperienceEffects = {
   glassmorphism: boolean;
 };
 
+export type ExperienceStageItemId =
+  | "brand"
+  | "hero"
+  | "subhead"
+  | "headline"
+  | "body"
+  | "cta"
+  | "titleArt";
+
+export type ExperienceStageItem = {
+  id: ExperienceStageItemId;
+  /** Percent of stage width (0–100) */
+  x: number;
+  /** Percent of stage height (0–100) */
+  y: number;
+  /** Optional width percent */
+  w: number;
+  z: number;
+  glow: boolean;
+  glowColor: string;
+  glowIntensity: number;
+};
+
 export type ExperiencePageConfig = {
   backgroundColor: string;
   backgroundGradientFrom: string;
@@ -74,6 +97,9 @@ export type ExperiencePageConfig = {
   heroScale: number;
   heroFit: "contain" | "cover";
   heroPosition: string;
+  /** stack = classic flow; freeform = drag/overlap on phone canvas */
+  layoutMode: "stack" | "freeform";
+  stage: ExperienceStageItem[];
   effectPreset: ExperienceEffectPreset;
   loaderLabel?: string;
   title?: string;
@@ -155,6 +181,26 @@ export const DEFAULT_EXPERIENCE_EFFECTS: ExperienceEffects = {
   glassmorphism: true,
 };
 
+export const STAGE_ITEM_IDS: ExperienceStageItemId[] = [
+  "brand",
+  "hero",
+  "titleArt",
+  "subhead",
+  "headline",
+  "body",
+  "cta",
+];
+
+export const DEFAULT_LANDING_STAGE: ExperienceStageItem[] = [
+  { id: "brand", x: 4, y: 5, w: 70, z: 20, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
+  { id: "hero", x: 8, y: 16, w: 84, z: 5, glow: true, glowColor: "#8FE3B8", glowIntensity: 35 },
+  { id: "titleArt", x: 10, y: 48, w: 70, z: 12, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
+  { id: "subhead", x: 8, y: 52, w: 84, z: 14, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
+  { id: "headline", x: 8, y: 60, w: 84, z: 15, glow: true, glowColor: "#FFFFFF", glowIntensity: 25 },
+  { id: "body", x: 8, y: 70, w: 84, z: 13, glow: false, glowColor: "#8FE3B8", glowIntensity: 30 },
+  { id: "cta", x: 8, y: 84, w: 84, z: 18, glow: true, glowColor: "#8FE3B8", glowIntensity: 45 },
+];
+
 function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePageConfig {
   return {
     backgroundColor: "#050505",
@@ -174,8 +220,54 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     heroScale: 100,
     heroFit: "contain",
     heroPosition: "right center",
+    layoutMode: "freeform",
+    stage: DEFAULT_LANDING_STAGE.map((item) => ({ ...item })),
     effectPreset: "soft",
     ...partial,
+  };
+}
+
+export function getStageItem(
+  page: ExperiencePageConfig,
+  id: ExperienceStageItemId,
+): ExperienceStageItem {
+  const found = (page.stage || []).find((item) => item.id === id);
+  const fallback = DEFAULT_LANDING_STAGE.find((item) => item.id === id)!;
+  return found ? { ...fallback, ...found } : { ...fallback };
+}
+
+export function upsertStageItem(
+  page: ExperiencePageConfig,
+  patch: Partial<ExperienceStageItem> & { id: ExperienceStageItemId },
+): ExperienceStageItem[] {
+  const base = (page.stage?.length ? page.stage : DEFAULT_LANDING_STAGE).map((item) => ({ ...item }));
+  const idx = base.findIndex((item) => item.id === patch.id);
+  if (idx >= 0) base[idx] = { ...base[idx], ...patch };
+  else base.push({ ...getStageItem(page, patch.id), ...patch });
+  return base;
+}
+
+export function stageGlowStyle(item: ExperienceStageItem, kind: "text" | "image" | "box" = "text") {
+  if (!item.glow) return {};
+  const color = item.glowColor || "#8FE3B8";
+  const intensity = Math.max(0, Math.min(100, item.glowIntensity ?? 40));
+  if (kind === "text") {
+    return {
+      textShadow: `0 0 ${6 + intensity / 8}px ${color}, 0 0 ${14 + intensity / 4}px ${color}99`,
+    };
+  }
+  return {
+    filter: `drop-shadow(0 0 ${4 + intensity / 10}px ${color}) drop-shadow(0 0 ${12 + intensity / 5}px ${color}88)`,
+  };
+}
+
+export function stageItemCss(item: ExperienceStageItem): Record<string, string | number> {
+  return {
+    position: "absolute",
+    left: `${item.x}%`,
+    top: `${item.y}%`,
+    width: `${item.w || 80}%`,
+    zIndex: item.z,
   };
 }
 
@@ -332,11 +424,42 @@ export function normalizeExperiencePage(
     heroScale: Math.max(40, Math.min(180, asNumber(p.heroScale, fallback.heroScale ?? 100))),
     heroFit: p.heroFit === "cover" ? "cover" : "contain",
     heroPosition: asString(p.heroPosition, fallback.heroPosition || "right center"),
+    layoutMode: p.layoutMode === "stack" ? "stack" : "freeform",
+    stage: normalizeStage(p.stage, fallback.stage),
     effectPreset: normalizeEffectPreset(p.effectPreset, fallback.effectPreset),
     loaderLabel: asString(p.loaderLabel, fallback.loaderLabel || ""),
     title: asString(p.title, fallback.title || ""),
     logoutLabel: asString(p.logoutLabel, fallback.logoutLabel || ""),
   };
+}
+
+function normalizeStage(raw: unknown, fallback: ExperienceStageItem[]): ExperienceStageItem[] {
+  const list = Array.isArray(raw) ? raw : fallback;
+  const byId = new Map<ExperienceStageItemId, ExperienceStageItem>();
+  for (const item of DEFAULT_LANDING_STAGE) byId.set(item.id, { ...item });
+  for (const item of fallback || []) {
+    if (item?.id && STAGE_ITEM_IDS.includes(item.id)) {
+      byId.set(item.id, { ...byId.get(item.id)!, ...item });
+    }
+  }
+  for (const item of list) {
+    if (!item || typeof item !== "object") continue;
+    const id = String((item as ExperienceStageItem).id) as ExperienceStageItemId;
+    if (!STAGE_ITEM_IDS.includes(id)) continue;
+    const prev = byId.get(id) || DEFAULT_LANDING_STAGE.find((d) => d.id === id)!;
+    const row = item as Partial<ExperienceStageItem>;
+    byId.set(id, {
+      id,
+      x: Math.max(0, Math.min(95, asNumber(row.x, prev.x))),
+      y: Math.max(0, Math.min(95, asNumber(row.y, prev.y))),
+      w: Math.max(10, Math.min(100, asNumber(row.w, prev.w))),
+      z: Math.max(0, Math.min(100, asNumber(row.z, prev.z))),
+      glow: asBool(row.glow, prev.glow),
+      glowColor: asString(row.glowColor, prev.glowColor),
+      glowIntensity: Math.max(0, Math.min(100, asNumber(row.glowIntensity, prev.glowIntensity))),
+    });
+  }
+  return STAGE_ITEM_IDS.map((id) => byId.get(id)!).filter(Boolean);
 }
 
 export function normalizeExperiencePages(raw: unknown): ExperiencePages {

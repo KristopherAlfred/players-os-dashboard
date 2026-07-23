@@ -713,7 +713,11 @@ export function ExperiencePage() {
               ) : null}
             </div>
           </section>
-          <ExperiencePhonePreview experience={experience} mode={section} />
+          <ExperiencePhonePreview
+            experience={experience}
+            mode={section}
+            onPatchPage={(patch) => patchPage("landing", patch)}
+          />
         </div>
       ) : null}
 
