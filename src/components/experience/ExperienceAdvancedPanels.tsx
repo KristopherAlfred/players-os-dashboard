@@ -632,26 +632,23 @@ export function ExperiencePagePanel({
 
       <WordStyleEditor
         label="Headline · style each word"
-        hint='Type the line, then tap a word (e.g. GLO) to change only that word’s color, font, or size'
+        hint="Type the line, then tap a word (e.g. GLO) to change only that word’s color, font, or size"
         plain={page.headline}
         runs={runsForPageField(page, "headline")}
-        onChangePlain={(headline) => onChange({ headline })}
-        onChangeRuns={(headlineRuns) => onChange({ headlineRuns })}
+        onChangeText={(headline, headlineRuns) => onChange({ headline, headlineRuns })}
       />
       <WordStyleEditor
         label="Subhead · style each word"
-        hint="Use Enter / \\n for line breaks in the text box"
+        hint="Use Enter for line breaks in the text box"
         plain={page.subhead}
         runs={runsForPageField(page, "subhead")}
-        onChangePlain={(subhead) => onChange({ subhead })}
-        onChangeRuns={(subheadRuns) => onChange({ subheadRuns })}
+        onChangeText={(subhead, subheadRuns) => onChange({ subhead, subheadRuns })}
       />
       <WordStyleEditor
         label="Body · style each word"
         plain={page.body}
         runs={runsForPageField(page, "body")}
-        onChangePlain={(body) => onChange({ body })}
-        onChangeRuns={(bodyRuns) => onChange({ bodyRuns })}
+        onChangeText={(body, bodyRuns) => onChange({ body, bodyRuns })}
       />
       <Field label="CTA label">
         <TextInput value={page.ctaLabel} onChange={(ctaLabel) => onChange({ ctaLabel })} />

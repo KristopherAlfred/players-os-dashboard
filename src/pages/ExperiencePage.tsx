@@ -348,10 +348,13 @@ export function ExperiencePage() {
   }
 
   function patchExperience(updater: (prev: ExperienceConfig) => ExperienceConfig) {
-    if (!layout) return;
-    pushHistory(layout);
+    setLayout((prev) => {
+      if (!prev) return prev;
+      pushHistory(prev);
+      const next = withExperience(prev, updater(getExperienceFromLayout(prev)));
+      return next;
+    });
     setDirty(true);
-    setLayout(withExperience(layout, updater(experience)));
     setStatus("Experience updated — publish to push live");
   }
 

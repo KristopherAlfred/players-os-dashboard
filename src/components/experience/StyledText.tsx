@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import {
   plainFromRuns,
   syncTextRuns,
@@ -96,8 +96,8 @@ type WordStyleEditorProps = {
   label: string;
   plain: string;
   runs: ExperienceTextRun[];
-  onChangePlain: (plain: string) => void;
-  onChangeRuns: (runs: ExperienceTextRun[]) => void;
+  /** Preferred: one atomic update so typing doesn't get overwritten. */
+  onChangeText: (plain: string, runs: ExperienceTextRun[]) => void;
   hint?: string;
   selectedChip?: number;
   onSelectedChipChange?: (chip: number) => void;
@@ -107,54 +107,57 @@ export function WordStyleEditor({
   label,
   plain,
   runs,
-  onChangePlain,
-  onChangeRuns,
+  onChangeText,
   hint,
   selectedChip: selectedChipProp,
   onSelectedChipChange,
 }: WordStyleEditorProps) {
+  const [draft, setDraft] = useState(plain);
+  const [selectedChipLocal, setSelectedChipLocal] = useState(0);
+
+  useEffect(() => {
+    setDraft(plain);
+  }, [plain]);
+
   const liveRuns =
     runs?.length && plainFromRuns(runs) === plain ? runs : syncTextRuns(plain, runs);
-  const editable = liveRuns
+  const draftRuns = draft === plain ? liveRuns : syncTextRuns(draft, liveRuns);
+  const editable = draftRuns
     .map((run, index) => ({ run, index }))
     .filter(({ run }) => run.text.trim().length > 0);
 
-  const [selectedChipLocal, setSelectedChipLocal] = useState(0);
   const selectedChip = selectedChipProp ?? selectedChipLocal;
   const setSelectedChip = onSelectedChipChange ?? setSelectedChipLocal;
   const safeChip = Math.min(selectedChip, Math.max(0, editable.length - 1));
   const selectedIdx = editable[safeChip]?.index ?? -1;
-  const selectedRun = selectedIdx >= 0 ? liveRuns[selectedIdx] : null;
+  const selectedRun = selectedIdx >= 0 ? draftRuns[selectedIdx] : null;
 
-  function commitRuns(nextRuns: ExperienceTextRun[]) {
-    onChangeRuns(nextRuns);
-    onChangePlain(plainFromRuns(nextRuns));
+  function commit(nextPlain: string, nextRuns: ExperienceTextRun[]) {
+    setDraft(nextPlain);
+    onChangeText(nextPlain, nextRuns);
+  }
+
+  function updatePlain(nextPlain: string) {
+    commit(nextPlain, syncTextRuns(nextPlain, liveRuns));
   }
 
   function patchSelected(patch: Partial<ExperienceTextRun>) {
     if (selectedIdx < 0) return;
-    commitRuns(liveRuns.map((run, i) => (i === selectedIdx ? { ...run, ...patch } : run)));
-  }
-
-  function updatePlain(nextPlain: string) {
-    onChangePlain(nextPlain);
-    onChangeRuns(syncTextRuns(nextPlain, liveRuns));
+    const nextRuns = draftRuns.map((run, i) => (i === selectedIdx ? { ...run, ...patch } : run));
+    commit(plainFromRuns(nextRuns), nextRuns);
   }
 
   function renameSelectedWord(nextWord: string) {
     if (selectedIdx < 0) return;
-    const cleaned = nextWord.replace(/\s+/g, " ");
-    // Allow empty while typing; spaces become a single space token
-    const text = cleaned.length ? cleaned : " ";
-    const nextRuns = liveRuns.map((run, i) => (i === selectedIdx ? { ...run, text } : run));
-    commitRuns(nextRuns);
+    const text = nextWord.length ? nextWord : " ";
+    const nextRuns = draftRuns.map((run, i) => (i === selectedIdx ? { ...run, text } : run));
+    commit(plainFromRuns(nextRuns), nextRuns);
   }
 
   return (
     <div
       className="space-y-3 rounded-xl border border-white/10 bg-black/30 p-3"
       onClick={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
     >
       <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">{label}</p>
       {hint ? <p className="text-[10px] text-white/40">{hint}</p> : null}
@@ -162,13 +165,20 @@ export function WordStyleEditor({
       <label className="block space-y-1">
         <span className="text-[10px] font-semibold uppercase tracking-wide text-dt-red">Edit the words</span>
         <textarea
-          value={plain}
+          value={draft}
           onChange={(e) => updatePlain(e.target.value)}
-          rows={2}
-          placeholder="Type your headline here…"
-          className="w-full rounded-md border border-white/25 bg-black px-3 py-2 text-sm text-white outline-none ring-dt-red/40 placeholder:text-white/30 focus:border-dt-red/60 focus:ring-1"
+          onKeyDown={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          rows={3}
+          spellCheck={false}
+          autoCorrect="off"
+          autoCapitalize="off"
+          placeholder="Type here — backspace and rewrite freely"
+          className="w-full resize-y rounded-md border border-white/25 bg-black px-3 py-2 text-sm text-white caret-white outline-none ring-dt-red/40 placeholder:text-white/30 focus:border-dt-red/60 focus:ring-1"
         />
-        <span className="text-[10px] text-white/40">Replace the whole line anytime — then tap a word below to style it.</span>
+        <span className="text-[10px] text-white/40">
+          Change the line here, then tap a word below to style only that word.
+        </span>
       </label>
 
       {editable.length ? (
@@ -203,7 +213,9 @@ export function WordStyleEditor({
                   type="text"
                   value={selectedRun.text}
                   onChange={(e) => renameSelectedWord(e.target.value)}
-                  className="w-full rounded-md border border-white/20 bg-black px-2.5 py-1.5 text-sm text-white outline-none focus:border-dt-red/50"
+                  onKeyDown={(e) => e.stopPropagation()}
+                  spellCheck={false}
+                  className="w-full rounded-md border border-white/20 bg-black px-2.5 py-1.5 text-sm text-white caret-white outline-none focus:border-dt-red/50"
                 />
               </label>
               <div className="grid gap-2 sm:grid-cols-3">

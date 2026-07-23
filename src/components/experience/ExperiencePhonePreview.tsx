@@ -605,17 +605,11 @@ function PageFreeformPreview({
                     ? "subhead"
                     : "body",
               )}
-              onChangePlain={(value) => {
+              onChangeText={(value, nextRuns) => {
                 const role = stageItemRole(selected);
-                if (role === "headline") onPatchPage({ headline: value });
-                else if (role === "subhead") onPatchPage({ subhead: value });
-                else onPatchPage({ body: value });
-              }}
-              onChangeRuns={(runs) => {
-                const role = stageItemRole(selected);
-                if (role === "headline") onPatchPage({ headlineRuns: runs });
-                else if (role === "subhead") onPatchPage({ subheadRuns: runs });
-                else onPatchPage({ bodyRuns: runs });
+                if (role === "headline") onPatchPage({ headline: value, headlineRuns: nextRuns });
+                else if (role === "subhead") onPatchPage({ subhead: value, subheadRuns: nextRuns });
+                else onPatchPage({ body: value, bodyRuns: nextRuns });
               }}
             />
           ) : null}
