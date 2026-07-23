@@ -513,7 +513,61 @@ function PageFreeformPreview({
   );
 }
 
-function BoxesStampOnlyPreview({
+function SettingsPreview({ experience }: { experience: ExperienceConfig }) {
+  const page = experience.pages.settings;
+  const logout = page.logoutLabel || "Log Out";
+  const title = page.title || page.headline || "Account Settings";
+  const rows = [
+    { label: "Personal Information", description: "Update your name and profile photo" },
+    { label: "Email Address", description: "Change the email on your account" },
+    { label: "Phone Number", description: "Update your mobile number" },
+    { label: logout, description: "Sign out of your account" },
+  ];
+  return (
+    <PhoneFrame label="Account Settings" hint="Default settings layout — edit title & colors in the panel">
+      <div
+        className="flex h-[560px] flex-col"
+        style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
+      >
+        <div className="border-b border-white/10 px-4 pb-3 pt-8">
+          <BrandMark experience={experience} />
+        </div>
+        <div className="flex-1 overflow-hidden px-3 pb-4 pt-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">← Back</p>
+          <div className="mt-5 text-center">
+            <div
+              className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border"
+              style={{ borderColor: `${page.accentColor || experience.theme.accent}99` }}
+            >
+              <span className="text-lg" style={{ color: page.accentColor || experience.theme.accent }}>
+                ⌘
+              </span>
+            </div>
+            <p className="mt-3 font-display text-sm font-extrabold tracking-[0.12em] text-white">{title}</p>
+            {page.body ? <p className="mt-1 text-[10px] text-white/50">{page.body}</p> : null}
+          </div>
+          <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-black/35">
+            {rows.map((row, index) => (
+              <div
+                key={row.label}
+                className={`flex items-center gap-2 px-3 py-3 ${index > 0 ? "border-t border-white/10" : ""}`}
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-bold tracking-wide text-white">{row.label}</p>
+                  <p className="text-[9px] text-white/45">{row.description}</p>
+                </div>
+                <span className="text-white/30">›</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <StampTray experience={experience} />
+    </PhoneFrame>
+  );
+}
+
+function HomeHeaderPreview({
   experience,
   onSaveLogo,
   onPlaceStamp,
@@ -525,22 +579,57 @@ function BoxesStampOnlyPreview({
   onRemoveStamp?: (stampId: string) => void;
 }) {
   const page = experience.pages.home;
-  const bg = pageBackgroundCss({ ...page, backgroundImage: "" }) || themeBackgroundCss({ ...experience.theme, backgroundImage: "" });
   return (
-    <PhoneFrame label="Home boxes" hint="Save / place logo stamps here too — they land on Home">
-      <div className="relative flex h-[560px] flex-col" style={{ background: bg, color: experience.theme.text }}>
+    <PhoneFrame
+      label="Home header"
+      hint="LIVE hero + home background — box grid is under Home boxes"
+    >
+      <div
+        className="flex h-[560px] flex-col"
+        style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
+      >
         <div className="border-b border-white/10 px-4 pb-3 pt-8">
           <BrandMark experience={experience} />
         </div>
-        <div className="relative space-y-2 p-3">
-          <div className="rounded-2xl border border-white/10 p-3" style={{ background: experience.theme.card }}>
-            <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: experience.theme.muted }}>
-              Home
-            </p>
-            <p className="mt-1 font-display text-base">{page.headline || "Your hub"}</p>
+        <div className="space-y-2 p-3">
+          <div className="relative flex h-[118px] overflow-hidden rounded-2xl border border-dashed border-white/20 bg-black/35">
+            {page.heroImage ? (
+              <img
+                src={resolveExperiencePreviewUrl(page.heroImage)}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover opacity-80"
+              />
+            ) : null}
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent" />
+            <div className="relative z-10 flex h-full flex-col justify-end p-3.5">
+              <p className="font-display text-lg font-extrabold tracking-[0.12em] text-white">
+                {(experience.brand.wordmark || "SLOANE").split(" ")[0]}{" "}
+                <span style={{ color: experience.theme.accent }}>LIVE</span>
+              </p>
+              <p className="mt-0.5 text-[11px] text-white/55">
+                {page.heroImage ? page.body || "Your hub" : "Upload hero art in this tab"}
+              </p>
+            </div>
           </div>
-          <p className="px-1 text-[10px] text-white/40">
-            Switch to Home chrome to drag stamps on the page canvas. Tray below still saves logos.
+          <div className="grid grid-cols-2 gap-2">
+            {["EXCLUSIVE\nVIDEOS", "LATEST NEWS\n& UPDATES", "EVENTS &\nGIVEAWAYS", "DOC &\nGLO"].map((title) => (
+              <div
+                key={title}
+                className="flex min-h-[88px] rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-black/80 p-2.5"
+              >
+                <p className="font-display text-[10px] font-extrabold uppercase leading-tight tracking-wide text-white/80">
+                  {title.split("\n").map((line, i, arr) => (
+                    <span key={`${title}-${i}`}>
+                      {line}
+                      {i < arr.length - 1 ? <br /> : null}
+                    </span>
+                  ))}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-[9px] uppercase tracking-wide text-white/35">
+            Blank starter boxes · edit images in Home boxes
           </p>
         </div>
       </div>
@@ -561,7 +650,7 @@ const MODE_LABEL: Record<PhonePreviewMode, string> = {
   landing: "Landing",
   youreIn: "You're In",
   settings: "Settings",
-  homePage: "Home",
+  homePage: "Home header",
   boxes: "Home boxes",
 };
 
@@ -582,9 +671,12 @@ export function ExperiencePhonePreview({
   onPlaceStamp?: (stampId: string) => void;
   onRemoveStamp?: (stampId: string) => void;
 }) {
-  if (mode === "boxes") {
+  if (mode === "settings") {
+    return <SettingsPreview experience={experience} />;
+  }
+  if (mode === "homePage") {
     return (
-      <BoxesStampOnlyPreview
+      <HomeHeaderPreview
         experience={experience}
         onSaveLogo={onSaveLogo}
         onPlaceStamp={onPlaceStamp}

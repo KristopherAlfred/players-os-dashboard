@@ -380,13 +380,13 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     effectPreset: "burst",
     ctaLabel: "Enter",
   }),
-  settings: pageDefaults({
-    title: "Account Settings",
-    headline: "Account Settings",
-    body: "Manage your Sloane Glo account",
-    logoutLabel: "Log Out",
-    effectPreset: "glass",
-  }),
+    settings: pageDefaults({
+      title: "Account Settings",
+      headline: "Account Settings",
+      body: "Manage your account details, contact info, and sign out.",
+      logoutLabel: "Log Out",
+      effectPreset: "glass",
+    }),
   home: pageDefaults({
     headline: "Home",
     body: "Your Sloane Glo hub",

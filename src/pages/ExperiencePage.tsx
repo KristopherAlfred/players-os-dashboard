@@ -66,7 +66,7 @@ const SECTIONS: { id: ExperienceSection; label: string }[] = [
   { id: "landing", label: "Landing" },
   { id: "youreIn", label: "You're In" },
   { id: "settings", label: "Settings" },
-  { id: "homePage", label: "Home chrome" },
+  { id: "homePage", label: "Home header" },
   { id: "boxes", label: "Home boxes" },
 ];
 
@@ -261,7 +261,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
                 style={imgStyle}
               />
             ) : (
-              <div className="flex h-full items-end justify-end p-2 text-[9px] text-white/25">Art</div>
+              <div className="flex h-full items-end justify-end p-2 text-[9px] text-white/30">Add image</div>
             )}
           </div>
         </div>
@@ -1034,16 +1034,14 @@ export function ExperiencePage() {
               }}
             >
               {layout.heroEnabled ? (
-                <div className="relative flex h-[118px] overflow-hidden rounded-2xl border border-white/10">
-                  <img
-                    src={resolveAssetUrl(
-                      experience.pages.home.heroImage ||
-                        experience.brand.logoSrc ||
-                        "/experience/logos/logo-ai-crown.png",
-                    )}
-                    alt=""
-                    className="absolute inset-0 h-full w-full object-cover opacity-80"
-                  />
+                <div className="relative flex h-[118px] overflow-hidden rounded-2xl border border-dashed border-white/20 bg-black/40">
+                  {experience.pages.home.heroImage ? (
+                    <img
+                      src={resolveAssetUrl(experience.pages.home.heroImage)}
+                      alt=""
+                      className="absolute inset-0 h-full w-full object-cover opacity-80"
+                    />
+                  ) : null}
                   <div className="absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent" />
                   <div className="relative z-10 flex h-full flex-col justify-end p-3.5">
                     <p className="font-display text-lg font-extrabold tracking-[0.12em] text-white">
@@ -1051,7 +1049,9 @@ export function ExperiencePage() {
                       <span style={{ color: experience.theme.accent }}>LIVE</span>
                     </p>
                     <p className="mt-0.5 text-[11px] text-white/60">
-                      {experience.pages.home.body || "Home preview"}
+                      {experience.pages.home.heroImage
+                        ? experience.pages.home.body || "Your hub"
+                        : "Upload hero art in Home header"}
                     </p>
                   </div>
                 </div>

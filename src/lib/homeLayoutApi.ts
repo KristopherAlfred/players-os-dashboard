@@ -104,7 +104,7 @@ async function layoutRequest(init?: RequestInit) {
 
 export async function fetchHomeLayout(): Promise<HomeLayout> {
   const data = (await layoutRequest()) as { layout: HomeLayout };
-  return data.layout;
+  return scrubHomeLayoutImages(data.layout);
 }
 
 export async function publishHomeLayout(layout: HomeLayout): Promise<HomeLayout> {
@@ -116,9 +116,39 @@ export async function publishHomeLayout(layout: HomeLayout): Promise<HomeLayout>
       "Content-Type": "application/json",
       "x-admin-secret": secret,
     },
-    body: JSON.stringify({ action: "publish", layout }),
+    body: JSON.stringify({ action: "publish", layout: scrubHomeLayoutImages(layout) }),
   })) as { layout: HomeLayout };
-  return data.layout;
+  return scrubHomeLayoutImages(data.layout);
+}
+
+export function scrubStarterWidgetImage(src: string | undefined | null): string {
+  if (!src) return "";
+  const s = src.toLowerCase();
+  if (
+    s.includes("dame") ||
+    s.includes("dametime") ||
+    s.includes("lillard") ||
+    s.includes("espncdn.com") ||
+    s.includes("/images/eventsbackground") ||
+    s.includes("join-dametime") ||
+    s.includes("damecity") ||
+    s.includes("dameexclusive") ||
+    s.includes("dametimenews") ||
+    s.includes("damedolla")
+  ) {
+    return "";
+  }
+  return src;
+}
+
+export function scrubHomeLayoutImages(layout: HomeLayout): HomeLayout {
+  return {
+    ...layout,
+    widgets: (layout.widgets || []).map((w) => ({
+      ...w,
+      imageSrc: scrubStarterWidgetImage(w.imageSrc),
+    })),
+  };
 }
 
 export async function generateHomeImage(

@@ -494,7 +494,21 @@ export function ExperiencePagePanel({
   return (
     <div className="space-y-4">
       <p className="text-xs text-white/45">
-        Editing <span className="text-dt-red">{pageKey}</span> — publish to push live into Sloane Glo.
+        {pageKey === "home" ? (
+          <>
+            <span className="text-dt-red">Home header</span> — LIVE hero art, home background, and header copy.
+            Box images and grid order live under <span className="text-white/70">Home boxes</span>.
+          </>
+        ) : pageKey === "settings" ? (
+          <>
+            <span className="text-dt-red">Account Settings</span> — default settings screen layout fans see inside
+            the app. Edit title, logout label, and colors here.
+          </>
+        ) : (
+          <>
+            Editing <span className="text-dt-red">{pageKey}</span> — publish to push live into Sloane Glo.
+          </>
+        )}
       </p>
 
       <GradientBackgroundPicker
