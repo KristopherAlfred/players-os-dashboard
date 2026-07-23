@@ -199,7 +199,7 @@ export type ExperienceConfig = {
 };
 
 export const DEFAULT_EXPERIENCE_BRAND: ExperienceBrand = {
-  logoSrc: "/experience/logos/logo-ai-crown.png",
+  logoSrc: "/experience/logos/logo-ai-racquet.png",
   logoColor: "#8FE3B8",
   logoTint: true,
   wordmark: "SLOANE GLO",
