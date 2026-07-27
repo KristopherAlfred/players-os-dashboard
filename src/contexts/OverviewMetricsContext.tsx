@@ -1,73 +1,89 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import {
-  fallbackOverviewMetrics,
   fetchOverviewMetrics,
   type OverviewMetrics,
 } from "../lib/overviewAnalytics";
-
-const CACHE_KEY = "amx.overviewMetrics.v2";
+import { fetchPlatformConnections, type PlatformConnection } from "../lib/platformConnections";
+import { supabase } from "../integrations/supabase/client";
 
 type OverviewMetricsState = {
-  metrics: OverviewMetrics;
+  /** Null until at least one connector is live — never placeholder data. */
+  metrics: OverviewMetrics | null;
+  connections: PlatformConnection[];
+  hasConnected: boolean;
   loading: boolean;
+  refresh: () => void;
 };
 
-function readCachedMetrics(): OverviewMetrics | null {
-  try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as OverviewMetrics;
-    if (!parsed?.kpis?.length || typeof parsed.overallFollowers !== "number") return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function writeCachedMetrics(metrics: OverviewMetrics) {
-  try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify(metrics));
-  } catch {
-    // Ignore quota / private-mode failures.
-  }
-}
-
 const OverviewMetricsContext = createContext<OverviewMetricsState>({
-  metrics: fallbackOverviewMetrics,
+  metrics: null,
+  connections: [],
+  hasConnected: false,
   loading: true,
+  refresh: () => {},
 });
 
 export function OverviewMetricsProvider({ children }: { children: ReactNode }) {
-  // Never hydrate KPIs from session cache on refresh — that flashes a stale total
-  // (e.g. 20.31M) before live social counts arrive.
-  const [metrics, setMetrics] = useState<OverviewMetrics>(fallbackOverviewMetrics);
+  const [metrics, setMetrics] = useState<OverviewMetrics | null>(null);
+  const [connections, setConnections] = useState<PlatformConnection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tick, setTick] = useState(0);
+
+  const refresh = useCallback(() => setTick((n) => n + 1), []);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchOverviewMetrics()
-      .then((next) => {
+    (async () => {
+      try {
+        const rows = await fetchPlatformConnections();
         if (cancelled) return;
-        setMetrics(next);
-        writeCachedMetrics(next);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        const cached = readCachedMetrics();
-        setMetrics(cached ?? fallbackOverviewMetrics);
-      })
-      .finally(() => {
+        setConnections(rows);
+
+        if (!rows.some((row) => row.connected)) {
+          setMetrics(null);
+          return;
+        }
+
+        const next = await fetchOverviewMetrics();
+        if (!cancelled) setMetrics(next);
+      } catch {
+        if (!cancelled) {
+          setConnections([]);
+          setMetrics(null);
+        }
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    })();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [tick]);
+
+  // Live-update when a platform is connected/disconnected in Settings.
+  useEffect(() => {
+    const channel = supabase
+      .channel("platform-connections-overview")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "platform_connections" },
+        () => refresh(),
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refresh]);
+
+  const hasConnected = connections.some((row) => row.connected);
 
   return (
-    <OverviewMetricsContext.Provider value={{ metrics, loading }}>
+    <OverviewMetricsContext.Provider
+      value={{ metrics, connections, hasConnected, loading, refresh }}
+    >
       {children}
     </OverviewMetricsContext.Provider>
   );
