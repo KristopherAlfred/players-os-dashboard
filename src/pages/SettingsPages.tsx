@@ -4,7 +4,6 @@ import {
   Bell,
   Check,
   ImagePlus,
-  Link2,
   LogOut,
   Palette,
   Settings2,
@@ -16,6 +15,7 @@ import { useTheme } from "../theme/ThemeContext";
 import type { ThemeTemplate } from "../theme/themes";
 import { DtSelect } from "../components/DtSelect";
 import { getDashboardAvatar, getDashboardAvatarRing } from "../lib/adminProfile";
+import { ConnectorCards } from "../components/settings/ConnectorCards";
 
 const TIMEZONE_OPTIONS = [
   { value: "pt", label: "Pacific Time (PT)" },
@@ -24,13 +24,6 @@ const TIMEZONE_OPTIONS = [
   { value: "et", label: "Eastern Time (ET)" },
 ];
 
-const integrations = [
-  { name: "Instagram", connected: true, last: "Synced 5m ago" },
-  { name: "X", connected: true, last: "Synced 8m ago" },
-  { name: "Facebook", connected: true, last: "Synced 12m ago" },
-  { name: "YouTube", connected: true, last: "Synced 15m ago" },
-  { name: "TikTok", connected: true, last: "Synced 20m ago" },
-];
 
 const permissions = [
   { role: "Admin", publish: true, export: true, monetize: true, settings: true },
