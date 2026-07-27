@@ -1,15 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  Facebook,
-  Instagram,
-  Mail,
-  Music2,
-  Twitch,
-  Twitter,
-  Video,
-  Youtube,
-  Link2,
-} from "lucide-react";
+import { Link2 } from "lucide-react";
+import { BRAND_COLORS, brandIconMap } from "./BrandIcons";
 import {
   fetchPlatformConnections,
   formatSyncedAgo,
@@ -17,16 +8,6 @@ import {
   type PlatformConnection,
 } from "../../lib/platformConnections";
 
-const iconMap: Record<string, typeof Youtube> = {
-  youtube: Youtube,
-  instagram: Instagram,
-  tiktok: Video,
-  twitch: Twitch,
-  spotify: Music2,
-  x: Twitter,
-  facebook: Facebook,
-  mailchimp: Mail,
-};
 
 export function ConnectorCards() {
   const [rows, setRows] = useState<PlatformConnection[]>([]);
@@ -88,7 +69,8 @@ export function ConnectorCards() {
               />
             ))
           : rows.map((row) => {
-              const Icon = iconMap[row.platform] ?? Link2;
+              const Icon = brandIconMap[row.platform];
+              const brand = BRAND_COLORS[row.platform] ?? "var(--theme-accent)";
               const busy = busyId === row.id;
               return (
                 <div
@@ -96,8 +78,11 @@ export function ConnectorCards() {
                   className="dt-surface flex flex-col rounded-2xl border border-dt-border bg-black/25 p-4 transition hover:border-white/15"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-dt-border bg-black/50 text-dt-red">
-                      <Icon size={18} />
+                    <span
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black/50"
+                      style={{ color: brand, boxShadow: `inset 0 0 18px color-mix(in srgb, ${brand} 18%, transparent)` }}
+                    >
+                      {Icon ? <Icon size={20} /> : <Link2 size={18} />}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-base font-semibold text-white">
