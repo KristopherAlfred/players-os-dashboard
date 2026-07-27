@@ -13,7 +13,7 @@ export function NoConnectorsBanner() {
         </p>
         <Link
           to="/settings"
-          className="mt-2 rounded-lg bg-dt-green px-6 py-3 text-base font-bold text-black transition-opacity hover:opacity-90"
+          className="mt-2 rounded-lg bg-[#8FE3B8] px-6 py-3 text-base font-bold text-black transition-colors hover:bg-[#A8F0CC]"
         >
           Connect platforms in Settings
         </Link>
