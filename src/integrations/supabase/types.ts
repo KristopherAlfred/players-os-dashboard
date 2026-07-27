@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      platform_connections: {
+        Row: {
+          connected: boolean
+          created_at: string
+          display_name: string
+          follower_count: number | null
+          handle: string | null
+          id: string
+          last_synced_at: string | null
+          platform: string
+          updated_at: string
+        }
+        Insert: {
+          connected?: boolean
+          created_at?: string
+          display_name: string
+          follower_count?: number | null
+          handle?: string | null
+          id?: string
+          last_synced_at?: string | null
+          platform: string
+          updated_at?: string
+        }
+        Update: {
+          connected?: boolean
+          created_at?: string
+          display_name?: string
+          follower_count?: number | null
+          handle?: string | null
+          id?: string
+          last_synced_at?: string | null
+          platform?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
