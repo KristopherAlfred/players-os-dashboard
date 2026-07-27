@@ -11,6 +11,10 @@ import {
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
+import {
+  fetchOnboardingComplete,
+  setOnboardingComplete,
+} from "../../lib/onboardingState";
 
 export type TourStep = {
   id: string;
