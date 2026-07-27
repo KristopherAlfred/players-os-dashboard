@@ -275,7 +275,6 @@ export function SettingsPage() {
         </section>
       </div>
 
-      <ConnectorCards />
 
 
       <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
