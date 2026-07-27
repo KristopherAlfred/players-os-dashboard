@@ -50,6 +50,33 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_follower_snapshots: {
+        Row: {
+          captured_on: string
+          created_at: string
+          follower_count: number
+          id: string
+          platform: string
+          updated_at: string
+        }
+        Insert: {
+          captured_on?: string
+          created_at?: string
+          follower_count?: number
+          id?: string
+          platform: string
+          updated_at?: string
+        }
+        Update: {
+          captured_on?: string
+          created_at?: string
+          follower_count?: number
+          id?: string
+          platform?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

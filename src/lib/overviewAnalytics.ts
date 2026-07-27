@@ -1,3 +1,9 @@
+import {
+  fetchFollowerSnapshots,
+  fetchPlatformConnections,
+  type FollowerSnapshot,
+  type PlatformConnection,
+} from "./platformConnections";
 import { fetchFacebookAnalytics } from "./facebookAnalyticsApi";
 import { fetchInstagramAnalytics } from "./instagramAnalyticsApi";
 import { fetchTwitterAnalytics } from "./twitterAnalyticsApi";
@@ -171,7 +177,7 @@ export const fallbackOverviewMetrics = buildOverviewMetrics({
   youtube: FALLBACK_PLATFORMS[3].followers,
 });
 
-export async function fetchOverviewMetrics(): Promise<OverviewMetrics> {
+async function fetchSocialOverviewMetrics(): Promise<OverviewMetrics> {
   const [instagram, facebook, twitter, youtube] = await Promise.allSettled([
     fetchInstagramAnalytics(),
     fetchFacebookAnalytics(),
@@ -232,6 +238,135 @@ export async function fetchOverviewMetrics(): Promise<OverviewMetrics> {
     avgLikes,
     syncedAt,
   });
+}
+
+
+
+/* ------------------------------------------------------------------ */
+/* Connector-backed metrics (Lovable Cloud `platform_connections`)      */
+/* ------------------------------------------------------------------ */
+
+function formatDayLabel(iso: string) {
+  const date = new Date(`${iso}T00:00:00Z`);
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
+function buildHistoryFromSnapshots(
+  snapshots: FollowerSnapshot[],
+  platforms: string[],
+): Array<{ date: string; followers: number }> {
+  const allowed = new Set(platforms);
+  const byDate = new Map<string, number>();
+  for (const snapshot of snapshots) {
+    if (!allowed.has(snapshot.platform)) continue;
+    byDate.set(
+      snapshot.captured_on,
+      (byDate.get(snapshot.captured_on) ?? 0) + Number(snapshot.follower_count ?? 0),
+    );
+  }
+  return [...byDate.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, followers]) => ({ date: formatDayLabel(date), followers }));
+}
+
+function changeLabel(current: number, previous: number | undefined) {
+  if (!previous || previous <= 0 || !current) return "No history yet";
+  const pct = ((current - previous) / previous) * 100;
+  const sign = pct >= 0 ? "+" : "";
+  return `${sign}${pct.toFixed(1)}%`;
+}
+
+const KPI_ICONS: OverviewKpi["icon"][] = [
+  "users",
+  "user-check",
+  "heart",
+  "eye",
+  "trending-up",
+  "mail",
+];
+
+export function buildConnectorMetrics(
+  connections: PlatformConnection[],
+  snapshots: FollowerSnapshot[],
+): OverviewMetrics | null {
+  const connected = connections.filter(
+    (c) => c.connected && typeof c.follower_count === "number" && (c.follower_count ?? 0) > 0,
+  );
+  if (connected.length === 0) return null;
+
+  const platformKeys = connected.map((c) => c.platform);
+  const overallFollowers = connected.reduce((sum, c) => sum + (c.follower_count ?? 0), 0);
+
+  // Per-platform change from the earliest snapshot in range.
+  const firstByPlatform = new Map<string, number>();
+  for (const snapshot of snapshots) {
+    if (!firstByPlatform.has(snapshot.platform)) {
+      firstByPlatform.set(snapshot.platform, Number(snapshot.follower_count ?? 0));
+    }
+  }
+
+  const history = buildHistoryFromSnapshots(snapshots, platformKeys);
+  const overallStart = history.length > 1 ? history[0].followers : undefined;
+
+  const kpis: OverviewKpi[] = [
+    {
+      label: "Overall Followers",
+      value: formatMetric(overallFollowers, true),
+      change: changeLabel(overallFollowers, overallStart),
+      icon: "users",
+    },
+    ...connected.slice(0, 5).map((c, index) => ({
+      label: c.display_name,
+      value: formatMetric(c.follower_count ?? 0, true),
+      change: changeLabel(c.follower_count ?? 0, firstByPlatform.get(c.platform)),
+      icon: KPI_ICONS[index % KPI_ICONS.length],
+    })),
+  ];
+
+  const latestSync = connected
+    .map((c) => c.last_synced_at)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .reverse()[0];
+
+  return {
+    syncedAt: latestSync ?? new Date().toISOString(),
+    overallFollowers,
+    platformShares: buildPlatformShares(
+      connected.map((c) => ({ name: c.display_name, followers: c.follower_count ?? 0 })),
+    ),
+    kpis,
+    audienceSnapshot: [
+      ...connected.map((c) => ({
+        label: `${c.display_name} Followers`,
+        value: formatMetric(c.follower_count ?? 0),
+      })),
+      { label: "Platforms Connected", value: String(connected.length) },
+      {
+        label: "History Points",
+        value: history.length ? String(history.length) : "Awaiting first snapshot",
+      },
+    ],
+    followersOverTime: history.length > 1 ? history : buildFollowersOverTime(overallFollowers),
+  };
+}
+
+export async function fetchConnectorOverviewMetrics(): Promise<OverviewMetrics | null> {
+  const [connections, snapshots] = await Promise.all([
+    fetchPlatformConnections(),
+    fetchFollowerSnapshots(90).catch(() => [] as FollowerSnapshot[]),
+  ]);
+  return buildConnectorMetrics(connections, snapshots);
+}
+
+export async function fetchOverviewMetrics(): Promise<OverviewMetrics> {
+  try {
+    const connectorMetrics = await fetchConnectorOverviewMetrics();
+    if (connectorMetrics) return connectorMetrics;
+  } catch (error) {
+    console.warn("Connector metrics unavailable, falling back to cached socials", error);
+  }
+  return fetchSocialOverviewMetrics();
 }
 
 export { PLATFORM_COLORS };

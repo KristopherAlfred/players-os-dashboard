@@ -23,7 +23,7 @@ export function TrafficSourcesChart() {
               dataKey="value"
             >
               {platformShares.map((entry, i) => (
-                <Cell key={entry.name} fill={palette.trafficShades[i]} />
+                <Cell key={entry.name} fill={palette.trafficShades[i % palette.trafficShades.length]} />
               ))}
             </Pie>
             <Tooltip
@@ -52,7 +52,7 @@ export function TrafficSourcesChart() {
               <span className="flex min-w-0 items-center gap-2 text-[#a3a3a3]">
                 <span
                   className="h-2 w-2 shrink-0 rounded-full"
-                  style={{ background: palette.trafficShades[i] }}
+                  style={{ background: palette.trafficShades[i % palette.trafficShades.length] }}
                 />
                 <span className="truncate">{s.name}</span>
               </span>
