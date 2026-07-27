@@ -15,7 +15,8 @@ import { YouTubeAnalyticsDashboard } from "../components/youtube/YouTubeAnalytic
 import { FacebookAnalyticsDashboard } from "../components/facebook/FacebookAnalyticsDashboard";
 import { TwitterAnalyticsDashboard } from "../components/twitter/TwitterAnalyticsDashboard";
 import { useDashboardSource } from "../contexts/DashboardSourceContext";
-import { OverviewMetricsProvider } from "../contexts/OverviewMetricsContext";
+import { OverviewMetricsProvider, useOverviewMetrics } from "../contexts/OverviewMetricsContext";
+import { NoConnectorsBanner } from "../components/NoConnectorsBanner";
 
 function OverviewDashboard() {
   return (
@@ -26,8 +27,12 @@ function OverviewDashboard() {
 }
 
 function OverviewDashboardContent() {
+  const { hasConnected, loading } = useOverviewMetrics();
+
   return (
     <div className="space-y-3 pb-4">
+      {!loading && !hasConnected && <NoConnectorsBanner />}
+
       <KpiCards />
 
       <div className="grid grid-cols-12 items-stretch gap-3">

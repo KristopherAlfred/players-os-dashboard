@@ -347,7 +347,8 @@ export function buildConnectorMetrics(
         value: history.length ? String(history.length) : "Awaiting first snapshot",
       },
     ],
-    followersOverTime: history.length > 1 ? history : buildFollowersOverTime(overallFollowers),
+    // Never blend synthetic history alongside real connector data.
+    followersOverTime: history.length > 1 ? history : [],
   };
 }
 
