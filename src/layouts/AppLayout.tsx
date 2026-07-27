@@ -11,6 +11,7 @@ import { FacebookAnalyticsProvider } from "../contexts/FacebookAnalyticsContext"
 import { TwitterAnalyticsProvider } from "../contexts/TwitterAnalyticsContext";
 import { SourceBanner } from "../components/dametime/DametimeAnalyticsStates";
 import { ContentSourceGuard } from "../components/ContentSourceGuard";
+import { OnboardingProvider } from "../components/onboarding/OnboardingTour";
 
 export function AppLayout() {
   const { pathname } = useLocation();
@@ -33,6 +34,7 @@ export function AppLayout() {
 
   return (
     <DashboardSourceProvider>
+      <OnboardingProvider>
       <DametimeAnalyticsProvider>
         <InstagramAnalyticsProvider>
           <YouTubeAnalyticsProvider>
@@ -63,6 +65,7 @@ export function AppLayout() {
           </YouTubeAnalyticsProvider>
         </InstagramAnalyticsProvider>
       </DametimeAnalyticsProvider>
+      </OnboardingProvider>
     </DashboardSourceProvider>
   );
 }

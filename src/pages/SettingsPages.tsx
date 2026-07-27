@@ -95,6 +95,8 @@ export function SettingsPage() {
         ) : null}
       </div>
 
+      <ConnectorCards />
+
       <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
         <div className="border-b border-dt-border px-5 py-4">
           <div className="flex items-center gap-2 text-dt-red">
@@ -273,7 +275,6 @@ export function SettingsPage() {
         </section>
       </div>
 
-      <ConnectorCards />
 
 
       <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
