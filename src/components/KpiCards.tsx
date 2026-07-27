@@ -21,7 +21,7 @@ const iconMap: Record<string, typeof Users> = {
 function AccentLoader({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex h-7 w-7 items-center justify-center xl:h-8 xl:w-8 ${className}`}
+      className={`inline-flex h-6 w-6 items-center justify-center xl:h-7 xl:w-7 ${className}`}
       aria-hidden
     >
       <span
