@@ -145,6 +145,25 @@ function TourOverlay({
   const rect = useTargetRect(step.target, index);
   const isLast = index === steps.length - 1;
 
+  // Bring the spotlighted element into view (page stays freely scrollable).
+  useEffect(() => {
+    if (!step.target) return;
+    const el = document.querySelector(step.target);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [step.target, index]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" || e.key === "Enter") onNext();
+      else if (e.key === "ArrowLeft") onBack();
+      else if (e.key === "Escape") onSkip();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onNext, onBack, onSkip]);
+
+
   const pad = 8;
   const spotlight = rect
     ? {
