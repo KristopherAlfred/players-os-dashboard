@@ -250,8 +250,6 @@ function TourOverlay({
   );
 }
 
-const STORAGE_KEY = "amx_onboarding_complete";
-
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState(false);
   const [index, setIndex] = useState(0);
@@ -265,24 +263,24 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     setActive(true);
   }, []);
 
-  const finish = useCallback(() => {
-    setActive(false);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* ignore */
-    }
-  }, []);
+  const finish = useCallback(
+    (goConnect = false) => {
+      setActive(false);
+      void setOnboardingComplete(true);
+      if (goConnect) navigate("/settings");
+    },
+    [navigate],
+  );
 
-  // First-login auto-trigger (completion flag moves to the backend next).
+  // Auto-trigger on first login, using the backend completion flag.
   useEffect(() => {
-    let done = "1";
-    try {
-      done = window.localStorage.getItem(STORAGE_KEY) ?? "";
-    } catch {
-      /* ignore */
-    }
-    if (!done) setActive(true);
+    let cancelled = false;
+    void fetchOnboardingComplete().then((done) => {
+      if (!cancelled && !done) setActive(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Keep the app on the route a step points at.
@@ -301,12 +299,12 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         <TourOverlay
           steps={steps}
           index={index}
-          onSkip={finish}
+          onSkip={() => finish()}
           onBack={() => setIndex((i) => Math.max(0, i - 1))}
           onNext={() =>
             setIndex((i) => {
               if (i >= steps.length - 1) {
-                finish();
+                finish(true);
                 return i;
               }
               return i + 1;
@@ -317,3 +315,4 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     </OnboardingContext.Provider>
   );
 }
+
