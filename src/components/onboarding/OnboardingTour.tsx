@@ -305,15 +305,10 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           index={index}
           onSkip={() => finish()}
           onBack={() => setIndex((i) => Math.max(0, i - 1))}
-          onNext={() =>
-            setIndex((i) => {
-              if (i >= steps.length - 1) {
-                finish(true);
-                return i;
-              }
-              return i + 1;
-            })
-          }
+          onNext={() => {
+            if (index >= steps.length - 1) finish(true);
+            else setIndex(index + 1);
+          }}
         />
       ) : null}
     </OnboardingContext.Provider>
