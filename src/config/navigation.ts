@@ -72,6 +72,12 @@ export const navSections: NavSection[] = [
     directPath: "/notifications",
   },
   {
+    label: "PLATFORMS",
+    icon: "layers",
+    items: [],
+    directPath: "/platforms",
+  },
+  {
     label: "FANS & DATA",
     icon: "users",
     items: [
