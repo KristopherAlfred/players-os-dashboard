@@ -76,8 +76,9 @@ export function FacebookLogo(props: IconProps) {
 
 export function MailchimpLogo(props: IconProps) {
   return (
-    <svg {...base(props)} aria-hidden>
-      <path d="M12 1.5c-4.2 0-7.9 2.4-9.3 5.9-.5 1.2-.6 2.5-.3 3.7-.9.8-1.4 2-1.4 3.2 0 1.6.8 3.1 2.2 4 .3 1.2 1 2.3 2 3.1 1.8 1.4 4.2 1.9 6.6 1.4 2.6-.5 4.6-2.1 5.3-4.2.1-.3.2-.7.2-1 2.4-.9 4.2-3 4.2-5.5 0-1.5-.6-2.9-1.7-3.9C19 4.3 15.8 1.5 12 1.5m-2.8 6.1c.6 0 1.1.6 1.1 1.3s-.5 1.3-1.1 1.3-1.1-.6-1.1-1.3.5-1.3 1.1-1.3m5.6 0c.6 0 1.1.6 1.1 1.3s-.5 1.3-1.1 1.3-1.1-.6-1.1-1.3.5-1.3 1.1-1.3m-2.8 5.6c2 0 3.6 1.1 3.6 2.4s-1.6 2.4-3.6 2.4-3.6-1.1-3.6-2.4 1.6-2.4 3.6-2.4" />
+    <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m2 7 10 6 10-6" />
     </svg>
   );
 }
