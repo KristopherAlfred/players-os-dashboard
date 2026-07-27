@@ -43,7 +43,7 @@ export function ConnectorCards() {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
+    <section data-tour="connector-cards" className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
       <div className="border-b border-dt-border px-5 py-4">
         <div className="flex items-center gap-2 text-dt-red">
           <Link2 size={16} />

@@ -11,6 +11,10 @@ import {
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
+import {
+  fetchOnboardingComplete,
+  setOnboardingComplete,
+} from "../../lib/onboardingState";
 
 export type TourStep = {
   id: string;
@@ -23,20 +27,58 @@ export type TourStep = {
   ctaLabel?: string;
 };
 
-/** Preview sequence — welcome + the Platforms step, for visual sign-off. */
+/** Full 7-step walkthrough. */
 export const TOUR_STEPS: TourStep[] = [
   {
     id: "welcome",
     title: "Welcome to your AMX Dashboard, Sloane",
     body: "This is your home base for performance, content and audience data across every platform — all in one place.",
+    route: "/",
+  },
+  {
+    id: "settings",
+    title: "Start in Settings",
+    body: "Connecting your accounts here is what powers real data everywhere else. Start with your most active platform.",
+    target: '[data-tour="nav-settings"]',
+    route: "/settings",
+  },
+  {
+    id: "connectors",
+    title: "Your connector cards",
+    body: "Connect adds an account, Configure tweaks a live one and Disconnect removes it. The status dot and “Synced” text show how fresh the data is.",
+    target: '[data-tour="connector-cards"]',
+    route: "/settings",
+  },
+  {
+    id: "overview",
+    title: "Dashboard Overview",
+    body: "Stat cards and the Followers Over Time chart fill in automatically as soon as a platform is connected.",
+    target: '[data-tour="kpi-cards"]',
+    route: "/",
   },
   {
     id: "platforms",
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
     target: '[data-tour="nav-platforms"]',
+    route: "/",
+  },
+  {
+    id: "sections",
+    title: "The rest of your sidebar",
+    body: "Experience is your fan-facing hub, Fans & Data holds audience and subscriber lists, Performance tracks results, Monetization covers revenue and Engagement handles messages and notifications.",
+    target: '[data-tour="nav-fans & data"]',
+    route: "/",
+  },
+  {
+    id: "done",
+    title: "You're all set",
+    body: "Revisit this tour anytime from the help icon up top. Next up: connect your first platform.",
+    route: "/",
+    ctaLabel: "Connect a platform",
   },
 ];
+
 
 type OnboardingContextValue = {
   start: () => void;
@@ -212,8 +254,6 @@ function TourOverlay({
   );
 }
 
-const STORAGE_KEY = "amx_onboarding_complete";
-
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState(false);
   const [index, setIndex] = useState(0);
@@ -227,24 +267,24 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     setActive(true);
   }, []);
 
-  const finish = useCallback(() => {
-    setActive(false);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* ignore */
-    }
-  }, []);
+  const finish = useCallback(
+    (goConnect = false) => {
+      setActive(false);
+      void setOnboardingComplete(true);
+      if (goConnect) navigate("/settings");
+    },
+    [navigate],
+  );
 
-  // First-login auto-trigger (completion flag moves to the backend next).
+  // Auto-trigger on first login, using the backend completion flag.
   useEffect(() => {
-    let done = "1";
-    try {
-      done = window.localStorage.getItem(STORAGE_KEY) ?? "";
-    } catch {
-      /* ignore */
-    }
-    if (!done) setActive(true);
+    let cancelled = false;
+    void fetchOnboardingComplete().then((done) => {
+      if (!cancelled && !done) setActive(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Keep the app on the route a step points at.
@@ -263,19 +303,15 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         <TourOverlay
           steps={steps}
           index={index}
-          onSkip={finish}
+          onSkip={() => finish()}
           onBack={() => setIndex((i) => Math.max(0, i - 1))}
-          onNext={() =>
-            setIndex((i) => {
-              if (i >= steps.length - 1) {
-                finish();
-                return i;
-              }
-              return i + 1;
-            })
-          }
+          onNext={() => {
+            if (index >= steps.length - 1) finish(true);
+            else setIndex(index + 1);
+          }}
         />
       ) : null}
     </OnboardingContext.Provider>
   );
 }
+
