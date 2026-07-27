@@ -216,7 +216,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
     }
 
     return (
-      <div key={section.label} className="mb-4">
+      <div key={section.label} data-tour={`nav-${section.label.toLowerCase()}`} className="mb-4">
         <button
           type="button"
           onClick={() => toggleSection(section.label)}
