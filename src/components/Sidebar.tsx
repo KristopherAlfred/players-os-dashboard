@@ -13,6 +13,7 @@ import {
   Radio,
   Sparkles,
   Bell,
+  Layers,
   X,
 } from "lucide-react";
 import {
@@ -36,6 +37,7 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
   radio: Radio,
   sparkles: Sparkles,
   bell: Bell,
+  layers: Layers,
 };
 
 const sectionGlowStyle = {
