@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { ReactElement, SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
@@ -84,7 +84,7 @@ export function MailchimpLogo(props: IconProps) {
 
 export const brandIconMap: Record<
   string,
-  (props: IconProps) => JSX.Element
+  (props: IconProps) => ReactElement
 > = {
   youtube: YouTubeLogo,
   instagram: InstagramLogo,
