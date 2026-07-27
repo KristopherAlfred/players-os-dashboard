@@ -6,7 +6,17 @@ import { useTheme } from "../theme/ThemeContext";
 export function TrafficSourcesChart() {
   const { palette } = useTheme();
   const { metrics } = useOverviewMetrics();
-  const platformShares = metrics.platformShares;
+  const platformShares = metrics?.platformShares ?? [];
+
+  if (platformShares.length === 0) {
+    return (
+      <Card title="Followers by Platform" className="h-[280px]">
+        <div className="flex h-[230px] items-center justify-center px-5 text-center text-[12px] text-dt-muted">
+          No connected platforms yet
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card title="Followers by Platform" className="h-[280px]">
