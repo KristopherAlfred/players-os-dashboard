@@ -280,34 +280,8 @@ export function SettingsPage() {
         </section>
       </div>
 
-      <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
-        <div className="border-b border-dt-border px-5 py-4">
-          <div className="flex items-center gap-2 text-dt-red">
-            <Link2 size={16} />
-            <h3 className="font-display text-sm font-semibold tracking-wide text-white">Connected platforms</h3>
-          </div>
-          <p className="mt-1 text-[11px] text-white/40">Social sources powering Content and overview analytics</p>
-        </div>
-        <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {integrations.map((item) => (
-            <div
-              key={item.name}
-              className="rounded-2xl border border-dt-border bg-black/25 p-4 transition hover:border-white/15"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-white">{item.name}</p>
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${item.connected ? "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.55)]" : "bg-white/25"}`}
-                />
-              </div>
-              <p className="mt-2 text-[11px] text-white/40">{item.last}</p>
-              <button type="button" className="mt-3 text-xs font-semibold text-dt-red hover:brightness-125">
-                {item.connected ? "Configure" : "Connect"}
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+      <ConnectorCards />
+
 
       <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
         <div className="border-b border-dt-border px-5 py-4">
