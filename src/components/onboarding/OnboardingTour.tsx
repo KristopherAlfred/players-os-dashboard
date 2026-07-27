@@ -173,79 +173,125 @@ function TourOverlay({
       };
 
   return createPortal(
-    <div className="fixed inset-0 z-[200]">
+    <div className="pointer-events-none fixed inset-0 z-[200]">
+      <style>{`
+        @keyframes amx-tour-ring { 0%,100% { opacity:.55; transform:scale(1); } 50% { opacity:1; transform:scale(1.012); } }
+        @keyframes amx-tour-sheen { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        @keyframes amx-tour-card { 0% { opacity:0; transform: translate3d(0,10px,0) scale(.97); } 100% { opacity:1; transform: translate3d(0,0,0) scale(1); } }
+      `}</style>
+
       {/* Dimmer + spotlight */}
       {spotlight ? (
         <div
-          className="pointer-events-none absolute rounded-xl transition-all duration-300 ease-out"
+          className="pointer-events-none absolute rounded-xl transition-all duration-500"
           style={{
             top: spotlight.top,
             left: spotlight.left,
             width: spotlight.width,
             height: spotlight.height,
+            transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
             boxShadow:
-              "0 0 0 9999px rgba(0,0,0,0.74), 0 0 0 2px var(--theme-accent), 0 0 28px 4px color-mix(in srgb, var(--theme-accent) 45%, transparent)",
+              "0 0 0 9999px rgba(0,0,0,0.72), 0 0 0 1.5px var(--theme-accent), 0 0 34px 6px color-mix(in srgb, var(--theme-accent) 45%, transparent), inset 0 0 24px color-mix(in srgb, var(--theme-accent) 14%, transparent)",
+            animation: "amx-tour-ring 2.4s ease-in-out infinite",
           }}
         />
       ) : (
-        <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-black/75 backdrop-blur-[3px] transition-opacity duration-500" />
       )}
 
       <div
         key={step.id}
-        className="absolute w-[min(360px,calc(100vw-32px))] animate-fade-in rounded-2xl border border-dt-border bg-dt-card p-5 shadow-[0_24px_60px_rgba(0,0,0,0.6)]"
+        className="pointer-events-auto absolute w-[min(380px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
         style={{
           ...cardStyle,
-          borderColor: "color-mix(in srgb, var(--theme-accent) 40%, transparent)",
+          transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
+          animation: "amx-tour-card .45s cubic-bezier(.22,1,.36,1) both",
+          background:
+            "linear-gradient(110deg, color-mix(in srgb, var(--theme-accent) 60%, transparent), rgba(255,255,255,0.06) 35%, rgba(255,255,255,0.04) 65%, color-mix(in srgb, var(--theme-accent) 45%, transparent)) 0% 50% / 200% 100%",
+          animationName: "amx-tour-card",
         }}
       >
-        <button
-          type="button"
-          onClick={onSkip}
-          className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-white/45 transition hover:bg-white/5 hover:text-white"
-        >
-          <X size={12} /> Skip tutorial
-        </button>
+        <div className="relative overflow-hidden rounded-[15px] bg-dt-card p-5">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.5]"
+            style={{
+              background:
+                "radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--theme-accent) 12%, transparent), transparent 60%)",
+            }}
+          />
 
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-dt-red">
-          <Sparkles size={11} />
-          Step {index + 1} of {steps.length}
-        </div>
-
-        <h3 className="font-display text-lg font-semibold leading-tight tracking-tight text-white">
-          {step.title}
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-white/60">{step.body}</p>
-
-        <div className="mt-5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5">
-            {steps.map((s, i) => (
-              <span
-                key={s.id}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-5 bg-dt-red" : "w-1.5 bg-white/20"
-                }`}
-              />
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            {index > 0 ? (
-              <button
-                type="button"
-                onClick={onBack}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-dt-border px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-white/25 hover:text-white"
-              >
-                <ArrowLeft size={13} /> Back
-              </button>
-            ) : null}
+          <div className="relative">
             <button
               type="button"
-              onClick={onNext}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-dt-red px-3.5 py-2 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(143,227,184,0.28)] transition hover:brightness-110"
+              onClick={onSkip}
+              className="absolute right-0 top-0 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-white/45 transition hover:bg-white/5 hover:text-white"
             >
-              {step.ctaLabel ?? (isLast ? "Finish" : "Next")}
-              {!isLast ? <ArrowRight size={13} /> : null}
+              <X size={12} /> Skip tutorial
             </button>
+
+            <div
+              className="mb-3 inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
+              style={{
+                color: "var(--theme-accent)",
+                borderWidth: 1,
+                borderColor: "color-mix(in srgb, var(--theme-accent) 32%, transparent)",
+                background: "color-mix(in srgb, var(--theme-accent) 10%, transparent)",
+              }}
+            >
+              <Sparkles size={11} />
+              Step {index + 1} of {steps.length}
+            </div>
+
+            <h3 className="font-display text-lg font-semibold leading-tight tracking-tight text-white">
+              {step.title}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/60">{step.body}</p>
+
+            {/* Progress bar */}
+            <div className="mt-4 h-[3px] w-full overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full transition-[width] duration-500"
+                style={{
+                  width: `${((index + 1) / steps.length) * 100}%`,
+                  background:
+                    "linear-gradient(90deg, color-mix(in srgb, var(--theme-accent) 55%, transparent), var(--theme-accent))",
+                  boxShadow: "0 0 12px color-mix(in srgb, var(--theme-accent) 60%, transparent)",
+                  transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
+                }}
+              />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">
+                ← → to navigate
+              </span>
+              <div className="flex items-center gap-2">
+                {index > 0 ? (
+                  <button
+                    type="button"
+                    onClick={onBack}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-dt-border px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-white/25 hover:text-white"
+                  >
+                    <ArrowLeft size={13} /> Back
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={onNext}
+                  className="group inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-black transition hover:brightness-110"
+                  style={{
+                    background:
+                      "linear-gradient(120deg, var(--theme-accent), color-mix(in srgb, var(--theme-accent) 70%, #ffffff))",
+                    boxShadow: "0 10px 26px color-mix(in srgb, var(--theme-accent) 32%, transparent)",
+                  }}
+                >
+                  {step.ctaLabel ?? (isLast ? "Finish" : "Next")}
+                  {!isLast ? (
+                    <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                  ) : null}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -253,6 +299,7 @@ function TourOverlay({
     document.body,
   );
 }
+
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState(false);
