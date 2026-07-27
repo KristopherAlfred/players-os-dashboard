@@ -20,12 +20,23 @@ function formatAxis(value: number) {
 export function TrafficChart() {
   const { palette } = useTheme();
   const { metrics } = useOverviewMetrics();
+  const data = metrics?.followersOverTime ?? [];
+
+  if (data.length === 0) {
+    return (
+      <Card title="Followers Over Time" className="h-[280px]">
+        <div className="flex h-[230px] items-center justify-center px-6 text-center text-[12px] text-dt-muted">
+          No connected platforms yet — connect a platform to start tracking follower history.
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card title="Followers Over Time" className="h-[280px]">
       <div className="h-[230px] px-2 pb-2 pt-1">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={metrics.followersOverTime}>
+          <LineChart data={data}>
             <CartesianGrid stroke="#ffffff" strokeDasharray="3 3" strokeOpacity={0.25} vertical={false} />
             <XAxis
               dataKey="date"
