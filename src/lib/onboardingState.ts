@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../integrations/supabase/client";
 
 /** Single-profile dashboard for now — one row keyed by this value. */
 export const ONBOARDING_PROFILE_KEY = "sloane";
