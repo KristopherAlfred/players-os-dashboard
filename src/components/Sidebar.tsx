@@ -195,6 +195,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         <div key={section.label} className="mb-4">
           <NavLink
             to={section.directPath}
+            data-tour={`nav-${section.label.toLowerCase()}`}
             onClick={onClose}
             className={({ isActive }) =>
               `flex w-full items-center gap-2.5 rounded-md px-2.5 py-2.5 transition-colors ${

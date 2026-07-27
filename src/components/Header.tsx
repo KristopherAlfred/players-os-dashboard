@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { SlidersHorizontal, Bell, Menu, Check } from "lucide-react";
+import { SlidersHorizontal, Bell, Menu, Check, HelpCircle } from "lucide-react";
 import {
   ALL_DASHBOARD_SOURCES,
   CONTENT_ALLOWED_SOURCES,
@@ -8,6 +8,7 @@ import {
   useDashboardSource,
   type DashboardSource,
 } from "../contexts/DashboardSourceContext";
+import { useOnboarding } from "./onboarding/OnboardingTour";
 import { getDashboardAvatar, getDashboardAvatarRing, onDashboardAvatarChange } from "../lib/adminProfile";
 
 const filterOptions: { id: DashboardSource; label: string }[] = [
@@ -34,6 +35,7 @@ export function Header({
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
   const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
   const filtersRef = useRef<HTMLDivElement>(null);
+  const { start: startTour } = useOnboarding();
 
   useEffect(
     () =>
@@ -144,6 +146,17 @@ export function Header({
               </div>
             )}
           </div>
+
+          <button
+            type="button"
+            data-tour="help-button"
+            title="Take the tour"
+            aria-label="Take the tour"
+            onClick={startTour}
+            className="relative rounded-md border border-dt-border bg-dt-card p-2 text-[#d4d4d4] transition hover:border-dt-red/50 hover:text-white"
+          >
+            <HelpCircle size={18} />
+          </button>
 
           <button
             type="button"

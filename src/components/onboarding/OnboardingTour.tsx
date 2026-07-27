@@ -34,7 +34,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "platforms",
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
-    target: '[data-tour="platforms-nav"]',
+    target: '[data-tour="nav-platforms"]',
   },
 ];
 
