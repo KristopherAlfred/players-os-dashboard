@@ -21,7 +21,7 @@ const iconMap: Record<string, typeof Users> = {
 function AccentLoader({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex h-7 w-7 items-center justify-center xl:h-8 xl:w-8 ${className}`}
+      className={`inline-flex h-6 w-6 items-center justify-center xl:h-7 xl:w-7 ${className}`}
       aria-hidden
     >
       <span
@@ -46,7 +46,7 @@ export function KpiCards() {
         return (
           <div
             key={stat.label}
-            className="dt-surface relative min-w-0 overflow-hidden rounded-xl border border-dt-border bg-dt-card p-5 pr-16"
+            className="dt-surface relative min-w-0 overflow-hidden rounded-xl border border-dt-border bg-dt-card p-4 pr-14"
           >
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-black to-black/95" />
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,rgba(143,227,184,0.04),transparent_55%)]" />
@@ -54,20 +54,20 @@ export function KpiCards() {
               {stat.label}
             </p>
             {loading ? (
-              <div className="relative mt-2 flex min-h-[28px] items-center xl:mt-2.5 xl:min-h-[32px]">
+              <div className="relative mt-1.5 flex min-h-[24px] items-center xl:min-h-[28px]">
                 <AccentLoader />
               </div>
             ) : (
               <>
                 <p
-                  className={`relative mt-3 text-3xl font-bold ${
+                  className={`relative mt-2 text-2xl font-bold ${
                     stat.connected ? "text-white" : "text-white/40"
                   }`}
                 >
                   {stat.value}
                 </p>
                 <p
-                  className={`relative mt-3 text-sm font-medium ${
+                  className={`relative mt-2 text-xs font-medium ${
                     stat.connected ? "text-dt-green" : "text-dt-muted"
                   }`}
                 >
@@ -75,9 +75,9 @@ export function KpiCards() {
                 </p>
               </>
             )}
-            <div className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2">
+            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
               <Icon
-                size={28}
+                size={24}
                 strokeWidth={1.75}
                 className={stat.connected ? "text-dt-green" : "text-white/20"}
                 style={
