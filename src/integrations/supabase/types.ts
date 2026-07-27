@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      onboarding_state: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          has_completed_onboarding: boolean
+          id: string
+          profile_key: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          has_completed_onboarding?: boolean
+          id?: string
+          profile_key: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          has_completed_onboarding?: boolean
+          id?: string
+          profile_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       platform_connections: {
         Row: {
           connected: boolean
