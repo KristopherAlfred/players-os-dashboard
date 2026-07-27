@@ -26,8 +26,12 @@ function OverviewDashboard() {
 }
 
 function OverviewDashboardContent() {
+  const { hasConnected, loading } = useOverviewMetrics();
+
   return (
     <div className="space-y-3 pb-4">
+      {!loading && !hasConnected && <NoConnectorsBanner />}
+
       <KpiCards />
 
       <div className="grid grid-cols-12 items-stretch gap-3">
