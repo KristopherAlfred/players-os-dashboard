@@ -23,20 +23,58 @@ export type TourStep = {
   ctaLabel?: string;
 };
 
-/** Preview sequence — welcome + the Platforms step, for visual sign-off. */
+/** Full 7-step walkthrough. */
 export const TOUR_STEPS: TourStep[] = [
   {
     id: "welcome",
     title: "Welcome to your AMX Dashboard, Sloane",
     body: "This is your home base for performance, content and audience data across every platform — all in one place.",
+    route: "/",
+  },
+  {
+    id: "settings",
+    title: "Start in Settings",
+    body: "Connecting your accounts here is what powers real data everywhere else. Start with your most active platform.",
+    target: '[data-tour="nav-settings"]',
+    route: "/settings",
+  },
+  {
+    id: "connectors",
+    title: "Your connector cards",
+    body: "Connect adds an account, Configure tweaks a live one and Disconnect removes it. The status dot and “Synced” text show how fresh the data is.",
+    target: '[data-tour="connector-cards"]',
+    route: "/settings",
+  },
+  {
+    id: "overview",
+    title: "Dashboard Overview",
+    body: "Stat cards and the Followers Over Time chart fill in automatically as soon as a platform is connected.",
+    target: '[data-tour="kpi-cards"]',
+    route: "/",
   },
   {
     id: "platforms",
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
     target: '[data-tour="nav-platforms"]',
+    route: "/",
+  },
+  {
+    id: "sections",
+    title: "The rest of your sidebar",
+    body: "Experience is your fan-facing hub, Fans & Data holds audience and subscriber lists, Performance tracks results, Monetization covers revenue and Engagement handles messages and notifications.",
+    target: '[data-tour="nav-fans & data"]',
+    route: "/",
+  },
+  {
+    id: "done",
+    title: "You're all set",
+    body: "Revisit this tour anytime from the help icon up top. Next up: connect your first platform.",
+    route: "/",
+    ctaLabel: "Connect a platform",
   },
 ];
+
 
 type OnboardingContextValue = {
   start: () => void;
