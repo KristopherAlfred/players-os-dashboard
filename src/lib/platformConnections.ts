@@ -43,3 +43,27 @@ export function formatSyncedAgo(iso: string | null): string {
   const days = Math.round(hours / 24);
   return `Synced ${days}d ago`;
 }
+
+export type FollowerSnapshot = {
+  platform: string;
+  captured_on: string;
+  follower_count: number;
+};
+
+export async function fetchFollowerSnapshots(days = 30): Promise<FollowerSnapshot[]> {
+  const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("platform_follower_snapshots")
+    .select("platform, captured_on, follower_count")
+    .gte("captured_on", since)
+    .order("captured_on", { ascending: true });
+
+  if (error) throw error;
+  return (data ?? []) as FollowerSnapshot[];
+}
+
+export async function recordFollowerSnapshots() {
+  const { data, error } = await supabase.functions.invoke("snapshot-followers");
+  if (error) throw error;
+  return data as { recorded: number; captured_on?: string };
+}
