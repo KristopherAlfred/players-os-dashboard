@@ -6,6 +6,8 @@ import {
   ImagePlus,
   LogOut,
   Palette,
+  PlayCircle,
+
   Settings2,
   Shield,
   UserRound,
@@ -16,6 +18,8 @@ import type { ThemeTemplate } from "../theme/themes";
 import { DtSelect } from "../components/DtSelect";
 import { getDashboardAvatar, getDashboardAvatarRing } from "../lib/adminProfile";
 import { ConnectorCards } from "../components/settings/ConnectorCards";
+import { useOnboarding } from "../components/onboarding/OnboardingTour";
+
 
 const TIMEZONE_OPTIONS = [
   { value: "pt", label: "Pacific Time (PT)" },
@@ -34,6 +38,8 @@ const permissions = [
 
 export function SettingsPage() {
   const navigate = useNavigate();
+  const { start: startTour } = useOnboarding();
+
   const { template, setTemplate, templates, palette } = useTheme();
   const [notifications, setNotifications] = useState(true);
   const [smsAlerts, setSmsAlerts] = useState(true);
@@ -75,14 +81,25 @@ export function SettingsPage() {
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-dt-red/40 bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.28)] transition hover:brightness-110"
-            >
-              <LogOut size={15} />
-              Sign out
-            </button>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={startTour}
+                className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-dt-red/40 bg-dt-red/10 px-5 text-sm font-semibold text-dt-red transition hover:bg-dt-red/20"
+              >
+                <PlayCircle size={16} />
+                Play tutorial
+              </button>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-dt-red/40 bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.28)] transition hover:brightness-110"
+              >
+                <LogOut size={15} />
+                Sign out
+              </button>
+            </div>
+
           </div>
         </div>
 
