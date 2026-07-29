@@ -29,6 +29,8 @@ export type TourStep = {
   /** Route the tour should be on for this step. */
   route?: string;
   ctaLabel?: string;
+  /** Which side of the spotlight the video card should sit on. */
+  side?: "left" | "right";
   /** Timestamp (seconds) in the presenter video where this step begins. */
   startAt: number;
 };
