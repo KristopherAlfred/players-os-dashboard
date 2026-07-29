@@ -293,6 +293,8 @@ function TourOverlay({
         className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
         style={{
           ...cardStyle,
+          "--tour-final-x": spotlight ? "0" : "-50%",
+          "--tour-final-y": spotlight ? "0" : "-50%",
           transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           animation: "amx-tour-card .45s cubic-bezier(.22,1,.36,1) both",
           background:
