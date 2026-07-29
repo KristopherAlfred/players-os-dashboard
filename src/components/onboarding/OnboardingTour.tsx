@@ -18,6 +18,7 @@ import {
 } from "../../lib/onboardingState";
 import { fetchPlatformConnections } from "../../lib/platformConnections";
 import introVideo from "../../assets/intro_vid.mp4.asset.json";
+import introCaptions from "../../assets/intro_vid.vtt.asset.json";
 
 export type TourStep = {
   id: string;
@@ -44,7 +45,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "settings",
-    startAt: 14,
+    startAt: 18.3,
     title: "Start in Settings",
     body: "Connecting your accounts here is what powers real data everywhere else. Start with your most active platform.",
     target: '[data-tour="nav-settings"]',
@@ -52,7 +53,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "connectors",
-    startAt: 32,
+    startAt: 38.4,
     title: "Your connector cards",
     body: "Connect adds an account, Configure tweaks a live one and Disconnect removes it. The status dot and “Synced” text show how fresh the data is.",
     target: '[data-tour="connector-cards"]',
@@ -60,7 +61,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "overview",
-    startAt: 58,
+    startAt: 62.4,
     title: "Dashboard Overview",
     body: "Stat cards and the Followers Over Time chart fill in automatically as soon as a platform is connected.",
     target: '[data-tour="kpi-cards"]',
@@ -68,7 +69,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "platforms",
-    startAt: 80,
+    startAt: 82.8,
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
     target: '[data-tour="nav-platforms"]',
@@ -76,7 +77,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "sections",
-    startAt: 98,
+    startAt: 101.8,
     title: "The rest of your sidebar",
     body: "Experience is your fan-facing hub, Fans & Data holds audience and subscriber lists, Performance tracks results, Monetization covers revenue and Engagement handles messages and notifications.",
     target: '[data-tour="nav-fans & data"]',
@@ -84,7 +85,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "done",
-    startAt: 118,
+    startAt: 118.4,
     title: "You're all set",
     body: "Revisit this tour anytime from the help icon up top. Next up: connect your first platform.",
     route: "/",
@@ -332,8 +333,17 @@ function TourOverlay({
                 autoPlay
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={onSkip}
+                crossOrigin="anonymous"
                 className="block aspect-video w-full object-cover"
-              />
+              >
+                <track
+                  kind="captions"
+                  src={introCaptions.url}
+                  srcLang="en"
+                  label="English"
+                  default
+                />
+              </video>
               <button
                 type="button"
                 onClick={needsSound ? enableSound : toggleMute}
