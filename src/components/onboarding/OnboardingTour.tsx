@@ -248,11 +248,11 @@ function TourOverlay({
     ? {
         top: Math.min(
           Math.max(spotlight.top, 16),
-          Math.max(window.innerHeight - 260, 16),
+          Math.max(window.innerHeight - 560, 16),
         ),
         left: Math.min(
           spotlight.left + spotlight.width + 18,
-          Math.max(window.innerWidth - 380, 16),
+          Math.max(window.innerWidth - 450, 16),
         ),
       }
     : {
