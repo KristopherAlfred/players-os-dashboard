@@ -335,7 +335,8 @@ function TourOverlay({
 
       <div
         ref={cardRef}
-        className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
+        onPointerDown={startDrag}
+        className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] cursor-grab overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500 active:cursor-grabbing"
         style={{
           ...cardStyle,
           "--tour-final-x": !dragged && !spotlight ? "-50%" : "0",
@@ -347,12 +348,7 @@ function TourOverlay({
           animationName: "amx-tour-card",
         } as React.CSSProperties}
       >
-        <div
-          onPointerDown={startDrag}
-          className="flex cursor-grab items-center justify-center gap-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40 active:cursor-grabbing"
-        >
-          <GripHorizontal size={12} /> Drag to move
-        </div>
+
 
         <div
           className="relative overflow-y-auto rounded-[15px] bg-dt-card p-5"
