@@ -266,7 +266,7 @@ function TourOverlay({
       <style>{`
         @keyframes amx-tour-ring { 0%,100% { opacity:.55; transform:scale(1); } 50% { opacity:1; transform:scale(1.012); } }
         @keyframes amx-tour-sheen { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-        @keyframes amx-tour-card { 0% { opacity:0; transform: translate3d(0,10px,0) scale(.97); } 100% { opacity:1; transform: translate3d(0,0,0) scale(1); } }
+        @keyframes amx-tour-card { 0% { opacity:0; transform: translate3d(0,10px,0) scale(.97); } 100% { opacity:1; transform: translate3d(var(--tour-final-x,0), var(--tour-final-y,0), 0) scale(1); } }
       `}</style>
 
       {/* Dimmer + spotlight */}
@@ -293,14 +293,19 @@ function TourOverlay({
         className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
         style={{
           ...cardStyle,
+          "--tour-final-x": spotlight ? "0" : "-50%",
+          "--tour-final-y": spotlight ? "0" : "-50%",
           transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           animation: "amx-tour-card .45s cubic-bezier(.22,1,.36,1) both",
           background:
             "linear-gradient(110deg, color-mix(in srgb, var(--theme-accent) 60%, transparent), rgba(255,255,255,0.06) 35%, rgba(255,255,255,0.04) 65%, color-mix(in srgb, var(--theme-accent) 45%, transparent)) 0% 50% / 200% 100%",
           animationName: "amx-tour-card",
-        }}
+        } as React.CSSProperties}
       >
-        <div className="relative overflow-hidden rounded-[15px] bg-dt-card p-5">
+        <div
+          className="relative overflow-y-auto rounded-[15px] bg-dt-card p-5"
+          style={{ maxHeight: "min(560px, 90vh)" }}
+        >
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.5]"
             style={{
