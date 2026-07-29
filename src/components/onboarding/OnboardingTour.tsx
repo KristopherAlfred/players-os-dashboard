@@ -317,6 +317,31 @@ function TourOverlay({
               <X size={12} /> Skip tutorial
             </button>
 
+            {/* Presenter video */}
+            <div className="relative mt-7 overflow-hidden rounded-xl border border-dt-border bg-black">
+              <video
+                ref={videoRef}
+                src={introVideo.url}
+                playsInline
+                autoPlay
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={onSkip}
+                className="block aspect-video w-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={needsSound ? enableSound : toggleMute}
+                className="absolute bottom-2 right-2 inline-flex items-center gap-1.5 rounded-lg bg-black/65 px-2 py-1 text-[10px] font-semibold text-white/85 backdrop-blur transition hover:bg-black/80"
+              >
+                {muted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+                {needsSound ? "Tap for sound" : muted ? "Unmute" : "Mute"}
+              </button>
+            </div>
+
+            <div className="mt-3" />
+
+
+
             <div
               className="mb-3 inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
               style={{
