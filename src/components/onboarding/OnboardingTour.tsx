@@ -302,7 +302,10 @@ function TourOverlay({
           animationName: "amx-tour-card",
         } as React.CSSProperties}
       >
-        <div className="relative overflow-hidden rounded-[15px] bg-dt-card p-5">
+        <div
+          className="relative overflow-y-auto rounded-[15px] bg-dt-card p-5"
+          style={{ maxHeight: "min(560px, 90vh)" }}
+        >
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.5]"
             style={{
