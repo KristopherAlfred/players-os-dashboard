@@ -146,16 +146,72 @@ function TourOverlay({
   onNext,
   onBack,
   onSkip,
+  onSeekStep,
 }: {
   steps: TourStep[];
   index: number;
   onNext: () => void;
   onBack: () => void;
   onSkip: () => void;
+  onSeekStep: (i: number) => void;
 }) {
   const step = steps[index];
   const rect = useTargetRect(step.target, index);
   const isLast = index === steps.length - 1;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [needsSound, setNeedsSound] = useState(false);
+
+  // Autoplay the presenter video (fall back to muted if the browser blocks it).
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {
+      v.muted = true;
+      setMuted(true);
+      setNeedsSound(true);
+      void v.play().catch(() => {});
+    });
+  }, []);
+
+  // Keep the video in sync when the user jumps steps manually.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const target = steps[index].startAt;
+    if (Math.abs(v.currentTime - target) > 1.5) {
+      const next = steps[index + 1]?.startAt ?? Infinity;
+      if (v.currentTime < target || v.currentTime >= next) v.currentTime = target;
+    }
+  }, [index, steps]);
+
+  // Advance the spotlight as the video reaches each scene.
+  const handleTimeUpdate = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    let next = 0;
+    steps.forEach((s, i) => {
+      if (v.currentTime + 0.15 >= s.startAt) next = i;
+    });
+    if (next !== index) onSeekStep(next);
+  }, [steps, index, onSeekStep]);
+
+  const enableSound = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = false;
+    setMuted(false);
+    setNeedsSound(false);
+    void v.play().catch(() => {});
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+    setNeedsSound(false);
+  }, []);
 
   // Bring the spotlighted element into view (page stays freely scrollable).
   useEffect(() => {
@@ -174,6 +230,7 @@ function TourOverlay({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onNext, onBack, onSkip]);
+
 
 
   const pad = 8;
