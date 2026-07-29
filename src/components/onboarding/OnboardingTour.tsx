@@ -5,16 +5,18 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import {
   fetchOnboardingComplete,
   setOnboardingComplete,
 } from "../../lib/onboardingState";
+import introVideo from "../../assets/intro_vid.mp4.asset.json";
 
 export type TourStep = {
   id: string;
@@ -25,7 +27,10 @@ export type TourStep = {
   /** Route the tour should be on for this step. */
   route?: string;
   ctaLabel?: string;
+  /** Timestamp (seconds) in the presenter video where this step begins. */
+  startAt: number;
 };
+
 
 /** Full 7-step walkthrough. */
 export const TOUR_STEPS: TourStep[] = [
