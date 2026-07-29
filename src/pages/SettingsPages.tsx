@@ -6,6 +6,8 @@ import {
   ImagePlus,
   LogOut,
   Palette,
+  PlayCircle,
+
   Settings2,
   Shield,
   UserRound,
