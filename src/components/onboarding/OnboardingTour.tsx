@@ -60,6 +60,7 @@ export const TOUR_STEPS: TourStep[] = [
     body: "Connect adds an account, Configure tweaks a live one and Disconnect removes it. The status dot and “Synced” text show how fresh the data is.",
     target: '[data-tour="connector-cards"]',
     route: "/settings",
+    side: "left",
   },
   {
     id: "overview",
@@ -68,6 +69,7 @@ export const TOUR_STEPS: TourStep[] = [
     body: "Stat cards and the Followers Over Time chart fill in automatically as soon as a platform is connected.",
     target: '[data-tour="kpi-cards"]',
     route: "/",
+    side: "left",
   },
   {
     id: "platforms",
@@ -75,8 +77,10 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
     target: '[data-tour="nav-platforms"]',
-    route: "/",
+    route: "/platforms",
+    side: "left",
   },
+
   {
     id: "sections",
     startAt: 101.8,
