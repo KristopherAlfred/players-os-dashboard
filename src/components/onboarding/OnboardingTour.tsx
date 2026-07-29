@@ -266,7 +266,7 @@ function TourOverlay({
       <style>{`
         @keyframes amx-tour-ring { 0%,100% { opacity:.55; transform:scale(1); } 50% { opacity:1; transform:scale(1.012); } }
         @keyframes amx-tour-sheen { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-        @keyframes amx-tour-card { 0% { opacity:0; transform: translate3d(0,10px,0) scale(.97); } 100% { opacity:1; transform: translate3d(0,0,0) scale(1); } }
+        @keyframes amx-tour-card { 0% { opacity:0; transform: translate3d(0,10px,0) scale(.97); } 100% { opacity:1; transform: translate3d(var(--tour-final-x,0), var(--tour-final-y,0), 0) scale(1); } }
       `}</style>
 
       {/* Dimmer + spotlight */}
