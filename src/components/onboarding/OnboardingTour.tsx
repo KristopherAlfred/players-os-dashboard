@@ -36,12 +36,14 @@ export type TourStep = {
 export const TOUR_STEPS: TourStep[] = [
   {
     id: "welcome",
+    startAt: 0,
     title: "Welcome to your AMX Dashboard, Sloane",
     body: "This is your home base for performance, content and audience data across every platform — all in one place.",
     route: "/",
   },
   {
     id: "settings",
+    startAt: 14,
     title: "Start in Settings",
     body: "Connecting your accounts here is what powers real data everywhere else. Start with your most active platform.",
     target: '[data-tour="nav-settings"]',
@@ -49,6 +51,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "connectors",
+    startAt: 32,
     title: "Your connector cards",
     body: "Connect adds an account, Configure tweaks a live one and Disconnect removes it. The status dot and “Synced” text show how fresh the data is.",
     target: '[data-tour="connector-cards"]',
@@ -56,6 +59,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "overview",
+    startAt: 58,
     title: "Dashboard Overview",
     body: "Stat cards and the Followers Over Time chart fill in automatically as soon as a platform is connected.",
     target: '[data-tour="kpi-cards"]',
@@ -63,6 +67,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "platforms",
+    startAt: 80,
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
     target: '[data-tour="nav-platforms"]',
@@ -70,6 +75,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "sections",
+    startAt: 98,
     title: "The rest of your sidebar",
     body: "Experience is your fan-facing hub, Fans & Data holds audience and subscriber lists, Performance tracks results, Monetization covers revenue and Engagement handles messages and notifications.",
     target: '[data-tour="nav-fans & data"]',
@@ -77,6 +83,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "done",
+    startAt: 118,
     title: "You're all set",
     body: "Revisit this tour anytime from the help icon up top. Next up: connect your first platform.",
     route: "/",
