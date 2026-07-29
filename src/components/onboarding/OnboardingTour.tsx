@@ -290,7 +290,7 @@ function TourOverlay({
 
       <div
         key={step.id}
-        className="pointer-events-auto absolute w-[min(380px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
+        className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
         style={{
           ...cardStyle,
           transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
