@@ -16,6 +16,7 @@ import {
   fetchOnboardingComplete,
   setOnboardingComplete,
 } from "../../lib/onboardingState";
+import { fetchPlatformConnections } from "../../lib/platformConnections";
 import introVideo from "../../assets/intro_vid.mp4.asset.json";
 
 export type TourStep = {
