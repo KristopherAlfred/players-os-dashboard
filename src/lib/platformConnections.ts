@@ -22,13 +22,9 @@ export async function fetchPlatformConnections(): Promise<PlatformConnection[]> 
 }
 
 export async function setPlatformConnected(id: string, connected: boolean) {
-  const { error } = await supabase
-    .from("platform_connections")
-    .update({
-      connected,
-      last_synced_at: connected ? new Date().toISOString() : null,
-    })
-    .eq("id", id);
+  const { error } = await supabase.functions.invoke("dashboard-state", {
+    body: { action: "set_platform_connected", id, connected },
+  });
 
   if (error) throw error;
 }
