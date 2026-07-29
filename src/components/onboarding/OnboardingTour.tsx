@@ -167,6 +167,8 @@ function TourOverlay({
   const rect = useTargetRect(step.target, index);
   const isLast = index === steps.length - 1;
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [dragPos, setDragPos] = useState<{ top: number; left: number } | null>(null);
   const [muted, setMuted] = useState(false);
   const [needsSound, setNeedsSound] = useState(false);
 
