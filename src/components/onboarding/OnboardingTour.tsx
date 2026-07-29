@@ -436,12 +436,16 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     [navigate],
   );
 
-  // Auto-trigger on first login, using the backend completion flag.
+  // Auto-trigger on first login, only while nothing is connected yet.
   useEffect(() => {
     let cancelled = false;
-    void fetchOnboardingComplete().then((done) => {
-      if (!cancelled && !done) setActive(true);
-    });
+    void Promise.all([fetchOnboardingComplete(), fetchPlatformConnections()]).then(
+      ([done, connections]) => {
+        const anyConnected = connections.some((c) => c.connected);
+        if (!cancelled && !done && !anyConnected) setActive(true);
+      },
+    );
+
     return () => {
       cancelled = true;
     };
