@@ -223,6 +223,11 @@ function TourOverlay({
     setNeedsSound(false);
   }, []);
 
+  // Each new scene re-positions the video automatically.
+  useEffect(() => {
+    setDragPos(null);
+  }, [index]);
+
   // Bring the spotlighted element into view (page stays freely scrollable).
   useEffect(() => {
     if (!step.target) return;
