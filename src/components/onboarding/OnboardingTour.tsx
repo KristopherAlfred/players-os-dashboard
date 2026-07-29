@@ -463,7 +463,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         <TourOverlay
           steps={steps}
           index={index}
+          onSeekStep={setIndex}
           onSkip={() => finish()}
+
           onBack={() => setIndex((i) => Math.max(0, i - 1))}
           onNext={() => {
             if (index >= steps.length - 1) finish(true);
