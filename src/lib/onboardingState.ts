@@ -15,12 +15,11 @@ export async function fetchOnboardingComplete(): Promise<boolean> {
 }
 
 export async function setOnboardingComplete(complete: boolean): Promise<void> {
-  await supabase.from("onboarding_state").upsert(
-    {
+  await supabase.functions.invoke("dashboard-state", {
+    body: {
+      action: "set_onboarding_complete",
       profile_key: ONBOARDING_PROFILE_KEY,
-      has_completed_onboarding: complete,
-      completed_at: complete ? new Date().toISOString() : null,
+      complete,
     },
-    { onConflict: "profile_key" },
-  );
+  });
 }
