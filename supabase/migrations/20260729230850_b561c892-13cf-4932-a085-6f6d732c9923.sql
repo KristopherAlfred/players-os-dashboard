@@ -1,0 +1,1 @@
+UPDATE public.onboarding_state SET has_completed_onboarding = false WHERE profile_key = 'sloane';
