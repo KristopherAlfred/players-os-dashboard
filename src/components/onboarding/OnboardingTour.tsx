@@ -283,6 +283,7 @@ function TourOverlay({
   const startDrag = (e: React.PointerEvent) => {
     const el = cardRef.current;
     if (!el) return;
+    if ((e.target as HTMLElement).closest("button, a, video, input, textarea")) return;
     const r = el.getBoundingClientRect();
     const offX = e.clientX - r.left;
     const offY = e.clientY - r.top;
