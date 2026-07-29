@@ -11,7 +11,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, GripHorizontal, Sparkles, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import {
   fetchOnboardingComplete,
   setOnboardingComplete,
@@ -223,6 +223,11 @@ function TourOverlay({
     setNeedsSound(false);
   }, []);
 
+  // Each new scene re-positions the video automatically.
+  useEffect(() => {
+    setDragPos(null);
+  }, [index]);
+
   // Bring the spotlighted element into view (page stays freely scrollable).
   useEffect(() => {
     if (!step.target) return;
@@ -283,6 +288,7 @@ function TourOverlay({
   const startDrag = (e: React.PointerEvent) => {
     const el = cardRef.current;
     if (!el) return;
+    if ((e.target as HTMLElement).closest("button, a, video, input, textarea")) return;
     const r = el.getBoundingClientRect();
     const offX = e.clientX - r.left;
     const offY = e.clientY - r.top;
@@ -335,7 +341,8 @@ function TourOverlay({
 
       <div
         ref={cardRef}
-        className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
+        onPointerDown={startDrag}
+        className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] cursor-grab overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500 active:cursor-grabbing"
         style={{
           ...cardStyle,
           "--tour-final-x": !dragged && !spotlight ? "-50%" : "0",
@@ -347,12 +354,7 @@ function TourOverlay({
           animationName: "amx-tour-card",
         } as React.CSSProperties}
       >
-        <div
-          onPointerDown={startDrag}
-          className="flex cursor-grab items-center justify-center gap-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40 active:cursor-grabbing"
-        >
-          <GripHorizontal size={12} /> Drag to move
-        </div>
+
 
         <div
           className="relative overflow-y-auto rounded-[15px] bg-dt-card p-5"
