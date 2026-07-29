@@ -5,16 +5,19 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import {
   fetchOnboardingComplete,
   setOnboardingComplete,
 } from "../../lib/onboardingState";
+import { fetchPlatformConnections } from "../../lib/platformConnections";
+import introVideo from "../../assets/intro_vid.mp4.asset.json";
 
 export type TourStep = {
   id: string;
@@ -25,18 +28,23 @@ export type TourStep = {
   /** Route the tour should be on for this step. */
   route?: string;
   ctaLabel?: string;
+  /** Timestamp (seconds) in the presenter video where this step begins. */
+  startAt: number;
 };
+
 
 /** Full 7-step walkthrough. */
 export const TOUR_STEPS: TourStep[] = [
   {
     id: "welcome",
+    startAt: 0,
     title: "Welcome to your AMX Dashboard, Sloane",
     body: "This is your home base for performance, content and audience data across every platform — all in one place.",
     route: "/",
   },
   {
     id: "settings",
+    startAt: 14,
     title: "Start in Settings",
     body: "Connecting your accounts here is what powers real data everywhere else. Start with your most active platform.",
     target: '[data-tour="nav-settings"]',
@@ -44,6 +52,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "connectors",
+    startAt: 32,
     title: "Your connector cards",
     body: "Connect adds an account, Configure tweaks a live one and Disconnect removes it. The status dot and “Synced” text show how fresh the data is.",
     target: '[data-tour="connector-cards"]',
@@ -51,6 +60,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "overview",
+    startAt: 58,
     title: "Dashboard Overview",
     body: "Stat cards and the Followers Over Time chart fill in automatically as soon as a platform is connected.",
     target: '[data-tour="kpi-cards"]',
@@ -58,6 +68,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "platforms",
+    startAt: 80,
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
     target: '[data-tour="nav-platforms"]',
@@ -65,6 +76,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "sections",
+    startAt: 98,
     title: "The rest of your sidebar",
     body: "Experience is your fan-facing hub, Fans & Data holds audience and subscriber lists, Performance tracks results, Monetization covers revenue and Engagement handles messages and notifications.",
     target: '[data-tour="nav-fans & data"]',
@@ -72,6 +84,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "done",
+    startAt: 118,
     title: "You're all set",
     body: "Revisit this tour anytime from the help icon up top. Next up: connect your first platform.",
     route: "/",
@@ -134,16 +147,72 @@ function TourOverlay({
   onNext,
   onBack,
   onSkip,
+  onSeekStep,
 }: {
   steps: TourStep[];
   index: number;
   onNext: () => void;
   onBack: () => void;
   onSkip: () => void;
+  onSeekStep: (i: number) => void;
 }) {
   const step = steps[index];
   const rect = useTargetRect(step.target, index);
   const isLast = index === steps.length - 1;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [needsSound, setNeedsSound] = useState(false);
+
+  // Autoplay the presenter video (fall back to muted if the browser blocks it).
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {
+      v.muted = true;
+      setMuted(true);
+      setNeedsSound(true);
+      void v.play().catch(() => {});
+    });
+  }, []);
+
+  // Keep the video in sync when the user jumps steps manually.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const target = steps[index].startAt;
+    if (Math.abs(v.currentTime - target) > 1.5) {
+      const next = steps[index + 1]?.startAt ?? Infinity;
+      if (v.currentTime < target || v.currentTime >= next) v.currentTime = target;
+    }
+  }, [index, steps]);
+
+  // Advance the spotlight as the video reaches each scene.
+  const handleTimeUpdate = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    let next = 0;
+    steps.forEach((s, i) => {
+      if (v.currentTime + 0.15 >= s.startAt) next = i;
+    });
+    if (next !== index) onSeekStep(next);
+  }, [steps, index, onSeekStep]);
+
+  const enableSound = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = false;
+    setMuted(false);
+    setNeedsSound(false);
+    void v.play().catch(() => {});
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+    setNeedsSound(false);
+  }, []);
 
   // Bring the spotlighted element into view (page stays freely scrollable).
   useEffect(() => {
@@ -164,6 +233,7 @@ function TourOverlay({
   }, [onNext, onBack, onSkip]);
 
 
+
   const pad = 8;
   const spotlight = rect
     ? {
@@ -178,11 +248,11 @@ function TourOverlay({
     ? {
         top: Math.min(
           Math.max(spotlight.top, 16),
-          Math.max(window.innerHeight - 260, 16),
+          Math.max(window.innerHeight - 560, 16),
         ),
         left: Math.min(
           spotlight.left + spotlight.width + 18,
-          Math.max(window.innerWidth - 380, 16),
+          Math.max(window.innerWidth - 450, 16),
         ),
       }
     : {
@@ -220,7 +290,7 @@ function TourOverlay({
 
       <div
         key={step.id}
-        className="pointer-events-auto absolute w-[min(380px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
+        className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
         style={{
           ...cardStyle,
           transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
@@ -247,6 +317,31 @@ function TourOverlay({
             >
               <X size={12} /> Skip tutorial
             </button>
+
+            {/* Presenter video */}
+            <div className="relative mt-7 overflow-hidden rounded-xl border border-dt-border bg-black">
+              <video
+                ref={videoRef}
+                src={introVideo.url}
+                playsInline
+                autoPlay
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={onSkip}
+                className="block aspect-video w-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={needsSound ? enableSound : toggleMute}
+                className="absolute bottom-2 right-2 inline-flex items-center gap-1.5 rounded-lg bg-black/65 px-2 py-1 text-[10px] font-semibold text-white/85 backdrop-blur transition hover:bg-black/80"
+              >
+                {muted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+                {needsSound ? "Tap for sound" : muted ? "Unmute" : "Mute"}
+              </button>
+            </div>
+
+            <div className="mt-3" />
+
+
 
             <div
               className="mb-3 inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
@@ -342,12 +437,16 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     [navigate],
   );
 
-  // Auto-trigger on first login, using the backend completion flag.
+  // Auto-trigger on first login, only while nothing is connected yet.
   useEffect(() => {
     let cancelled = false;
-    void fetchOnboardingComplete().then((done) => {
-      if (!cancelled && !done) setActive(true);
-    });
+    void Promise.all([fetchOnboardingComplete(), fetchPlatformConnections()]).then(
+      ([done, connections]) => {
+        const anyConnected = connections.some((c) => c.connected);
+        if (!cancelled && !done && !anyConnected) setActive(true);
+      },
+    );
+
     return () => {
       cancelled = true;
     };
@@ -369,7 +468,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         <TourOverlay
           steps={steps}
           index={index}
+          onSeekStep={setIndex}
           onSkip={() => finish()}
+
           onBack={() => setIndex((i) => Math.max(0, i - 1))}
           onNext={() => {
             if (index >= steps.length - 1) finish(true);
