@@ -300,7 +300,7 @@ function TourOverlay({
           background:
             "linear-gradient(110deg, color-mix(in srgb, var(--theme-accent) 60%, transparent), rgba(255,255,255,0.06) 35%, rgba(255,255,255,0.04) 65%, color-mix(in srgb, var(--theme-accent) 45%, transparent)) 0% 50% / 200% 100%",
           animationName: "amx-tour-card",
-        }}
+        } as React.CSSProperties}
       >
         <div className="relative overflow-hidden rounded-[15px] bg-dt-card p-5">
           <div
