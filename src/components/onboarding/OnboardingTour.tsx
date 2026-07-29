@@ -11,7 +11,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, GripHorizontal, Sparkles, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import {
   fetchOnboardingComplete,
   setOnboardingComplete,
