@@ -38,6 +38,8 @@ const permissions = [
 
 export function SettingsPage() {
   const navigate = useNavigate();
+  const { start: startTour } = useOnboarding();
+
   const { template, setTemplate, templates, palette } = useTheme();
   const [notifications, setNotifications] = useState(true);
   const [smsAlerts, setSmsAlerts] = useState(true);
