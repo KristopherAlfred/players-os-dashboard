@@ -18,6 +18,8 @@ import type { ThemeTemplate } from "../theme/themes";
 import { DtSelect } from "../components/DtSelect";
 import { getDashboardAvatar, getDashboardAvatarRing } from "../lib/adminProfile";
 import { ConnectorCards } from "../components/settings/ConnectorCards";
+import { useOnboarding } from "../components/onboarding/OnboardingTour";
+
 
 const TIMEZONE_OPTIONS = [
   { value: "pt", label: "Pacific Time (PT)" },
