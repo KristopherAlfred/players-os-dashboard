@@ -11,7 +11,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Sparkles, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, GripHorizontal, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import {
   fetchOnboardingComplete,
   setOnboardingComplete,
@@ -29,6 +29,8 @@ export type TourStep = {
   /** Route the tour should be on for this step. */
   route?: string;
   ctaLabel?: string;
+  /** Which side of the spotlight the video card should sit on. */
+  side?: "left" | "right";
   /** Timestamp (seconds) in the presenter video where this step begins. */
   startAt: number;
 };
@@ -58,6 +60,7 @@ export const TOUR_STEPS: TourStep[] = [
     body: "Connect adds an account, Configure tweaks a live one and Disconnect removes it. The status dot and “Synced” text show how fresh the data is.",
     target: '[data-tour="connector-cards"]',
     route: "/settings",
+    side: "left",
   },
   {
     id: "overview",
@@ -66,6 +69,7 @@ export const TOUR_STEPS: TourStep[] = [
     body: "Stat cards and the Followers Over Time chart fill in automatically as soon as a platform is connected.",
     target: '[data-tour="kpi-cards"]',
     route: "/",
+    side: "left",
   },
   {
     id: "platforms",
@@ -73,8 +77,10 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Platforms",
     body: "Drill into any single platform for Social Blade–style analytics: growth charts, recent posts and engagement.",
     target: '[data-tour="nav-platforms"]',
-    route: "/",
+    route: "/platforms",
+    side: "left",
   },
+
   {
     id: "sections",
     startAt: 101.8,
@@ -161,6 +167,8 @@ function TourOverlay({
   const rect = useTargetRect(step.target, index);
   const isLast = index === steps.length - 1;
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [dragPos, setDragPos] = useState<{ top: number; left: number } | null>(null);
   const [muted, setMuted] = useState(false);
   const [needsSound, setNeedsSound] = useState(false);
 
@@ -245,22 +253,58 @@ function TourOverlay({
       }
     : null;
 
-  const cardStyle: React.CSSProperties = spotlight
+  const CARD_W = Math.min(420, window.innerWidth - 32);
+
+  const autoStyle: React.CSSProperties = spotlight
     ? {
         top: Math.min(
           Math.max(spotlight.top, 16),
           Math.max(window.innerHeight - 560, 16),
         ),
-        left: Math.min(
-          spotlight.left + spotlight.width + 18,
-          Math.max(window.innerWidth - 450, 16),
-        ),
+        left:
+          step.side === "left"
+            ? Math.max(spotlight.left - CARD_W - 18, 16)
+            : Math.min(
+                spotlight.left + spotlight.width + 18,
+                Math.max(window.innerWidth - CARD_W - 16, 16),
+              ),
       }
     : {
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
       };
+
+  const dragged = dragPos !== null;
+  const cardStyle: React.CSSProperties = dragged
+    ? { top: dragPos.top, left: dragPos.left }
+    : autoStyle;
+
+  const startDrag = (e: React.PointerEvent) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const offX = e.clientX - r.left;
+    const offY = e.clientY - r.top;
+    const move = (ev: PointerEvent) => {
+      setDragPos({
+        left: Math.min(
+          Math.max(ev.clientX - offX, 8),
+          window.innerWidth - r.width - 8,
+        ),
+        top: Math.min(
+          Math.max(ev.clientY - offY, 8),
+          window.innerHeight - Math.min(r.height, window.innerHeight - 16) - 8,
+        ),
+      });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
 
   return createPortal(
     <div className="pointer-events-none fixed inset-0 z-[200]">
@@ -290,12 +334,12 @@ function TourOverlay({
       )}
 
       <div
-        key={step.id}
+        ref={cardRef}
         className="pointer-events-auto absolute w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-dt-card/95 p-[1.5px] shadow-[0_28px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-[top,left] duration-500"
         style={{
           ...cardStyle,
-          "--tour-final-x": spotlight ? "0" : "-50%",
-          "--tour-final-y": spotlight ? "0" : "-50%",
+          "--tour-final-x": !dragged && !spotlight ? "-50%" : "0",
+          "--tour-final-y": !dragged && !spotlight ? "-50%" : "0",
           transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           animation: "amx-tour-card .45s cubic-bezier(.22,1,.36,1) both",
           background:
@@ -303,6 +347,13 @@ function TourOverlay({
           animationName: "amx-tour-card",
         } as React.CSSProperties}
       >
+        <div
+          onPointerDown={startDrag}
+          className="flex cursor-grab items-center justify-center gap-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40 active:cursor-grabbing"
+        >
+          <GripHorizontal size={12} /> Drag to move
+        </div>
+
         <div
           className="relative overflow-y-auto rounded-[15px] bg-dt-card p-5"
           style={{ maxHeight: "min(560px, 90vh)" }}
