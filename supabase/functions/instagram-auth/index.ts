@@ -22,8 +22,9 @@ const SCOPES = [
 
 function redirectUri(req: Request) {
   const url = new URL(req.url);
-  return `${url.origin}/functions/v1/instagram-auth/callback`;
+  return `https://${url.host}/functions/v1/instagram-auth/callback`;
 }
+
 
 async function graph<T>(path: string, params: Record<string, string>): Promise<T> {
   const url = new URL(`${GRAPH}/${path}`);
