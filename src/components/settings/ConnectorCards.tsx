@@ -7,7 +7,7 @@ import {
   setPlatformConnected,
   type PlatformConnection,
 } from "../../lib/platformConnections";
-import { syncInstagram } from "../../lib/instagramGraphApi";
+import { connectInstagram, syncInstagram } from "../../lib/instagramGraphApi";
 
 
 
