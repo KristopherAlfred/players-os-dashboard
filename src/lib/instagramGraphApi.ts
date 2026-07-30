@@ -41,6 +41,34 @@ export type InstagramSyncResult = {
   error?: string;
 };
 
+/** Opens the Meta login popup and resolves once the window is closed. */
+export async function connectInstagram(): Promise<void> {
+  const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(
+    "instagram-auth",
+    { body: {} },
+  );
+  if (error) throw new Error(data?.error ?? error.message);
+  if (!data?.url) throw new Error(data?.error ?? "Could not start Instagram login");
+
+  const popup = window.open(data.url, "instagram-auth", "width=600,height=760");
+  if (!popup) throw new Error("Popup blocked — allow popups and try again.");
+
+  await new Promise<void>((resolve) => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === "instagram-auth") finish();
+    };
+    const timer = window.setInterval(() => {
+      if (popup.closed) finish();
+    }, 600);
+    function finish() {
+      window.clearInterval(timer);
+      window.removeEventListener("message", onMessage);
+      resolve();
+    }
+    window.addEventListener("message", onMessage);
+  });
+}
+
 /** Pulls fresh data from the official Instagram Graph API into the backend. */
 export async function syncInstagram(): Promise<InstagramSyncResult> {
   const { data, error } = await supabase.functions.invoke<InstagramSyncResult>("instagram-sync", {
@@ -50,6 +78,7 @@ export async function syncInstagram(): Promise<InstagramSyncResult> {
   if (data?.error) throw new Error(data.error);
   return data ?? {};
 }
+
 
 export async function fetchInstagramAccountStats(): Promise<InstagramAccountStats | null> {
   const { data, error } = await supabase
