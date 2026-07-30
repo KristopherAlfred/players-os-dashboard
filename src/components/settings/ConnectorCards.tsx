@@ -36,17 +36,20 @@ export function ConnectorCards() {
     setBusyId(row.id);
     try {
       if (row.platform === "instagram" && connected) {
+        await connectInstagram();
         await syncInstagram();
       } else {
         await setPlatformConnected(row.id, connected);
       }
       await load();
+      setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Update failed");
     } finally {
       setBusyId(null);
     }
   }
+
 
   async function resync(row: PlatformConnection) {
     setBusyId(row.id);
