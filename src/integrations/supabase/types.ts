@@ -14,6 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
+      instagram_account_stats: {
+        Row: {
+          biography: string | null
+          created_at: string
+          followers_count: number
+          follows_count: number
+          id: string
+          ig_user_id: string
+          impressions: number
+          last_synced_at: string | null
+          media_count: number
+          name: string | null
+          profile_picture_url: string | null
+          profile_views: number
+          reach: number
+          updated_at: string
+          username: string | null
+          website: string | null
+        }
+        Insert: {
+          biography?: string | null
+          created_at?: string
+          followers_count?: number
+          follows_count?: number
+          id?: string
+          ig_user_id: string
+          impressions?: number
+          last_synced_at?: string | null
+          media_count?: number
+          name?: string | null
+          profile_picture_url?: string | null
+          profile_views?: number
+          reach?: number
+          updated_at?: string
+          username?: string | null
+          website?: string | null
+        }
+        Update: {
+          biography?: string | null
+          created_at?: string
+          followers_count?: number
+          follows_count?: number
+          id?: string
+          ig_user_id?: string
+          impressions?: number
+          last_synced_at?: string | null
+          media_count?: number
+          name?: string | null
+          profile_picture_url?: string | null
+          profile_views?: number
+          reach?: number
+          updated_at?: string
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      instagram_media: {
+        Row: {
+          caption: string | null
+          comments_count: number
+          created_at: string
+          id: string
+          ig_user_id: string
+          impressions: number
+          like_count: number
+          media_id: string
+          media_product_type: string | null
+          media_type: string | null
+          media_url: string | null
+          permalink: string | null
+          reach: number
+          saved: number
+          thumbnail_url: string | null
+          timestamp: string | null
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          comments_count?: number
+          created_at?: string
+          id?: string
+          ig_user_id: string
+          impressions?: number
+          like_count?: number
+          media_id: string
+          media_product_type?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          permalink?: string | null
+          reach?: number
+          saved?: number
+          thumbnail_url?: string | null
+          timestamp?: string | null
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          comments_count?: number
+          created_at?: string
+          id?: string
+          ig_user_id?: string
+          impressions?: number
+          like_count?: number
+          media_id?: string
+          media_product_type?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          permalink?: string | null
+          reach?: number
+          saved?: number
+          thumbnail_url?: string | null
+          timestamp?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       onboarding_state: {
         Row: {
           completed_at: string | null
