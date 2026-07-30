@@ -36,17 +36,32 @@ function insightValue(list: Insight[] | undefined, name: string): number {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const token = Deno.env.get("META_ACCESS_TOKEN") ?? "";
-  const igUserId = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") ?? "";
-
-  if (!token || !igUserId) {
-    return json({ error: "Instagram credentials are not configured" }, 400);
-  }
-
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
+
+  const { data: auth } = await supabase
+    .from("instagram_auth")
+    .select("ig_user_id, access_token, token_expires_at")
+    .order("connected_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const token = auth?.access_token ?? "";
+  const igUserId = auth?.ig_user_id ?? "";
+
+  if (!token || !igUserId) {
+    return json({ error: "not_connected", message: "Sign in with Instagram first." }, 400);
+  }
+
+  if (auth?.token_expires_at && new Date(auth.token_expires_at).getTime() < Date.now()) {
+    return json(
+      { error: "token_expired", message: "Instagram login expired. Please reconnect." },
+      400,
+    );
+  }
+
 
   try {
     const profile = await graph<{
