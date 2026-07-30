@@ -7,6 +7,8 @@ import {
   setPlatformConnected,
   type PlatformConnection,
 } from "../../lib/platformConnections";
+import { syncInstagram } from "../../lib/instagramGraphApi";
+
 
 
 export function ConnectorCards() {
