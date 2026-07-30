@@ -71,6 +71,45 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_auth: {
+        Row: {
+          access_token: string
+          connected_at: string
+          created_at: string
+          id: string
+          ig_user_id: string | null
+          page_id: string | null
+          page_name: string | null
+          token_expires_at: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          access_token: string
+          connected_at?: string
+          created_at?: string
+          id?: string
+          ig_user_id?: string | null
+          page_id?: string | null
+          page_name?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          access_token?: string
+          connected_at?: string
+          created_at?: string
+          id?: string
+          ig_user_id?: string | null
+          page_id?: string | null
+          page_name?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       instagram_media: {
         Row: {
           caption: string | null
