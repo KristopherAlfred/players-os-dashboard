@@ -33,7 +33,11 @@ export function ConnectorCards() {
   async function toggle(row: PlatformConnection, connected: boolean) {
     setBusyId(row.id);
     try {
-      await setPlatformConnected(row.id, connected);
+      if (row.platform === "instagram" && connected) {
+        await syncInstagram();
+      } else {
+        await setPlatformConnected(row.id, connected);
+      }
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Update failed");
@@ -41,6 +45,20 @@ export function ConnectorCards() {
       setBusyId(null);
     }
   }
+
+  async function resync(row: PlatformConnection) {
+    setBusyId(row.id);
+    try {
+      await syncInstagram();
+      await load();
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Sync failed");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
 
   return (
     <section data-tour="connector-cards" className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
