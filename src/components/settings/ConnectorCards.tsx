@@ -7,6 +7,8 @@ import {
   setPlatformConnected,
   type PlatformConnection,
 } from "../../lib/platformConnections";
+import { syncInstagram } from "../../lib/instagramGraphApi";
+
 
 
 export function ConnectorCards() {
@@ -33,7 +35,11 @@ export function ConnectorCards() {
   async function toggle(row: PlatformConnection, connected: boolean) {
     setBusyId(row.id);
     try {
-      await setPlatformConnected(row.id, connected);
+      if (row.platform === "instagram" && connected) {
+        await syncInstagram();
+      } else {
+        await setPlatformConnected(row.id, connected);
+      }
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Update failed");
@@ -41,6 +47,20 @@ export function ConnectorCards() {
       setBusyId(null);
     }
   }
+
+  async function resync(row: PlatformConnection) {
+    setBusyId(row.id);
+    try {
+      await syncInstagram();
+      await load();
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Sync failed");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
 
   return (
     <section data-tour="connector-cards" className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
@@ -111,10 +131,19 @@ export function ConnectorCards() {
                       <>
                         <button
                           type="button"
-                          className="flex-1 rounded-xl border border-dt-border bg-black/40 px-3 py-2 text-xs font-semibold text-white transition hover:border-dt-red/50 hover:text-dt-red"
+                          disabled={busy}
+                          onClick={
+                            row.platform === "instagram" ? () => resync(row) : undefined
+                          }
+                          className="flex-1 rounded-xl border border-dt-border bg-black/40 px-3 py-2 text-xs font-semibold text-white transition hover:border-dt-red/50 hover:text-dt-red disabled:opacity-50"
                         >
-                          Configure
+                          {row.platform === "instagram"
+                            ? busy
+                              ? "Syncing…"
+                              : "Sync now"
+                            : "Configure"}
                         </button>
+
                         <button
                           type="button"
                           disabled={busy}
