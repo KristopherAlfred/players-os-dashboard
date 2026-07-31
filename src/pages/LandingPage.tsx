@@ -109,11 +109,11 @@ export function LandingPage() {
             className="mb-6 inline-flex items-center gap-1 text-xs text-white/50 transition hover:text-white"
           >
             <ArrowLeft size={13} />
-            Back to AMX home
+            Back to Players OS home
           </Link>
           <img
-            src="/amx-dashboard-logo.png"
-            alt="AMX Dashboard"
+            src="/players-os-logo.png"
+            alt="Players OS"
             className="mx-auto h-14 w-auto max-w-[240px] object-contain sm:h-16"
           />
         </div>

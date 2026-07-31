@@ -41,7 +41,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "welcome",
     startAt: 0,
-    title: "Welcome to your AMX Dashboard, Sloane",
+    title: "Welcome to your Players OS, Sloane",
     body: "This is your home base for performance, content and audience data across every platform — all in one place.",
     route: "/",
   },

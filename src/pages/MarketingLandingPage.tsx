@@ -73,8 +73,8 @@ export function MarketingLandingPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <Link to="/welcome" className="shrink-0">
             <img
-              src="/amx-dashboard-logo.png"
-              alt="AMX Dashboard"
+              src="/players-os-logo.png"
+              alt="Players OS"
               className="h-10 w-auto max-w-[200px] object-contain sm:h-11"
             />
           </Link>
@@ -104,8 +104,8 @@ export function MarketingLandingPage() {
               Built for athletes &amp; their teams
             </div>
             <img
-              src="/amx-dashboard-logo.png"
-              alt="AMX Dashboard"
+              src="/players-os-logo.png"
+              alt="Players OS"
               className="mx-auto mb-8 h-20 w-auto max-w-[320px] object-contain sm:h-24"
             />
             <h1 className="font-display text-4xl font-bold leading-tight tracking-wide text-white sm:text-5xl lg:text-6xl">
@@ -113,7 +113,7 @@ export function MarketingLandingPage() {
               <span className="text-dt-red">Your command center.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
-              AMX Dashboard is the athlete &amp; admin platform for the culture — content, audience
+              Players OS is the athlete &amp; admin platform for the culture — content, audience
               intelligence, monetization, and engagement in one place, built for the pros.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -121,7 +121,7 @@ export function MarketingLandingPage() {
                 to="/login?mode=signup"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-dt-red px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-dt-red/30 transition hover:bg-dt-red-hover sm:w-auto"
               >
-                Edit My AMX Experience
+                Edit My Players OS Experience
                 <ArrowRight size={18} />
               </Link>
               <Link
@@ -153,7 +153,7 @@ export function MarketingLandingPage() {
               <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
               <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
               <span className="ml-2 text-[10px] font-medium uppercase tracking-widest text-white/40">
-                AMX Dashboard Preview
+                Players OS Preview
               </span>
             </div>
             <div className="grid gap-px bg-white/5 p-4 sm:grid-cols-3">
@@ -193,7 +193,7 @@ export function MarketingLandingPage() {
                 Everything your team needs to win
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-white/70 sm:text-base">
-                From first upload to fan monetization — AMX gives athletes, agents, and reps the same
+                From first upload to fan monetization — Players OS gives athletes, agents, and reps the same
                 playbook the biggest brands use.
               </p>
             </div>
@@ -218,12 +218,12 @@ export function MarketingLandingPage() {
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0000]/80 via-black to-black p-8 sm:p-12">
             <div className="grid items-center gap-10 lg:grid-cols-2">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-dt-red">Why AMX</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-dt-red">Why Players OS</p>
                 <h2 className="mt-2 font-display text-3xl font-bold tracking-wide text-white sm:text-4xl">
                   Real fans. Real data. Real value.
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed text-white/70 sm:text-base">
-                  Stop guessing who your audience is or what content hits. AMX turns fan behavior into
+                  Stop guessing who your audience is or what content hits. Players OS turns fan behavior into
                   actionable insight — so you can grow the brand, deepen loyalty, and unlock new revenue.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-white/80">
@@ -264,7 +264,7 @@ export function MarketingLandingPage() {
         <section className="border-t border-white/10 bg-black/70 px-4 py-14 sm:px-6 sm:py-16">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-wide text-white sm:text-4xl">
-              Ready to run your AMX experience?
+              Ready to run your Players OS experience?
             </h2>
             <p className="mt-4 text-sm text-white/70 sm:text-base">
               Join the platform built for athletes, agents, and reps who move at pro speed.
@@ -274,7 +274,7 @@ export function MarketingLandingPage() {
                 to="/login?mode=signup"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-dt-red px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-dt-red/30 transition hover:bg-dt-red-hover"
               >
-                Edit My AMX Experience
+                Edit My Players OS Experience
                 <ArrowRight size={18} />
               </Link>
               <Link
