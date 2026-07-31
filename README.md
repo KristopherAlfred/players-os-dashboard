@@ -1,6 +1,6 @@
 # Sloane Dashboard
 
-Cloned from Sloane Glo AMX dashboard. Edit branding, data sources, and env vars for Sloane Stephens — Dame projects are unchanged.
+Cloned from Sloane Glo Players OS dashboard. Edit branding, data sources, and env vars for Sloane Stephens — Dame projects are unchanged.
 
 # SLOANE GLO Dashboard
 

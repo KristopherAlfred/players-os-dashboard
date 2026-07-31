@@ -8,8 +8,8 @@ export function BrandLogo({ compact = false, variant = "default" }: BrandLogoPro
     return (
       <div className="flex h-[72px] w-full items-center justify-center bg-transparent px-4 py-3">
         <img
-          src="/amx-dashboard-logo.png"
-          alt="AMX Dashboard"
+          src="/players-os-logo.png"
+          alt="Players OS"
           className="h-full w-full object-contain object-center"
         />
       </div>
@@ -19,8 +19,8 @@ export function BrandLogo({ compact = false, variant = "default" }: BrandLogoPro
   if (compact) {
     return (
       <img
-        src="/amx-dashboard-logo.png"
-        alt="AMX Dashboard"
+        src="/players-os-logo.png"
+        alt="Players OS"
         className="h-8 w-auto max-w-[160px] object-contain object-left"
       />
     );
@@ -28,8 +28,8 @@ export function BrandLogo({ compact = false, variant = "default" }: BrandLogoPro
 
   return (
     <img
-      src="/amx-dashboard-logo.png"
-      alt="AMX Dashboard"
+      src="/players-os-logo.png"
+      alt="Players OS"
       className="h-11 w-auto max-w-[200px] object-contain object-left"
     />
   );
