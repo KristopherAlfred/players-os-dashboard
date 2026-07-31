@@ -93,12 +93,12 @@ export function LandingPage() {
   const fieldLabelClass = "mb-1.5 block text-xs font-medium text-white";
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-black">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#001a0f] to-[#000a06]" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#002214] to-black" />
+    <div className="marketing-theme relative flex min-h-[100dvh] flex-col overflow-hidden bg-black">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#150202] to-[#0a0101]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#1c0303] to-black" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.98),transparent_40%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(143,227,184,0.28),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(143,227,184,0.22),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(226,35,26,0.3),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(226,35,26,0.18),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.88),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.45),transparent_70%)]" />
 
@@ -112,17 +112,17 @@ export function LandingPage() {
             Back to Players OS home
           </Link>
           <img
-            src="/players-os-logo.png"
+            src="/players-os-logo-transparent.png"
             alt="Players OS"
-            className="mx-auto h-14 w-auto max-w-[240px] object-contain sm:h-16"
+            className="logo-glow mx-auto h-24 w-auto max-w-[400px] object-contain sm:h-28"
           />
         </div>
 
-        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#00140c]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">
+        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#120202]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md">
           {view === "signin" && (
             <>
               <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#00140c] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#120202] to-black" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/35 via-dt-red/10 to-black" />
                 <div className="relative">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-dt-red">Members only</p>
@@ -226,7 +226,7 @@ export function LandingPage() {
           {view === "signup" && (
             <>
               <div className="relative overflow-hidden border-b border-white/10 px-6 py-4">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#00140c] to-black" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#120202] to-black" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-dt-red/35 via-dt-red/10 to-black" />
                 <div className="relative">
                 <button

@@ -55,10 +55,10 @@ const stats = [
 function PageBackground() {
   return (
     <>
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-b from-black via-[#0a0000] to-black" />
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-black via-[#140000] to-black" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(143,227,184,0.22),transparent_50%)]" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(143,227,184,0.08),transparent_45%)]" />
+      <div className="pointer-events-none fixed inset-0 bg-gradient-to-b from-black via-[#120202] to-black" />
+      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-black via-[#1a0303] to-black" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(226,35,26,0.26),transparent_52%)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(226,35,26,0.1),transparent_45%)]" />
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,0,0,0.95),transparent_55%)]" />
     </>
   );
@@ -66,16 +66,16 @@ function PageBackground() {
 
 export function MarketingLandingPage() {
   return (
-    <div className="relative min-h-[100dvh] overflow-x-hidden bg-black text-white">
+    <div className="marketing-theme relative min-h-[100dvh] overflow-x-hidden bg-black text-white">
       <PageBackground />
 
       <header className="relative z-10 border-b border-white/10 bg-black/40 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <Link to="/welcome" className="shrink-0">
             <img
-              src="/players-os-logo.png"
+              src="/players-os-logo-transparent.png"
               alt="Players OS"
-              className="h-10 w-auto max-w-[200px] object-contain sm:h-11"
+              className="logo-glow h-14 w-auto max-w-[280px] object-contain sm:h-16"
             />
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -104,9 +104,9 @@ export function MarketingLandingPage() {
               Built for athletes &amp; their teams
             </div>
             <img
-              src="/players-os-logo.png"
+              src="/players-os-logo-transparent.png"
               alt="Players OS"
-              className="mx-auto mb-8 h-20 w-auto max-w-[320px] object-contain sm:h-24"
+              className="logo-glow mx-auto mb-8 h-32 w-auto max-w-[560px] object-contain sm:h-40 lg:h-48"
             />
             <h1 className="font-display text-4xl font-bold leading-tight tracking-wide text-white sm:text-5xl lg:text-6xl">
               Your brand. Your fans.{" "}
