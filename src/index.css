@@ -295,7 +295,6 @@ select option,
 }
 
 /* Logo lockup blends its dark banner background into the page */
-.brand-logo-blend {
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 6px 24px rgba(226, 35, 26, 0.35));
+.logo-glow {
+  filter: drop-shadow(0 8px 30px rgba(226, 35, 26, 0.35));
 }
