@@ -73,9 +73,9 @@ export function MarketingLandingPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <Link to="/welcome" className="shrink-0">
             <img
-              src="/players-os-logo-transparent.png"
+              src="/players-os-logo.png"
               alt="Players OS"
-              className="logo-glow h-14 w-auto max-w-[280px] object-contain sm:h-16"
+              className="h-14 w-auto max-w-[280px] object-contain sm:h-16"
             />
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -104,9 +104,9 @@ export function MarketingLandingPage() {
               Built for athletes &amp; their teams
             </div>
             <img
-              src="/players-os-logo-transparent.png"
+              src="/players-os-logo.png"
               alt="Players OS"
-              className="logo-glow mx-auto mb-8 h-32 w-auto max-w-[560px] object-contain sm:h-40 lg:h-48"
+              className="mx-auto mb-8 h-32 w-auto max-w-[560px] object-contain sm:h-40 lg:h-48"
             />
             <h1 className="font-display text-4xl font-bold leading-tight tracking-wide text-white sm:text-5xl lg:text-6xl">
               Your brand. Your fans.{" "}

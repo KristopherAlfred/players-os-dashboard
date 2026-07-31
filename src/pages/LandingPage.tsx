@@ -112,9 +112,9 @@ export function LandingPage() {
             Back to Players OS home
           </Link>
           <img
-            src="/players-os-logo-transparent.png"
+            src="/players-os-logo.png"
             alt="Players OS"
-            className="logo-glow mx-auto h-24 w-auto max-w-[400px] object-contain sm:h-28"
+            className="mx-auto h-24 w-auto max-w-[400px] object-contain sm:h-28"
           />
         </div>
 
