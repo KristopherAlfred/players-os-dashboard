@@ -285,3 +285,17 @@ select option,
 .animate-filter-pulse {
   animation: filter-pulse-red 0.55s ease-in-out 3;
 }
+
+/* Commercial / marketing surfaces: red + black brand theme (dashboard stays mint) */
+.marketing-theme {
+  --theme-accent: #E2231A;
+  --theme-accent-hover: #F5382E;
+  --color-dt-red: #E2231A;
+  --color-dt-red-hover: #F5382E;
+}
+
+/* Logo lockup blends its dark banner background into the page */
+.brand-logo-blend {
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 6px 24px rgba(226, 35, 26, 0.35));
+}
