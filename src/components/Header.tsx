@@ -10,10 +10,12 @@ import {
 } from "../contexts/DashboardSourceContext";
 import { useOnboarding } from "./onboarding/OnboardingTour";
 import { getDashboardAvatar, getDashboardAvatarRing, onDashboardAvatarChange } from "../lib/adminProfile";
+import { useAthlete } from "../contexts/AthleteContext";
 
 const filterOptions: { id: DashboardSource; label: string }[] = [
   { id: "overview", label: "Overview" },
-  { id: "dametime", label: "Sloane Glo" },
+  // The fan-app source is labelled with the athlete's own brand name.
+  { id: "dametime", label: "__FAN_APP__" },
   { id: "instagram", label: "Instagram" },
   { id: "youtube", label: "YouTube" },
   { id: "facebook", label: "Facebook" },
@@ -36,6 +38,7 @@ export function Header({
   const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
   const filtersRef = useRef<HTMLDivElement>(null);
   const { start: startTour } = useOnboarding();
+  const { fanAppName, displayName, athlete } = useAthlete();
 
   useEffect(
     () =>
@@ -110,10 +113,14 @@ export function Header({
               >
                 {onContent ? (
                   <p className="border-b border-dt-border px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-white/40">
-                    Content pages: Overview or Sloane Glo only
+                    Content pages: Overview or {fanAppName} only
                   </p>
                 ) : null}
-                {filterOptions.map((option) => {
+                {filterOptions.map((rawOption) => {
+                  const option =
+                    rawOption.label === "__FAN_APP__"
+                      ? { ...rawOption, label: fanAppName }
+                      : rawOption;
                   const active = source === option.id;
                   const enabled = allowed.includes(option.id);
                   return (
@@ -172,8 +179,8 @@ export function Header({
             className="hidden shrink-0 rounded-full transition hover:ring-2 hover:ring-dt-red/60 sm:block"
           >
             <img
-              src={avatar}
-              alt="Sloane Stephens — open profile"
+              src={athlete?.profile_photo_url || avatar}
+              alt={`${displayName} — open profile`}
               className="h-9 w-9 rounded-full border-2 object-cover object-top"
               style={{ borderColor: ringColor }}
             />
