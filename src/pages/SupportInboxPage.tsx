@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Inbox, Loader2, Mail, RefreshCw, Search } from "lucide-react";
 import {
@@ -10,6 +11,7 @@ import {
 const POLL_MS = 45_000;
 
 export function SupportInboxPage() {
+  const { fanAppName } = useAthlete();
   const [reports, setReports] = useState<SupportReport[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export function SupportInboxPage() {
       setStatus(
         isRefresh
           ? `Refreshed ${next.length} support reports`
-          : `Live from Sloane Glo Help & Support · ${next.length} reports`,
+          : `Live from ${fanAppName} Help & Support · ${next.length} reports`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load support reports");
@@ -77,7 +79,7 @@ export function SupportInboxPage() {
                 Support inbox
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Help reports from the Sloane Glo app
+                Help reports from the {fanAppName} app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Messages fans submit in Help & Support land here live from Supabase — subject, message, contact, and page.

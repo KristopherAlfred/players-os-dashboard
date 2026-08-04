@@ -187,7 +187,7 @@ export function TrafficOverviewPage() {
             ? `Filtered to ${fanLabel} · synced ${new Date(data.syncedAt).toLocaleString()}`
             : isRefresh
               ? `Refreshed from Supabase · ${new Date(data.syncedAt).toLocaleString()}`
-              : `Live from Sloane Glo fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
+              : `Live from ${fanAppName} fan_events · synced ${new Date(data.syncedAt).toLocaleString()}`,
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to load traffic analytics";
@@ -328,7 +328,7 @@ export function TrafficOverviewPage() {
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {selectedFan
                   ? `Traffic for ${fanDisplayName(selectedFan)}`
-                  : "Clicks, page views & nav from Sloane Glo"}
+                  : `Clicks, page views & nav from ${fanAppName}`}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 {selectedFan
