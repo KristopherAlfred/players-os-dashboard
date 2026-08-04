@@ -17,6 +17,7 @@ import { TwitterAnalyticsDashboard } from "../components/twitter/TwitterAnalytic
 import { useDashboardSource } from "../contexts/DashboardSourceContext";
 import { OverviewMetricsProvider, useOverviewMetrics } from "../contexts/OverviewMetricsContext";
 import { NoConnectorsBanner } from "../components/NoConnectorsBanner";
+import { AiInsightsPanel } from "../components/AiInsightsPanel";
 
 function OverviewDashboard() {
   return (
@@ -56,6 +57,12 @@ function OverviewDashboardContent() {
         </div>
         <div className="col-span-12 flex lg:col-span-4">
           <UploadWidget />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-12 items-stretch gap-3">
+        <div className="col-span-12">
+          <AiInsightsPanel />
         </div>
       </div>
 
