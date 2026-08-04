@@ -26,6 +26,11 @@ import {
   type NotificationSurface,
 } from "../lib/notificationsApi";
 import { DtSelect } from "../components/DtSelect";
+import { useAthlete } from "../contexts/AthleteContext";
+import {
+  SmartSuggestions,
+  type NotificationSuggestion,
+} from "../components/notifications/SmartSuggestions";
 
 const FREQUENCY_PRESETS = [
   { label: "Every 15 seconds", value: 15 },
