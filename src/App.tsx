@@ -28,6 +28,8 @@ import { RequireOnboarding } from "./components/RequireOnboarding";
 import { OnboardingPage } from "./pages/OnboardingPage";
 import { AthleteProvider } from "./contexts/AthleteContext";
 import { isDashboardAuthed } from "./lib/dashboardAuth";
+import { BioLinkPage } from "./pages/BioLinkPage";
+import { BioLinkRedirectPage } from "./pages/BioLinkRedirectPage";
 
 export default function App() {
   return (
