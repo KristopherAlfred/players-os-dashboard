@@ -24,6 +24,8 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { LandingPage } from "./pages/LandingPage";
 import { MarketingLandingPage } from "./pages/MarketingLandingPage";
 import { RequireAuth, PublicOnly } from "./components/RequireAuth";
+import { RequireOnboarding } from "./components/RequireOnboarding";
+import { OnboardingPage } from "./pages/OnboardingPage";
 import { AthleteProvider } from "./contexts/AthleteContext";
 import { isDashboardAuthed } from "./lib/dashboardAuth";
 
