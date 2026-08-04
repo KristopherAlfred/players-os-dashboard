@@ -342,6 +342,7 @@ function InstagramSocialPanel({
   analytics: InstagramAnalytics | null;
   loading: boolean;
 }) {
+  const { fanAppName } = useAthlete();
   if (!analytics) {
     if (loading) return <SourceLoading message="Loading Instagram analytics…" />;
     return <SourceError title="Could not load Instagram analytics" message="No data available." />;
