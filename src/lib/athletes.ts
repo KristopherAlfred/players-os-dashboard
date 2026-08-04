@@ -37,6 +37,7 @@ export type AthleteTheme = {
   tagline: string | null;
   headline: string | null;
   subheadline: string | null;
+  fan_app_name: string | null;
   is_published: boolean;
 };
 
@@ -53,7 +54,7 @@ const ATHLETE_COLUMNS =
   "id, profile_key, full_name, display_name, sport, sport_icon, gender, team_or_league, bio_short, profile_photo_url, onboarding_completed";
 
 const THEME_COLUMNS =
-  "athlete_id, template_id, bg_solid, gradient_from, gradient_via, gradient_to, accent_color, accent_hover, button_bg, button_text, button_border_radius, background_image, logo_url, tagline, headline, subheadline, is_published";
+  "athlete_id, template_id, bg_solid, gradient_from, gradient_via, gradient_to, accent_color, accent_hover, button_bg, button_text, button_border_radius, background_image, logo_url, tagline, headline, subheadline, fan_app_name, is_published";
 
 const LINK_COLUMNS = "id, athlete_id, slug, destination_app_url, is_published, click_count";
 

@@ -45,6 +45,7 @@ const THEME_FIELDS = [
   "tagline",
   "headline",
   "subheadline",
+  "fan_app_name",
 ] as const;
 
 Deno.serve(async (req) => {
