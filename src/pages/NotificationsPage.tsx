@@ -94,6 +94,21 @@ export function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [customFrequency, setCustomFrequency] = useState(false);
+  const { fanAppName } = useAthlete();
+
+  function useSuggestion(suggestion: NotificationSuggestion) {
+    const item = createEmptyNotification();
+    const next = { ...item, message: suggestion.message };
+    setSelectedId(next.id);
+    setDraft(next);
+    setCustomFrequency(false);
+    setError(null);
+    setStatus(
+      suggestion.kind === "ai"
+        ? "Draft started from an AI insight — review, then Publish"
+        : "Draft started from a bio link milestone — review, then Publish",
+    );
+  }
 
   useEffect(() => {
     void fetchNotificationFeed()
