@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "../components/Sidebar";
 import { Header } from "../components/Header";
-import { routeMeta } from "../config/navigation";
+import { fillRouteCopy, routeMeta } from "../config/navigation";
 import { DashboardSourceProvider } from "../contexts/DashboardSourceContext";
 import { DametimeAnalyticsProvider } from "../contexts/DametimeAnalyticsContext";
 import { InstagramAnalyticsProvider } from "../contexts/InstagramAnalyticsContext";
@@ -12,13 +12,20 @@ import { TwitterAnalyticsProvider } from "../contexts/TwitterAnalyticsContext";
 import { SourceBanner } from "../components/dametime/DametimeAnalyticsStates";
 import { ContentSourceGuard } from "../components/ContentSourceGuard";
 import { OnboardingProvider } from "../components/onboarding/OnboardingTour";
+import { useAthlete } from "../contexts/AthleteContext";
 
 export function AppLayout() {
   const { pathname } = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const meta = routeMeta[pathname] ?? {
-    title: "SLOANE GLO",
+  const { fanAppName, displayName } = useAthlete();
+  const rawMeta = routeMeta[pathname] ?? {
+    title: "{fanApp}",
     subtitle: "Creator analytics and fan engagement platform.",
+  };
+  const copyValues = { fanApp: fanAppName, athlete: displayName };
+  const meta = {
+    title: fillRouteCopy(rawMeta.title, copyValues),
+    subtitle: fillRouteCopy(rawMeta.subtitle, copyValues),
   };
 
   useEffect(() => {

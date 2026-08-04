@@ -17,8 +17,11 @@ const MAX_UPLOAD_BYTES = 2.5 * 1024 * 1024;
 function fieldClass() {
   return "w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25";
 }
+import { useAthlete } from "../contexts/AthleteContext";
 
 export function ProfilePage() {
+  const { displayName, sport, fanAppName, athlete } = useAthlete();
+  const athletePhoto = athlete?.profile_photo_url ?? "";
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
   const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
   const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(getDashboardAvatarRing()));
@@ -120,8 +123,8 @@ export function ProfilePage() {
           <div className="flex flex-col items-center gap-4 p-6">
             <div className="relative">
               <img
-                src={avatar}
-                alt="Profile"
+                src={isDefaultAvatar(avatar) ? athletePhoto || avatar : avatar}
+                alt={`${displayName} profile photo`}
                 className="h-44 w-44 rounded-full border-4 object-cover object-top shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
                 style={{ borderColor: ringColor }}
               />
@@ -130,8 +133,10 @@ export function ProfilePage() {
               </span>
             </div>
             <div className="text-center">
-              <p className="font-display text-lg font-bold text-white">Sloane Stephens</p>
-              <p className="text-xs uppercase tracking-[0.16em] text-white/40">Sloane Glo Admin</p>
+              <p className="font-display text-lg font-bold text-white">{displayName}</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-white/40">
+                {sport ? `${sport} · ` : ""}{fanAppName} Admin
+              </p>
             </div>
             {!usingDefault ? (
               <button
