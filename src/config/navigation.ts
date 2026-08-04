@@ -106,6 +106,19 @@ export const navSections: NavSection[] = [
   },
 ];
 
+/**
+ * Route copy uses `{fanApp}` and `{athlete}` tokens so every page header reads
+ * from the logged-in athlete instead of one hardcoded name.
+ */
+export function fillRouteCopy(
+  copy: string,
+  values: { fanApp: string; athlete: string },
+): string {
+  return copy
+    .replaceAll("{fanApp}", values.fanApp)
+    .replaceAll("{athlete}", values.athlete);
+}
+
 export type RouteMeta = {
   title: string;
   subtitle: string;
@@ -114,43 +127,43 @@ export type RouteMeta = {
 export const routeMeta: Record<string, RouteMeta> = {
   "/": {
     title: "Dashboard Overview",
-    subtitle: "Real-time performance of the Sloane Glo ecosystem.",
+    subtitle: "Real-time performance of the {fanApp} ecosystem.",
   },
   "/content/social": {
     title: "Social",
-    subtitle: "Live Instagram, X, and Facebook analytics from Sloane Glo.",
+    subtitle: "Live Instagram, X, and Facebook analytics from {fanApp}.",
   },
   "/content/news": {
     title: "News",
-    subtitle: "Write newsletters and insights that publish straight to the Sloane Glo app.",
+    subtitle: "Write newsletters and insights that publish straight to the {fanApp} app.",
   },
   "/content/videos": {
     title: "Videos",
-    subtitle: "YouTube analytics plus Exclusive uploads — same tabs fans use in Sloane Glo.",
+    subtitle: "YouTube analytics plus Exclusive uploads — same tabs fans use in {fanApp}.",
   },
   "/content/doc-and-glo": {
     title: "Doc & Glo",
-    subtitle: "Sloane’s skincare line — sync products from the shop and publish them to the app.",
+    subtitle: "{athlete}’s skincare line — sync products from the shop and publish them to the app.",
   },
   "/content/music": {
     title: "Doc & Glo",
-    subtitle: "Sloane’s skincare line — sync products from the shop and publish them to the app.",
+    subtitle: "{athlete}’s skincare line — sync products from the shop and publish them to the app.",
   },
   "/content/events": {
     title: "Events & Giveaways",
-    subtitle: "Create and publish events and giveaways fans see in the Sloane Glo app.",
+    subtitle: "Create and publish events and giveaways fans see in the {fanApp} app.",
   },
   "/content/calendar": {
     title: "Content Calendar",
-    subtitle: "Live posts from Sloane Glo and social — exact date, time, and what went live.",
+    subtitle: "Live posts from {fanApp} and social — exact date, time, and what went live.",
   },
   "/live": {
     title: "Live",
-    subtitle: "Go live on Sloane Glo for fans watching in the app and on the site.",
+    subtitle: "Go live on {fanApp} for fans watching in the app and on the site.",
   },
   "/experience": {
     title: "Experience",
-    subtitle: "Drag, style, and publish the Sloane Glo app home screen.",
+    subtitle: "Drag, style, and publish the {fanApp} app home screen.",
   },
   "/notifications": {
     title: "Notifications",
@@ -162,11 +175,11 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/engagement/activity": {
     title: "Fan Activity",
-    subtitle: "Live Sloane Glo app clicks, page views, and fan interactions from Supabase.",
+    subtitle: "Live {fanApp} app clicks, page views, and fan interactions from Supabase.",
   },
   "/engagement/support": {
     title: "Support Inbox",
-    subtitle: "Help & Support reports submitted by fans in the Sloane Glo app.",
+    subtitle: "Help & Support reports submitted by fans in the {fanApp} app.",
   },
   "/settings": {
     title: "Settings",
@@ -174,14 +187,14 @@ export const routeMeta: Record<string, RouteMeta> = {
   },
   "/fans/audience": {
     title: "Fan Locations",
-    subtitle: "Live Sloane Glo fan composition, geo, and engagement from Supabase.",
+    subtitle: "Live {fanApp} fan composition, geo, and engagement from Supabase.",
   },
   "/fans/subscribers": {
     title: "Email / SMS List",
-    subtitle: "Live Sloane Glo fan emails, phones, and SMS opt-ins from Supabase.",
+    subtitle: "Live {fanApp} fan emails, phones, and SMS opt-ins from Supabase.",
   },
   "/performance/traffic": {
     title: "Traffic Overview",
-    subtitle: "Live Sloane Glo page views, clicks, and navigation from Supabase fan_events.",
+    subtitle: "Live {fanApp} page views, clicks, and navigation from Supabase fan_events.",
   },
 };
