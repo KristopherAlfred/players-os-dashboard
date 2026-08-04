@@ -17,6 +17,7 @@ const MAX_UPLOAD_BYTES = 2.5 * 1024 * 1024;
 function fieldClass() {
   return "w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25";
 }
+import { useAthlete } from "../contexts/AthleteContext";
 
 export function ProfilePage() {
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
@@ -130,8 +131,10 @@ export function ProfilePage() {
               </span>
             </div>
             <div className="text-center">
-              <p className="font-display text-lg font-bold text-white">Sloane Stephens</p>
-              <p className="text-xs uppercase tracking-[0.16em] text-white/40">Sloane Glo Admin</p>
+              <p className="font-display text-lg font-bold text-white">{displayName}</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-white/40">
+                {sport ? `${sport} · ` : ""}{fanAppName} Admin
+              </p>
             </div>
             {!usingDefault ? (
               <button
