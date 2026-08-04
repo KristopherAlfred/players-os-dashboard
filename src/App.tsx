@@ -28,11 +28,14 @@ import { RequireOnboarding } from "./components/RequireOnboarding";
 import { OnboardingPage } from "./pages/OnboardingPage";
 import { AthleteProvider } from "./contexts/AthleteContext";
 import { isDashboardAuthed } from "./lib/dashboardAuth";
+import { BioLinkPage } from "./pages/BioLinkPage";
+import { BioLinkRedirectPage } from "./pages/BioLinkRedirectPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/go/:slug" element={<BioLinkRedirectPage />} />
         <Route
           path="/welcome"
           element={
@@ -94,6 +97,7 @@ export default function App() {
           <Route path="fans/segments" element={<Navigate to="/fans/audience" replace />} />
           <Route path="fans/subscribers" element={<SubscribersPage />} />
           <Route path="fans/behavior" element={<Navigate to="/fans/audience" replace />} />
+          <Route path="bio-link" element={<BioLinkPage />} />
           <Route path="performance/traffic" element={<TrafficOverviewPage />} />
           <Route path="performance/funnel" element={<Navigate to="/performance/traffic" replace />} />
           <Route path="performance/campaigns" element={<Navigate to="/performance/traffic" replace />} />

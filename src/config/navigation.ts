@@ -83,6 +83,7 @@ export const navSections: NavSection[] = [
     items: [
       { label: "Fan Locations", path: "/fans/audience" },
       { label: "Email/SMS List", path: "/fans/subscribers" },
+      { label: "Bio Link", path: "/bio-link" },
     ],
   },
   {
@@ -192,6 +193,10 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/fans/subscribers": {
     title: "Email / SMS List",
     subtitle: "Live {fanApp} fan emails, phones, and SMS opt-ins from Supabase.",
+  },
+  "/bio-link": {
+    title: "Bio Link",
+    subtitle: "Claim one short link that funnels social traffic into {fanApp}.",
   },
   "/performance/traffic": {
     title: "Traffic Overview",
