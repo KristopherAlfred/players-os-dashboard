@@ -183,11 +183,21 @@ export function applyExperienceTemplate(
   config: ExperienceConfig,
   template: ExperienceTemplate,
 ): ExperienceConfig {
+  const ctaBg = template.theme.buttonBg;
+  const ctaText = template.theme.buttonText;
+  const pages = Object.fromEntries(
+    Object.entries(config.pages).map(([key, page]) => [
+      key,
+      ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page,
+    ]),
+  ) as ExperienceConfig["pages"];
+
   return {
     ...config,
     brand: { ...config.brand, ...template.brand },
     theme: { ...config.theme, ...template.theme },
     effects: { ...config.effects, ...template.effects },
+    pages,
   };
 }
 
