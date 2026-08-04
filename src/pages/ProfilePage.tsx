@@ -20,6 +20,7 @@ function fieldClass() {
 import { useAthlete } from "../contexts/AthleteContext";
 
 export function ProfilePage() {
+  const { displayName, sport, fanAppName } = useAthlete();
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
   const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
   const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(getDashboardAvatarRing()));
