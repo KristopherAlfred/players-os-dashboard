@@ -427,7 +427,7 @@ export function LivePage() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
                   <Radio size={18} />
                 </span>
-                Go Live on Sloane Glo
+                Go Live on {fanAppName}
               </button>
             )}
 
