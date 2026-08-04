@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -37,6 +38,7 @@ const permissions = [
 ];
 
 export function SettingsPage() {
+  const { fanAppName, firstName } = useAthlete();
   const navigate = useNavigate();
   const { start: startTour } = useOnboarding();
 
@@ -77,7 +79,7 @@ export function SettingsPage() {
                 Appearance, account & access
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Pick a color template, manage preferences, and see how connected platforms sync into Sloane Glo.
+                Pick a color template, manage preferences, and see how connected platforms sync into {fanAppName}.
               </p>
             </div>
 
@@ -209,7 +211,7 @@ export function SettingsPage() {
             <label className="block">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Display name</span>
               <input
-                defaultValue="Sloane Glo Admin"
+                defaultValue={`${fanAppName} Admin`}
                 className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
               />
             </label>
@@ -258,7 +260,7 @@ export function SettingsPage() {
               },
               {
                 label: "SMS alerts for live drops",
-                hint: "When Sloane goes live or posts exclusive content",
+                hint: `When ${firstName} goes live or posts exclusive content`,
                 checked: smsAlerts,
                 onChange: setSmsAlerts,
               },
@@ -300,7 +302,7 @@ export function SettingsPage() {
             <Shield size={16} />
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Roles & permissions</h3>
           </div>
-          <p className="mt-1 text-[11px] text-white/40">Reference matrix for Sloane Glo dashboard access levels</p>
+          <p className="mt-1 text-[11px] text-white/40">Reference matrix for {fanAppName} dashboard access levels</p>
         </div>
         <div className="overflow-x-auto p-2 sm:p-4">
           <table className="w-full min-w-[520px] text-left text-sm">
