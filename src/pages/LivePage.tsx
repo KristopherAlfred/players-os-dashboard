@@ -359,6 +359,7 @@ export function LivePage() {
               <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.12em] text-white/45">Stream title</span>
               <input
                 value={title}
+                placeholder={`${fanAppName} Live`}
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isLive}
                 className="w-full rounded-xl border border-dt-border bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-dt-red/60 disabled:opacity-60"
