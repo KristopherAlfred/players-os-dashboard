@@ -50,12 +50,16 @@ import {
   BrandHeaderFields,
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
+import { ExperienceTemplateGallery } from "../components/experience/ExperienceTemplateGallery";
+import { applyExperienceTemplate, detectExperienceTemplate } from "../lib/experienceTemplates";
+import { useAthlete } from "../contexts/AthleteContext";
 import {
   ExperienceContentStudio,
   type ExperienceContentKind,
 } from "../components/experience/ExperienceContentStudio";
 
 type ExperienceSection =
+  | "templates"
   | "boxes"
   | "brand"
   | "theme"
@@ -66,6 +70,7 @@ type ExperienceSection =
   | "homePage";
 
 const SECTIONS: { id: ExperienceSection; label: string }[] = [
+  { id: "templates", label: "Templates" },
   { id: "brand", label: "Brand / Logo" },
   { id: "theme", label: "Colors" },
   { id: "effects", label: "Effects" },
@@ -89,7 +94,7 @@ function readFileAsDataUrl(file: File): Promise<string> {
 }
 
 const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: typeof Ticket }[] = [
-  { type: "tickets", label: "Sloane Glo Tickets", hint: "Ticket drops", Icon: Ticket },
+  { type: "tickets", label: "Tickets", hint: "Ticket drops", Icon: Ticket },
   { type: "custom", label: "Custom box", hint: "Any link + art", Icon: LayoutTemplate },
   { type: "videos", label: "Videos", hint: "Exclusive clips", Icon: Film },
   { type: "news", label: "News", hint: "Newsletters", Icon: Newspaper },
@@ -142,7 +147,7 @@ const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
   { id: "lowercase", label: "lowercase", hint: "exclusive videos" },
   { id: "stacked", label: "Stacked words", hint: "One word per line" },
   { id: "single_line", label: "Single line", hint: "No line breaks" },
-  { id: "sloane_style", label: "Sloane style", hint: "2–3 short caps lines" },
+  { id: "sloane_style", label: "Balanced caps", hint: "2–3 short caps lines" },
 ];
 
 function titleLines(title: string) {
@@ -284,8 +289,9 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
 }
 
 export function ExperiencePage() {
+  const { fanAppName, displayName } = useAthlete();
   const [layout, setLayout] = useState<HomeLayout | null>(null);
-  const [section, setSection] = useState<ExperienceSection>("brand");
+  const [section, setSection] = useState<ExperienceSection>("templates");
   const [contentStudio, setContentStudio] = useState<ExperienceContentKind | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -323,6 +329,7 @@ export function ExperiencePage() {
   );
 
   const experience = useMemo(() => getExperienceFromLayout(layout), [layout]);
+  const activeTemplateId = useMemo(() => detectExperienceTemplate(experience), [experience]);
 
   const ordered = useMemo(
     () => (layout ? [...layout.widgets].sort((a, b) => a.order - b.order) : []),
@@ -483,7 +490,7 @@ export function ExperiencePage() {
       });
       setLayout(published);
       setDirty(false);
-      setStatus("Published experience to Sloane Glo");
+      setStatus(`Published experience to ${fanAppName}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Publish failed");
     } finally {
@@ -564,7 +571,7 @@ export function ExperiencePage() {
                 Advanced experience studio
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Customize every page of Sloane Glo
+                Customize every page of {fanAppName}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Logos, gradients, button colors, fonts, effects, landing / you&apos;re-in / settings / home boxes —
@@ -667,9 +674,18 @@ export function ExperiencePage() {
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">
                 {SECTIONS.find((s) => s.id === section)?.label}
               </h3>
-              <p className="text-[11px] text-white/40">Changes sync to Sloane Glo when you publish</p>
+              <p className="text-[11px] text-white/40">Changes sync to {fanAppName} when you publish</p>
             </div>
             <div className="max-h-[calc(100vh-8rem)] overflow-y-auto p-4">
+              {section === "templates" ? (
+                <ExperienceTemplateGallery
+                  activeId={activeTemplateId}
+                  onApply={(template) => {
+                    patchExperience((prev) => applyExperienceTemplate(prev, template));
+                    setStatus(`${template.label} template applied — publish to push live`);
+                  }}
+                />
+              ) : null}
               {section === "brand" ? (
                 <ExperienceBrandPanel
                   brand={experience.brand}
@@ -748,7 +764,7 @@ export function ExperiencePage() {
           </section>
           <ExperiencePhonePreview
             experience={experience}
-            mode={section}
+            mode={section === "templates" ? "theme" : section}
             pageKey={
               section === "youreIn"
                 ? "youreIn"
@@ -1030,7 +1046,7 @@ export function ExperiencePage() {
                 rows={3}
                 disabled={generating}
                 className={fieldClass()}
-                placeholder="Example: Sloane Stephens red jersey cutout, transparent background, mobile app tile"
+                placeholder={`Example: ${displayName} action shot cutout, transparent background, mobile app tile`}
               />
               {selected?.imageSrc ? (
                 <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
