@@ -194,6 +194,10 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Email / SMS List",
     subtitle: "Live {fanApp} fan emails, phones, and SMS opt-ins from Supabase.",
   },
+  "/bio-link": {
+    title: "Bio Link",
+    subtitle: "Claim one short link that funnels social traffic into {fanApp}.",
+  },
   "/performance/traffic": {
     title: "Traffic Overview",
     subtitle: "Live {fanApp} page views, clicks, and navigation from Supabase fan_events.",
