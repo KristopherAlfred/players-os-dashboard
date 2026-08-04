@@ -324,6 +324,8 @@ export function NotificationsPage() {
         )}
       </div>
 
+      <SmartSuggestions onUse={useSuggestion} />
+
       <div className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_360px]">
         {/* List */}
         <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
