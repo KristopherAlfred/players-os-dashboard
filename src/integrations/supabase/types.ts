@@ -14,6 +14,216 @@ export type Database = {
   }
   public: {
     Tables: {
+      athlete_ai_insights: {
+        Row: {
+          athlete_id: string
+          created_at: string
+          data_snapshot: Json
+          id: string
+          insight_type: string
+          recommendation: string | null
+          summary: string
+        }
+        Insert: {
+          athlete_id: string
+          created_at?: string
+          data_snapshot?: Json
+          id?: string
+          insight_type?: string
+          recommendation?: string | null
+          summary: string
+        }
+        Update: {
+          athlete_id?: string
+          created_at?: string
+          data_snapshot?: Json
+          id?: string
+          insight_type?: string
+          recommendation?: string | null
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "athlete_ai_insights_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      athlete_bio_links: {
+        Row: {
+          athlete_id: string
+          click_count: number
+          created_at: string
+          destination_app_url: string | null
+          id: string
+          is_published: boolean
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          athlete_id: string
+          click_count?: number
+          created_at?: string
+          destination_app_url?: string | null
+          id?: string
+          is_published?: boolean
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          athlete_id?: string
+          click_count?: number
+          created_at?: string
+          destination_app_url?: string | null
+          id?: string
+          is_published?: boolean
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "athlete_bio_links_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      athlete_theme: {
+        Row: {
+          accent_color: string
+          accent_hover: string
+          athlete_id: string
+          background_image: string | null
+          bg_solid: string
+          button_bg: string
+          button_border_radius: number
+          button_text: string
+          created_at: string
+          gradient_from: string
+          gradient_to: string
+          gradient_via: string
+          headline: string | null
+          id: string
+          is_published: boolean
+          logo_url: string | null
+          subheadline: string | null
+          tagline: string | null
+          template_id: string
+          updated_at: string
+        }
+        Insert: {
+          accent_color?: string
+          accent_hover?: string
+          athlete_id: string
+          background_image?: string | null
+          bg_solid?: string
+          button_bg?: string
+          button_border_radius?: number
+          button_text?: string
+          created_at?: string
+          gradient_from?: string
+          gradient_to?: string
+          gradient_via?: string
+          headline?: string | null
+          id?: string
+          is_published?: boolean
+          logo_url?: string | null
+          subheadline?: string | null
+          tagline?: string | null
+          template_id?: string
+          updated_at?: string
+        }
+        Update: {
+          accent_color?: string
+          accent_hover?: string
+          athlete_id?: string
+          background_image?: string | null
+          bg_solid?: string
+          button_bg?: string
+          button_border_radius?: number
+          button_text?: string
+          created_at?: string
+          gradient_from?: string
+          gradient_to?: string
+          gradient_via?: string
+          headline?: string | null
+          id?: string
+          is_published?: boolean
+          logo_url?: string | null
+          subheadline?: string | null
+          tagline?: string | null
+          template_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "athlete_theme_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: true
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      athletes: {
+        Row: {
+          bio_short: string | null
+          created_at: string
+          display_name: string | null
+          full_name: string
+          full_name_normalized: string | null
+          gender: string | null
+          id: string
+          onboarding_completed: boolean
+          profile_key: string | null
+          profile_photo_url: string | null
+          sport: string | null
+          sport_icon: string | null
+          team_or_league: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          bio_short?: string | null
+          created_at?: string
+          display_name?: string | null
+          full_name: string
+          full_name_normalized?: string | null
+          gender?: string | null
+          id?: string
+          onboarding_completed?: boolean
+          profile_key?: string | null
+          profile_photo_url?: string | null
+          sport?: string | null
+          sport_icon?: string | null
+          team_or_league?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          bio_short?: string | null
+          created_at?: string
+          display_name?: string | null
+          full_name?: string
+          full_name_normalized?: string | null
+          gender?: string | null
+          id?: string
+          onboarding_completed?: boolean
+          profile_key?: string | null
+          profile_photo_url?: string | null
+          sport?: string | null
+          sport_icon?: string | null
+          team_or_league?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       instagram_account_stats: {
         Row: {
           biography: string | null
@@ -74,6 +284,7 @@ export type Database = {
       instagram_auth: {
         Row: {
           access_token: string
+          athlete_id: string | null
           connected_at: string
           created_at: string
           id: string
@@ -86,6 +297,7 @@ export type Database = {
         }
         Insert: {
           access_token: string
+          athlete_id?: string | null
           connected_at?: string
           created_at?: string
           id?: string
@@ -98,6 +310,7 @@ export type Database = {
         }
         Update: {
           access_token?: string
+          athlete_id?: string | null
           connected_at?: string
           created_at?: string
           id?: string
@@ -108,7 +321,15 @@ export type Database = {
           updated_at?: string
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "instagram_auth_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       instagram_media: {
         Row: {
@@ -172,6 +393,7 @@ export type Database = {
       }
       onboarding_state: {
         Row: {
+          athlete_id: string | null
           completed_at: string | null
           created_at: string
           has_completed_onboarding: boolean
@@ -180,6 +402,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          athlete_id?: string | null
           completed_at?: string | null
           created_at?: string
           has_completed_onboarding?: boolean
@@ -188,6 +411,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          athlete_id?: string | null
           completed_at?: string | null
           created_at?: string
           has_completed_onboarding?: boolean
@@ -195,10 +419,19 @@ export type Database = {
           profile_key?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_state_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       platform_connections: {
         Row: {
+          athlete_id: string | null
           connected: boolean
           created_at: string
           display_name: string
@@ -210,6 +443,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          athlete_id?: string | null
           connected?: boolean
           created_at?: string
           display_name: string
@@ -221,6 +455,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          athlete_id?: string | null
           connected?: boolean
           created_at?: string
           display_name?: string
@@ -231,10 +466,19 @@ export type Database = {
           platform?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "platform_connections_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       platform_follower_snapshots: {
         Row: {
+          athlete_id: string | null
           captured_on: string
           created_at: string
           follower_count: number
@@ -243,6 +487,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          athlete_id?: string | null
           captured_on?: string
           created_at?: string
           follower_count?: number
@@ -251,6 +496,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          athlete_id?: string | null
           captured_on?: string
           created_at?: string
           follower_count?: number
@@ -258,7 +504,15 @@ export type Database = {
           platform?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "platform_follower_snapshots_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
