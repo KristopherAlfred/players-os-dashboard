@@ -274,7 +274,7 @@ export function NotificationsPage() {
                 In-app toasts
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Schedule Sloane Glo notifications
+                Schedule {fanAppName} notifications
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Write extra messages that pop in the fan app with the same red-gradient toast look — set frequency, duration, and schedule windows.
