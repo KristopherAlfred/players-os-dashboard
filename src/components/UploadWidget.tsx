@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { Link } from "react-router-dom";
 import { Sparkles, Newspaper } from "lucide-react";
 import { Card } from "./ui/Card";
