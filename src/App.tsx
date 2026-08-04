@@ -24,6 +24,8 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { LandingPage } from "./pages/LandingPage";
 import { MarketingLandingPage } from "./pages/MarketingLandingPage";
 import { RequireAuth, PublicOnly } from "./components/RequireAuth";
+import { RequireOnboarding } from "./components/RequireOnboarding";
+import { OnboardingPage } from "./pages/OnboardingPage";
 import { AthleteProvider } from "./contexts/AthleteContext";
 import { isDashboardAuthed } from "./lib/dashboardAuth";
 
@@ -49,12 +51,21 @@ export default function App() {
         />
         <Route element={<RequireAuth />}>
           <Route
+            path="/onboarding"
             element={
               <AthleteProvider>
-                <AppLayout />
+                <OnboardingPage />
+              </AthleteProvider>
+            }
+          />
+          <Route
+            element={
+              <AthleteProvider>
+                <RequireOnboarding />
               </AthleteProvider>
             }
           >
+          <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="content/social" element={<SocialContentPage />} />
           <Route path="content/news" element={<NewsContentPage />} />
@@ -98,7 +109,9 @@ export default function App() {
           <Route path="settings/integrations" element={<Navigate to="/settings" replace />} />
           <Route path="settings/account" element={<Navigate to="/settings" replace />} />
           </Route>
+          </Route>
         </Route>
+
         <Route path="*" element={<Navigate to={isDashboardAuthed() ? "/" : "/welcome"} replace />} />
       </Routes>
     </BrowserRouter>
