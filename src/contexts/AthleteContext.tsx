@@ -99,6 +99,7 @@ export function AthleteProvider({ children }: { children: ReactNode }) {
       displayName,
       firstName: displayName.split(/\s+/)[0] || FALLBACK_NAME,
       sport: athlete?.sport ?? "",
+      fanAppName: theme?.fan_app_name?.trim() || `${displayName.split(/\s+/)[0]} Fan App`,
       refresh: load,
     };
   }, [athlete, theme, bioLink, loading, load]);
