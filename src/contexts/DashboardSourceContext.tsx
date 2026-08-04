@@ -38,7 +38,8 @@ const DashboardSourceContext = createContext<DashboardSourceContextValue | null>
 
 const sourceLabels: Record<DashboardSource, string> = {
   overview: "Overview",
-  dametime: "Sloane Glo",
+  // Overridden at render time with the athlete's own fan-app name.
+  dametime: "Fan App",
   instagram: "Instagram",
   youtube: "YouTube",
   facebook: "Facebook",
