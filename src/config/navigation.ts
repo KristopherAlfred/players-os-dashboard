@@ -83,6 +83,7 @@ export const navSections: NavSection[] = [
     items: [
       { label: "Fan Locations", path: "/fans/audience" },
       { label: "Email/SMS List", path: "/fans/subscribers" },
+      { label: "Bio Link", path: "/bio-link" },
     ],
   },
   {
