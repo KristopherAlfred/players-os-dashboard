@@ -107,7 +107,9 @@ export default function App() {
           <Route path="settings/integrations" element={<Navigate to="/settings" replace />} />
           <Route path="settings/account" element={<Navigate to="/settings" replace />} />
           </Route>
+          </Route>
         </Route>
+
         <Route path="*" element={<Navigate to={isDashboardAuthed() ? "/" : "/welcome"} replace />} />
       </Routes>
     </BrowserRouter>
