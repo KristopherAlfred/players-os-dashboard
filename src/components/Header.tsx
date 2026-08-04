@@ -106,7 +106,9 @@ export function Header({
                 size={14}
                 className={`shrink-0 ${filterPulse ? "text-dt-red" : "text-dt-muted"}`}
               />
-              <span className="hidden sm:inline">{sourceLabel}</span>
+              <span className="hidden sm:inline">
+                {source === "dametime" ? fanAppName : sourceLabel}
+              </span>
               <span className="sm:hidden">Filter</span>
             </button>
 
