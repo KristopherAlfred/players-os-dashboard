@@ -9,7 +9,12 @@ import {
   type DashboardSource,
 } from "../contexts/DashboardSourceContext";
 import { useOnboarding } from "./onboarding/OnboardingTour";
-import { getDashboardAvatar, getDashboardAvatarRing, onDashboardAvatarChange } from "../lib/adminProfile";
+import {
+  getDashboardAvatar,
+  getDashboardAvatarRing,
+  isDefaultAvatar,
+  onDashboardAvatarChange,
+} from "../lib/adminProfile";
 import { useAthlete } from "../contexts/AthleteContext";
 
 const filterOptions: { id: DashboardSource; label: string }[] = [
@@ -179,7 +184,7 @@ export function Header({
             className="hidden shrink-0 rounded-full transition hover:ring-2 hover:ring-dt-red/60 sm:block"
           >
             <img
-              src={athlete?.profile_photo_url || avatar}
+              src={isDefaultAvatar(avatar) ? athlete?.profile_photo_url || avatar : avatar}
               alt={`${displayName} — open profile`}
               className="h-9 w-9 rounded-full border-2 object-cover object-top"
               style={{ borderColor: ringColor }}
