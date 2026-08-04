@@ -104,6 +104,7 @@ export type Database = {
           button_border_radius: number
           button_text: string
           created_at: string
+          fan_app_name: string | null
           gradient_from: string
           gradient_to: string
           gradient_via: string
@@ -126,6 +127,7 @@ export type Database = {
           button_border_radius?: number
           button_text?: string
           created_at?: string
+          fan_app_name?: string | null
           gradient_from?: string
           gradient_to?: string
           gradient_via?: string
@@ -148,6 +150,7 @@ export type Database = {
           button_border_radius?: number
           button_text?: string
           created_at?: string
+          fan_app_name?: string | null
           gradient_from?: string
           gradient_to?: string
           gradient_via?: string
