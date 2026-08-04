@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { generateText, Output, streamText } from "npm:ai";
+import { streamText } from "npm:ai";
 import { z } from "npm:zod";
 import { createLovableAiGatewayProvider } from "../_shared/ai-gateway.ts";
 
@@ -105,11 +105,16 @@ Deno.serve(async (req) => {
       const result = streamText({
         model: gateway(MODEL),
         system: systemPrompt(snapshot),
-        prompt:
-          "Generate the 3 most valuable insights for this athlete right now. Each needs a one-sentence summary of what the data shows and one specific recommendation they can act on this week.",
-        output: Output.object({ schema: insightSchema }),
+        prompt: [
+          "Generate the 3 most valuable insights for this athlete right now.",
+          "Reply with JSON only, no markdown fences, shaped exactly:",
+          '{"insights":[{"insight_type":"trend|opportunity|risk|content","summary":"one sentence on what the data shows","recommendation":"one specific action for this week"}]}',
+        ].join("\n"),
       });
-      const output = await result.output;
+      const raw = (await result.text).replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+      const parsed = insightSchema.safeParse(JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1)));
+      if (!parsed.success) return json({ error: "AI returned an unexpected response — try again" }, 502);
+      const output = parsed.data;
 
       const rows = output.insights.map((i) => ({
         athlete_id: body.athleteId,
