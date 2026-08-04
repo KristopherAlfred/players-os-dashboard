@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   Activity,
@@ -129,6 +130,7 @@ function Surface({
 }
 
 export function TrafficOverviewPage() {
+  const { fanAppName } = useAthlete();
   const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
   const [fans, setFans] = useState<FanContact[]>([]);
   const [fanEmail, setFanEmail] = useState("");
