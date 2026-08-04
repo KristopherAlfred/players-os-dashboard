@@ -47,7 +47,13 @@ export default function App() {
           }
         />
         <Route element={<RequireAuth />}>
-          <Route element={<AppLayout />}>
+          <Route
+            element={
+              <AthleteProvider>
+                <AppLayout />
+              </AthleteProvider>
+            }
+          >
           <Route index element={<DashboardPage />} />
           <Route path="content/social" element={<SocialContentPage />} />
           <Route path="content/news" element={<NewsContentPage />} />
