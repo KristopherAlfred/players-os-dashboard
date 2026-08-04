@@ -32,6 +32,8 @@ type AthleteContextValue = {
   displayName: string;
   firstName: string;
   sport: string;
+  /** The athlete's fan-app brand name, e.g. "Sloane Glo". */
+  fanAppName: string;
   refresh: () => Promise<void>;
 };
 
@@ -45,6 +47,7 @@ const AthleteContext = createContext<AthleteContextValue>({
   displayName: FALLBACK_NAME,
   firstName: FALLBACK_NAME,
   sport: "",
+  fanAppName: "Fan App",
   refresh: async () => {},
 });
 
