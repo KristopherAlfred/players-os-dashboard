@@ -20,7 +20,8 @@ function fieldClass() {
 import { useAthlete } from "../contexts/AthleteContext";
 
 export function ProfilePage() {
-  const { displayName, sport, fanAppName } = useAthlete();
+  const { displayName, sport, fanAppName, athlete } = useAthlete();
+  const athletePhoto = athlete?.profile_photo_url ?? "";
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
   const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
   const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(getDashboardAvatarRing()));
@@ -122,8 +123,8 @@ export function ProfilePage() {
           <div className="flex flex-col items-center gap-4 p-6">
             <div className="relative">
               <img
-                src={avatar}
-                alt="Profile"
+                src={isDefaultAvatar(avatar) ? athletePhoto || avatar : avatar}
+                alt={`${displayName} profile photo`}
                 className="h-44 w-44 rounded-full border-4 object-cover object-top shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
                 style={{ borderColor: ringColor }}
               />
