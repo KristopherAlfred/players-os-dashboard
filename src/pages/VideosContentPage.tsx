@@ -56,7 +56,6 @@ function matchesExclusiveTarget(target: string | null | undefined, videoId: stri
 }
 
 export function VideosContentPage() {
-  const { fanAppName } = useAthlete();
   const [tab, setTab] = useState<VideosTab>("youtube");
   const activeIndex = TABS.findIndex((item) => item.id === tab);
 
@@ -121,6 +120,7 @@ export function VideosContentPage() {
 }
 
 function YouTubeVideosPanel() {
+  const { fanAppName } = useAthlete();
   const [analytics, setAnalytics] = useState<YouTubeAnalytics | null>(null);
   const [dameAnalytics, setDameAnalytics] = useState<DametimeAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -278,6 +278,7 @@ function YouTubeVideosPanel() {
 }
 
 function ExclusiveVideosPanel() {
+  const { fanAppName } = useAthlete();
   const [feed, setFeed] = useState<ExclusiveVideoFeed | null>(null);
   const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
