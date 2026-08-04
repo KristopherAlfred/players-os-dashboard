@@ -1,3 +1,4 @@
+import { useAthlete } from "../../contexts/AthleteContext";
 import type { ReactNode } from "react";
 import { useAnalyticsView } from "../../hooks/useAnalyticsView";
 import type { DametimeAnalytics } from "../../lib/dametimeAnalyticsApi";
@@ -29,15 +30,16 @@ export function SourceError({
   );
 }
 
-export function DametimeLoading({ message = "Loading Sloane Glo analytics…" }: { message?: string }) {
+export function DametimeLoading({ message = "Loading fan app analytics…" }: { message?: string }) {
   return <SourceLoading message={message} />;
 }
 
 export function DametimeError({ message }: { message: string }) {
-  return <SourceError title="Could not load Sloane Glo analytics" message={message} />;
+  return <SourceError title="Could not load fan app analytics" message={message} />;
 }
 
 export function SourceBanner() {
+  const { fanAppName } = useAthlete();
   const { isDametime, isInstagram, isYoutube, isFacebook, isTwitter, analytics, loading, instagram, youtube, facebook, twitter } =
     useAnalyticsView();
 
@@ -45,7 +47,7 @@ export function SourceBanner() {
     return (
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
-          Sloane Glo filter active — showing live analytics from the Sloane Glo app.
+          {fanAppName} filter active — showing live analytics from your fan app.
         </p>
         {!loading && analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">

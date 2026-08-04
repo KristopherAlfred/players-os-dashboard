@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Eye,
@@ -55,6 +56,7 @@ function matchesExclusiveTarget(target: string | null | undefined, videoId: stri
 }
 
 export function VideosContentPage() {
+  const { fanAppName } = useAthlete();
   const [tab, setTab] = useState<VideosTab>("youtube");
   const activeIndex = TABS.findIndex((item) => item.id === tab);
 
@@ -76,7 +78,7 @@ export function VideosContentPage() {
               YouTube analytics & Exclusive uploads
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-white/65">
-              Same tabs fans use in Sloane Glo — switch to Exclusive to upload clips and track opens once they go live.
+              Same tabs fans use in your fan app — switch to Exclusive to upload clips and track opens once they go live.
             </p>
           </div>
         </div>
@@ -134,7 +136,7 @@ function YouTubeVideosPanel() {
         fetchYouTubeAnalytics(),
         fetchDametimeAnalytics().catch(() => null),
       ]);
-      if (!data) throw new Error("Could not load YouTube analytics from Sloane Glo.");
+      if (!data) throw new Error(`Could not load YouTube analytics from ${fanAppName}.`);
       setAnalytics(data);
       setDameAnalytics(dame);
     } catch (err) {
@@ -240,7 +242,7 @@ function YouTubeVideosPanel() {
 
       <Panel title="In-app YouTube clicks">
         <p className="mb-3 text-[11px] text-white/40">
-          Fans tapping Sloane’s YouTube videos in the Sloane Glo app — stored in Supabase `fan_events`
+          Fans tapping your YouTube videos in the {fanAppName} app — stored in Supabase `fan_events`
         </p>
         {youtubeAppClicks.length === 0 ? (
           <p className="py-6 text-center text-sm text-dt-muted">
@@ -444,7 +446,7 @@ function ExclusiveVideosPanel() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — live in Sloane Glo Exclusive Videos"
+          ? `Published — live in ${fanAppName} Exclusive Videos`
           : "Draft saved",
       );
     } catch (err) {
@@ -565,7 +567,7 @@ function ExclusiveVideosPanel() {
         <StatCard label="Exclusive videos" value={String(stats.total)} />
         <StatCard label="Published" value={String(stats.published)} />
         <StatCard label="Drafts" value={String(stats.drafts)} />
-        <StatCard label="App opens" value={formatMetric(totalOpens)} hint="From Sloane Glo fan_events" />
+        <StatCard label="App opens" value={formatMetric(totalOpens)} hint={`From ${fanAppName} fan_events`} />
       </div>
 
       {error ? (
@@ -583,7 +585,7 @@ function ExclusiveVideosPanel() {
             <div className="border-b border-dt-border px-4 py-3.5">
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">Exclusive performance</h3>
               <p className="text-[11px] text-white/40">
-                Opens of each exclusive video detail page in the Sloane Glo app
+                Opens of each exclusive video detail page in the {fanAppName} app
               </p>
             </div>
             {stats.published === 0 ? (
