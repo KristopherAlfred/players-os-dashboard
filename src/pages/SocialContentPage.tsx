@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -58,6 +59,7 @@ type Bundle = {
 };
 
 export function SocialContentPage() {
+  const { fanAppName } = useAthlete();
   const [tab, setTab] = useState<SocialTab>("instagram");
   const [bundle, setBundle] = useState<Bundle>({
     instagram: null,
@@ -90,10 +92,10 @@ export function SocialContentPage() {
       setStatus(
         isRefresh
           ? `Refreshed social analytics · ${latest}`
-          : `Live Sloane Glo social analytics · synced ${latest}`,
+          : `Live ${fanAppName} social analytics · synced ${latest}`,
       );
       if (!instagram && !facebook && !twitter && !tiktok) {
-        setError("Could not load social analytics from Sloane Glo.");
+        setError(`Could not load social analytics from ${fanAppName}.`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load social analytics");
@@ -163,10 +165,10 @@ export function SocialContentPage() {
                 </span>
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Same feeds fans see in Sloane Glo
+                Same feeds fans see in {fanAppName}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Live Instagram, X, Facebook, and TikTok analytics from the Sloane Glo app — YouTube lives under Videos.
+                Live Instagram, X, Facebook, and TikTok analytics from the {fanAppName} app — YouTube lives under Videos.
               </p>
             </div>
 
@@ -340,6 +342,7 @@ function InstagramSocialPanel({
   analytics: InstagramAnalytics | null;
   loading: boolean;
 }) {
+  const { fanAppName } = useAthlete();
   if (!analytics) {
     if (loading) return <SourceLoading message="Loading Instagram analytics…" />;
     return <SourceError title="Could not load Instagram analytics" message="No data available." />;
@@ -382,7 +385,7 @@ function InstagramSocialPanel({
           <div className="mb-3 flex items-center justify-between">
             <div>
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">Recent grid</h3>
-              <p className="text-[11px] text-white/40">Matches the Instagram feed layout in Sloane Glo</p>
+              <p className="text-[11px] text-white/40">Matches the Instagram feed layout in {fanAppName}</p>
             </div>
             <p className="text-[11px] text-white/40">{posts.length} posts</p>
           </div>

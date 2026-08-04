@@ -325,7 +325,7 @@ function GeoSummary({ analytics }: { analytics: DametimeAnalytics }) {
 export function DametimeAnalyticsDashboard() {
   const { analytics, loading, error, refreshing, refresh } = useAnalyticsView();
 
-  if (loading && !analytics) return <LoadingState message="Loading Sloane Glo analytics…" />;
+  if (loading && !analytics) return <LoadingState message="Loading fan app analytics…" />;
   if (error && !analytics) return <ErrorState message={error} />;
   if (!analytics) return <ErrorState message="No analytics data available." />;
 

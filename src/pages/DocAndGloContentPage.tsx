@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useEffect, useMemo, useState } from "react";
 import {
   EyeOff,
@@ -40,6 +41,7 @@ function findFeedItem(feed: DocAndGloFeed | null, productId: string) {
 }
 
 export function DocAndGloContentPage() {
+  const { fanAppName } = useAthlete();
   const [feed, setFeed] = useState<DocAndGloFeed | null>(null);
   const [catalog, setCatalog] = useState<DocAndGloCatalogProduct[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -200,7 +202,7 @@ export function DocAndGloContentPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — product is live on Sloane Glo Doc & Glo"
+          ? `Published — product is live on ${fanAppName} Doc & Glo`
           : "Saved as draft",
       );
     } catch (err) {
@@ -284,11 +286,11 @@ export function DocAndGloContentPage() {
                 Doc & Glo
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Curate Sloane&apos;s skincare line for the app
+                Curate the product line for the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Sync products from docandglo.com, feature bestsellers, edit copy and images, then
-                publish what fans see in Sloane Glo.
+                publish what fans see in {fanAppName}.
               </p>
             </div>
 

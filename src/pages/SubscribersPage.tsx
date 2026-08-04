@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useEffect, useMemo, useState } from "react";
 import {
   Download,
@@ -24,6 +25,7 @@ function fieldClass() {
 type ChannelFilter = "all" | "email" | "sms";
 
 export function SubscribersPage() {
+  const { fanAppName } = useAthlete();
   const [fans, setFans] = useState<FanContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -47,8 +49,8 @@ export function SubscribersPage() {
       });
       setStatus(
         isRefresh
-          ? `Refreshed ${data.count} fans from Sloane Glo / Supabase`
-          : `Live from Sloane Glo — ${data.count} fans`,
+          ? `Refreshed ${data.count} fans from ${fanAppName} / the database`
+          : `Live from ${fanAppName} — ${data.count} fans`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load fan contacts");
@@ -114,10 +116,10 @@ export function SubscribersPage() {
                 Live fan list
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Email & SMS from Sloane Glo
+                Email & SMS from {fanAppName}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Contacts sync directly from the Sloane Glo app Supabase `fans` table — every signup email, phone, and SMS opt-in.
+                Contacts sync directly from the {fanAppName} app Supabase `fans` table — every signup email, phone, and SMS opt-in.
               </p>
             </div>
 
@@ -273,7 +275,7 @@ export function SubscribersPage() {
                   <td colSpan={6} className="px-4 py-16 text-center text-sm text-white/40">
                     {fans.length
                       ? "No contacts match this filter"
-                      : "No fans found in Supabase yet — new Sloane Glo signups will show here"}
+                      : "No fans found in Supabase yet — new signups will show here"}
                   </td>
                 </tr>
               ) : null}

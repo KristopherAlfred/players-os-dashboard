@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity,
@@ -22,6 +23,7 @@ function eventCount(analytics: DametimeAnalytics, type: string) {
 }
 
 export function FanActivityPage() {
+  const { fanAppName } = useAthlete();
   const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -38,7 +40,7 @@ export function FanActivityPage() {
       setStatus(
         isRefresh
           ? `Refreshed · ${new Date(data.syncedAt).toLocaleString()}`
-          : `Live Sloane Glo fan activity · synced ${new Date(data.syncedAt).toLocaleString()}`,
+          : `Live ${fanAppName} fan activity · synced ${new Date(data.syncedAt).toLocaleString()}`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load fan activity");
@@ -106,7 +108,7 @@ export function FanActivityPage() {
                 What fans are doing in the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Live from Sloane Glo `fan_events` — page views, nav taps, card opens, buys, and more as they happen.
+                Live from {fanAppName} `fan_events` — page views, nav taps, card opens, buys, and more as they happen.
               </p>
             </div>
 
@@ -175,7 +177,7 @@ export function FanActivityPage() {
           <div className="flex flex-col gap-3 border-b border-dt-border p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">Live activity feed</h3>
-              <p className="text-[11px] text-white/40">Latest fan_events from the Sloane Glo app</p>
+              <p className="text-[11px] text-white/40">Latest fan_events from the {fanAppName} app</p>
             </div>
             <div className="flex flex-wrap gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
               <button

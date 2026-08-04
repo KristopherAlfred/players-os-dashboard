@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Card } from "./ui/Card";
@@ -61,6 +62,7 @@ function buildCountryRows(
 }
 
 export function AudienceDemographics() {
+  const { fanAppName } = useAthlete();
   const [countries, setCountries] = useState<CountryRow[]>(() => buildCountryRows([], 0));
   const [mappedFans, setMappedFans] = useState(0);
   const [totalFans, setTotalFans] = useState(0);
@@ -105,7 +107,7 @@ export function AudienceDemographics() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-dt-muted">Top Countries</p>
             <p className="mt-0.5 text-[11px] text-white/40">
-              Live Sloane Glo fan geo
+              Live {fanAppName} fan geo
               {totalFans > 0
                 ? ` · ${formatMetric(mappedFans)} of ${formatMetric(totalFans)} fans mapped`
                 : " · waiting for signups"}

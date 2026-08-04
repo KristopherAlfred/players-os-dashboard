@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, MoreHorizontal, Pencil, Play, Search } from "lucide-react";
@@ -55,7 +56,7 @@ function mapExclusiveVideo(item: ExclusiveVideoItem): RecentRow {
     published: formatPublished(item.publishedAt, item.date),
     publishedAt: new Date(item.publishedAt || item.date || 0).getTime() || 0,
     meta: item.duration || "Exclusive",
-    detail: item.description?.trim() || "Sloane Glo exclusive",
+    detail: item.description?.trim() || "Exclusive drop",
     thumbUrl: resolveVideoAssetUrl(item.thumbnail),
     isVideo: true,
     editPath: "/content/videos",
@@ -90,7 +91,7 @@ function mapNews(item: NewsItem): RecentRow {
     meta: isNewsletter ? "Newsletter" : item.category === "insights" ? "Insight" : "News",
     detail:
       item.description?.trim() ||
-      (item.source === "players_tribune" ? "Players' Tribune" : "Sloane Glo news"),
+      (item.source === "players_tribune" ? "Players' Tribune" : "Fan app news"),
     thumbUrl: resolveNewsAssetUrl(item.thumbnail),
     isVideo: false,
     editPath: "/content/news",
@@ -107,7 +108,7 @@ function mapEvent(item: AppEventItem): RecentRow {
     published: formatPublished(item.publishedAt, item.dateLabel),
     publishedAt: new Date(item.publishedAt || item.deadline || 0).getTime() || 0,
     meta: item.location || item.dateLabel || (isGiveaway ? "Giveaway" : "Event"),
-    detail: item.description?.trim() || item.deadlineDisplay || "Sloane Glo events",
+    detail: item.description?.trim() || item.deadlineDisplay || "Fan app events",
     thumbUrl: resolveEventAssetUrl(item.thumbnail),
     isVideo: false,
     editPath: "/content/events",
@@ -128,6 +129,7 @@ function LiveThumb({ src, isVideo }: { src: string; isVideo: boolean }) {
 }
 
 export function RecentContent() {
+  const { fanAppName } = useAthlete();
   const [activeTab, setActiveTab] = useState<ContentTab>("All Content");
   const [videoSource, setVideoSource] = useState<VideoSourceFilter>("all");
   const [query, setQuery] = useState("");
@@ -163,7 +165,7 @@ export function RecentContent() {
         setRows(next);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load Sloane Glo content");
+          setError(err instanceof Error ? err.message : "Failed to load fan app content");
           setRows([]);
         }
       } finally {
@@ -222,7 +224,7 @@ export function RecentContent() {
           <div>
             <h3 className="text-sm font-semibold text-white">Recent Content</h3>
             <p className="mt-0.5 text-[11px] text-white/45">
-              Live from Sloane Glo — YouTube, exclusives, news, and events
+              Live from {fanAppName} — YouTube, exclusives, news, and events
             </p>
           </div>
           {loading ? <Loader2 size={14} className="animate-spin text-dt-red" /> : null}
@@ -330,7 +332,7 @@ export function RecentContent() {
             {loading && rows.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-sm text-dt-muted">
-                  Loading Sloane Glo content…
+                  Loading {fanAppName} content…
                 </td>
               </tr>
             ) : filteredRows.length === 0 ? (

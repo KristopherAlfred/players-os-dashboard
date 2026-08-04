@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useEffect, useMemo, useState } from "react";
 import {
   ExternalLink,
@@ -38,6 +39,7 @@ function categoryLabel(category: NewsCategory) {
 }
 
 export function NewsContentPage() {
+  const { fanAppName, displayName } = useAthlete();
   const [feed, setFeed] = useState<NewsFeed | null>(null);
   const [beehiiv, setBeehiiv] = useState<BeehiivFeed | null>(null);
   const [beehiivLoading, setBeehiivLoading] = useState(true);
@@ -146,7 +148,7 @@ export function NewsContentPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — live on Sloane Glo News"
+          ? `Published — live on ${fanAppName} News`
           : "Draft saved",
       );
     } catch (err) {
@@ -225,7 +227,7 @@ export function NewsContentPage() {
         <StatCard label="Drafts" value={String(stats.drafts)} />
       </div>
 
-      <Panel title="Sloane Stephens Off-Court">
+      <Panel title={`${displayName} Off-Court`}>
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="text-[11px] text-dt-muted">
             {beehiiv?.source === "live" ? "Live from Beehiiv" : beehiiv ? "Cached" : "—"}
@@ -391,7 +393,7 @@ export function NewsContentPage() {
                   value={draft.title}
                   onChange={(e) => patchDraft({ title: e.target.value })}
                   className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm outline-none focus:border-dt-red/50"
-                  placeholder="Sincerely, Sloane Episode #21"
+                  placeholder="Newsletter episode #21"
                   style={titleTypographyStyle(draft)}
                 />
               </label>
@@ -449,7 +451,7 @@ export function NewsContentPage() {
                   onChange={(e) => patchDraft({ body: e.target.value })}
                   rows={12}
                   className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 font-mono text-sm leading-relaxed outline-none focus:border-dt-red/50"
-                  placeholder="Type the full newsletter here. Fans read this in the Sloane Glo app."
+                  placeholder={`Type the full newsletter here. Fans read this in the ${fanAppName} app.`}
                 />
               </label>
 

@@ -1117,7 +1117,7 @@ function VideosStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
         setYoutubeHandle(analytics.channel.handle || `@${SLOANE_SOCIAL.youtubeHandle}`);
         setStatus(`YouTube synced · ${analytics.recentVideos.length} videos`);
       } else {
-        setError("Could not load YouTube feed for Sloane channel");
+        setError("Could not load the YouTube feed for this channel");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "YouTube sync failed");

@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -72,6 +73,7 @@ function buildMonthCells(year: number, monthIndex: number) {
 }
 
 export function ContentCalendarPage() {
+  const { fanAppName, firstName } = useAthlete();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [monthIndex, setMonthIndex] = useState(now.getMonth());
@@ -92,7 +94,7 @@ export function ContentCalendarPage() {
       setStatus(
         isRefresh
           ? `Refreshed · ${new Date(calendar.syncedAt).toLocaleString()}`
-          : `Live from Sloane Glo · synced ${new Date(calendar.syncedAt).toLocaleString()}`,
+          : `Live from ${fanAppName} · synced ${new Date(calendar.syncedAt).toLocaleString()}`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load content calendar");
@@ -208,10 +210,10 @@ export function ContentCalendarPage() {
                 </span>
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                What Sloane posted, by exact date & time
+                What {firstName} posted, by exact date &amp; time
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Live from Sloane Glo + synced social — tap a day to see everything that went live that day.
+                Live from {fanAppName} + synced social — tap a day to see everything that went live that day.
               </p>
             </div>
 

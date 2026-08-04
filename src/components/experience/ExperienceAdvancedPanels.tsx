@@ -1,3 +1,4 @@
+import { useAthlete } from "../../contexts/AthleteContext";
 import type { ReactNode } from "react";
 import { TITLE_FONT_OPTIONS, type TitleFontFamily } from "../../lib/typography";
 import type {
@@ -552,6 +553,7 @@ export function ExperiencePagePanel({
   brand?: ExperienceBrand;
   onChangeBrand?: (patch: Partial<ExperienceBrand>) => void;
 }) {
+  const { fanAppName } = useAthlete();
   return (
     <div className="space-y-4">
       {brand && onChangeBrand ? <BrandHeaderFields brand={brand} onChange={onChangeBrand} /> : null}
@@ -568,7 +570,7 @@ export function ExperiencePagePanel({
           </>
         ) : (
           <>
-            Editing <span className="text-dt-red">{pageKey}</span> — publish to push live into Sloane Glo.
+            Editing <span className="text-dt-red">{pageKey}</span> — publish to push live into {fanAppName}.
           </>
         )}
       </p>
@@ -658,7 +660,7 @@ export function ExperiencePagePanel({
       {pageKey === "landing" ? (
         <div className="space-y-3 rounded-xl border border-dt-border p-3">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
-            Landing social proof · Follow Sloane
+            Landing social proof · Follow me
           </p>
           <Field label="Fans box title">
             <TextInput

@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -91,6 +92,7 @@ function PosterPreview({
 }
 
 export function EventsGiveawaysPage() {
+  const { fanAppName } = useAthlete();
   const [feed, setFeed] = useState<EventsFeed | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<AppEventItem | null>(null);
@@ -217,7 +219,7 @@ export function EventsGiveawaysPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? `Published — live in Sloane Glo ${payload.type === "giveaway" ? "Giveaways" : "Upcoming"}`
+          ? `Published — live in ${fanAppName} ${payload.type === "giveaway" ? "Giveaways" : "Upcoming"}`
           : "Draft saved",
       );
     } catch (err) {
@@ -306,7 +308,7 @@ export function EventsGiveawaysPage() {
                 Publish posters fans unlock in the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Create Upcoming events or Giveaways with thumbnail, deadline, description, and link — they appear in the Sloane Glo events grid after publish.
+                Create Upcoming events or Giveaways with thumbnail, deadline, description, and link — they appear in the {fanAppName} events grid after publish.
               </p>
             </div>
 

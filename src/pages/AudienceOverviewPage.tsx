@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -289,6 +290,7 @@ function FixFanLocation({ onSaved }: { onSaved: () => void }) {
 }
 
 export function AudienceOverviewPage() {
+  const { fanAppName } = useAthlete();
   const [analytics, setAnalytics] = useState<DametimeAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -304,7 +306,7 @@ export function AudienceOverviewPage() {
       setStatus(
         isRefresh
           ? `Refreshed · ${new Date(data.syncedAt).toLocaleString()}`
-          : `Live from Sloane Glo · synced ${new Date(data.syncedAt).toLocaleString()}`,
+          : `Live from ${fanAppName} · synced ${new Date(data.syncedAt).toLocaleString()}`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load audience overview");
@@ -380,7 +382,7 @@ export function AudienceOverviewPage() {
                 </span>
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Where Sloane Glo fans are signing up
+                Where {fanAppName} fans are signing up
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Live composition from Supabase — signups, email & SMS capture, active fans, and where they’re located.
@@ -514,7 +516,7 @@ export function AudienceOverviewPage() {
         <div className="flex flex-col gap-1 border-b border-dt-border px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Signup map</h3>
-            <p className="text-[11px] text-white/40">Where Sloane Glo fans are signing up from</p>
+            <p className="text-[11px] text-white/40">Where {fanAppName} fans are signing up from</p>
           </div>
           <div className="inline-flex items-center gap-1.5 text-[11px] text-white/45">
             <MapPin size={12} className="text-dt-red" />
