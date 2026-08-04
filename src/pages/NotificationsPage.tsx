@@ -26,6 +26,11 @@ import {
   type NotificationSurface,
 } from "../lib/notificationsApi";
 import { DtSelect } from "../components/DtSelect";
+import { useAthlete } from "../contexts/AthleteContext";
+import {
+  SmartSuggestions,
+  type NotificationSuggestion,
+} from "../components/notifications/SmartSuggestions";
 
 const FREQUENCY_PRESETS = [
   { label: "Every 15 seconds", value: 15 },
@@ -89,6 +94,21 @@ export function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [customFrequency, setCustomFrequency] = useState(false);
+  const { fanAppName } = useAthlete();
+
+  function useSuggestion(suggestion: NotificationSuggestion) {
+    const item = createEmptyNotification();
+    const next = { ...item, message: suggestion.message };
+    setSelectedId(next.id);
+    setDraft(next);
+    setCustomFrequency(false);
+    setError(null);
+    setStatus(
+      suggestion.kind === "ai"
+        ? "Draft started from an AI insight — review, then Publish"
+        : "Draft started from a bio link milestone — review, then Publish",
+    );
+  }
 
   useEffect(() => {
     void fetchNotificationFeed()
@@ -162,7 +182,7 @@ export function NotificationsPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — live in Sloane Glo app toasts"
+          ? `Published — live in ${fanAppName} app toasts`
           : "Draft saved",
       );
     } catch (err) {
@@ -254,7 +274,7 @@ export function NotificationsPage() {
                 In-app toasts
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Schedule Sloane Glo notifications
+                Schedule {fanAppName} notifications
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Write extra messages that pop in the fan app with the same red-gradient toast look — set frequency, duration, and schedule windows.
@@ -303,6 +323,8 @@ export function NotificationsPage() {
           </div>
         )}
       </div>
+
+      <SmartSuggestions onUse={useSuggestion} />
 
       <div className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_360px]">
         {/* List */}
