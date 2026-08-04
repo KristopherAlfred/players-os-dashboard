@@ -182,7 +182,7 @@ export function NotificationsPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — live in Sloane Glo app toasts"
+          ? `Published — live in ${fanAppName} app toasts`
           : "Draft saved",
       );
     } catch (err) {
