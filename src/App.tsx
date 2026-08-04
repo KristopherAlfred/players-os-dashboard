@@ -97,6 +97,7 @@ export default function App() {
           <Route path="fans/segments" element={<Navigate to="/fans/audience" replace />} />
           <Route path="fans/subscribers" element={<SubscribersPage />} />
           <Route path="fans/behavior" element={<Navigate to="/fans/audience" replace />} />
+          <Route path="bio-link" element={<BioLinkPage />} />
           <Route path="performance/traffic" element={<TrafficOverviewPage />} />
           <Route path="performance/funnel" element={<Navigate to="/performance/traffic" replace />} />
           <Route path="performance/campaigns" element={<Navigate to="/performance/traffic" replace />} />
