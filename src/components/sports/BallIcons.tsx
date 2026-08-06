@@ -31,13 +31,21 @@ function Basketball(props: BallProps) {
 function Football(props: BallProps) {
   return (
     <svg {...frame(props)} aria-hidden>
-      <path
-        d="M8 24c0-9 7-16 16-16s16 7 16 16-7 16-16 16S8 33 8 24Z"
-        transform="rotate(-20 24 24)"
-        fill="#7B3F16"
-      />
-      <g {...stroke} stroke="rgba(255,255,255,0.85)">
-        <path d="M17 24h14M20 20v8M24 19v10M28 20v8" />
+      <g transform="rotate(-25 24 24)">
+        <path
+          d="M6 24c6-9 12-13 18-13s12 4 18 13c-6 9-12 13-18 13s-12-4-18-13Z"
+          fill="#7B3F16"
+        />
+        <path
+          d="M6 24c6-9 12-13 18-13s12 4 18 13c-6 9-12 13-18 13s-12-4-18-13Z"
+          fill="none"
+          stroke="rgba(255,255,255,0.85)"
+          strokeWidth="1.4"
+        />
+        <g stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" fill="none">
+          <path d="M18 24h12" />
+          <path d="M21 21.5v5M24 21v6M27 21.5v5" />
+        </g>
       </g>
     </svg>
   );
