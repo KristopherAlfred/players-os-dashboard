@@ -195,7 +195,7 @@ function withOverride(palette: ThemePalette): ThemePalette {
     ...palette,
     accent,
     accentHover,
-    chartSecondary: lighten(accent, -0 + 0.0) === accent ? accent : accent,
+    chartSecondary: lighten(accent, 0.12),
     trafficShades: shades(accent),
   };
 }
