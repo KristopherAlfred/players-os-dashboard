@@ -25,6 +25,9 @@ import {
   type NavSection,
 } from "../config/navigation";
 import { BrandLogo } from "./BrandLogo";
+import { useAthlete } from "../contexts/AthleteContext";
+import { findLeague, findSport } from "../lib/sportsCatalog";
+import { LeagueMark } from "./sports/SportPicker";
 import { useTheme } from "../theme/ThemeContext";
 
 const iconMap: Record<string, typeof LayoutDashboard> = {
