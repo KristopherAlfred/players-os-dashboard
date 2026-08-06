@@ -66,11 +66,16 @@ export type FollowerSnapshot = {
 
 export async function fetchFollowerSnapshots(days = 30): Promise<FollowerSnapshot[]> {
   const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
-  const { data, error } = await supabase
+  const athleteId = await currentAthleteId();
+  let query = supabase
     .from("platform_follower_snapshots")
     .select("platform, captured_on, follower_count")
     .gte("captured_on", since)
     .order("captured_on", { ascending: true });
+
+  if (athleteId) query = query.eq("athlete_id", athleteId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
   return (data ?? []) as FollowerSnapshot[];
