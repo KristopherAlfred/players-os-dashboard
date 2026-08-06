@@ -284,8 +284,42 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
           </button>
         </div>
 
+        <AthleteSportBadge />
+
         <nav className="flex-1 overflow-y-auto px-4 py-4">{navSections.map(renderSection)}</nav>
       </aside>
     </>
+  );
+}
+
+/** League / sport identity strip: shows the mark of whatever the athlete picked. */
+function AthleteSportBadge() {
+  const { athlete, sport: sportName } = useAthlete();
+  const sport = findSport(athlete?.sport_icon || sportName);
+  const league = findLeague(sport, athlete?.team_or_league);
+
+  if (!sport) return null;
+
+  return (
+    <div className="mx-4 mt-4 flex items-center gap-2.5 rounded-xl border border-dt-border bg-dt-card/70 px-3 py-2.5">
+      <span
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+        style={{
+          background: `radial-gradient(circle at 30% 25%, ${(league?.accent ?? sport.accent)}33, transparent 72%)`,
+        }}
+      >
+        <LeagueMark league={league} sport={sport} size={26} />
+      </span>
+      <div className="min-w-0">
+        <p className="truncate text-xs font-semibold text-dt-text">
+          {league?.label ?? athlete?.team_or_league ?? sport.label}
+        </p>
+        <p className="truncate text-[10px] text-dt-muted">
+          {[sport.label, athlete?.gender === "female" ? "Women's" : athlete?.gender === "male" ? "Men's" : null]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      </div>
+    </div>
   );
 }
