@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { ReactElement, SVGProps } from "react";
 import type { BallKind } from "../../lib/sportsCatalog";
 
 type BallProps = SVGProps<SVGSVGElement> & { size?: number };
@@ -216,7 +216,7 @@ function Generic(props: BallProps) {
   );
 }
 
-export const ballIcons: Record<BallKind, (props: BallProps) => JSX.Element> = {
+export const ballIcons: Record<BallKind, (props: BallProps) => ReactElement> = {
   basketball: Basketball,
   football: Football,
   baseball: Baseball,
