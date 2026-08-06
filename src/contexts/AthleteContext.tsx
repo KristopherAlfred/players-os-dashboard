@@ -16,6 +16,7 @@ import {
   type AthleteTheme,
 } from "../lib/athletes";
 import { loadDashboardSession } from "../lib/dashboardAuth";
+import { AthleteThemeSync } from "../theme/AthleteThemeSync";
 
 /**
  * The logged-in athlete, their theme and their bio link. Every dashboard
@@ -104,5 +105,10 @@ export function AthleteProvider({ children }: { children: ReactNode }) {
     };
   }, [athlete, theme, bioLink, loading, load]);
 
-  return <AthleteContext.Provider value={value}>{children}</AthleteContext.Provider>;
+  return (
+    <AthleteContext.Provider value={value}>
+      <AthleteThemeSync />
+      {children}
+    </AthleteContext.Provider>
+  );
 }

@@ -21,26 +21,13 @@ import {
   type Athlete,
 } from "../lib/athletes";
 import { loadDashboardSession } from "../lib/dashboardAuth";
+import { SportPicker, type SportSelection } from "../components/sports/SportPicker";
 import { useAthlete } from "../contexts/AthleteContext";
 
 /**
  * Multi-step athlete onboarding. Step 1 name-matches against existing athletes
  * so a migrated athlete (Sloane is #1) is recognised and skips straight in.
  */
-
-const SPORTS = [
-  "Tennis",
-  "Basketball",
-  "Football",
-  "Soccer",
-  "Track & Field",
-  "Golf",
-  "Baseball",
-  "Volleyball",
-  "Swimming",
-  "Gymnastics",
-  "Other",
-];
 
 const ACCENTS = [
   { label: "Mint", accent: "#7CE7B0", text: "#04231A" },
@@ -75,6 +62,8 @@ export function OnboardingPage() {
   const [bio, setBio] = useState("");
   const [fanAppName, setFanAppName] = useState("");
   const [accentIndex, setAccentIndex] = useState(0);
+  const [sportId, setSportId] = useState("");
+  const [leagueAccent, setLeagueAccent] = useState<{ accent: string; text: string } | null>(null);
   const [slug, setSlug] = useState("");
   const [slugState, setSlugState] = useState<"idle" | "checking" | "free" | "taken">("idle");
 
@@ -155,13 +144,16 @@ export function OnboardingPage() {
         full_name: fullName.trim(),
         display_name: displayName.trim() || fullName.trim(),
         sport: sport || null,
+        sport_icon: sportId || null,
         gender: gender || null,
         team_or_league: team.trim() || null,
         bio_short: bio.trim() || null,
         onboarding_completed: true,
       });
 
-      const accent = ACCENTS[accentIndex];
+      const accent = leagueAccent
+        ? { accent: leagueAccent.accent, text: leagueAccent.text }
+        : ACCENTS[accentIndex];
       await saveAthleteTheme(athleteId, {
         accent_color: accent.accent,
         accent_hover: accent.accent,
@@ -300,62 +292,26 @@ export function OnboardingPage() {
             </>
           )}
 
-          {/* ---- Step 2: sport details ---- */}
+          {/* ---- Step 2: visual sport / league picker ---- */}
           {step === 1 && (
             <>
               <Heading
                 icon={Trophy}
-                title="Tell us about your sport"
-                subtitle="This shapes your dashboard metrics and content categories."
+                title="Pick your game"
+                subtitle="Your sport and league shape your dashboard colours, badge and metrics."
               />
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass} htmlFor="onboarding-sport">
-                    Sport
-                  </label>
-                  <select
-                    id="onboarding-sport"
-                    className={inputClass}
-                    value={sport}
-                    onChange={(e) => setSport(e.target.value)}
-                  >
-                    <option value="">Select a sport</option>
-                    {SPORTS.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass} htmlFor="onboarding-gender">
-                    Division
-                  </label>
-                  <select
-                    id="onboarding-gender"
-                    className={inputClass}
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                  >
-                    <option value="">Prefer not to say</option>
-                    <option value="female">Women's</option>
-                    <option value="male">Men's</option>
-                    <option value="mixed">Mixed</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="onboarding-team">
-                  Team or league
-                </label>
-                <input
-                  id="onboarding-team"
-                  className={inputClass}
-                  value={team}
-                  onChange={(e) => setTeam(e.target.value)}
-                  placeholder="e.g. WTA Tour"
-                />
-              </div>
+              <SportPicker
+                sportLabel={sport}
+                leagueLabel={team}
+                division={gender}
+                onDivisionChange={setGender}
+                onChange={(selection: SportSelection) => {
+                  setSportId(selection.sportId);
+                  setSport(selection.sportLabel);
+                  setTeam(selection.leagueLabel);
+                  setLeagueAccent({ accent: selection.accent, text: selection.accentText });
+                }}
+              />
               <div>
                 <label className={labelClass} htmlFor="onboarding-bio">
                   Short bio
@@ -411,7 +367,10 @@ export function OnboardingPage() {
                     <button
                       key={option.label}
                       type="button"
-                      onClick={() => setAccentIndex(index)}
+                      onClick={() => {
+                        setAccentIndex(index);
+                        setLeagueAccent(null);
+                      }}
                       className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-2 transition ${
                         accentIndex === index
                           ? "border-white/70 bg-white/10"

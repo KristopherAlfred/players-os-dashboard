@@ -173,7 +173,36 @@ export function getPalette(template: ThemeTemplate): ThemePalette {
   }
 }
 
-export function applyPalette(palette: ThemePalette) {
+/**
+ * Accent chosen by the athlete (league brand colour / onboarding brand colour).
+ * It overrides the template accent so everything the athlete picks in onboarding
+ * shows up across the dashboard front end.
+ */
+let accentOverride: { accent: string; accentHover: string } | null = null;
+let lastPalette: ThemePalette | null = null;
+
+export function setAccentOverride(accent: string | null, accentHover?: string | null) {
+  accentOverride = accent
+    ? { accent, accentHover: accentHover || lighten(accent, 0.12) }
+    : null;
+  if (lastPalette) applyPalette(lastPalette);
+}
+
+function withOverride(palette: ThemePalette): ThemePalette {
+  if (!accentOverride) return palette;
+  const { accent, accentHover } = accentOverride;
+  return {
+    ...palette,
+    accent,
+    accentHover,
+    chartSecondary: lighten(accent, 0.12),
+    trafficShades: shades(accent),
+  };
+}
+
+export function applyPalette(basePalette: ThemePalette) {
+  lastPalette = basePalette;
+  const palette = withOverride(basePalette);
   const root = document.documentElement;
   root.style.setProperty("--theme-bg", palette.bg);
   root.style.setProperty("--theme-panel", palette.panel);

@@ -522,7 +522,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      seed_athlete_platform_connections: {
+        Args: { _athlete_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
