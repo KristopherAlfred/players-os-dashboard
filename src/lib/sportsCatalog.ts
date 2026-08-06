@@ -273,7 +273,7 @@ export const SPORTS: Sport[] = [
       league("lcs", "League Championship", "#0BC6E3", "pro", "lolesports.com", DARK),
       league("cdl", "Call of Duty League", "#F5A623", "pro", "callofdutyleague.com", DARK),
       league("valorant", "VCT Valorant", "#FF4655", "pro", "valorantesports.com"),
-      league("nacе", "Collegiate Esports", "#0653A1", "college", "nacesports.org"),
+      league("nace", "Collegiate Esports", "#0653A1", "college", "nacesports.org"),
       league("hs-esports", "High School Esports", "#E2231A", "school", "highschoolesportsleague.com"),
     ],
   },
