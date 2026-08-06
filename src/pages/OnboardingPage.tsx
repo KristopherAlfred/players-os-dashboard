@@ -367,7 +367,10 @@ export function OnboardingPage() {
                     <button
                       key={option.label}
                       type="button"
-                      onClick={() => setAccentIndex(index)}
+                      onClick={() => {
+                        setAccentIndex(index);
+                        setLeagueAccent(null);
+                      }}
                       className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-2 transition ${
                         accentIndex === index
                           ? "border-white/70 bg-white/10"
