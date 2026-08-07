@@ -1,4 +1,28 @@
 import { useCallback, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import {
+  ArrowRight,
+  CalendarDays,
+  Camera,
+  Check,
+  Clock,
+  Crown,
+  Flame,
+  Gift,
+  Heart,
+  Lock,
+  Menu,
+  Music,
+  ShoppingBag,
+  Sparkle,
+  Star,
+  Ticket,
+  Trophy,
+  Users,
+  Video,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+
 import type {
   ExperienceBrand,
   ExperienceBuiltinStageId,
@@ -46,7 +70,36 @@ const STAGE_LABELS: Record<ExperienceBuiltinStageId, string> = {
   headline: "Headline",
   body: "Body",
   cta: "CTA button",
+  featureRow: "Feature strip",
+  memberProof: "Members row",
 };
+
+const FEATURE_ICONS: Record<string, LucideIcon> = {
+  star: Star,
+  clock: Clock,
+  gift: Gift,
+  users: Users,
+  ticket: Ticket,
+  video: Video,
+  music: Music,
+  shop: ShoppingBag,
+  bolt: Zap,
+  heart: Heart,
+  crown: Crown,
+  flame: Flame,
+  lock: Lock,
+  calendar: CalendarDays,
+  trophy: Trophy,
+  camera: Camera,
+  sparkle: Sparkle,
+  check: Check,
+};
+
+function FeatureIcon({ name, color }: { name: string; color: string }) {
+  const Icon = FEATURE_ICONS[String(name || "").toLowerCase()] ?? Star;
+  return <Icon size={16} strokeWidth={1.6} style={{ color }} />;
+}
+
 
 function PhoneFrame({ children, label, hint }: { children: ReactNode; label: string; hint?: string }) {
   return (
@@ -470,7 +523,24 @@ function PageFreeformPreview({
         />
       );
     } else if (role === "headline") {
-      body = (
+      const gradient =
+        page.headlineGradientFrom && page.headlineGradientTo
+          ? `linear-gradient(90deg, ${page.headlineGradientFrom}, ${page.headlineGradientTo})`
+          : "";
+      body = gradient ? (
+        <p
+          className="text-center font-display text-xl font-extrabold"
+          style={{
+            backgroundImage: gradient,
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            color: "transparent",
+          }}
+        >
+          {page.headline}
+        </p>
+      ) : (
         <StyledTextRuns
           as="p"
           runs={runsForPageField(page, "headline")}
@@ -485,6 +555,7 @@ function PageFreeformPreview({
           }}
         />
       );
+
     } else if (role === "body") {
       body = (
         <StyledTextRuns
@@ -500,22 +571,101 @@ function PageFreeformPreview({
           }}
         />
       );
+    } else if (role === "featureRow") {
+      if (!showLandingChrome || !(page.features || []).length) return null;
+      body = (
+        <div className="grid w-full grid-cols-2 gap-2" style={stageGlowStyle(item, "box")}>
+          {(page.features || []).map((feat) => (
+            <div
+              key={feat.id}
+              className="flex flex-col gap-1.5 px-2.5 py-2"
+              style={{
+                background: page.featureBg,
+                border: `1px solid ${page.featureBorderColor}`,
+                borderRadius: page.featureRadius,
+              }}
+            >
+              <FeatureIcon name={feat.icon} color={page.featureIconColor} />
+              <span className="text-[9px] font-semibold leading-tight" style={{ color: page.featureTextColor }}>
+                {feat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    } else if (role === "memberProof") {
+      if (!showLandingChrome) return null;
+      const proof = page.memberProof;
+      if (!proof?.count && !(proof?.avatars || []).length) return null;
+      body = (
+        <div
+          className="flex w-full items-center gap-2 px-3 py-2"
+          style={{
+            background: proof.bg,
+            border: `1px solid ${proof.borderColor}`,
+            borderRadius: proof.radius,
+            ...stageGlowStyle(item, "box"),
+          }}
+        >
+          <div className="flex -space-x-2">
+            {(proof.avatars || []).slice(0, 4).map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={src}
+                alt=""
+                className="h-5 w-5 rounded-full border border-white/25 object-cover"
+              />
+            ))}
+            {proof.extraLabel ? (
+              <span className="flex h-5 items-center justify-center rounded-full border border-white/25 bg-black/60 px-1.5 text-[8px] font-bold text-white">
+                {proof.extraLabel}
+              </span>
+            ) : null}
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="text-[10px] font-bold" style={{ color: proof.countColor }}>
+              {proof.count}
+            </span>
+            <span className="text-[8px]" style={{ color: proof.labelColor }}>
+              {proof.label}
+            </span>
+          </div>
+          <div className="ml-auto flex gap-1">
+            {(proof.thumbs || []).slice(0, 3).map((src, i) => (
+              <img key={`${src}-${i}`} src={src} alt="" className="h-6 w-5 rounded-[4px] object-cover" />
+            ))}
+          </div>
+        </div>
+      );
     } else if (role === "cta") {
       if (!showLandingChrome) return null;
+      const ctaGradient =
+        page.ctaGradientFrom && page.ctaGradientTo
+          ? `linear-gradient(${page.ctaGradientAngle ?? 90}deg, ${page.ctaGradientFrom}, ${page.ctaGradientTo})`
+          : "";
       body = (
         <div className="flex w-full flex-col gap-2">
           <button
             type="button"
-            className="w-full py-2.5 text-sm font-bold"
+            className="flex w-full items-center justify-center gap-2 py-2.5 text-sm font-bold"
             style={{
-              background: page.ctaBg,
+              background: ctaGradient || page.ctaBg,
               color: page.ctaText,
-              borderRadius: experience.theme.buttonRadius,
+              borderRadius: page.ctaRadius ?? experience.theme.buttonRadius,
               ...stageGlowStyle(item, "box"),
             }}
           >
-            {page.ctaLabel || "Join My Circle →"}
+            <span>{page.ctaLabel || "Join My Circle"}</span>
+            {page.ctaShowArrow ? (
+              <span
+                className="flex h-5 w-5 items-center justify-center rounded-full"
+                style={{ background: "rgba(0,0,0,0.22)" }}
+              >
+                <ArrowRight size={12} strokeWidth={2.4} />
+              </span>
+            ) : null}
           </button>
+
           {(page.extraButtons || []).map((btn) => (
             <button
               key={btn.id}
@@ -574,6 +724,15 @@ function PageFreeformPreview({
         onClick={() => setSelectedId(null)}
       >
         {stageIds.map(renderItem)}
+        {page.showMenuButton ? (
+          <div
+            className="absolute right-3 top-3 z-[130] flex h-7 w-7 items-center justify-center rounded-full border"
+            style={{ borderColor: `${page.menuButtonColor}55`, color: page.menuButtonColor, background: "rgba(0,0,0,0.35)" }}
+          >
+            <Menu size={13} strokeWidth={2} />
+          </div>
+        ) : null}
+
         {showLandingChrome && showUnlock ? (
           <div className="absolute inset-x-0 bottom-0 z-[120] px-2 pb-2 pt-16">
             <div

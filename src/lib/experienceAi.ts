@@ -2,11 +2,14 @@ import { supabase } from "../integrations/supabase/client";
 import {
   createButtonId,
   normalizeButtons,
+  normalizeFeatures,
+  normalizeMemberProof,
   type ExperienceButton,
   type ExperienceConfig,
   type ExperiencePageConfig,
   type ExperienceStageItem,
 } from "./experienceConfig";
+
 
 /** AI design copilot client. Prompts + model calls live in the edge function. */
 
@@ -167,7 +170,12 @@ function applyPagePatch(
   patch: Record<string, unknown> | undefined,
   extras: { clearButtons?: boolean; addButtons?: Partial<ExperienceButton>[] },
 ): ExperiencePageConfig {
-  const raw = { ...(patch ?? {}) } as Partial<ExperiencePageConfig> & { stage?: unknown; extraButtons?: unknown };
+  const raw = { ...(patch ?? {}) } as Partial<ExperiencePageConfig> & {
+    stage?: unknown;
+    extraButtons?: unknown;
+    features?: unknown;
+    memberProof?: unknown;
+  };
   const stage = mergeStage(page.stage ?? [], raw.stage);
   delete raw.stage;
   let buttons = extras.clearButtons ? [] : page.extraButtons ?? [];
@@ -175,14 +183,25 @@ function applyPagePatch(
     buttons = normalizeButtons(raw.extraButtons, buttons);
     delete raw.extraButtons;
   }
+  let features = page.features ?? [];
+  if (raw.features !== undefined) {
+    features = normalizeFeatures(raw.features, features);
+    delete raw.features;
+  }
+  let memberProof = page.memberProof;
+  if (raw.memberProof !== undefined) {
+    memberProof = normalizeMemberProof(raw.memberProof, memberProof);
+    delete raw.memberProof;
+  }
   if (extras.addButtons?.length) {
     buttons = [
       ...buttons,
       ...normalizeButtons(extras.addButtons.map((b) => ({ ...b, id: b.id || createButtonId() }))),
     ].slice(0, 8);
   }
-  return { ...page, ...raw, stage, extraButtons: buttons };
+  return { ...page, ...raw, stage, extraButtons: buttons, features, memberProof };
 }
+
 
 /** Merge an AI patch into the config, optionally styling every page at once. */
 export function applyExperiencePatch(
