@@ -284,16 +284,46 @@ export function ExperienceAiDesigner({
         </div>
 
         {attachment ? (
-          <div className="flex items-center gap-3 border-t border-dt-border px-3 py-2">
+          <div className="flex flex-wrap items-center gap-3 border-t border-dt-border px-3 py-2">
             <img src={attachment} alt="" className="h-12 w-12 rounded-lg object-cover" />
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] text-white/60">Reference attached</p>
+              <p className="text-[11px] text-white/60">Image attached</p>
               <div className="mt-1 flex gap-1">
                 {palette.map((c) => (
                   <span key={c} className="h-4 w-4 rounded" style={{ background: c }} title={c} />
                 ))}
               </div>
             </div>
+            <div className="flex w-full flex-wrap items-center gap-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40">Use in app</span>
+              {(
+                [
+                  ["backgroundImage", "Background"],
+                  ["heroImage", "Hero art"],
+                  ["titleImage", "Title art"],
+                ] as const
+              ).map(([field, label]) => (
+                <button
+                  key={field}
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const src = await compressDataUrl(attachment);
+                      onSetPageImage(field, src);
+                      onStatus(`Your image is now the ${label.toLowerCase()}`);
+                      setAttachment(null);
+                      setPalette([]);
+                    } catch (err) {
+                      onError(err instanceof Error ? err.message : "Could not use that image");
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2.5 py-1.5 text-[11px] font-semibold text-white/80 hover:border-dt-red/50 hover:text-white"
+                >
+                  <ImagePlus size={12} /> {label}
+                </button>
+              ))}
+            </div>
+
             {palette.length ? (
               <button
                 type="button"
