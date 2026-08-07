@@ -775,18 +775,25 @@ function PageFreeformPreview({
             >
               Send back
             </button>
-            {stageItemRole(selected) === "stamp" ? (
-              <button
-                type="button"
-                onClick={() => {
-                  onPatchPage({ stage: removeStageItem(page, selectedId) });
-                  setSelectedId(null);
-                }}
-                className="rounded-lg border border-white/15 px-2.5 py-1.5 text-[10px] text-red-300/80"
-              >
-                Remove stamp
-              </button>
-            ) : null}
+            <label className="flex items-center gap-1.5 rounded-lg border border-white/15 px-2.5 py-1.5 text-[10px] text-white/70">
+              Width {selected.w || 80}%
+              <input
+                type="range"
+                min={8}
+                max={100}
+                value={selected.w || 80}
+                onChange={(e) => patchItem(selectedId, { w: Number(e.target.value) })}
+                className="w-24"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => deleteItem(selectedId)}
+              className="rounded-lg border border-red-400/40 bg-red-500/10 px-2.5 py-1.5 text-[10px] font-semibold text-red-300"
+            >
+              {stageItemRole(selected) === "stamp" ? "Delete stamp" : "Delete from phone"}
+            </button>
+
             <button
               type="button"
               onClick={() => setSelectedId(null)}
