@@ -117,6 +117,11 @@ export async function askExperienceDesigner(input: {
     patch: payload?.patch ?? {},
     applyToAllPages: Boolean(payload?.applyToAllPages),
     imagePrompt: payload?.imagePrompt ?? null,
+    imageTarget:
+      payload?.imageTarget === "heroImage" || payload?.imageTarget === "titleImage"
+        ? payload.imageTarget
+        : "backgroundImage",
+
   };
 }
 
