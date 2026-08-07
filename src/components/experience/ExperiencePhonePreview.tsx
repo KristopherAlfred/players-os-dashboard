@@ -567,7 +567,7 @@ function PageFreeformPreview({
 
 
   return (
-    <PhoneFrame label={label} hint="Drag logo & words separately · tap a word to style it">
+    <PhoneFrame label={label} hint="Drag to move · corner handle to resize · × to delete">
       <div
         className="relative h-[560px] w-full"
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
