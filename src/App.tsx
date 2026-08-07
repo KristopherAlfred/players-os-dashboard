@@ -35,6 +35,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/__tpldebug" element={<TemplateGalleryDebug />} />
         <Route path="/go/:slug" element={<BioLinkRedirectPage />} />
         <Route
           path="/welcome"
