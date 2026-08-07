@@ -773,17 +773,32 @@ export function applyExperienceTemplate(
 ): ExperienceConfig {
   const ctaBg = template.theme.buttonBg;
   const ctaText = template.theme.buttonText;
+  /** Every template loads its artwork into the preview — delete it there if unwanted. */
+  const art = template.landing?.heroImage ?? template.photo;
   const pages = Object.fromEntries(
     Object.entries(config.pages).map(([key, page]) => {
       let next = ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page;
-      if (key === "landing" && template.landing) {
-        next = {
-          ...next,
-          ...template.landing,
-          features: (template.landing.features ?? next.features).map((f) => ({ ...f })),
-          memberProof: { ...next.memberProof, ...(template.landing.memberProof ?? {}) },
-          stage: (template.landing.stage ?? next.stage).map((s) => ({ ...s })),
-        };
+      if (key === "landing") {
+        if (template.landing) {
+          next = {
+            ...next,
+            ...template.landing,
+            features: (template.landing.features ?? next.features).map((f) => ({ ...f })),
+            memberProof: { ...next.memberProof, ...(template.landing.memberProof ?? {}) },
+            stage: (template.landing.stage ?? next.stage).map((s) => ({ ...s })),
+          };
+        }
+        if (art) {
+          next = {
+            ...next,
+            heroImage: art,
+            heroFit: next.heroFit || "cover",
+            // make sure the hero slot is visible so the art always lands in the preview
+            stage: (next.stage ?? []).map((s) =>
+              (s.id === "hero" || s.role === "hero") ? { ...s, hidden: false } : s,
+            ),
+          };
+        }
       }
       return [key, next];
     }),
@@ -796,8 +811,8 @@ export function applyExperienceTemplate(
     effects: { ...config.effects, ...template.effects },
     pages,
   };
-
 }
+
 
 /** Best-guess of which template the current theme came from (accent match). */
 export function detectExperienceTemplate(config: ExperienceConfig): string | null {
