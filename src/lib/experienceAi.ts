@@ -27,12 +27,17 @@ export type ExperiencePatch = {
   clearButtons?: boolean;
 };
 
+export type ArtTarget = "backgroundImage" | "heroImage" | "titleImage";
+
 export type DesignerResult = {
   reply: string;
   patch: ExperiencePatch;
   applyToAllPages: boolean;
   imagePrompt: string | null;
+  /** Where generated artwork should be placed when imagePrompt is set */
+  imageTarget: ArtTarget;
 };
+
 
 function aiError(error: unknown, fallback: string): Error {
   const raw = error instanceof Error ? error.message : String(error ?? "");
