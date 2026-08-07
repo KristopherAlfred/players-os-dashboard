@@ -41,7 +41,7 @@ const ACCENTS = [
 type Step = 0 | 1 | 2 | 3;
 
 const cardClass =
-  "w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#120202]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md";
+  "w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#120202]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md";
 
 const inputClass =
   "w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/40 focus:border-dt-red/60 focus:ring-1 focus:ring-dt-red/40";
@@ -194,7 +194,7 @@ export function OnboardingPage() {
         </p>
       </div>
 
-      <div className={`relative z-10 ${cardClass}`}>
+      <div className={`relative z-10 ${cardClass} ${step === 1 ? "max-w-6xl" : "max-w-xl"}`}>
         <div className="flex items-center gap-2 border-b border-white/10 px-6 py-3">
           {steps.map((label, index) => (
             <div key={label} className="flex flex-1 items-center gap-2">
