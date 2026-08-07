@@ -839,7 +839,7 @@ function PageFreeformPreview({
                     onClick={() => patchItem(item.id, { hidden: false })}
                     className="rounded-md border border-white/15 px-2 py-1 text-[10px] text-white/60 hover:text-white"
                   >
-                    + {STAGE_LABELS[stageItemRole(item)] ?? item.id}
+                    + {(STAGE_LABELS as Record<string, string>)[stageItemRole(item)] ?? item.id}
                   </button>
                 ))}
               </div>
