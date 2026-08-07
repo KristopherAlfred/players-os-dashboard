@@ -15,6 +15,9 @@ export type Athlete = {
   sport_icon: string | null;
   gender: string | null;
   team_or_league: string | null;
+  competition_level: string | null;
+  league: string | null;
+  position: string | null;
   bio_short: string | null;
   profile_photo_url: string | null;
   onboarding_completed: boolean;
@@ -51,7 +54,7 @@ export type AthleteBioLink = {
 };
 
 const ATHLETE_COLUMNS =
-  "id, profile_key, full_name, display_name, sport, sport_icon, gender, team_or_league, bio_short, profile_photo_url, onboarding_completed";
+  "id, profile_key, full_name, display_name, sport, sport_icon, gender, team_or_league, competition_level, league, position, bio_short, profile_photo_url, onboarding_completed";
 
 const THEME_COLUMNS =
   "athlete_id, template_id, bg_solid, gradient_from, gradient_via, gradient_to, accent_color, accent_hover, button_bg, button_text, button_border_radius, background_image, logo_url, tagline, headline, subheadline, fan_app_name, is_published";
