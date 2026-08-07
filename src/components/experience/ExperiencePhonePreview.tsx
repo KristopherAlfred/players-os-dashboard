@@ -405,18 +405,37 @@ function PageFreeformPreview({
     } else if (role === "cta") {
       if (!showLandingChrome) return null;
       body = (
-        <button
-          type="button"
-          className="w-full py-2.5 text-sm font-bold"
-          style={{
-            background: page.ctaBg,
-            color: page.ctaText,
-            borderRadius: experience.theme.buttonRadius,
-            ...stageGlowStyle(item, "box"),
-          }}
-        >
-          {page.ctaLabel || "Join My Circle →"}
-        </button>
+        <div className="flex w-full flex-col gap-2">
+          <button
+            type="button"
+            className="w-full py-2.5 text-sm font-bold"
+            style={{
+              background: page.ctaBg,
+              color: page.ctaText,
+              borderRadius: experience.theme.buttonRadius,
+              ...stageGlowStyle(item, "box"),
+            }}
+          >
+            {page.ctaLabel || "Join My Circle →"}
+          </button>
+          {(page.extraButtons || []).map((btn) => (
+            <button
+              key={btn.id}
+              type="button"
+              className={`py-2 text-xs font-semibold ${btn.fullWidth === false ? "self-center px-5" : "w-full"}`}
+              style={{
+                background:
+                  btn.style === "solid" ? btn.bg : btn.style === "ghost" ? "transparent" : "rgba(255,255,255,0.04)",
+                color: btn.style === "solid" ? btn.text : btn.bg,
+                border: btn.style === "solid" ? "none" : `1px solid ${btn.borderColor || btn.bg}`,
+                borderRadius: btn.radius ?? experience.theme.buttonRadius,
+                boxShadow: btn.glow ? `0 0 18px ${btn.glowColor || btn.bg}66` : "none",
+              }}
+            >
+              {btn.label}
+            </button>
+          ))}
+        </div>
       );
     } else if (role === "stamp") {
       const stamp = (experience.stamps || []).find((s) => s.id === item.stampId);
