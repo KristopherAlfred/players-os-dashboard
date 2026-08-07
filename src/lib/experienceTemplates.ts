@@ -296,10 +296,19 @@ export function applyExperienceTemplate(
   const ctaBg = template.theme.buttonBg;
   const ctaText = template.theme.buttonText;
   const pages = Object.fromEntries(
-    Object.entries(config.pages).map(([key, page]) => [
-      key,
-      ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page,
-    ]),
+    Object.entries(config.pages).map(([key, page]) => {
+      let next = ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page;
+      if (key === "landing" && template.landing) {
+        next = {
+          ...next,
+          ...template.landing,
+          features: (template.landing.features ?? next.features).map((f) => ({ ...f })),
+          memberProof: { ...next.memberProof, ...(template.landing.memberProof ?? {}) },
+          stage: (template.landing.stage ?? next.stage).map((s) => ({ ...s })),
+        };
+      }
+      return [key, next];
+    }),
   ) as ExperienceConfig["pages"];
 
   return {
@@ -309,6 +318,7 @@ export function applyExperienceTemplate(
     effects: { ...config.effects, ...template.effects },
     pages,
   };
+
 }
 
 /** Best-guess of which template the current theme came from (accent match). */
