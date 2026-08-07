@@ -297,7 +297,7 @@ export function OnboardingPage() {
             <>
               <Heading
                 icon={Trophy}
-                title="Pick your game"
+                title="Pick your sport"
                 subtitle="Your sport and league shape your dashboard colours, badge and metrics."
               />
               <SportPicker
