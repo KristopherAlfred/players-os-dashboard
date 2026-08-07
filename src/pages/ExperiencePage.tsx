@@ -296,6 +296,8 @@ export function ExperiencePage() {
   const [layout, setLayout] = useState<HomeLayout | null>(null);
   const [section, setSection] = useState<ExperienceSection>("templates");
   const [contentStudio, setContentStudio] = useState<ExperienceContentKind | null>(null);
+  /** On the Templates tab the phone preview stays hidden until a template is picked. */
+  const [templatePreviewOpen, setTemplatePreviewOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -674,7 +676,9 @@ export function ExperiencePage() {
         <div
           className={`grid items-start gap-4 ${
             section === "templates"
-              ? "xl:grid-cols-[minmax(0,1fr)_260px]"
+              ? templatePreviewOpen
+                ? "xl:grid-cols-[minmax(0,1fr)_300px]"
+                : "grid-cols-1"
               : "xl:grid-cols-[minmax(0,1fr)_320px]"
           }`}
         >
@@ -710,6 +714,7 @@ export function ExperiencePage() {
                   activeId={activeTemplateId}
                   onApply={(template) => {
                     patchExperience((prev) => applyExperienceTemplate(prev, template));
+                    setTemplatePreviewOpen(true);
                     setStatus(`${template.label} template applied — publish to push live`);
                   }}
                 />
@@ -790,6 +795,7 @@ export function ExperiencePage() {
               ) : null}
             </div>
           </section>
+          {section === "templates" && !templatePreviewOpen ? null : (
           <ExperiencePhonePreview
             experience={experience}
             mode={section === "templates" || section === "ai" ? "theme" : section}
@@ -874,6 +880,7 @@ export function ExperiencePage() {
               }));
             }}
           />
+          )}
         </div>
       ) : null}
 
