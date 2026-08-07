@@ -50,7 +50,7 @@ export function ExperienceTemplateGallery({
           Choose a template.{" "}
           <span style={{ color: "rgb(var(--theme-accent-rgb))" }}>Make it yours.</span>
         </h3>
-        <p className="mt-1 text-[11px] text-white/50">
+        <p className="mt-1 text-xs text-white/50">
           Fully customizable. Built to stand out. Tap a card to load its full layout — then edit
           every headline, color, icon and button.
         </p>
@@ -77,7 +77,7 @@ export function ExperienceTemplateGallery({
         })}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
         {templates.map((template) => {
           const active = template.id === activeId;
           return (
@@ -132,18 +132,18 @@ export function ExperienceTemplateGallery({
                   </span>
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2 bg-black/55 px-2.5 py-2">
+              <div className="flex items-center justify-between gap-2 bg-black/55 px-3.5 py-3">
                 <div className="min-w-0">
-                  <p className="truncate text-[10px] font-bold uppercase tracking-[0.1em] text-white">
+                  <p className="truncate text-[13px] font-bold uppercase tracking-[0.1em] text-white">
                     {template.label}
                   </p>
-                  <p className="truncate text-[8px] text-white/40">{template.vibe}</p>
+                  <p className="truncate text-[10px] text-white/45">{template.vibe}</p>
                 </div>
                 <div className="flex shrink-0 gap-0.5">
                   {template.swatches.map((c) => (
                     <span
                       key={c}
-                      className="h-2.5 w-2.5 rounded-full border border-white/20"
+                      className="h-3.5 w-3.5 rounded-full border border-white/20"
                       style={{ background: c }}
                     />
                   ))}

@@ -671,7 +671,13 @@ export function ExperiencePage() {
       </div>
 
       {section !== "boxes" ? (
-        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div
+          className={`grid items-start gap-4 ${
+            section === "templates"
+              ? "xl:grid-cols-[minmax(0,1fr)_260px]"
+              : "xl:grid-cols-[minmax(0,1fr)_320px]"
+          }`}
+        >
           <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
             <div className="border-b border-dt-border px-4 py-3">
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">
