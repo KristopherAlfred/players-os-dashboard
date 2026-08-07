@@ -246,7 +246,7 @@ function MapPinMarker({ active, scale }: { active: boolean; scale: number }) {
     >
       <path
         d="M0,0 C-7.5,-11 -14,-20 -14,-28 A14,14 0 1 1 14,-28 C14,-20 7.5,-11 0,0 Z"
-        fill="#8FE3B8"
+        fill="var(--theme-accent)"
         stroke="#fff"
         strokeWidth={1.25}
       />
@@ -346,7 +346,7 @@ function ChoroplethMap({
                     style={{
                       default: { outline: "none", opacity: 1 },
                       hover: {
-                        fill: clickable && target ? "#8FE3B8" : intensityToColor(intensity, paletteId),
+                        fill: clickable && target ? "var(--theme-accent)" : intensityToColor(intensity, paletteId),
                         outline: "none",
                         cursor: clickable && target ? "pointer" : "default",
                         opacity: 1,
@@ -366,7 +366,7 @@ function ChoroplethMap({
         <defs>
           <linearGradient id="map-pin-shine" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
-            <stop offset="55%" stopColor="#8FE3B8" stopOpacity="0" />
+            <stop offset="55%" stopColor="var(--theme-accent)" stopOpacity="0" />
             <stop offset="100%" stopColor="#7a0008" stopOpacity="0.45" />
           </linearGradient>
         </defs>

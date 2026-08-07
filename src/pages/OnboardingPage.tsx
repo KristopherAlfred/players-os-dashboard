@@ -9,6 +9,7 @@ import {
   Palette,
   Sparkles,
   Trophy,
+  Upload,
   UserRound,
 } from "lucide-react";
 import {
@@ -23,6 +24,7 @@ import {
 import { loadDashboardSession } from "../lib/dashboardAuth";
 import { SportPicker, type SportSelection } from "../components/sports/SportPicker";
 import { useAthlete } from "../contexts/AthleteContext";
+import { setDashboardAvatar } from "../lib/adminProfile";
 
 /**
  * Multi-step athlete onboarding. Step 1 name-matches against existing athletes
@@ -64,6 +66,7 @@ export function OnboardingPage() {
   const [accentIndex, setAccentIndex] = useState(0);
   const [sportId, setSportId] = useState("");
   const [leagueAccent, setLeagueAccent] = useState<{ accent: string; text: string } | null>(null);
+  const [headshot, setHeadshot] = useState("");
   const [slug, setSlug] = useState("");
   const [slugState, setSlugState] = useState<"idle" | "checking" | "free" | "taken">("idle");
 
@@ -148,6 +151,7 @@ export function OnboardingPage() {
         gender: gender || null,
         team_or_league: team.trim() || null,
         bio_short: bio.trim() || null,
+        profile_photo_url: /^https?:\/\//i.test(headshot) ? headshot : null,
         onboarding_completed: true,
       });
 
@@ -161,6 +165,8 @@ export function OnboardingPage() {
         button_text: accent.text,
         fan_app_name: fanAppName.trim() || `${firstName} Fan App`,
       });
+
+      if (headshot) setDashboardAvatar(headshot);
 
       const clean = slugify(slug);
       if (clean.length >= 3 && slugState !== "taken") {
@@ -359,6 +365,66 @@ export function OnboardingPage() {
                   onChange={(e) => setFanAppName(e.target.value)}
                   placeholder={`${firstName || "Your"} Fan App`}
                 />
+              </div>
+              <div>
+                <span className={labelClass}>Profile headshot</span>
+                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3">
+                  {headshot ? (
+                    <img
+                      src={headshot}
+                      alt="Your headshot"
+                      className="h-14 w-14 rounded-full border border-white/20 object-cover object-top"
+                    />
+                  ) : (
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-white/20 bg-black/50 text-sm font-semibold text-white/50">
+                      {(displayName || fullName).slice(0, 1).toUpperCase() || "?"}
+                    </span>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/85 transition hover:bg-white/[0.08]">
+                      <Upload size={13} />
+                      {headshot ? "Change photo" : "Upload headshot"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          e.target.value = "";
+                          if (!file) return;
+                          if (!file.type.startsWith("image/")) {
+                            setError("Pick an image file (PNG, JPG, WEBP…)");
+                            return;
+                          }
+                          if (file.size > 2_500_000) {
+                            setError("Image is too big — keep it under 2.5 MB");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            if (typeof reader.result === "string") {
+                              setHeadshot(reader.result);
+                              setError(null);
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </label>
+                    <p className="mt-1.5 text-[11px] text-white/40">
+                      Shows in the top-right of your dashboard. Square photos look best.
+                    </p>
+                  </div>
+                  {headshot ? (
+                    <button
+                      type="button"
+                      onClick={() => setHeadshot("")}
+                      className="text-[11px] text-white/45 transition hover:text-white"
+                    >
+                      Remove
+                    </button>
+                  ) : null}
+                </div>
               </div>
               <div>
                 <span className={labelClass}>Accent colour</span>

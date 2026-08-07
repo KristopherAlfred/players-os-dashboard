@@ -246,7 +246,7 @@ export function PlatformDetailPage() {
                 <Line
                   type="monotone"
                   dataKey="followers"
-                  stroke="#8FE3B8"
+                  stroke="var(--theme-accent)"
                   strokeWidth={2}
                   dot={false}
                 />

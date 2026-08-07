@@ -43,11 +43,11 @@ const defaultPalette: ThemePalette = {
   border: "#1e1e1e",
   muted: "#8a8a8a",
   text: "#f0f0f0",
-  accent: "#8FE3B8",
-  accentHover: "#A8F0CC",
-  chartSecondary: "#5CBF8F",
-  chartTertiary: "#2F6B4F",
-  trafficShades: shades("#8FE3B8"),
+  accent: "#E2231A",
+  accentHover: "#F5382E",
+  chartSecondary: "#F5382E",
+  chartTertiary: "#7A0F0A",
+  trafficShades: shades("#E2231A"),
 };
 
 const teamPalette: ThemePalette = {
@@ -117,10 +117,10 @@ export const themeTemplates: {
 }[] = [
   {
     id: "default",
-    name: "Sloane Glo",
-    description: "Soft mint green & black",
-    swatches: ["#8FE3B8", "#f0f0f0", "#080808"],
-    preview: "linear-gradient(135deg, #080808 0%, #051a12 45%, #8FE3B8 100%)",
+    name: "Players OS",
+    description: "Brand red & black",
+    swatches: ["#E2231A", "#f0f0f0", "#080808"],
+    preview: "linear-gradient(135deg, #080808 0%, #1a0303 45%, #E2231A 100%)",
   },
   {
     id: "team",

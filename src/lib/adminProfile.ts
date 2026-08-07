@@ -1,15 +1,14 @@
-/** Sloane Stephens' official ESPN headshot — the default dashboard avatar. */
-export const DEFAULT_AVATAR_URL =
-  "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png";
+/** No default headshot — athletes add their own during onboarding or in Profile. */
+export const DEFAULT_AVATAR_URL = "";
 
 const AVATAR_KEY = "dt-dashboard-avatar";
 const RING_KEY = "dt-dashboard-avatar-ring";
 const AVATAR_EVENT = "dt-avatar-changed";
 
-export const DEFAULT_RING_COLOR = "#8FE3B8";
+export const DEFAULT_RING_COLOR = "var(--theme-accent)";
 
 export const RING_COLORS: { id: string; label: string; value: string }[] = [
-  { id: "mint", label: "Sloane Mint", value: DEFAULT_RING_COLOR },
+  { id: "accent", label: "Your accent", value: DEFAULT_RING_COLOR },
   { id: "white", label: "White", value: "#ffffff" },
   { id: "gold", label: "Gold", value: "#f5b60d" },
   { id: "green", label: "Green", value: "#22c55e" },
@@ -67,7 +66,7 @@ export function resetDashboardAvatar() {
 }
 
 export function isDefaultAvatar(src: string) {
-  return src === DEFAULT_AVATAR_URL;
+  return !src.trim();
 }
 
 /** Subscribe to avatar changes (returns unsubscribe). */

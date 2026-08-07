@@ -13,6 +13,7 @@ import { SourceBanner } from "../components/dametime/DametimeAnalyticsStates";
 import { ContentSourceGuard } from "../components/ContentSourceGuard";
 import { OnboardingProvider } from "../components/onboarding/OnboardingTour";
 import { useAthlete } from "../contexts/AthleteContext";
+import { AiAssistantWidget } from "../components/AiAssistantWidget";
 
 export function AppLayout() {
   const { pathname } = useLocation();
@@ -66,6 +67,7 @@ export function AppLayout() {
                 </div>
               </main>
             </div>
+            <AiAssistantWidget />
           </div>
           </TwitterAnalyticsProvider>
           </FacebookAnalyticsProvider>
