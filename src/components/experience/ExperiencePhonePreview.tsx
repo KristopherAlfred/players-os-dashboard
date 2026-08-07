@@ -363,10 +363,30 @@ function PageFreeformPreview({
     return STAGE_LABELS[role];
   })();
 
+  const hiddenItems = (page.stage || []).filter((item) => item.hidden);
+
+  const deleteItem = useCallback(
+    (id: string) => {
+      if (!onPatchPage) return;
+      const item = getStageItem(page, id);
+      onPatchPage({
+        layoutMode: "freeform",
+        stage:
+          stageItemRole(item) === "stamp"
+            ? removeStageItem(page, id)
+            : upsertStageItem(page, { id, hidden: true }),
+      });
+      setSelectedId(null);
+    },
+    [onPatchPage, page],
+  );
+
   const renderItem = (id: string) => {
     const item = getStageItem(page, id);
+    if (item.hidden) return null;
     const role = stageItemRole(item);
     let body: ReactNode = null;
+
 
     if (role === "logo") {
       if (!brand.showLogoImage || !brand.logoSrc) {
