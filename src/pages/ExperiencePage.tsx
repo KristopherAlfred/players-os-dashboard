@@ -710,6 +710,7 @@ export function ExperiencePage() {
                   activeId={activeTemplateId}
                   onApply={(template) => {
                     patchExperience((prev) => applyExperienceTemplate(prev, template));
+                    setTemplatePreviewOpen(true);
                     setStatus(`${template.label} template applied — publish to push live`);
                   }}
                 />
