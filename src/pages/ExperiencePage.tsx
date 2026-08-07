@@ -51,6 +51,7 @@ import {
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
 import { ExperienceTemplateGallery } from "../components/experience/ExperienceTemplateGallery";
+import { ExperienceAiDesigner } from "../components/experience/ExperienceAiDesigner";
 import { applyExperienceTemplate, detectExperienceTemplate } from "../lib/experienceTemplates";
 import { useAthlete } from "../contexts/AthleteContext";
 import {
@@ -59,6 +60,7 @@ import {
 } from "../components/experience/ExperienceContentStudio";
 
 type ExperienceSection =
+  | "ai"
   | "templates"
   | "boxes"
   | "brand"
@@ -70,6 +72,7 @@ type ExperienceSection =
   | "homePage";
 
 const SECTIONS: { id: ExperienceSection; label: string }[] = [
+  { id: "ai", label: "✦ AI Designer" },
   { id: "templates", label: "Templates" },
   { id: "brand", label: "Brand / Logo" },
   { id: "theme", label: "Colors" },
@@ -289,7 +292,7 @@ function PreviewCard({ widget, selected }: { widget: HomeWidget; selected: boole
 }
 
 export function ExperiencePage() {
-  const { fanAppName, displayName } = useAthlete();
+  const { fanAppName, displayName, athlete } = useAthlete();
   const [layout, setLayout] = useState<HomeLayout | null>(null);
   const [section, setSection] = useState<ExperienceSection>("templates");
   const [contentStudio, setContentStudio] = useState<ExperienceContentKind | null>(null);
@@ -677,6 +680,25 @@ export function ExperiencePage() {
               <p className="text-[11px] text-white/40">Changes sync to {fanAppName} when you publish</p>
             </div>
             <div className="max-h-[calc(100vh-8rem)] overflow-y-auto p-4">
+              {section === "ai" ? (
+                <ExperienceAiDesigner
+                  experience={experience}
+                  pageKey="landing"
+                  context={{
+                    fanAppName,
+                    athlete: displayName,
+                    sport: athlete?.sport ?? undefined,
+                    team: athlete?.team_or_league ?? undefined,
+                  }}
+                  onApply={(updater, note) => {
+                    patchExperience(updater);
+                    setStatus(`${note} — publish to push live`);
+                  }}
+                  onSetPageImage={(field, dataUrl) => patchPage("landing", { [field]: dataUrl })}
+                  onStatus={(message) => setStatus(message)}
+                  onError={(message) => setError(message)}
+                />
+              ) : null}
               {section === "templates" ? (
                 <ExperienceTemplateGallery
                   activeId={activeTemplateId}
@@ -764,7 +786,7 @@ export function ExperiencePage() {
           </section>
           <ExperiencePhonePreview
             experience={experience}
-            mode={section === "templates" ? "theme" : section}
+            mode={section === "templates" || section === "ai" ? "theme" : section}
             pageKey={
               section === "youreIn"
                 ? "youreIn"
