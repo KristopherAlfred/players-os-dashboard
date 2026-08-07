@@ -795,6 +795,7 @@ export function ExperiencePage() {
               ) : null}
             </div>
           </section>
+          {section === "templates" && !templatePreviewOpen ? null : (
           <ExperiencePhonePreview
             experience={experience}
             mode={section === "templates" || section === "ai" ? "theme" : section}
@@ -879,6 +880,7 @@ export function ExperiencePage() {
               }));
             }}
           />
+          )}
         </div>
       ) : null}
 
