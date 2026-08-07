@@ -94,15 +94,20 @@ function DraggableStageItem({
   selected,
   onSelect,
   onMove,
+  onResize,
+  onDelete,
   children,
 }: {
   item: ExperienceStageItem;
   selected: boolean;
   onSelect: () => void;
   onMove: (x: number, y: number) => void;
+  onResize?: (w: number, scale: number) => void;
+  onDelete?: () => void;
   children: ReactNode;
 }) {
   const drag = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const resize = useRef<{ startX: number; startY: number; origW: number; origScale: number } | null>(null);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -141,6 +146,39 @@ function DraggableStageItem({
     }
   };
 
+  const onHandleDown = (e: ReactPointerEvent<HTMLSpanElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    resize.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      origW: item.w || 80,
+      origScale: item.scale ?? 100,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onHandleMove = (e: ReactPointerEvent<HTMLSpanElement>) => {
+    if (!resize.current || !onResize) return;
+    const stage = e.currentTarget.parentElement?.parentElement;
+    const rect = stage?.getBoundingClientRect();
+    if (!rect) return;
+    const dx = ((e.clientX - resize.current.startX) / rect.width) * 100;
+    const dy = ((e.clientY - resize.current.startY) / rect.height) * 100;
+    const w = Math.max(8, Math.min(100, resize.current.origW + dx));
+    const scale = Math.max(40, Math.min(220, resize.current.origScale + dy * 1.6));
+    onResize(Math.round(w), Math.round(scale));
+  };
+
+  const onHandleUp = (e: ReactPointerEvent<HTMLSpanElement>) => {
+    resize.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  };
+
   return (
     <div
       role="button"
@@ -150,6 +188,12 @@ function DraggableStageItem({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => {
+        if ((e.key === "Delete" || e.key === "Backspace") && onDelete) {
+          e.preventDefault();
+          onDelete();
+        }
+      }}
       className={`cursor-grab touch-none active:cursor-grabbing ${
         selected
           ? "outline outline-1 outline-dashed outline-white/55 outline-offset-2"
@@ -158,9 +202,43 @@ function DraggableStageItem({
       style={stageItemCss(item) as CSSProperties}
     >
       {children}
+      {selected ? (
+        <>
+          {onDelete ? (
+            <span
+              role="button"
+              tabIndex={-1}
+              aria-label="Delete this item"
+              title="Delete"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="absolute -right-2 -top-2 z-[200] flex h-4 w-4 cursor-pointer items-center justify-center rounded-full border border-white/40 bg-black text-[9px] leading-none text-red-300"
+            >
+              ×
+            </span>
+          ) : null}
+          {onResize ? (
+            <span
+              role="button"
+              tabIndex={-1}
+              aria-label="Resize this item"
+              title="Drag to resize"
+              onPointerDown={onHandleDown}
+              onPointerMove={onHandleMove}
+              onPointerUp={onHandleUp}
+              onPointerCancel={onHandleUp}
+              className="absolute -bottom-2 -right-2 z-[200] h-4 w-4 cursor-nwse-resize touch-none rounded-sm border border-white/50 bg-white/80"
+            />
+          ) : null}
+        </>
+      ) : null}
     </div>
   );
 }
+
 
 function StampTray({
   experience,
