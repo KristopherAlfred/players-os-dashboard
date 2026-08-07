@@ -146,7 +146,7 @@ export function DashboardPreview({
             <Sparkles size={13} style={{ color: accent }} className="mt-0.5 shrink-0" />
             <p className="text-[11px] leading-snug text-white/70">
               AI insight: your {sport?.label?.toLowerCase() ?? "game"} highlights drive the most
-              saves — post one before every {teamLabel || leagueLabel || "game day"}.
+              saves — post one before every {teamLabel ? `${teamLabel} game` : "game day"}.
             </p>
           </div>
 
