@@ -221,6 +221,9 @@ export function applyPalette(basePalette: ThemePalette) {
   const rgb = hexToRgb(palette.accent);
   if (rgb) {
     const { r, g, b } = rgb;
+    // Drives every accent glow / shadow across the dashboard.
+    root.style.setProperty("--theme-accent-rgb", `${r}, ${g}, ${b}`);
+
     root.style.setProperty(
       "--gradient-bg",
       `radial-gradient(ellipse 80% 50% at 50% -10%, rgba(${r}, ${g}, ${b}, 0.08) 0%, transparent 50%), linear-gradient(180deg, ${palette.bg} 0%, ${palette.panel} 40%, ${palette.bg} 100%)`,
