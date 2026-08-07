@@ -109,23 +109,8 @@ export function SportPicker({
   return (
     <div className="space-y-4">
       <div>
-        <div className="mb-3 flex items-start gap-3">
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border"
-            style={{
-              borderColor: `${selectedSport?.accent ?? "#E2231A"}66`,
-              backgroundColor: `${selectedSport?.accent ?? "#E2231A"}1f`,
-            }}
-          >
-            <Trophy size={17} style={{ color: selectedSport?.accent ?? "#E2231A" }} />
-          </span>
-          <div>
-            <h3 className="text-xl font-semibold leading-tight text-white">Pick your sport</h3>
-            <p className="text-xs text-white/50">
-              Your sport and league shape your dashboard colours, badge and metrics.
-            </p>
-          </div>
-        </div>
+
+
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {SPORTS.map((sport) => {
