@@ -112,7 +112,7 @@ export function SportPicker({
 
 
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {SPORTS.map((sport) => {
             const active = selectedSport?.id === sport.id;
             return (
@@ -121,13 +121,13 @@ export function SportPicker({
                 type="button"
                 onClick={() => selectSport(sport)}
                 aria-pressed={active}
-                className={`group relative flex h-[168px] flex-col justify-end overflow-hidden rounded-2xl border text-left transition-all duration-300 hover:-translate-y-1 ${
+                className={`group relative flex aspect-[9/10] flex-col justify-end overflow-hidden rounded-2xl border bg-black text-left transition-all duration-300 hover:-translate-y-1.5 ${
                   active ? "border-transparent" : "border-white/10 hover:border-white/25"
                 }`}
                 style={
                   active
                     ? {
-                        boxShadow: `0 0 0 2px ${sport.accent}, 0 18px 40px -18px ${sport.accent}`,
+                        boxShadow: `0 0 0 2px ${sport.accent}, 0 24px 55px -20px ${sport.accent}`,
                       }
                     : undefined
                 }
@@ -136,53 +136,50 @@ export function SportPicker({
                   src={SPORT_PHOTOS[sport.id] ?? SPORT_PHOTOS.other}
                   alt=""
                   loading="lazy"
-                  width={512}
-                  height={640}
-                  className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
-                    active
-                      ? "scale-105 opacity-100"
-                      : "opacity-70 saturate-50 group-hover:scale-105 group-hover:opacity-95 group-hover:saturate-100"
+                  className={`absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out will-change-transform ${
+                    active ? "scale-[1.06]" : "group-hover:scale-[1.12]"
                   }`}
                 />
-                <span className="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-transparent" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent transition-opacity duration-500 group-hover:opacity-80" />
                 {active && (
                   <span
                     className="absolute inset-0 opacity-40"
                     style={{
-                      background: `linear-gradient(to top, ${sport.accent}66, transparent 65%)`,
+                      background: `linear-gradient(to top, ${sport.accent}55, transparent 60%)`,
                     }}
                   />
                 )}
+                <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                  <span
+                    className="absolute inset-0"
+                    style={{
+                      background: `radial-gradient(120% 90% at 50% 110%, ${sport.accent}44, transparent 60%)`,
+                    }}
+                  />
+                </span>
 
                 {active && (
                   <span
-                    className="animate-bubble-pop absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full shadow-lg"
+                    className="animate-bubble-pop absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full shadow-lg"
                     style={{ backgroundColor: sport.accent, color: sport.accentText }}
                   >
-                    <Check size={13} strokeWidth={3} />
+                    <Check size={15} strokeWidth={3} />
                   </span>
                 )}
 
-                <span className="relative z-10 flex flex-col items-center gap-1 px-2 pb-3">
-                  <span
-                    className={`flex h-9 w-9 items-center justify-center rounded-full bg-black/45 backdrop-blur-sm transition-transform duration-300 ${
-                      active ? "scale-110" : "group-hover:scale-105"
-                    }`}
-                  >
-                    <BallIcon kind={sport.ball} size={26} />
-                  </span>
-                  <span className="text-center text-[13px] font-semibold leading-tight text-white">
+                <span className="relative z-10 flex flex-col items-center gap-1 px-3 pb-5 transition-transform duration-500 group-hover:-translate-y-1">
+                  <span className="text-center text-lg font-bold leading-tight text-white">
                     {sport.label}
                   </span>
-                  <span className="text-center text-[9px] uppercase tracking-[0.12em] text-white/45">
+                  <span className="text-center text-[12px] text-white/60">
                     {SPORT_TAGLINES[sport.id] ?? ""}
                   </span>
                 </span>
 
                 {active && (
                   <ChevronDown
-                    size={12}
-                    className="absolute bottom-0.5 left-1/2 -translate-x-1/2 rounded-full bg-black/80 text-white/70"
+                    size={14}
+                    className="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-black/80 text-white/70"
                   />
                 )}
               </button>
