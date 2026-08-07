@@ -537,11 +537,14 @@ function PageFreeformPreview({
         selected={selectedId === id}
         onSelect={() => selectStageItem(id)}
         onMove={(x, y) => patchItem(id, { x, y })}
+        onResize={onPatchPage ? (w, scale) => patchItem(id, { w, scale }) : undefined}
+        onDelete={onPatchPage ? () => deleteItem(id) : undefined}
       >
         {body}
       </DraggableStageItem>
     );
   };
+
 
   return (
     <PhoneFrame label={label} hint="Drag logo & words separately · tap a word to style it">
