@@ -299,7 +299,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
 function AthleteSportBadge() {
   const { athlete, sport: sportName } = useAthlete();
   const sport = findSport(athlete?.sport_icon || sportName);
-  const league = findLeague(sport, athlete?.team_or_league);
+  const league = findLeague(sport, athlete?.league) ?? findLeague(sport, athlete?.team_or_league);
 
   if (!sport) return null;
 
@@ -313,12 +313,13 @@ function AthleteSportBadge() {
       >
         <LeagueMark league={league} sport={sport} size={26} />
       </span>
-      <div className="min-w-0">
-        <p className="truncate text-xs font-semibold text-dt-text">
-          {league?.label ?? athlete?.team_or_league ?? sport.label}
+      <div className="min-w-0 flex-1">
+        <p className="flex items-center gap-1.5 truncate text-xs font-semibold text-dt-text">
+          <span className="truncate">{athlete?.team_or_league ?? league?.label ?? sport.label}</span>
+          {league ? <LeagueMark league={league} sport={sport} size={14} /> : null}
         </p>
         <p className="truncate text-[10px] text-dt-muted">
-          {[sport.label, athlete?.gender === "female" ? "Women's" : athlete?.gender === "male" ? "Men's" : null]
+          {[sport.label, league?.label, athlete?.gender === "female" ? "Women's" : athlete?.gender === "male" ? "Men's" : null]
             .filter(Boolean)
             .join(" · ")}
         </p>
