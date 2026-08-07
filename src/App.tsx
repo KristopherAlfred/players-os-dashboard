@@ -1,4 +1,3 @@
-import { TemplateGalleryDebug } from "./pages/TemplateGalleryDebug";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
@@ -36,7 +35,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/__tpldebug" element={<TemplateGalleryDebug />} />
         <Route path="/go/:slug" element={<BioLinkRedirectPage />} />
         <Route
           path="/welcome"
