@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ChevronDown, Trophy } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import {
   DIVISIONS,
   SPORTS,
