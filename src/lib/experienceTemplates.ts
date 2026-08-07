@@ -1,3 +1,4 @@
+import { SPORT_PHOTOS } from "./sportPhotos";
 import type {
   ExperienceBrand,
   ExperienceConfig,
@@ -24,6 +25,10 @@ export type ExperienceTemplate = {
   brand: Partial<ExperienceBrand>;
   /** Full-layout templates: landing page composition applied verbatim. */
   landing?: Partial<ExperiencePageConfig>;
+  /** Filter chips in the gallery, e.g. ["dark","sport"]. */
+  tags?: string[];
+  /** Hero photo shown in the mini preview card. */
+  photo?: string;
 };
 
 export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
@@ -31,6 +36,8 @@ export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
     id: "join-the-circle",
     label: "Join The Circle",
     vibe: "Full cinematic layout — feature grid, gradient CTA, social proof",
+    tags: ["dark", "sport", "bold"],
+    photo: SPORT_PHOTOS.tennis,
     swatches: ["#04070a", "#0a1b1f", "#25D8E8", "#8FF08A"],
     theme: {
       bg: "#04070a",
@@ -74,6 +81,10 @@ export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
       accentColor: "#2FE0D6",
       effectPreset: "glass",
       layoutMode: "freeform",
+      heroImage: SPORT_PHOTOS.tennis,
+      heroFit: "cover",
+      heroPosition: "center",
+      heroScale: 100,
       subhead: "THE OFFICIAL\nSLOANE GLO\nCOMMUNITY",
       headline: "Join Sloane Glo",
       headlineGradientFrom: "#FFFFFF",
@@ -321,6 +332,9 @@ type FullTemplateSpec = {
   muted: string;
   radius?: number;
   light?: boolean;
+  /** key in SPORT_PHOTOS */
+  photo: string;
+  tags: string[];
 };
 
 function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
@@ -333,6 +347,8 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
     id: s.id,
     label: s.label,
     vibe: s.vibe,
+    tags: s.tags,
+    photo: SPORT_PHOTOS[s.photo] ?? SPORT_PHOTOS.other,
     swatches: [s.bg, s.bgVia, s.accent, s.ctaTo ?? s.accentHover],
     theme: {
       bg: s.bg,
@@ -377,6 +393,10 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
       accentColor: s.accent,
       effectPreset: s.light ? "soft" : "glass",
       layoutMode: "freeform",
+      heroImage: SPORT_PHOTOS[s.photo] ?? SPORT_PHOTOS.other,
+      heroFit: "cover",
+      heroPosition: "center",
+      heroScale: 100,
       subhead: "",
       headline: s.headline,
       headlineGradientFrom: s.text,
@@ -434,6 +454,8 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
 const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   {
     id: "gridiron",
+    photo: "football",
+    tags: ["dark", "sport", "bold"],
     label: "Gridiron",
     vibe: "Football — lime energy, night-practice grit",
     wordmark: "GRIDIRON",
@@ -457,6 +479,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "deep-end",
+    photo: "swimming",
+    tags: ["dark", "sport", "vibrant"],
     label: "Deep End",
     vibe: "Swimming — deep blue water light",
     wordmark: "DEEP END",
@@ -480,6 +504,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "overtime",
+    photo: "basketball",
+    tags: ["dark", "sport", "bold"],
     label: "Overtime",
     vibe: "Basketball — arena orange under the lights",
     wordmark: "OVERTIME",
@@ -503,6 +529,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "title-mode",
+    photo: "combat",
+    tags: ["dark", "minimal", "bold"],
     label: "Title Mode",
     vibe: "Boxing — black & white championship mono",
     wordmark: "TITLE MODE",
@@ -526,6 +554,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "wave-ryders",
+    photo: "other",
+    tags: ["nature", "vibrant", "sport"],
     label: "Wave Ryders",
     vibe: "Surf — cyan ocean spray",
     wordmark: "WAVE RYDERS",
@@ -549,6 +579,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "speed-lab",
+    photo: "track",
+    tags: ["dark", "tech", "vibrant"],
     label: "Speed Lab",
     vibe: "Cycling — magenta dusk velocity",
     wordmark: "SPEED LAB",
@@ -573,6 +605,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "flow-state",
+    photo: "gymnastics",
+    tags: ["light", "minimal", "pastel"],
     label: "Flow State",
     vibe: "Yoga — light, airy, sage calm",
     wordmark: "FLOW STATE",
@@ -598,6 +632,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "track-life",
+    photo: "track",
+    tags: ["bold", "sport", "urban"],
     label: "Track Life",
     vibe: "Track — rust clay and orange starts",
     wordmark: "TRACK LIFE",
@@ -621,6 +657,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "iron-club",
+    photo: "volleyball",
+    tags: ["dark", "tech", "bold"],
     label: "Iron Club",
     vibe: "Strength — indigo steel gym",
     wordmark: "IRON CLUB",
@@ -645,6 +683,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "ace-club",
+    photo: "tennis",
+    tags: ["light", "minimal", "sport"],
     label: "Ace Club",
     vibe: "Tennis — bright court light, lime accent",
     wordmark: "ACE CLUB",
@@ -670,6 +710,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "cold-air",
+    photo: "hockey",
+    tags: ["light", "nature", "minimal"],
     label: "Cold Air",
     vibe: "Snowboard — alpine blue-grey",
     wordmark: "COLD AIR",
@@ -694,6 +736,8 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "level-up",
+    photo: "esports",
+    tags: ["dark", "tech", "neon"],
     label: "Level Up",
     vibe: "Esports — violet RGB glow",
     wordmark: "LEVEL UP",
