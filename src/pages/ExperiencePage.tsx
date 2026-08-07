@@ -296,6 +296,8 @@ export function ExperiencePage() {
   const [layout, setLayout] = useState<HomeLayout | null>(null);
   const [section, setSection] = useState<ExperienceSection>("templates");
   const [contentStudio, setContentStudio] = useState<ExperienceContentKind | null>(null);
+  /** On the Templates tab the phone preview stays hidden until a template is picked. */
+  const [templatePreviewOpen, setTemplatePreviewOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
