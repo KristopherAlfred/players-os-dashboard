@@ -140,7 +140,7 @@ export function AiAssistantWidget() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close AI assistant" : "Open AI assistant"}
-        className="flex h-13 w-13 items-center justify-center rounded-full bg-dt-red p-4 text-dt-bg shadow-lg shadow-black/50 transition hover:brightness-110"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-dt-red text-dt-bg shadow-lg shadow-black/50 transition hover:brightness-110"
       >
         {open ? <X size={20} /> : <MessageCircle size={20} />}
       </button>
