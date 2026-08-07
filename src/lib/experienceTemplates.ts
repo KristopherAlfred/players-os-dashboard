@@ -1,4 +1,5 @@
 import { SPORT_PHOTOS } from "./sportPhotos";
+import { TEMPLATE_ART } from "./templateArt";
 import type {
   ExperienceBrand,
   ExperienceConfig,
@@ -37,7 +38,7 @@ export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
     label: "Join The Circle",
     vibe: "Full cinematic layout — feature grid, gradient CTA, social proof",
     tags: ["dark", "sport", "bold"],
-    photo: SPORT_PHOTOS.tennis,
+    photo: TEMPLATE_ART["join-the-circle"],
     swatches: ["#04070a", "#0a1b1f", "#25D8E8", "#8FF08A"],
     theme: {
       bg: "#04070a",
@@ -81,7 +82,7 @@ export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
       accentColor: "#2FE0D6",
       effectPreset: "glass",
       layoutMode: "freeform",
-      heroImage: SPORT_PHOTOS.tennis,
+      heroImage: TEMPLATE_ART["join-the-circle"],
       heroFit: "cover",
       heroPosition: "center",
       heroScale: 100,
@@ -348,7 +349,7 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
     label: s.label,
     vibe: s.vibe,
     tags: s.tags,
-    photo: SPORT_PHOTOS[s.photo] ?? SPORT_PHOTOS.other,
+    photo: TEMPLATE_ART[s.id] ?? SPORT_PHOTOS[s.photo] ?? SPORT_PHOTOS.other,
     swatches: [s.bg, s.bgVia, s.accent, s.ctaTo ?? s.accentHover],
     theme: {
       bg: s.bg,
@@ -393,7 +394,7 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
       accentColor: s.accent,
       effectPreset: s.light ? "soft" : "glass",
       layoutMode: "freeform",
-      heroImage: SPORT_PHOTOS[s.photo] ?? SPORT_PHOTOS.other,
+      heroImage: TEMPLATE_ART[s.id] ?? SPORT_PHOTOS[s.photo] ?? SPORT_PHOTOS.other,
       heroFit: "cover",
       heroPosition: "center",
       heroScale: 100,
