@@ -22,7 +22,10 @@ const QUICK_PROMPTS = [
   "Clean minimal blackout look with white text only",
   "Remove every glow and shadow in the app",
   "Add buttons for my shop, tickets and highlights",
+  "Generate a cinematic background image that matches my colors and place it",
+  "Delete the tagline and title art, then rebalance the layout",
   "Redesign the whole app 10x better — colors, type, layout and buttons",
+
 ];
 
 /** Dominant colors from an uploaded reference image (client-side, no upload). */
