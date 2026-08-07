@@ -179,6 +179,7 @@ export function getPalette(template: ThemeTemplate): ThemePalette {
  * shows up across the dashboard front end.
  */
 let accentOverride: { accent: string; accentHover: string } | null = null;
+let accentOverrideEnabled = true;
 let lastPalette: ThemePalette | null = null;
 
 export function setAccentOverride(accent: string | null, accentHover?: string | null) {
@@ -188,8 +189,18 @@ export function setAccentOverride(accent: string | null, accentHover?: string | 
   if (lastPalette) applyPalette(lastPalette);
 }
 
+/**
+ * When the athlete hand-picks a colour template in Settings, that template's
+ * accent must win over their league/onboarding accent so every button, chart
+ * and glow re-colours to the template.
+ */
+export function setAccentOverrideEnabled(enabled: boolean) {
+  accentOverrideEnabled = enabled;
+  if (lastPalette) applyPalette(lastPalette);
+}
+
 function withOverride(palette: ThemePalette): ThemePalette {
-  if (!accentOverride) return palette;
+  if (!accentOverride || !accentOverrideEnabled) return palette;
   const { accent, accentHover } = accentOverride;
   return {
     ...palette,
@@ -199,6 +210,7 @@ function withOverride(palette: ThemePalette): ThemePalette {
     trafficShades: shades(accent),
   };
 }
+
 
 export function applyPalette(basePalette: ThemePalette) {
   lastPalette = basePalette;
