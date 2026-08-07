@@ -94,15 +94,20 @@ function DraggableStageItem({
   selected,
   onSelect,
   onMove,
+  onResize,
+  onDelete,
   children,
 }: {
   item: ExperienceStageItem;
   selected: boolean;
   onSelect: () => void;
   onMove: (x: number, y: number) => void;
+  onResize?: (w: number, scale: number) => void;
+  onDelete?: () => void;
   children: ReactNode;
 }) {
   const drag = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const resize = useRef<{ startX: number; startY: number; origW: number; origScale: number } | null>(null);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -141,6 +146,39 @@ function DraggableStageItem({
     }
   };
 
+  const onHandleDown = (e: ReactPointerEvent<HTMLSpanElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    resize.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      origW: item.w || 80,
+      origScale: item.scale ?? 100,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onHandleMove = (e: ReactPointerEvent<HTMLSpanElement>) => {
+    if (!resize.current || !onResize) return;
+    const stage = e.currentTarget.parentElement?.parentElement;
+    const rect = stage?.getBoundingClientRect();
+    if (!rect) return;
+    const dx = ((e.clientX - resize.current.startX) / rect.width) * 100;
+    const dy = ((e.clientY - resize.current.startY) / rect.height) * 100;
+    const w = Math.max(8, Math.min(100, resize.current.origW + dx));
+    const scale = Math.max(40, Math.min(220, resize.current.origScale + dy * 1.6));
+    onResize(Math.round(w), Math.round(scale));
+  };
+
+  const onHandleUp = (e: ReactPointerEvent<HTMLSpanElement>) => {
+    resize.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  };
+
   return (
     <div
       role="button"
@@ -150,6 +188,12 @@ function DraggableStageItem({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => {
+        if ((e.key === "Delete" || e.key === "Backspace") && onDelete) {
+          e.preventDefault();
+          onDelete();
+        }
+      }}
       className={`cursor-grab touch-none active:cursor-grabbing ${
         selected
           ? "outline outline-1 outline-dashed outline-white/55 outline-offset-2"
@@ -158,9 +202,43 @@ function DraggableStageItem({
       style={stageItemCss(item) as CSSProperties}
     >
       {children}
+      {selected ? (
+        <>
+          {onDelete ? (
+            <span
+              role="button"
+              tabIndex={-1}
+              aria-label="Delete this item"
+              title="Delete"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="absolute -right-2 -top-2 z-[200] flex h-4 w-4 cursor-pointer items-center justify-center rounded-full border border-white/40 bg-black text-[9px] leading-none text-red-300"
+            >
+              ×
+            </span>
+          ) : null}
+          {onResize ? (
+            <span
+              role="button"
+              tabIndex={-1}
+              aria-label="Resize this item"
+              title="Drag to resize"
+              onPointerDown={onHandleDown}
+              onPointerMove={onHandleMove}
+              onPointerUp={onHandleUp}
+              onPointerCancel={onHandleUp}
+              className="absolute -bottom-2 -right-2 z-[200] h-4 w-4 cursor-nwse-resize touch-none rounded-sm border border-white/50 bg-white/80"
+            />
+          ) : null}
+        </>
+      ) : null}
     </div>
   );
 }
+
 
 function StampTray({
   experience,
@@ -285,10 +363,30 @@ function PageFreeformPreview({
     return STAGE_LABELS[role];
   })();
 
+  const hiddenItems = (page.stage || []).filter((item) => item.hidden);
+
+  const deleteItem = useCallback(
+    (id: string) => {
+      if (!onPatchPage) return;
+      const item = getStageItem(page, id);
+      onPatchPage({
+        layoutMode: "freeform",
+        stage:
+          stageItemRole(item) === "stamp"
+            ? removeStageItem(page, id)
+            : upsertStageItem(page, { id, hidden: true }),
+      });
+      setSelectedId(null);
+    },
+    [onPatchPage, page],
+  );
+
   const renderItem = (id: string) => {
     const item = getStageItem(page, id);
+    if (item.hidden) return null;
     const role = stageItemRole(item);
     let body: ReactNode = null;
+
 
     if (role === "logo") {
       if (!brand.showLogoImage || !brand.logoSrc) {
@@ -459,14 +557,17 @@ function PageFreeformPreview({
         selected={selectedId === id}
         onSelect={() => selectStageItem(id)}
         onMove={(x, y) => patchItem(id, { x, y })}
+        onResize={onPatchPage ? (w, scale) => patchItem(id, { w, scale }) : undefined}
+        onDelete={onPatchPage ? () => deleteItem(id) : undefined}
       >
         {body}
       </DraggableStageItem>
     );
   };
 
+
   return (
-    <PhoneFrame label={label} hint="Drag logo & words separately · tap a word to style it">
+    <PhoneFrame label={label} hint="Drag to move · corner handle to resize · × to delete">
       <div
         className="relative h-[560px] w-full"
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
@@ -674,18 +775,25 @@ function PageFreeformPreview({
             >
               Send back
             </button>
-            {stageItemRole(selected) === "stamp" ? (
-              <button
-                type="button"
-                onClick={() => {
-                  onPatchPage({ stage: removeStageItem(page, selectedId) });
-                  setSelectedId(null);
-                }}
-                className="rounded-lg border border-white/15 px-2.5 py-1.5 text-[10px] text-red-300/80"
-              >
-                Remove stamp
-              </button>
-            ) : null}
+            <label className="flex items-center gap-1.5 rounded-lg border border-white/15 px-2.5 py-1.5 text-[10px] text-white/70">
+              Width {selected.w || 80}%
+              <input
+                type="range"
+                min={8}
+                max={100}
+                value={selected.w || 80}
+                onChange={(e) => patchItem(selectedId, { w: Number(e.target.value) })}
+                className="w-24"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => deleteItem(selectedId)}
+              className="rounded-lg border border-red-400/40 bg-red-500/10 px-2.5 py-1.5 text-[10px] font-semibold text-red-300"
+            >
+              {stageItemRole(selected) === "stamp" ? "Delete stamp" : "Delete from phone"}
+            </button>
+
             <button
               type="button"
               onClick={() => setSelectedId(null)}
@@ -720,7 +828,25 @@ function PageFreeformPreview({
           ) : null}
             </>
           ) : null}
+          {hiddenItems.length ? (
+            <div className="space-y-1 rounded-lg border border-white/10 bg-white/[0.03] p-2">
+              <p className="text-[9px] uppercase tracking-wide text-white/40">Deleted — tap to bring back</p>
+              <div className="flex flex-wrap gap-1.5">
+                {hiddenItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => patchItem(item.id, { hidden: false })}
+                    className="rounded-md border border-white/15 px-2 py-1 text-[10px] text-white/60 hover:text-white"
+                  >
+                    + {(STAGE_LABELS as Record<string, string>)[stageItemRole(item)] ?? item.id}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <button
+
             type="button"
             onClick={() =>
               onPatchPage({

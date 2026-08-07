@@ -22,7 +22,10 @@ const QUICK_PROMPTS = [
   "Clean minimal blackout look with white text only",
   "Remove every glow and shadow in the app",
   "Add buttons for my shop, tickets and highlights",
+  "Generate a cinematic background image that matches my colors and place it",
+  "Delete the tagline and title art, then rebalance the layout",
   "Redesign the whole app 10x better — colors, type, layout and buttons",
+
 ];
 
 /** Dominant colors from an uploaded reference image (client-side, no upload). */
@@ -147,7 +150,12 @@ export function ExperienceAiDesigner({
             : result.reply,
         },
       ]);
-      if (result.imagePrompt) setArtPrompt(result.imagePrompt);
+      if (result.imagePrompt) {
+        setArtPrompt(result.imagePrompt);
+        setArtTarget(result.imageTarget);
+        await makeArt(result.imagePrompt, result.imageTarget);
+      }
+
     } catch (err) {
       const message = err instanceof Error ? err.message : "The designer could not respond";
       setMessages((prev) => [...prev, { role: "assistant", content: message }]);
@@ -156,20 +164,28 @@ export function ExperienceAiDesigner({
     }
   }
 
-  async function makeArt() {
-    const p = artPrompt.trim();
+  async function makeArt(promptOverride?: string, targetOverride?: typeof artTarget) {
+    const p = (promptOverride ?? artPrompt).trim();
+    const target = targetOverride ?? artTarget;
     if (!p || makingArt) return;
     setMakingArt(true);
     try {
       const src = await generateExperienceArt(p);
-      onSetPageImage(artTarget, src);
+      onSetPageImage(target, src);
       onStatus("Artwork generated and placed — publish to push live");
+      if (promptOverride) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: `Generated artwork and placed it as the ${target.replace("Image", "")} image.`, image: src },
+        ]);
+      }
     } catch (err) {
       onError(err instanceof Error ? err.message : "Could not generate the artwork");
     } finally {
       setMakingArt(false);
     }
   }
+
 
   return (
     <div className="space-y-5">
