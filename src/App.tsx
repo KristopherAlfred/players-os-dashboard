@@ -1,3 +1,4 @@
+import { TemplateGalleryDebug } from "./pages/TemplateGalleryDebug";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
