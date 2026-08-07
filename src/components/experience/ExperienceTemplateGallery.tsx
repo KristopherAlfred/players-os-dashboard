@@ -66,7 +66,13 @@ export function ExperienceTemplateGallery({
               <div className="space-y-2 bg-black/45 px-3 py-2.5">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs font-bold uppercase tracking-[0.1em] text-white">{template.label}</p>
+                  {template.landing ? (
+                    <span className="rounded-full border border-white/20 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em] text-white/70">
+                      Full layout
+                    </span>
+                  ) : null}
                   <div className="flex gap-1">
+
                     {template.swatches.map((c) => (
                       <span
                         key={c}

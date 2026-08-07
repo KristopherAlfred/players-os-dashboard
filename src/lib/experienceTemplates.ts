@@ -1,9 +1,17 @@
-import type { ExperienceBrand, ExperienceConfig, ExperienceEffects, ExperienceTheme } from "./experienceConfig";
+import type {
+  ExperienceBrand,
+  ExperienceConfig,
+  ExperienceEffects,
+  ExperiencePageConfig,
+  ExperienceTheme,
+} from "./experienceConfig";
 
 /**
  * Wix-style starter templates for the fan app. Each template is a themed
  * "look" (colors, buttons, fonts, effects) that can be applied on top of the
  * athlete's existing content without touching their copy or boxes.
+ * Templates with a `landing` block are full layout templates — they also set
+ * the landing page composition (copy, feature strip, CTA, social proof, stage).
  */
 export type ExperienceTemplate = {
   id: string;
@@ -14,9 +22,111 @@ export type ExperienceTemplate = {
   theme: Partial<ExperienceTheme>;
   effects: Partial<ExperienceEffects>;
   brand: Partial<ExperienceBrand>;
+  /** Full-layout templates: landing page composition applied verbatim. */
+  landing?: Partial<ExperiencePageConfig>;
 };
 
 export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
+  {
+    id: "join-the-circle",
+    label: "Join The Circle",
+    vibe: "Full cinematic layout — feature grid, gradient CTA, social proof",
+    swatches: ["#04070a", "#0a1b1f", "#25D8E8", "#8FF08A"],
+    theme: {
+      bg: "#04070a",
+      bgGradientFrom: "#04070a",
+      bgGradientVia: "#071417",
+      bgGradientTo: "#020405",
+      bgGradientAngle: 165,
+      useGradientBg: true,
+      accent: "#2FE0D6",
+      accentHover: "#8FF08A",
+      buttonBg: "#2FE0D6",
+      buttonText: "#04140f",
+      buttonBorder: "transparent",
+      buttonRadius: 999,
+      text: "#FFFFFF",
+      muted: "rgba(255,255,255,0.62)",
+    },
+    effects: {
+      glow: true,
+      glowColor: "#2FE0D6",
+      glowIntensity: 32,
+      particles: false,
+      shimmer: false,
+      vignette: true,
+      noise: true,
+      noiseOpacity: 8,
+      glassmorphism: true,
+    },
+    brand: {
+      logoColor: "#2FE0D6",
+      logoTint: true,
+      wordmarkColor: "#FFFFFF",
+      taglineColor: "rgba(255,255,255,0.7)",
+      tagline: "One Circle. One Glow.",
+    },
+    landing: {
+      backgroundColor: "#04070a",
+      backgroundGradientFrom: "rgba(4,7,10,0.10)",
+      backgroundGradientTo: "#04070a",
+      useGradientBg: true,
+      accentColor: "#2FE0D6",
+      effectPreset: "glass",
+      layoutMode: "freeform",
+      subhead: "THE OFFICIAL\nSLOANE GLO\nCOMMUNITY",
+      headline: "Join Sloane Glo",
+      headlineGradientFrom: "#FFFFFF",
+      headlineGradientTo: "#5CE9A6",
+      body: "Exclusive drops, early access, giveaways, content, and real connection with Sloane and fans.",
+      ctaLabel: "JOIN THE CIRCLE",
+      ctaText: "#04140f",
+      ctaGradientFrom: "#25D8E8",
+      ctaGradientTo: "#A6F276",
+      ctaGradientAngle: 90,
+      ctaRadius: 999,
+      ctaShowArrow: true,
+      showMenuButton: true,
+      menuButtonColor: "rgba(47,224,214,0.9)",
+      featureBg: "rgba(255,255,255,0.045)",
+      featureBorderColor: "rgba(47,224,214,0.24)",
+      featureIconColor: "#2FE0D6",
+      featureTextColor: "#FFFFFF",
+      featureRadius: 18,
+      features: [
+        { id: "f1", icon: "star", label: "EXCLUSIVE DROPS" },
+        { id: "f2", icon: "clock", label: "EARLY ACCESS" },
+        { id: "f3", icon: "gift", label: "SPECIAL GIVEAWAYS" },
+        { id: "f4", icon: "users", label: "REAL CONNECTION" },
+      ],
+      memberProof: {
+        count: "25K+",
+        label: "Members",
+        extraLabel: "+12",
+        avatars: [],
+        thumbs: [],
+        bg: "rgba(255,255,255,0.045)",
+        borderColor: "rgba(255,255,255,0.12)",
+        countColor: "#2FE0D6",
+        labelColor: "rgba(255,255,255,0.62)",
+        radius: 20,
+      },
+      stage: [
+        { id: "logo", x: 4, y: 3.5, w: 15, z: 22, glow: true, glowColor: "#2FE0D6", glowIntensity: 45 },
+        { id: "wordmark", x: 21, y: 5, w: 52, z: 21, glow: false, glowColor: "#FFFFFF", glowIntensity: 0 },
+        { id: "tagline", x: 21, y: 9.5, w: 52, z: 20, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
+        { id: "hero", x: 6, y: 14, w: 90, z: 5, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
+        { id: "titleArt", x: 10, y: 46, w: 70, z: 12, hidden: true, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
+        { id: "subhead", x: 8, y: 47, w: 84, z: 14, glow: false, glowColor: "#2FE0D6", glowIntensity: 20 },
+        { id: "headline", x: 6, y: 54, w: 88, z: 15, scale: 120, glow: false, glowColor: "#FFFFFF", glowIntensity: 0 },
+        { id: "body", x: 10, y: 62, w: 80, z: 13, glow: false, glowColor: "#FFFFFF", glowIntensity: 0 },
+        { id: "featureRow", x: 5, y: 69, w: 90, z: 16, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
+        { id: "cta", x: 7, y: 80, w: 86, z: 18, glow: true, glowColor: "#5CE9A6", glowIntensity: 40 },
+        { id: "memberProof", x: 5, y: 88, w: 90, z: 17, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
+      ],
+    },
+  },
+
   {
     id: "mint-night",
     label: "Mint Night",
@@ -186,10 +296,19 @@ export function applyExperienceTemplate(
   const ctaBg = template.theme.buttonBg;
   const ctaText = template.theme.buttonText;
   const pages = Object.fromEntries(
-    Object.entries(config.pages).map(([key, page]) => [
-      key,
-      ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page,
-    ]),
+    Object.entries(config.pages).map(([key, page]) => {
+      let next = ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page;
+      if (key === "landing" && template.landing) {
+        next = {
+          ...next,
+          ...template.landing,
+          features: (template.landing.features ?? next.features).map((f) => ({ ...f })),
+          memberProof: { ...next.memberProof, ...(template.landing.memberProof ?? {}) },
+          stage: (template.landing.stage ?? next.stage).map((s) => ({ ...s })),
+        };
+      }
+      return [key, next];
+    }),
   ) as ExperienceConfig["pages"];
 
   return {
@@ -199,6 +318,7 @@ export function applyExperienceTemplate(
     effects: { ...config.effects, ...template.effects },
     pages,
   };
+
 }
 
 /** Best-guess of which template the current theme came from (accent match). */
