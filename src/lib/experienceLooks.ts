@@ -57,7 +57,78 @@ function look(
   };
 }
 
+/** Replica of the cinematic "Join the Circle" mockup: gradient CTA, feature grid, member proof. */
+const circleLook: ExperienceLook = {
+  id: "glow-circle",
+  label: "Glow Circle",
+  hint: "Cinematic join-the-circle layout",
+  swatch: ["#7CF3D6", "#C6F24E", "#04070a"],
+  patch: {
+    theme: {
+      bg: "#04070a",
+      bgGradientFrom: "#04070a",
+      bgGradientVia: "#071318",
+      bgGradientTo: "#020406",
+      useGradientBg: true,
+      accent: "#7CF3D6",
+      accentHover: "#A9F8E6",
+      text: "#FFFFFF",
+      buttonBg: "#7CF3D6",
+      buttonText: "#04140f",
+      buttonRadius: 999,
+    },
+    effects: { glow: true, glowIntensity: 35, glowColor: "#7CF3D6", vignette: true, noise: true, noiseOpacity: 10 },
+    brand: { logoColor: "#7CF3D6", taglineColor: "rgba(255,255,255,0.6)" },
+    page: {
+      backgroundColor: "#04070a",
+      backgroundGradientFrom: "rgba(4,7,10,0.15)",
+      backgroundGradientTo: "#04070a",
+      useGradientBg: true,
+      accentColor: "#7CF3D6",
+      effectPreset: "glass",
+      headline: "Join Sloane Glo",
+      headlineGradientFrom: "#FFFFFF",
+      headlineGradientTo: "#7CF3D6",
+      body: "Exclusive drops, early access and behind-the-scenes moments — straight from the tour.",
+      ctaLabel: "JOIN THE CIRCLE",
+      ctaGradientFrom: "#7CF3D6",
+      ctaGradientTo: "#C6F24E",
+      ctaGradientAngle: 90,
+      ctaRadius: 999,
+      ctaShowArrow: true,
+      ctaText: "#04140f",
+      showMenuButton: true,
+      menuButtonColor: "#7CF3D6",
+      featureBg: "rgba(255,255,255,0.05)",
+      featureBorderColor: "rgba(124,243,214,0.28)",
+      featureIconColor: "#7CF3D6",
+      featureTextColor: "#FFFFFF",
+      featureRadius: 18,
+      features: [
+        { id: "f1", icon: "star", label: "Exclusive Drops" },
+        { id: "f2", icon: "clock", label: "Early Access" },
+        { id: "f3", icon: "gift", label: "Member Perks" },
+        { id: "f4", icon: "users", label: "The Inner Circle" },
+      ],
+      memberProof: {
+        count: "12,480+",
+        label: "Members",
+        extraLabel: "+9k",
+        avatars: [],
+        thumbs: [],
+        bg: "rgba(255,255,255,0.05)",
+        borderColor: "rgba(255,255,255,0.14)",
+        countColor: "#7CF3D6",
+        labelColor: "rgba(255,255,255,0.6)",
+        radius: 18,
+      },
+    } as Record<string, unknown>,
+  },
+};
+
 export const EXPERIENCE_LOOKS: ExperienceLook[] = [
+  circleLook,
+
   look("neon-court", "Neon Court", "Electric arena glow", "#39FF88", "#7CFFB2", "#020604", "#0b2b1c", "#04170f", "#FFFFFF", "#04140c", {
     effects: { glow: true, glowIntensity: 70, shimmer: true, animatedGradient: true, vignette: true },
     page: { effectPreset: "neon" },
