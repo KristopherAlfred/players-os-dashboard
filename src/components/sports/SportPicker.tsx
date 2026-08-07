@@ -38,6 +38,8 @@ type Props = {
   division: string;
   onChange: (selection: SportSelection) => void;
   onDivisionChange: (division: string) => void;
+  /** Leagues now live on their own onboarding page; hide the bubble sheet there. */
+  showLeagues?: boolean;
 };
 
 export function LeagueMark({
@@ -76,6 +78,7 @@ export function SportPicker({
   division,
   onChange,
   onDivisionChange,
+  showLeagues = true,
 }: Props) {
   const selectedSport = findSport(sportLabel);
   const selectedLeague = findLeague(selectedSport, leagueLabel);
@@ -190,7 +193,7 @@ export function SportPicker({
 
 
       {/* Bubble sheet that pops down under the sports grid */}
-      {openSportId && selectedSport?.id === openSportId && (
+      {showLeagues && openSportId && selectedSport?.id === openSportId && (
         <div
           key={openSportId}
           className="animate-bubble-pop origin-top rounded-2xl border border-white/12 bg-black/60 p-3 shadow-2xl shadow-black/60"

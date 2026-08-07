@@ -25,6 +25,9 @@ const ATHLETE_FIELDS = [
   "sport_icon",
   "gender",
   "team_or_league",
+  "competition_level",
+  "league",
+  "position",
   "bio_short",
   "profile_photo_url",
 ] as const;

@@ -176,13 +176,16 @@ export type Database = {
       athletes: {
         Row: {
           bio_short: string | null
+          competition_level: string | null
           created_at: string
           display_name: string | null
           full_name: string
           full_name_normalized: string | null
           gender: string | null
           id: string
+          league: string | null
           onboarding_completed: boolean
+          position: string | null
           profile_key: string | null
           profile_photo_url: string | null
           sport: string | null
@@ -193,13 +196,16 @@ export type Database = {
         }
         Insert: {
           bio_short?: string | null
+          competition_level?: string | null
           created_at?: string
           display_name?: string | null
           full_name: string
           full_name_normalized?: string | null
           gender?: string | null
           id?: string
+          league?: string | null
           onboarding_completed?: boolean
+          position?: string | null
           profile_key?: string | null
           profile_photo_url?: string | null
           sport?: string | null
@@ -210,13 +216,16 @@ export type Database = {
         }
         Update: {
           bio_short?: string | null
+          competition_level?: string | null
           created_at?: string
           display_name?: string | null
           full_name?: string
           full_name_normalized?: string | null
           gender?: string | null
           id?: string
+          league?: string | null
           onboarding_completed?: boolean
+          position?: string | null
           profile_key?: string | null
           profile_photo_url?: string | null
           sport?: string | null

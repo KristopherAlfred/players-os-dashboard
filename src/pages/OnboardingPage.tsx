@@ -6,11 +6,15 @@ import {
   Check,
   Link2,
   Loader2,
+  Layers,
+  MapPin,
   Palette,
+  ShieldCheck,
   Sparkles,
   Trophy,
   Upload,
   UserRound,
+  Users,
 } from "lucide-react";
 import {
   claimBioSlug,
@@ -23,12 +27,23 @@ import {
 } from "../lib/athletes";
 import { loadDashboardSession } from "../lib/dashboardAuth";
 import { SportPicker, type SportSelection } from "../components/sports/SportPicker";
+import {
+  LeaguePicker,
+  LevelPicker,
+  RolePicker,
+  TeamPicker,
+} from "../components/sports/OnboardingPickers";
+import { DashboardPreview } from "../components/onboarding/DashboardPreview";
+import { findLeague, findSport, type League } from "../lib/sportsCatalog";
+import { findLevel } from "../lib/sportsTeams";
 import { useAthlete } from "../contexts/AthleteContext";
 import { setDashboardAvatar } from "../lib/adminProfile";
 
 /**
- * Multi-step athlete onboarding. Step 1 name-matches against existing athletes
- * so a migrated athlete (Sloane is #1) is recognised and skips straight in.
+ * Multi-step athlete onboarding, one decision per page: name → sport → brand →
+ * level → league → team → role → dashboard preview → bio link. Step 1
+ * name-matches against existing athletes so a migrated athlete (Sloane is #1)
+ * is recognised and skips straight in.
  */
 
 const ACCENTS = [
@@ -40,7 +55,20 @@ const ACCENTS = [
   { label: "Coral", accent: "#FF7A59", text: "#2B0C03" },
 ];
 
-type Step = 0 | 1 | 2 | 3;
+const STEP_LABELS = [
+  "You",
+  "Sport",
+  "Brand",
+  "Level",
+  "League",
+  "Team",
+  "Role",
+  "Preview",
+  "Link",
+];
+
+/** Steps that need the wide card. */
+const WIDE_STEPS = new Set([1, 3, 4, 5, 7]);
 
 const cardClass =
   "w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/80 via-[#120202]/90 to-black/90 shadow-2xl shadow-black/80 backdrop-blur-md";
@@ -55,17 +83,21 @@ export function OnboardingPage() {
   const { athlete, refresh } = useAthlete();
   const session = loadDashboardSession();
 
-  const [step, setStep] = useState<Step>(0);
+  const [step, setStep] = useState(0);
   const [fullName, setFullName] = useState(session?.name?.trim() ?? "");
   const [displayName, setDisplayName] = useState("");
   const [sport, setSport] = useState("");
   const [gender, setGender] = useState("");
-  const [team, setTeam] = useState("");
   const [bio, setBio] = useState("");
   const [fanAppName, setFanAppName] = useState("");
   const [accentIndex, setAccentIndex] = useState(0);
   const [sportId, setSportId] = useState("");
+  const [levelId, setLevelId] = useState("");
+  const [leagueId, setLeagueId] = useState("");
+  const [leagueLabel, setLeagueLabel] = useState("");
   const [leagueAccent, setLeagueAccent] = useState<{ accent: string; text: string } | null>(null);
+  const [teamLabel, setTeamLabel] = useState("");
+  const [role, setRole] = useState("");
   const [headshot, setHeadshot] = useState("");
   const [slug, setSlug] = useState("");
   const [slugState, setSlugState] = useState<"idle" | "checking" | "free" | "taken">("idle");
@@ -81,6 +113,15 @@ export function OnboardingPage() {
   }, [athlete, navigate]);
 
   const firstName = useMemo(() => fullName.trim().split(/\s+/)[0] ?? "", [fullName]);
+  const selectedSport = useMemo(() => findSport(sportId || sport), [sportId, sport]);
+  const selectedLeague = useMemo(
+    () => findLeague(selectedSport, leagueId || leagueLabel),
+    [selectedSport, leagueId, leagueLabel],
+  );
+
+  const activeAccent = leagueAccent ?? ACCENTS[accentIndex];
+  const resolvedFanAppName = fanAppName.trim() || `${firstName || "Your"} Fan App`;
+  const resolvedDisplayName = displayName.trim() || fullName.trim();
 
   useEffect(() => {
     if (!slug && firstName) setSlug(slugify(fullName));
@@ -139,31 +180,45 @@ export function OnboardingPage() {
     }
   }
 
+  function handleLeagueChange(item: League | null, customLabel?: string) {
+    if (item) {
+      setLeagueId(item.id);
+      setLeagueLabel(item.label);
+      setLeagueAccent({ accent: item.accent, text: item.accentText });
+      return;
+    }
+    if (customLabel) {
+      setLeagueId("");
+      setLeagueLabel(customLabel);
+      setLeagueAccent(null);
+    }
+  }
+
   async function finish() {
     setSaving(true);
     setError(null);
     try {
       const athleteId = await upsertAthlete({
         full_name: fullName.trim(),
-        display_name: displayName.trim() || fullName.trim(),
+        display_name: resolvedDisplayName,
         sport: sport || null,
         sport_icon: sportId || null,
         gender: gender || null,
-        team_or_league: team.trim() || null,
+        competition_level: findLevel(levelId)?.label ?? null,
+        league: leagueLabel.trim() || null,
+        position: role || null,
+        team_or_league: teamLabel.trim() || leagueLabel.trim() || null,
         bio_short: bio.trim() || null,
         profile_photo_url: /^https?:\/\//i.test(headshot) ? headshot : null,
         onboarding_completed: true,
       });
 
-      const accent = leagueAccent
-        ? { accent: leagueAccent.accent, text: leagueAccent.text }
-        : ACCENTS[accentIndex];
       await saveAthleteTheme(athleteId, {
-        accent_color: accent.accent,
-        accent_hover: accent.accent,
-        button_bg: accent.accent,
-        button_text: accent.text,
-        fan_app_name: fanAppName.trim() || `${firstName} Fan App`,
+        accent_color: activeAccent.accent,
+        accent_hover: activeAccent.accent,
+        button_bg: activeAccent.accent,
+        button_text: activeAccent.text,
+        fan_app_name: resolvedFanAppName,
       });
 
       if (headshot) setDashboardAvatar(headshot);
@@ -182,8 +237,6 @@ export function OnboardingPage() {
     }
   }
 
-  const steps = ["You", "Sport", "Brand", "Link"];
-
   return (
     <div className="marketing-theme relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-black px-4 py-10">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#150202] to-[#0a0101]" />
@@ -200,12 +253,12 @@ export function OnboardingPage() {
         </p>
       </div>
 
-      <div className={`relative z-10 ${cardClass} ${step === 1 ? "max-w-6xl" : "max-w-xl"}`}>
-        <div className="flex items-center gap-2 border-b border-white/10 px-6 py-3">
-          {steps.map((label, index) => (
-            <div key={label} className="flex flex-1 items-center gap-2">
+      <div className={`relative z-10 ${cardClass} ${WIDE_STEPS.has(step) ? "max-w-6xl" : "max-w-xl"}`}>
+        <div className="flex items-center gap-1.5 border-b border-white/10 px-6 py-3">
+          {STEP_LABELS.map((label, index) => (
+            <div key={label} className="flex flex-1 items-center gap-1.5">
               <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold ${
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${
                   index < step
                     ? "bg-dt-red text-white"
                     : index === step
@@ -216,7 +269,7 @@ export function OnboardingPage() {
                 {index < step ? <Check size={12} /> : index + 1}
               </span>
               <span
-                className={`hidden text-[11px] sm:block ${
+                className={`hidden text-[11px] lg:block ${
                   index === step ? "text-white" : "text-white/40"
                 }`}
               >
@@ -298,7 +351,7 @@ export function OnboardingPage() {
             </>
           )}
 
-          {/* ---- Step 2: visual sport / league picker ---- */}
+          {/* ---- Step 2: visual sport picker ---- */}
           {step === 1 && (
             <>
               <Heading
@@ -308,14 +361,20 @@ export function OnboardingPage() {
               />
               <SportPicker
                 sportLabel={sport}
-                leagueLabel={team}
+                leagueLabel={leagueLabel}
                 division={gender}
+                showLeagues={false}
                 onDivisionChange={setGender}
                 onChange={(selection: SportSelection) => {
                   setSportId(selection.sportId);
                   setSport(selection.sportLabel);
-                  setTeam(selection.leagueLabel);
-                  setLeagueAccent({ accent: selection.accent, text: selection.accentText });
+                  if (selection.sportId !== sportId) {
+                    setLeagueId("");
+                    setLeagueLabel("");
+                    setTeamLabel("");
+                    setRole("");
+                    setLeagueAccent(null);
+                  }
                 }}
               />
               <div>
@@ -438,7 +497,7 @@ export function OnboardingPage() {
                         setLeagueAccent(null);
                       }}
                       className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-2 transition ${
-                        accentIndex === index
+                        accentIndex === index && !leagueAccent
                           ? "border-white/70 bg-white/10"
                           : "border-white/10 hover:border-white/30"
                       }`}
@@ -456,8 +515,119 @@ export function OnboardingPage() {
             </>
           )}
 
-          {/* ---- Step 4: bio link ---- */}
+          {/* ---- Step 4: competition level ---- */}
           {step === 3 && (
+            <>
+              <Heading
+                icon={Layers}
+                title="Find your team"
+                subtitle="What level do you compete at? Choose the league and team that represent you."
+              />
+              <LevelPicker
+                value={levelId}
+                onChange={(id) => {
+                  setLevelId(id);
+                  setStep(4);
+                }}
+              />
+              <StepNav onBack={() => setStep(2)} onNext={() => setStep(4)} />
+            </>
+          )}
+
+          {/* ---- Step 5: league ---- */}
+          {step === 4 && (
+            <>
+              <Heading
+                icon={ShieldCheck}
+                title="Select your league"
+                subtitle={`${findLevel(levelId)?.label ?? "Your level"} · ${
+                  selectedSport?.label ?? "your sport"
+                } leagues and organizations.`}
+              />
+              <LeaguePicker
+                sport={selectedSport}
+                levelId={levelId}
+                value={leagueLabel}
+                onChange={handleLeagueChange}
+              />
+              <StepNav onBack={() => setStep(3)} onNext={() => setStep(5)} />
+            </>
+          )}
+
+          {/* ---- Step 6: team ---- */}
+          {step === 5 && (
+            <>
+              <Heading
+                icon={Users}
+                title="Select your team"
+                subtitle={
+                  leagueLabel
+                    ? `Search ${leagueLabel} teams, schools or clubs.`
+                    : "Search teams, schools or clubs."
+                }
+              />
+              <TeamPicker
+                sport={selectedSport}
+                leagueId={leagueId}
+                leagueLabel={leagueLabel}
+                value={teamLabel}
+                onChange={setTeamLabel}
+              />
+              <StepNav onBack={() => setStep(4)} onNext={() => setStep(6)} />
+            </>
+          )}
+
+          {/* ---- Step 7: role ---- */}
+          {step === 6 && (
+            <>
+              <Heading
+                icon={MapPin}
+                title="What's your role?"
+                subtitle="Your position helps us customize your dashboard with the most relevant metrics and insights."
+              />
+              <RolePicker sportId={sportId} value={role} onChange={setRole} />
+              <StepNav onBack={() => setStep(5)} onNext={() => setStep(7)} />
+            </>
+          )}
+
+          {/* ---- Step 8: dashboard preview ---- */}
+          {step === 7 && (
+            <>
+              <Heading
+                icon={Sparkles}
+                title="Does this look right?"
+                subtitle="Here's your dashboard, built from everything you just picked."
+              />
+              <DashboardPreview
+                accent={activeAccent.accent}
+                accentText={activeAccent.text}
+                displayName={resolvedDisplayName}
+                fanAppName={resolvedFanAppName}
+                headshot={headshot}
+                sport={selectedSport}
+                league={selectedLeague}
+                leagueLabel={leagueLabel}
+                teamLabel={teamLabel}
+                role={role}
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStep(3)}
+                  className="flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2.5 text-sm text-white/70 transition hover:text-white"
+                >
+                  <ArrowLeft size={14} />
+                  Change something
+                </button>
+                <div className="flex-1">
+                  <PrimaryButton onClick={() => setStep(8)}>Yes, looks right</PrimaryButton>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* ---- Step 9: bio link ---- */}
+          {step === 8 && (
             <>
               <Heading
                 icon={Link2}
@@ -495,7 +665,7 @@ export function OnboardingPage() {
               <button
                 type="button"
                 className="w-full text-xs text-white/50 transition hover:text-white"
-                onClick={() => setStep(2)}
+                onClick={() => setStep(7)}
               >
                 Back
               </button>
