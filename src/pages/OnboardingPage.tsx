@@ -194,7 +194,7 @@ export function OnboardingPage() {
         </p>
       </div>
 
-      <div className={`relative z-10 ${cardClass}`}>
+      <div className={`relative z-10 ${cardClass} ${step === 1 ? "max-w-6xl" : "max-w-xl"}`}>
         <div className="flex items-center gap-2 border-b border-white/10 px-6 py-3">
           {steps.map((label, index) => (
             <div key={label} className="flex flex-1 items-center gap-2">
