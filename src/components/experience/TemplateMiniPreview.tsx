@@ -79,6 +79,27 @@ export function TemplateMiniPreview({ template }: { template: ExperienceTemplate
         color: text,
       }}
     >
+      {/* hero photo — fills the top of the card, fades into the page bg */}
+      <div className="absolute inset-x-0 top-0 h-[62%] overflow-hidden">
+        {photo ? (
+          <img
+            src={photo}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover"
+            style={{ objectPosition: "center top" }}
+          />
+        ) : null}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(to bottom, ${
+              l.backgroundColor ?? theme.bg
+            }BF 0%, transparent 22%, transparent 58%, ${l.backgroundColor ?? theme.bg} 99%)`,
+          }}
+        />
+      </div>
+
       {/* header */}
       <div className="relative z-20 flex items-start gap-1.5 px-2.5 pt-2.5">
         <span
@@ -106,28 +127,8 @@ export function TemplateMiniPreview({ template }: { template: ExperienceTemplate
         </span>
       </div>
 
-      {/* hero */}
-      <div className="relative mt-1.5 h-[38%] w-full overflow-hidden">
-        {photo ? (
-          <img
-            src={photo}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover"
-            style={{ objectPosition: "center" }}
-          />
-        ) : null}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to bottom, transparent 35%, ${
-              l.backgroundColor ?? theme.bg
-            } 96%)`,
-          }}
-        />
-      </div>
-
       {/* copy */}
+
       <div className="relative z-10 -mt-2 flex flex-1 flex-col justify-end gap-1.5 px-2.5 pb-2.5">
         <p
           className="whitespace-pre-line text-[10px] font-extrabold uppercase leading-[1.05] tracking-tight"
