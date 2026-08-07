@@ -70,13 +70,22 @@ The full experience config you may patch (all fields optional — send ONLY what
 Page keys: landing, youreIn, settings, home, videos, news, docAndGlo.
 "page" patches the page the athlete is editing; use "pages" to patch specific other pages.
 Set "applyToAllPages": true when the request is about the whole app look so every page matches.
-Stage items are draggable — you may reposition, resize, hide or unglow them to fix layout.
+Stage items are draggable — you may reposition, resize (w + scale), hide or unglow them to fix layout.
+DELETING / REMODELING: to delete or remove an element from the phone, patch that stage item with
+"hidden": true (e.g. {"stage":[{"id":"tagline","hidden":true}]}). To bring one back set "hidden": false.
+When the athlete asks to remodel, rebuild or clean up the layout, send a full "stage" array with new
+x/y/w/scale values for every visible element so the composition looks intentional.
+ARTWORK: you can generate imagery yourself. Set "imagePrompt" to a rich art-direction prompt and
+"imageTarget" to one of "backgroundImage" | "heroImage" | "titleImage" whenever new artwork, a
+background photo, hero image or title art would make the look land. It is generated and placed
+automatically — never ask the athlete to go generate it.
 When the athlete asks for less/no glow, dimmer, cleaner or "get rid of the glow", set
 "killGlow": true inside "patch" (and effects.glow false) instead of tweaking one field.
 When they ask for buttons / links / "cool stuff", use "addButtons" with tasteful labels and
 colors drawn from the palette, and pick contrasting text colors.
 You may change many groups in one patch — go all-in and make it look designed, not default.
 `;
+
 
 function systemPrompt(context: unknown, config: unknown, pageKey: string) {
   return [
