@@ -15,7 +15,7 @@ export type LandingSocialStat = {
 };
 
 export const HOT_PINK = "#FF2D95";
-export const MINT = "#8FE3B8";
+export const MINT = "var(--theme-accent)";
 
 export const DEFAULT_LANDING_SOCIALS: LandingSocialStat[] = [
   {

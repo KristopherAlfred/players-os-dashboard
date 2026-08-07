@@ -216,7 +216,7 @@ function Esports(props: BallProps) {
 function Generic(props: BallProps) {
   return (
     <svg {...frame(props)} aria-hidden>
-      <circle cx="24" cy="24" r="18" fill="#7CE7B0" />
+      <circle cx="24" cy="24" r="18" fill="var(--theme-accent)" />
       <g {...stroke}>
         <path d="M24 6v36M6 24h36" />
       </g>

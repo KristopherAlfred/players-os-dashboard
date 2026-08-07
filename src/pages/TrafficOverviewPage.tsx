@@ -40,7 +40,7 @@ import { fanDisplayName, fetchFansList, formatFanJoined, type FanContact } from 
 import { DtSelect } from "../components/DtSelect";
 
 const POLL_MS = 30_000;
-const CHART_COLORS = ["#8FE3B8", "#ffffff", "#7DCEA0", "#94a3b8", "#A3E4C5", "#64748b"];
+const CHART_COLORS = ["var(--theme-accent)", "#ffffff", "var(--theme-traffic-2)", "#94a3b8", "var(--theme-traffic-1)", "#64748b"];
 
 const TIME_RANGE_OPTIONS = [
   { value: "1", label: "Last 24 hours" },
@@ -610,8 +610,8 @@ export function TrafficOverviewPage() {
               <AreaChart data={derived.timeline}>
                 <defs>
                   <linearGradient id="trafficEvents" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8FE3B8" stopOpacity={0.45} />
-                    <stop offset="100%" stopColor="#8FE3B8" stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--theme-accent)" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="var(--theme-accent)" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="trafficViews" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#ffffff" stopOpacity={0.28} />
@@ -627,7 +627,7 @@ export function TrafficOverviewPage() {
                   type="monotone"
                   dataKey="events"
                   name="Events"
-                  stroke="#8FE3B8"
+                  stroke="var(--theme-accent)"
                   fill="url(#trafficEvents)"
                   strokeWidth={2.5}
                 />
@@ -643,7 +643,7 @@ export function TrafficOverviewPage() {
                   type="monotone"
                   dataKey="clicks"
                   name="Clicks"
-                  stroke="#7DCEA0"
+                  stroke="var(--theme-traffic-2)"
                   fill="transparent"
                   strokeWidth={2}
                 />
@@ -727,7 +727,7 @@ export function TrafficOverviewPage() {
                   tickLine={false}
                 />
                 <Tooltip contentStyle={tooltipStyle()} />
-                <Bar dataKey="count" name="Count" fill="#8FE3B8" radius={[0, 8, 8, 0]} />
+                <Bar dataKey="count" name="Count" fill="var(--theme-accent)" radius={[0, 8, 8, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -19,10 +19,10 @@ export const trafficOverTime = [
 ];
 
 export const trafficSources = [
-  { name: "Facebook", value: 46.8, color: "#8FE3B8" },
-  { name: "Instagram", value: 36.9, color: "#A8F0CC" },
-  { name: "X (Twitter)", value: 15.4, color: "#7DCEA0" },
-  { name: "TikTok", value: 0.8, color: "#5CBF8F" },
+  { name: "Facebook", value: 46.8, color: "var(--theme-accent)" },
+  { name: "Instagram", value: 36.9, color: "var(--theme-accent-hover)" },
+  { name: "X (Twitter)", value: 15.4, color: "var(--theme-traffic-2)" },
+  { name: "TikTok", value: 0.8, color: "var(--theme-chart-secondary)" },
 ];
 
 export const audienceSnapshot = [
