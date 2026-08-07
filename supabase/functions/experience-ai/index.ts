@@ -214,14 +214,22 @@ Deno.serve(async (req) => {
       patch?: Record<string, unknown>;
       applyToAllPages?: boolean;
       imagePrompt?: string | null;
+      imageTarget?: string | null;
     };
+
+    const target =
+      parsed.imageTarget === "heroImage" || parsed.imageTarget === "titleImage"
+        ? parsed.imageTarget
+        : "backgroundImage";
 
     return json({
       reply: parsed.reply || "Updated your look.",
       patch: parsed.patch ?? {},
       applyToAllPages: Boolean(parsed.applyToAllPages),
       imagePrompt: parsed.imagePrompt || null,
+      imageTarget: target,
     });
+
   } catch (err) {
     const message = err instanceof Error ? err.message : "AI request failed";
     const status = /429|rate/i.test(message) ? 429 : /402|credit/i.test(message) ? 402 : 500;
