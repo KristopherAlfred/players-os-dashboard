@@ -59,6 +59,21 @@ async function extractPalette(dataUrl: string, count = 5): Promise<string[]> {
     });
 }
 
+/** Downscale + compress an uploaded image so it can be stored in the layout config. */
+async function compressDataUrl(dataUrl: string, maxEdge = 1400, quality = 0.82): Promise<string> {
+  const img = new Image();
+  img.src = dataUrl;
+  await img.decode();
+  const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(img.width * scale));
+  canvas.height = Math.max(1, Math.round(img.height * scale));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return dataUrl;
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/webp", quality);
+}
+
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
