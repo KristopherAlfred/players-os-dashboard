@@ -74,7 +74,10 @@ export type ExperienceBuiltinStageId =
   | "headline"
   | "body"
   | "cta"
+  | "featureRow"
+  | "memberProof"
   | "titleArt";
+
 
 /** Built-in stage ids, or stamp instance ids like `stamp_…`. */
 export type ExperienceStageItemId = ExperienceBuiltinStageId | (string & {});
@@ -136,6 +139,28 @@ export type ExperienceButton = {
   icon?: string;
 };
 
+/** Icon + label chip inside the feature strip (Exclusive drops / Early access / …). */
+export type ExperienceFeature = {
+  id: string;
+  icon: string;
+  label: string;
+};
+
+/** Social-proof row: member avatars, a count and content thumbnails. */
+export type ExperienceMemberProof = {
+  count: string;
+  label: string;
+  avatars: string[];
+  thumbs: string[];
+  extraLabel: string;
+  bg: string;
+  borderColor: string;
+  countColor: string;
+  labelColor: string;
+  radius: number;
+};
+
+
 export type ExperiencePageConfig = {
   backgroundColor: string;
   backgroundGradientFrom: string;
@@ -184,7 +209,30 @@ export type ExperiencePageConfig = {
   bodyRuns: ExperienceTextRun[];
   /** Extra buttons rendered under the primary CTA */
   extraButtons: ExperienceButton[];
+  /** Any-color gradient for the primary CTA (both ends required to activate) */
+  ctaGradientFrom: string;
+  ctaGradientTo: string;
+  ctaGradientAngle: number;
+  ctaRadius: number;
+  /** Circular arrow badge on the right of the CTA */
+  ctaShowArrow: boolean;
+  /** Gradient-filled headline text (both ends required to activate) */
+  headlineGradientFrom: string;
+  headlineGradientTo: string;
+  /** Hamburger button in the top-right corner */
+  showMenuButton: boolean;
+  menuButtonColor: string;
+  /** Feature strip */
+  features: ExperienceFeature[];
+  featureBg: string;
+  featureBorderColor: string;
+  featureIconColor: string;
+  featureTextColor: string;
+  featureRadius: number;
+  /** Member social-proof row */
+  memberProof: ExperienceMemberProof;
 };
+
 
 export type ExperiencePages = {
   landing: ExperiencePageConfig;
@@ -275,8 +323,11 @@ export const STAGE_ITEM_IDS: ExperienceBuiltinStageId[] = [
   "subhead",
   "headline",
   "body",
+  "featureRow",
   "cta",
+  "memberProof",
 ];
+
 
 export const DEFAULT_CONTENT_STAGE: ExperienceStageItem[] = [
   { id: "titleArt", x: 55, y: 8, w: 42, z: 8, scale: 100, glow: true, glowColor: "#8FE3B8", glowIntensity: 40 },
@@ -329,9 +380,12 @@ export const DEFAULT_LANDING_STAGE: ExperienceStageItem[] = [
   { id: "titleArt", x: 10, y: 48, w: 70, z: 12, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
   { id: "subhead", x: 8, y: 52, w: 84, z: 14, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
   { id: "headline", x: 8, y: 60, w: 84, z: 15, glow: true, glowColor: "#FFFFFF", glowIntensity: 25 },
-  { id: "body", x: 8, y: 70, w: 84, z: 13, glow: false, glowColor: "#8FE3B8", glowIntensity: 30 },
+  { id: "body", x: 8, y: 68, w: 84, z: 13, glow: false, glowColor: "#8FE3B8", glowIntensity: 30 },
+  { id: "featureRow", x: 6, y: 76, w: 88, z: 16, glow: false, glowColor: "#8FE3B8", glowIntensity: 25 },
   { id: "cta", x: 8, y: 84, w: 84, z: 18, glow: true, glowColor: "#8FE3B8", glowIntensity: 45 },
+  { id: "memberProof", x: 6, y: 91, w: 88, z: 17, glow: false, glowColor: "#8FE3B8", glowIntensity: 20 },
 ];
+
 
 export function isBuiltinStageId(id: string): id is ExperienceBuiltinStageId {
   return (STAGE_ITEM_IDS as string[]).includes(id);
@@ -379,7 +433,88 @@ export function placeStampOnPage(
   return base;
 }
 
+export const DEFAULT_MEMBER_PROOF: ExperienceMemberProof = {
+  count: "",
+  label: "Members",
+  avatars: [],
+  thumbs: [],
+  extraLabel: "",
+  bg: "rgba(255,255,255,0.04)",
+  borderColor: "rgba(255,255,255,0.14)",
+  countColor: "#8FE3B8",
+  labelColor: "rgba(255,255,255,0.6)",
+  radius: 18,
+};
+
+/** Icon keys the feature strip / buttons can use. */
+export const EXPERIENCE_FEATURE_ICONS = [
+  "star",
+  "clock",
+  "gift",
+  "users",
+  "ticket",
+  "video",
+  "music",
+  "shop",
+  "bolt",
+  "heart",
+  "crown",
+  "flame",
+  "lock",
+  "calendar",
+  "trophy",
+  "camera",
+  "sparkle",
+  "check",
+] as const;
+
+export function createFeatureId() {
+  return `feat_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+export function normalizeFeatures(raw: unknown, fallback: ExperienceFeature[] = []): ExperienceFeature[] {
+  if (!Array.isArray(raw)) return (fallback || []).map((f) => ({ ...f }));
+  return raw
+    .filter((row) => row && typeof row === "object")
+    .slice(0, 6)
+    .map((row) => {
+      const f = row as Partial<ExperienceFeature>;
+      return {
+        id: String(f.id || "") || createFeatureId(),
+        icon: String(f.icon || "star").toLowerCase(),
+        label: String(f.label || "Feature").slice(0, 40),
+      };
+    });
+}
+
+export function normalizeMemberProof(
+  raw: unknown,
+  fallback: ExperienceMemberProof = DEFAULT_MEMBER_PROOF,
+): ExperienceMemberProof {
+  const m = (raw ?? {}) as Partial<ExperienceMemberProof>;
+  const list = (value: unknown, fb: string[]) =>
+    Array.isArray(value)
+      ? value.filter((v) => typeof v === "string" && v.trim()).slice(0, 8).map((v) => String(v))
+      : (fb || []).slice();
+  return {
+    count: typeof m.count === "string" ? m.count.slice(0, 12) : fallback.count,
+    label: typeof m.label === "string" ? m.label.slice(0, 24) : fallback.label,
+    avatars: list(m.avatars, fallback.avatars),
+    thumbs: list(m.thumbs, fallback.thumbs),
+    extraLabel: typeof m.extraLabel === "string" ? m.extraLabel.slice(0, 8) : fallback.extraLabel,
+    bg: typeof m.bg === "string" ? m.bg : fallback.bg,
+    borderColor: typeof m.borderColor === "string" ? m.borderColor : fallback.borderColor,
+    countColor: typeof m.countColor === "string" ? m.countColor : fallback.countColor,
+    labelColor: typeof m.labelColor === "string" ? m.labelColor : fallback.labelColor,
+    radius:
+      typeof m.radius === "number" && Number.isFinite(m.radius)
+        ? Math.max(0, Math.min(999, m.radius))
+        : fallback.radius,
+  };
+}
+
 function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePageConfig {
+
   return {
     backgroundColor: "#050505",
     backgroundGradientFrom: "#050505",
@@ -419,6 +554,23 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     subheadRuns: [],
     bodyRuns: [],
     extraButtons: [],
+    ctaGradientFrom: "",
+    ctaGradientTo: "",
+    ctaGradientAngle: 90,
+    ctaRadius: 999,
+    ctaShowArrow: false,
+    headlineGradientFrom: "",
+    headlineGradientTo: "",
+    showMenuButton: false,
+    menuButtonColor: "#8FE3B8",
+    features: [],
+    featureBg: "rgba(255,255,255,0.04)",
+    featureBorderColor: "rgba(255,255,255,0.14)",
+    featureIconColor: "#8FE3B8",
+    featureTextColor: "#FFFFFF",
+    featureRadius: 18,
+    memberProof: { ...DEFAULT_MEMBER_PROOF },
+
     ...partial,
   };
 }
@@ -803,8 +955,25 @@ export function normalizeExperiencePage(
     subheadRuns: normalizeTextRuns(p.subheadRuns, asString(p.subhead, fallback.subhead)),
     bodyRuns: normalizeTextRuns(p.bodyRuns, asString(p.body, fallback.body)),
     extraButtons: normalizeButtons(p.extraButtons, fallback.extraButtons),
+    ctaGradientFrom: asString(p.ctaGradientFrom, fallback.ctaGradientFrom ?? ""),
+    ctaGradientTo: asString(p.ctaGradientTo, fallback.ctaGradientTo ?? ""),
+    ctaGradientAngle: Math.max(0, Math.min(360, asNumber(p.ctaGradientAngle, fallback.ctaGradientAngle ?? 90))),
+    ctaRadius: Math.max(0, Math.min(999, asNumber(p.ctaRadius, fallback.ctaRadius ?? 999))),
+    ctaShowArrow: asBool(p.ctaShowArrow, fallback.ctaShowArrow ?? false),
+    headlineGradientFrom: asString(p.headlineGradientFrom, fallback.headlineGradientFrom ?? ""),
+    headlineGradientTo: asString(p.headlineGradientTo, fallback.headlineGradientTo ?? ""),
+    showMenuButton: asBool(p.showMenuButton, fallback.showMenuButton ?? false),
+    menuButtonColor: asString(p.menuButtonColor, fallback.menuButtonColor ?? "#8FE3B8"),
+    features: normalizeFeatures(p.features, fallback.features ?? []),
+    featureBg: asString(p.featureBg, fallback.featureBg ?? "rgba(255,255,255,0.04)"),
+    featureBorderColor: asString(p.featureBorderColor, fallback.featureBorderColor ?? "rgba(255,255,255,0.14)"),
+    featureIconColor: asString(p.featureIconColor, fallback.featureIconColor ?? "#8FE3B8"),
+    featureTextColor: asString(p.featureTextColor, fallback.featureTextColor ?? "#FFFFFF"),
+    featureRadius: Math.max(0, Math.min(999, asNumber(p.featureRadius, fallback.featureRadius ?? 18))),
+    memberProof: normalizeMemberProof(p.memberProof, fallback.memberProof ?? DEFAULT_MEMBER_PROOF),
   };
 }
+
 
 function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceStageItem): ExperienceStageItem {
   const role = stageItemRole({ ...prev, ...row, id: String(row.id || prev.id) });

@@ -52,21 +52,33 @@ The full experience config you may patch (all fields optional — send ONLY what
             "unlockGlowColor": hex, "unlockPanelBorderColor": hex,
             "fansProofTitle": string, "fansProofBody": string, "followTitle": string,
             "footerLine": string,
-            "stage": [ { "id": "logo|wordmark|tagline|hero|titleArt|subhead|headline|body|cta",
+            "ctaGradientFrom": css color, "ctaGradientTo": css color, "ctaGradientAngle": 0-360,
+            "ctaRadius": 0-999, "ctaShowArrow": bool,
+            "headlineGradientFrom": css color, "headlineGradientTo": css color,
+            "showMenuButton": bool, "menuButtonColor": css color,
+            "features": [ { "icon": "star|clock|gift|users|ticket|video|music|shop|bolt|heart|crown|flame|lock|calendar|trophy|camera|sparkle|check", "label": string } ],
+            "featureBg": css color, "featureBorderColor": css color,
+            "featureIconColor": css color, "featureTextColor": css color, "featureRadius": 0-999,
+            "memberProof": { "count": string, "label": string, "extraLabel": string,
+                             "bg": css color, "borderColor": css color,
+                             "countColor": css color, "labelColor": css color, "radius": 0-999 },
+            "stage": [ { "id": "logo|wordmark|tagline|hero|titleArt|subhead|headline|body|featureRow|cta|memberProof",
                          "x": 0-95, "y": 0-95, "w": 8-100, "z": 0-100, "scale": 40-220,
-                         "hidden": bool, "glow": bool, "glowColor": hex, "glowIntensity": 0-100,
+                         "hidden": bool, "glow": bool, "glowColor": css color, "glowIntensity": 0-100,
                          "fillFrom": css color, "fillTo": css color, "borderColor": css color } ],
             "extraButtons": [ { "label": string, "href": url, "style": "solid|outline|ghost",
-                                "bg": hex, "text": hex, "borderColor": css color,
-                                "radius": 0-999, "glow": bool, "glowColor": hex,
+                                "bg": css color, "text": css color, "borderColor": css color,
+                                "radius": 0-999, "glow": bool, "glowColor": css color,
                                 "fullWidth": bool } ] },
   "pages": { "<pageKey>": { ...same shape as "page"... } },
   "killGlow": true,          // removes EVERY glow/shadow/shimmer across all pages
   "clearButtons": true,      // removes the extra buttons on the target page
   "addButtons": [ { "label": string, "href": url, "style": "solid|outline|ghost",
-                    "bg": hex, "text": hex, "borderColor": css color, "radius": 0-999,
-                    "glow": bool, "glowColor": hex, "fullWidth": bool } ]
+                    "bg": css color, "text": css color, "borderColor": css color, "radius": 0-999,
+                    "glow": bool, "glowColor": css color, "fullWidth": bool } ]
 }
+COLORS: every color field accepts ANY CSS color — hex, rgb()/rgba(), hsl(), oklch(), color-mix() —
+you are NOT limited to preset templates. Invent exact palettes to match the request or reference image.
 Page keys: landing, youreIn, settings, home, videos, news, docAndGlo.
 "page" patches the page the athlete is editing; use "pages" to patch specific other pages.
 Set "applyToAllPages": true when the request is about the whole app look so every page matches.
@@ -75,6 +87,11 @@ DELETING / REMODELING: to delete or remove an element from the phone, patch that
 "hidden": true (e.g. {"stage":[{"id":"tagline","hidden":true}]}). To bring one back set "hidden": false.
 When the athlete asks to remodel, rebuild or clean up the layout, send a full "stage" array with new
 x/y/w/scale values for every visible element so the composition looks intentional.
+PREMIUM LAYOUT KIT: to match high-end mockups use the feature strip ("features" 2-4 icon chips +
+stage item "featureRow"), the gradient CTA ("ctaGradientFrom"/"ctaGradientTo"/"ctaShowArrow"/"ctaRadius":999),
+a gradient headline ("headlineGradientFrom"/"headlineGradientTo"), a corner hamburger ("showMenuButton")
+and the social-proof row ("memberProof" + stage item "memberProof"). Make sure the stage items for
+featureRow / memberProof are visible (hidden:false) with sensible x/y/w when you add that content.
 ARTWORK: you can generate imagery yourself. Set "imagePrompt" to a rich art-direction prompt and
 "imageTarget" to one of "backgroundImage" | "heroImage" | "titleImage" whenever new artwork, a
 background photo, hero image or title art would make the look land. It is generated and placed
@@ -83,7 +100,9 @@ When the athlete asks for less/no glow, dimmer, cleaner or "get rid of the glow"
 "killGlow": true inside "patch" (and effects.glow false) instead of tweaking one field.
 When they ask for buttons / links / "cool stuff", use "addButtons" with tasteful labels and
 colors drawn from the palette, and pick contrasting text colors.
+When they attach a mockup, reproduce it closely: same palette, same blocks, same order.
 You may change many groups in one patch — go all-in and make it look designed, not default.
+
 `;
 
 
