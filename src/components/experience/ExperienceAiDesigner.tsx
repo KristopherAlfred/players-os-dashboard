@@ -20,6 +20,9 @@ const QUICK_PROMPTS = [
   "Make it feel expensive: less glow, more contrast, tighter buttons",
   "Give it a neon streetwear vibe with animated gradients",
   "Clean minimal blackout look with white text only",
+  "Remove every glow and shadow in the app",
+  "Add buttons for my shop, tickets and highlights",
+  "Redesign the whole app 10x better — colors, type, layout and buttons",
 ];
 
 /** Dominant colors from an uploaded reference image (client-side, no upload). */
