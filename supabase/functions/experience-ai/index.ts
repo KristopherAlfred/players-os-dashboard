@@ -101,7 +101,7 @@ function systemPrompt(context: unknown, config: unknown, pageKey: string) {
     "Never refuse a styling request and never ask for permission — make the strongest tasteful call,",
     "and change several groups at once so the result looks like a designed app, not a tweak.",
     "Reply with JSON ONLY, no markdown fences, shaped exactly:",
-    '{"reply":"one or two short sentences on what you changed","patch":{...},"applyToAllPages":false,"imagePrompt":null}',
+    '{"reply":"one or two short sentences on what you changed","patch":{...},"applyToAllPages":false,"imagePrompt":null,"imageTarget":"backgroundImage"}',
     SCHEMA_DOC,
     `ATHLETE CONTEXT: ${JSON.stringify(context)}`,
     `PAGE BEING EDITED: ${pageKey}`,
