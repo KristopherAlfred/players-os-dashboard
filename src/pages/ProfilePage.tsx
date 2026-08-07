@@ -24,7 +24,10 @@ export function ProfilePage() {
   const athletePhoto = athlete?.profile_photo_url ?? "";
   const [avatar, setAvatar] = useState<string>(() => getDashboardAvatar());
   const [ringColor, setRingColor] = useState<string>(() => getDashboardAvatarRing());
-  const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(getDashboardAvatarRing()));
+  const [hsva, setHsva] = useState<HsvaColor>(() => {
+    const ring = getDashboardAvatarRing();
+    return hexToHsva(/^#[0-9a-f]{3,8}$/i.test(ring) ? ring : "#E2231A");
+  });
   const [urlDraft, setUrlDraft] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +84,7 @@ export function ProfilePage() {
       {/* Header card */}
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
         <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(226,35,26,0.22),transparent_52%)]" />
           <div className="relative flex items-center gap-4">
             <div className="mb-0 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
               <UserRound size={12} />
@@ -122,12 +125,21 @@ export function ProfilePage() {
           </div>
           <div className="flex flex-col items-center gap-4 p-6">
             <div className="relative">
-              <img
-                src={isDefaultAvatar(avatar) ? athletePhoto || avatar : avatar}
-                alt={`${displayName} profile photo`}
-                className="h-44 w-44 rounded-full border-4 object-cover object-top shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
-                style={{ borderColor: ringColor }}
-              />
+              {(isDefaultAvatar(avatar) ? athletePhoto : avatar) ? (
+                <img
+                  src={isDefaultAvatar(avatar) ? athletePhoto || avatar : avatar}
+                  alt={`${displayName} profile photo`}
+                  className="h-44 w-44 rounded-full border-4 object-cover object-top shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+                  style={{ borderColor: ringColor }}
+                />
+              ) : (
+                <div
+                  className="flex h-44 w-44 items-center justify-center rounded-full border-4 bg-black/60 font-display text-4xl font-bold text-white/70"
+                  style={{ borderColor: ringColor }}
+                >
+                  {displayName.slice(0, 1).toUpperCase() || "?"}
+                </div>
+              )}
               <span className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/80 text-dt-red">
                 <ImagePlus size={16} />
               </span>
@@ -144,12 +156,12 @@ export function ProfilePage() {
                 onClick={() => {
                   resetDashboardAvatar();
                   setAvatar(getDashboardAvatar());
-                  setStatus("Back to the default ESPN headshot");
+                  setStatus("Profile photo removed");
                   setError(null);
                 }}
                 className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-white/80 transition hover:bg-white/[0.08]"
               >
-                <RotateCcw size={13} /> Reset to ESPN headshot
+                <RotateCcw size={13} /> Remove photo
               </button>
             ) : null}
           </div>

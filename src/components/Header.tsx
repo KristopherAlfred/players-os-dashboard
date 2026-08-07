@@ -53,6 +53,7 @@ export function Header({
       }),
     [],
   );
+  const photo = isDefaultAvatar(avatar) ? athlete?.profile_photo_url || "" : avatar;
   const onContent = isContentRoute(pathname);
   const allowed = onContent ? CONTENT_ALLOWED_SOURCES : ALL_DASHBOARD_SOURCES;
 
@@ -185,12 +186,22 @@ export function Header({
             title="View and edit your profile photo"
             className="hidden shrink-0 rounded-full transition hover:ring-2 hover:ring-dt-red/60 sm:block"
           >
-            <img
-              src={isDefaultAvatar(avatar) ? athlete?.profile_photo_url || avatar : avatar}
-              alt={`${displayName} — open profile`}
-              className="h-9 w-9 rounded-full border-2 object-cover object-top"
-              style={{ borderColor: ringColor }}
-            />
+            {photo ? (
+              <img
+                src={photo}
+                alt={`${displayName} — open profile`}
+                className="h-9 w-9 rounded-full border-2 object-cover object-top"
+                style={{ borderColor: ringColor }}
+              />
+            ) : (
+              <span
+                aria-label={`${displayName} — open profile`}
+                className="flex h-9 w-9 items-center justify-center rounded-full border-2 bg-black/60 text-xs font-semibold text-white/70"
+                style={{ borderColor: ringColor }}
+              >
+                {displayName.slice(0, 1).toUpperCase() || "?"}
+              </span>
+            )}
           </Link>
         </div>
       </div>
