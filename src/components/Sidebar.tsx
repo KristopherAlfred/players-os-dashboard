@@ -314,10 +314,10 @@ function AthleteSportBadge() {
         <LeagueMark league={league} sport={sport} size={26} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-1.5 truncate text-xs font-semibold text-dt-text">
-          <span className="truncate">{athlete?.team_or_league ?? league?.label ?? sport.label}</span>
-          {league ? <LeagueMark league={league} sport={sport} size={14} /> : null}
+        <p className="truncate text-xs font-semibold text-dt-text">
+          {athlete?.team_or_league ?? league?.label ?? sport.label}
         </p>
+
         <p className="truncate text-[10px] text-dt-muted">
           {[sport.label, league?.label, athlete?.gender === "female" ? "Women's" : athlete?.gender === "male" ? "Men's" : null]
             .filter(Boolean)
