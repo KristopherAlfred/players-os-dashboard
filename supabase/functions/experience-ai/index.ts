@@ -30,15 +30,15 @@ type ContentBlock =
   | { type: "image_url"; image_url: { url: string } };
 
 const SCHEMA_DOC = `
-The experience config you may patch (all fields optional — only send what changes):
+The full experience config you may patch (all fields optional — send ONLY what changes):
 {
   "brand": { "logoColor": hex, "logoTint": bool, "wordmark": string, "wordmarkColor": hex,
-             "tagline": string, "taglineColor": hex, "showLogoImage": bool },
+             "wordmarkFontFamily": font, "tagline": string, "taglineColor": hex, "showLogoImage": bool },
   "theme": { "bg": hex, "bgGradientFrom": hex, "bgGradientVia": hex, "bgGradientTo": hex,
              "bgGradientAngle": 0-360, "useGradientBg": bool, "surface": hex, "card": hex,
              "border": css color, "text": hex, "muted": css color, "accent": hex,
              "accentHover": hex, "buttonBg": hex, "buttonText": hex, "buttonBorder": css color,
-             "buttonRadius": 0-999 },
+             "buttonRadius": 0-999, "fontDisplay": font, "fontBody": font },
   "effects": { "glow": bool, "glowColor": hex, "glowIntensity": 0-100, "particles": bool,
                "particleColor": hex, "noise": bool, "noiseOpacity": 0-40, "shimmer": bool,
                "blurBackdrop": bool, "vignette": bool, "animatedGradient": bool,
@@ -47,25 +47,50 @@ The experience config you may patch (all fields optional — only send what chan
             "useGradientBg": bool, "headline": string, "subhead": string, "body": string,
             "ctaLabel": string, "ctaBg": hex, "ctaText": hex, "accentColor": hex,
             "effectPreset": "none|glow|shimmer|glass|neon|burst|rays|soft",
+            "layoutMode": "stack|freeform", "heroScale": 40-180,
             "unlockHeadline": string, "unlockBody": string, "unlockFooter": string,
             "unlockGlowColor": hex, "unlockPanelBorderColor": hex,
             "fansProofTitle": string, "fansProofBody": string, "followTitle": string,
-            "footerLine": string }
+            "footerLine": string,
+            "stage": [ { "id": "logo|wordmark|tagline|hero|titleArt|subhead|headline|body|cta",
+                         "x": 0-95, "y": 0-95, "w": 8-100, "z": 0-100, "scale": 40-220,
+                         "hidden": bool, "glow": bool, "glowColor": hex, "glowIntensity": 0-100,
+                         "fillFrom": css color, "fillTo": css color, "borderColor": css color } ],
+            "extraButtons": [ { "label": string, "href": url, "style": "solid|outline|ghost",
+                                "bg": hex, "text": hex, "borderColor": css color,
+                                "radius": 0-999, "glow": bool, "glowColor": hex,
+                                "fullWidth": bool } ] },
+  "pages": { "<pageKey>": { ...same shape as "page"... } },
+  "killGlow": true,          // removes EVERY glow/shadow/shimmer across all pages
+  "clearButtons": true,      // removes the extra buttons on the target page
+  "addButtons": [ { "label": string, "href": url, "style": "solid|outline|ghost",
+                    "bg": hex, "text": hex, "borderColor": css color, "radius": 0-999,
+                    "glow": bool, "glowColor": hex, "fullWidth": bool } ]
 }
-"page" patches the page the athlete is editing. Set "applyToAllPages": true when the
-request is about the whole app look (colors, vibe, theme) so every page matches.
-Set "imagePrompt" to a short art-direction prompt ONLY when the athlete asked for
-generated artwork/background imagery.
+Page keys: landing, youreIn, settings, home, videos, news, docAndGlo.
+"page" patches the page the athlete is editing; use "pages" to patch specific other pages.
+Set "applyToAllPages": true when the request is about the whole app look so every page matches.
+Stage items are draggable — you may reposition, resize, hide or unglow them to fix layout.
+When the athlete asks for less/no glow, dimmer, cleaner or "get rid of the glow", set
+"killGlow": true inside "patch" (and effects.glow false) instead of tweaking one field.
+When they ask for buttons / links / "cool stuff", use "addButtons" with tasteful labels and
+colors drawn from the palette, and pick contrasting text colors.
+You may change many groups in one patch — go all-in and make it look designed, not default.
 `;
 
 function systemPrompt(context: unknown, config: unknown, pageKey: string) {
   return [
     "You are the design copilot inside PlayersOS, customizing an athlete's fan app front end.",
-    "You translate plain-language requests into concrete design changes. Be bold and tasteful:",
+    "You translate plain-language requests into concrete design changes. You have FULL control of",
+    "colors, gradients, fonts, effects, copy, layout positions, buttons and per-page styling — use it.",
+    "Be bold and tasteful:",
     "high contrast, readable text, cohesive palettes, dark-first premium sports aesthetics.",
     "Always keep text readable against its background and keep the athlete's brand identity intact",
     "unless they explicitly ask to change it.",
     "If a reference image is attached, pull its palette and mood into the patch.",
+    "Reply with JSON ONLY, no markdown fences, shaped exactly:",
+    "Never refuse a styling request and never ask for permission — make the strongest tasteful call,",
+    "and change several groups at once so the result looks like a designed app, not a tweak.",
     "Reply with JSON ONLY, no markdown fences, shaped exactly:",
     '{"reply":"one or two short sentences on what you changed","patch":{...},"applyToAllPages":false,"imagePrompt":null}',
     SCHEMA_DOC,
