@@ -1,5 +1,12 @@
 import { supabase } from "../integrations/supabase/client";
-import type { ExperienceConfig, ExperiencePageConfig } from "./experienceConfig";
+import {
+  createButtonId,
+  normalizeButtons,
+  type ExperienceButton,
+  type ExperienceConfig,
+  type ExperiencePageConfig,
+  type ExperienceStageItem,
+} from "./experienceConfig";
 
 /** AI design copilot client. Prompts + model calls live in the edge function. */
 
@@ -10,6 +17,14 @@ export type ExperiencePatch = {
   theme?: Record<string, unknown>;
   effects?: Record<string, unknown>;
   page?: Record<string, unknown>;
+  /** Per-page patches keyed by page id (landing, home, videos, news, docAndGlo, youreIn, settings) */
+  pages?: Record<string, Record<string, unknown>>;
+  /** Kill every glow/shadow in the app before applying the rest of the patch */
+  killGlow?: boolean;
+  /** Buttons to append to the target page(s) */
+  addButtons?: Partial<ExperienceButton>[];
+  /** Remove all extra buttons first */
+  clearButtons?: boolean;
 };
 
 export type DesignerResult = {
@@ -36,6 +51,7 @@ export function designerConfigSnapshot(
     brand: experience.brand,
     theme: experience.theme,
     effects: experience.effects,
+    pageKeys: Object.keys(experience.pages),
     page: {
       backgroundColor: page.backgroundColor,
       backgroundGradientFrom: page.backgroundGradientFrom,
@@ -49,6 +65,22 @@ export function designerConfigSnapshot(
       ctaText: page.ctaText,
       accentColor: page.accentColor,
       effectPreset: page.effectPreset,
+      layoutMode: page.layoutMode,
+      heroScale: page.heroScale,
+      unlockHeadline: page.unlockHeadline,
+      unlockBody: page.unlockBody,
+      footerLine: page.footerLine,
+      extraButtons: page.extraButtons ?? [],
+      stage: (page.stage ?? []).map((item) => ({
+        id: item.id,
+        x: item.x,
+        y: item.y,
+        w: item.w,
+        scale: item.scale,
+        hidden: item.hidden,
+        glow: item.glow,
+        glowIntensity: item.glowIntensity,
+      })),
     },
   };
 }
@@ -94,6 +126,54 @@ export async function generateExperienceArt(prompt: string): Promise<string> {
   return payload.imageSrc;
 }
 
+function mergeStage(
+  prev: ExperienceStageItem[],
+  incoming: unknown,
+): ExperienceStageItem[] {
+  if (!Array.isArray(incoming)) return prev;
+  const next = prev.map((item) => ({ ...item }));
+  for (const raw of incoming) {
+    if (!raw || typeof raw !== "object") continue;
+    const row = raw as Partial<ExperienceStageItem> & { id?: string };
+    if (!row.id) continue;
+    const idx = next.findIndex((item) => item.id === row.id);
+    if (idx >= 0) next[idx] = { ...next[idx], ...row } as ExperienceStageItem;
+  }
+  return next;
+}
+
+function stripGlow(page: ExperiencePageConfig): ExperiencePageConfig {
+  return {
+    ...page,
+    unlockGlowColor: "transparent",
+    effectPreset: page.effectPreset === "glow" || page.effectPreset === "neon" ? "none" : page.effectPreset,
+    stage: (page.stage ?? []).map((item) => ({ ...item, glow: false, glowIntensity: 0 })),
+    extraButtons: (page.extraButtons ?? []).map((b) => ({ ...b, glow: false })),
+  };
+}
+
+function applyPagePatch(
+  page: ExperiencePageConfig,
+  patch: Record<string, unknown> | undefined,
+  extras: { clearButtons?: boolean; addButtons?: Partial<ExperienceButton>[] },
+): ExperiencePageConfig {
+  const raw = { ...(patch ?? {}) } as Partial<ExperiencePageConfig> & { stage?: unknown; extraButtons?: unknown };
+  const stage = mergeStage(page.stage ?? [], raw.stage);
+  delete raw.stage;
+  let buttons = extras.clearButtons ? [] : page.extraButtons ?? [];
+  if (raw.extraButtons !== undefined) {
+    buttons = normalizeButtons(raw.extraButtons, buttons);
+    delete raw.extraButtons;
+  }
+  if (extras.addButtons?.length) {
+    buttons = [
+      ...buttons,
+      ...normalizeButtons(extras.addButtons.map((b) => ({ ...b, id: b.id || createButtonId() }))),
+    ].slice(0, 8);
+  }
+  return { ...page, ...raw, stage, extraButtons: buttons };
+}
+
 /** Merge an AI patch into the config, optionally styling every page at once. */
 export function applyExperiencePatch(
   prev: ExperienceConfig,
@@ -101,18 +181,43 @@ export function applyExperiencePatch(
   pageKey: keyof ExperienceConfig["pages"],
   applyToAllPages: boolean,
 ): ExperienceConfig {
-  const pagePatch = (patch.page ?? {}) as Partial<ExperiencePageConfig>;
   const pageKeys = Object.keys(prev.pages) as (keyof ExperienceConfig["pages"])[];
   const pages = { ...prev.pages };
+
+  if (patch.killGlow) {
+    for (const key of pageKeys) pages[key] = stripGlow(pages[key]);
+  }
+
   const targets = applyToAllPages ? pageKeys : [pageKey];
   for (const key of targets) {
-    pages[key] = { ...pages[key], ...pagePatch };
+    pages[key] = applyPagePatch(pages[key], patch.page, {
+      clearButtons: patch.clearButtons,
+      addButtons: patch.addButtons,
+    });
   }
+
+  for (const [key, pagePatch] of Object.entries(patch.pages ?? {})) {
+    if (!(key in pages)) continue;
+    const typed = key as keyof ExperienceConfig["pages"];
+    pages[typed] = applyPagePatch(pages[typed], pagePatch, {});
+  }
+
+  const effects = { ...prev.effects, ...(patch.effects ?? {}) };
+  if (patch.killGlow) {
+    effects.glow = false;
+    effects.glowIntensity = 0;
+    effects.shimmer = false;
+    if (patch.effects?.glow === true) {
+      effects.glow = true;
+      effects.glowIntensity = Number(patch.effects.glowIntensity ?? 40);
+    }
+  }
+
   return {
     ...prev,
     brand: { ...prev.brand, ...(patch.brand ?? {}) },
     theme: { ...prev.theme, ...(patch.theme ?? {}) },
-    effects: { ...prev.effects, ...(patch.effects ?? {}) },
+    effects,
     pages,
   };
 }
@@ -120,6 +225,10 @@ export function applyExperiencePatch(
 /** Human summary of what a patch touched, for the chat transcript. */
 export function describePatch(patch: ExperiencePatch): string[] {
   const out: string[] = [];
+  if (patch.killGlow) out.push("glow: removed everywhere");
+  if (patch.clearButtons) out.push("buttons: cleared");
+  if (patch.addButtons?.length) out.push(`buttons: +${patch.addButtons.length}`);
+  for (const key of Object.keys(patch.pages ?? {})) out.push(`page ${key} restyled`);
   for (const group of ["brand", "theme", "effects", "page"] as const) {
     const entries = Object.entries(patch[group] ?? {});
     if (entries.length) {

@@ -120,6 +120,22 @@ export type ExperienceTextRun = {
 };
 
 
+/** Extra call-to-action buttons the athlete (or the AI designer) can add to a page. */
+export type ExperienceButton = {
+  id: string;
+  label: string;
+  href: string;
+  style: "solid" | "outline" | "ghost";
+  bg: string;
+  text: string;
+  borderColor: string;
+  radius: number;
+  glow: boolean;
+  glowColor: string;
+  fullWidth: boolean;
+  icon?: string;
+};
+
 export type ExperiencePageConfig = {
   backgroundColor: string;
   backgroundGradientFrom: string;
@@ -166,6 +182,8 @@ export type ExperiencePageConfig = {
   headlineRuns: ExperienceTextRun[];
   subheadRuns: ExperienceTextRun[];
   bodyRuns: ExperienceTextRun[];
+  /** Extra buttons rendered under the primary CTA */
+  extraButtons: ExperienceButton[];
 };
 
 export type ExperiencePages = {
@@ -400,6 +418,7 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     headlineRuns: [],
     subheadRuns: [],
     bodyRuns: [],
+    extraButtons: [],
     ...partial,
   };
 }
@@ -708,6 +727,35 @@ export function normalizeExperienceEffects(raw: unknown): ExperienceEffects {
   };
 }
 
+export function createButtonId() {
+  return `btn_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+export function normalizeButtons(raw: unknown, fallback: ExperienceButton[] = []): ExperienceButton[] {
+  if (!Array.isArray(raw)) return (fallback || []).map((b) => ({ ...b }));
+  return raw
+    .filter((row) => row && typeof row === "object")
+    .slice(0, 8)
+    .map((row) => {
+      const b = row as Partial<ExperienceButton>;
+      const style = b.style === "outline" || b.style === "ghost" ? b.style : "solid";
+      return {
+        id: asString(b.id, "") || createButtonId(),
+        label: asString(b.label, "Tap in").slice(0, 60),
+        href: asString(b.href, ""),
+        style,
+        bg: asString(b.bg, "#FFFFFF"),
+        text: asString(b.text, "#0a0a0a"),
+        borderColor: asString(b.borderColor, "rgba(255,255,255,0.35)"),
+        radius: Math.max(0, Math.min(999, asNumber(b.radius, 999))),
+        glow: asBool(b.glow, false),
+        glowColor: asString(b.glowColor, "#FFFFFF"),
+        fullWidth: asBool(b.fullWidth, true),
+        icon: asString(b.icon, "") || undefined,
+      };
+    });
+}
+
 export function normalizeExperiencePage(
   raw: unknown,
   fallback: ExperiencePageConfig,
@@ -754,6 +802,7 @@ export function normalizeExperiencePage(
     headlineRuns: normalizeTextRuns(p.headlineRuns, asString(p.headline, fallback.headline)),
     subheadRuns: normalizeTextRuns(p.subheadRuns, asString(p.subhead, fallback.subhead)),
     bodyRuns: normalizeTextRuns(p.bodyRuns, asString(p.body, fallback.body)),
+    extraButtons: normalizeButtons(p.extraButtons, fallback.extraButtons),
   };
 }
 
