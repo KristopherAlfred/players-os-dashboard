@@ -828,7 +828,25 @@ function PageFreeformPreview({
           ) : null}
             </>
           ) : null}
+          {hiddenItems.length ? (
+            <div className="space-y-1 rounded-lg border border-white/10 bg-white/[0.03] p-2">
+              <p className="text-[9px] uppercase tracking-wide text-white/40">Deleted — tap to bring back</p>
+              <div className="flex flex-wrap gap-1.5">
+                {hiddenItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => patchItem(item.id, { hidden: false })}
+                    className="rounded-md border border-white/15 px-2 py-1 text-[10px] text-white/60 hover:text-white"
+                  >
+                    + {STAGE_LABELS[stageItemRole(item)] ?? item.id}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <button
+
             type="button"
             onClick={() =>
               onPatchPage({
