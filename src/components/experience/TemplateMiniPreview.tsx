@@ -73,7 +73,7 @@ export function TemplateMiniPreview({ template }: { template: ExperienceTemplate
     <div
       className="relative flex h-full w-full flex-col overflow-hidden"
       style={{
-        background: `linear-gradient(${l.backgroundGradientAngle ?? 165}deg, ${
+        background: `linear-gradient(165deg, ${
           l.backgroundGradientFrom ?? theme.bgGradientFrom ?? theme.bg
         }, ${l.backgroundGradientTo ?? theme.bg})`,
         color: text,
