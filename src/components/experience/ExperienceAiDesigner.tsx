@@ -147,7 +147,12 @@ export function ExperienceAiDesigner({
             : result.reply,
         },
       ]);
-      if (result.imagePrompt) setArtPrompt(result.imagePrompt);
+      if (result.imagePrompt) {
+        setArtPrompt(result.imagePrompt);
+        setArtTarget(result.imageTarget);
+        await makeArt(result.imagePrompt, result.imageTarget);
+      }
+
     } catch (err) {
       const message = err instanceof Error ? err.message : "The designer could not respond";
       setMessages((prev) => [...prev, { role: "assistant", content: message }]);
