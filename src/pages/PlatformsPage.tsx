@@ -105,7 +105,7 @@ export function PlatformsPage() {
                   <p className="truncate font-display text-sm font-semibold text-white">{row.display_name}</p>
                   <span
                     className={`h-2 w-2 shrink-0 rounded-full ${
-                      row.connected ? "bg-dt-green shadow-[0_0_8px_rgba(143,227,184,0.9)]" : "bg-white/25"
+                      row.connected ? "bg-dt-green shadow-[0_0_8px_rgba(var(--theme-accent-rgb),0.9)]" : "bg-white/25"
                     }`}
                   />
                 </div>

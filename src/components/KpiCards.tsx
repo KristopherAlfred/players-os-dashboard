@@ -28,7 +28,7 @@ function AccentLoader({ className = "" }: { className?: string }) {
         className="h-full w-full animate-spin rounded-full border-2 border-dt-green/25 border-t-dt-green"
         style={{
           filter:
-            "drop-shadow(0 0 6px rgba(143,227,184,0.95)) drop-shadow(0 0 14px rgba(143,227,184,0.55))",
+            "drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),0.95)) drop-shadow(0 0 14px rgba(var(--theme-accent-rgb),0.55))",
         }}
       />
     </span>
@@ -49,7 +49,7 @@ export function KpiCards() {
             className="dt-surface relative min-w-0 overflow-hidden rounded-xl border border-dt-border bg-dt-card p-4 pr-14"
           >
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-black to-black/95" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,rgba(143,227,184,0.04),transparent_55%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,rgba(var(--theme-accent-rgb),0.04),transparent_55%)]" />
             <p className="relative text-xs font-semibold uppercase tracking-wide text-white">
               {stat.label}
             </p>

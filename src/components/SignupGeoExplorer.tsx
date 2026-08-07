@@ -55,7 +55,7 @@ function MapGradientBackground() {
   return (
     <>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-[#030303] to-black" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(143,227,184,0.05),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(var(--theme-accent-rgb),0.05),transparent_55%)]" />
     </>
   );
 }
@@ -240,7 +240,7 @@ function MapPinMarker({ active, scale }: { active: boolean; scale: number }) {
       transform={`scale(${scale})`}
       style={{
         filter: active
-          ? "drop-shadow(0 2px 6px rgba(143,227,184,0.9))"
+          ? "drop-shadow(0 2px 6px rgba(var(--theme-accent-rgb),0.9))"
           : "drop-shadow(0 2px 4px rgba(0,0,0,0.45))",
       }}
     >

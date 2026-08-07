@@ -63,7 +63,7 @@ export function VideosContentPage() {
     <div className="space-y-5">
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
         <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(var(--theme-accent-rgb),0.22),transparent_52%)]" />
           <div className="relative max-w-2xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
               <Film size={12} />
@@ -89,7 +89,7 @@ export function VideosContentPage() {
             className="relative grid grid-cols-2 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1"
           >
             <div
-              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/2)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(143,227,184,0.35)] transition-transform duration-300 ease-out"
+              className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/2)] rounded-lg bg-dt-red shadow-[0_8px_24px_rgba(var(--theme-accent-rgb),0.35)] transition-transform duration-300 ease-out"
               style={{ transform: `translateX(${activeIndex * 100}%)` }}
               aria-hidden
             />
@@ -558,7 +558,7 @@ function ExclusiveVideosPanel() {
         <button
           type="button"
           onClick={startNew}
-          className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)]"
+          className="inline-flex items-center gap-2 rounded-xl bg-dt-red px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(var(--theme-accent-rgb),0.35)]"
         >
           <Plus size={14} /> New exclusive video
         </button>

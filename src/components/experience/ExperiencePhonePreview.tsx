@@ -55,7 +55,7 @@ function PhoneFrame({ children, label, hint }: { children: ReactNode; label: str
         Live phone · {label}
       </p>
       {hint ? <p className="mb-2 text-center text-[10px] text-white/35">{hint}</p> : null}
-      <div className="exp-phone-shell relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black shadow-[0_0_48px_rgba(143,227,184,0.12)]">
+      <div className="exp-phone-shell relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black shadow-[0_0_48px_rgba(var(--theme-accent-rgb),0.12)]">
         <div className="pointer-events-none absolute left-1/2 top-2 z-50 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
         <div className="relative min-h-[560px] overflow-hidden">{children}</div>
       </div>

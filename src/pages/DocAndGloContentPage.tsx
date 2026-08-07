@@ -279,7 +279,7 @@ export function DocAndGloContentPage() {
     <div className="space-y-5">
       <div className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
         <div className="relative border-b border-dt-border bg-gradient-to-br from-black via-[#0c0c0c] to-[#051a12] px-5 py-5 sm:px-7 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(143,227,184,0.22),transparent_52%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(var(--theme-accent-rgb),0.22),transparent_52%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
@@ -311,7 +311,7 @@ export function DocAndGloContentPage() {
                 type="button"
                 onClick={() => void (draft ? saveDraft("published") : startNew())}
                 disabled={saving}
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(143,227,184,0.35)] transition hover:brightness-110 disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-dt-red px-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(var(--theme-accent-rgb),0.35)] transition hover:brightness-110 disabled:opacity-60"
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                 {draft ? "Publish to app" : "Add product"}
@@ -451,7 +451,7 @@ export function DocAndGloContentPage() {
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">App preview</p>
           <div className="w-full max-w-[320px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <div className="relative min-h-[560px] bg-gradient-to-b from-[#051a12] via-black to-black px-4 pb-6 pt-8">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(143,227,184,0.28),transparent_55%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(var(--theme-accent-rgb),0.28),transparent_55%)]" />
               <div className="relative">
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-dt-red">Doc & Glo</p>
                 <h3 className="mt-1 font-display text-xl font-semibold text-white">Clean body care</h3>
