@@ -273,7 +273,7 @@ export const DEFAULT_CONTENT_STAGE: ExperienceStageItem[] = [
     glowIntensity: 30,
     fillFrom: "rgba(0,0,0,0.55)",
     fillTo: "rgba(0,0,0,0.2)",
-    borderColor: "rgba(143,227,184,0.45)",
+    borderColor: "rgba(var(--theme-accent-rgb),0.45)",
   },
   {
     id: "subhead",
@@ -286,7 +286,7 @@ export const DEFAULT_CONTENT_STAGE: ExperienceStageItem[] = [
     glowIntensity: 30,
     fillFrom: "rgba(0,0,0,0.5)",
     fillTo: "rgba(0,0,0,0.15)",
-    borderColor: "rgba(143,227,184,0.35)",
+    borderColor: "rgba(var(--theme-accent-rgb),0.35)",
   },
   {
     id: "body",

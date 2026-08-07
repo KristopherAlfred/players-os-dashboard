@@ -35,7 +35,7 @@ export function ExperienceTemplateGallery({
               onClick={() => onApply(template)}
               className={`group overflow-hidden rounded-2xl border text-left transition ${
                 active
-                  ? "border-dt-red shadow-[0_0_0_1px_rgba(143,227,184,0.35),0_10px_30px_rgba(0,0,0,0.5)]"
+                  ? "border-dt-red shadow-[0_0_0_1px_rgba(var(--theme-accent-rgb),0.35),0_10px_30px_rgba(0,0,0,0.5)]"
                   : "border-white/10 hover:border-white/30"
               }`}
             >

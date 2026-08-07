@@ -93,7 +93,7 @@ const CONTENT_STAGE_LABELS: Record<(typeof CONTENT_STAGE_IDS)[number], string> =
 function PhoneChrome({ activeTab, children }: { activeTab: PhoneTab; children: ReactNode }) {
   return (
     <div className="sticky top-4 self-start xl:order-2">
-      <div className="relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black shadow-[0_0_48px_rgba(143,227,184,0.12)]">
+      <div className="relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black shadow-[0_0_48px_rgba(var(--theme-accent-rgb),0.12)]">
         <div className="pointer-events-none absolute left-1/2 top-2 z-20 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
         <div className="h-[420px] overflow-y-auto bg-[#050505] pt-8">{children}</div>
         <div className="border-t border-white/10 bg-[#0a0a0a] px-1 pb-3 pt-2">
@@ -346,7 +346,7 @@ function ContentPhonePreview({
             }
           }}
         >
-          <span className="h-1 w-12 rounded-full bg-[#8FE3B8]/80 shadow-[0_0_8px_rgba(143,227,184,0.6)]" />
+          <span className="h-1 w-12 rounded-full bg-[#8FE3B8]/80 shadow-[0_0_8px_rgba(var(--theme-accent-rgb),0.6)]" />
         </div>
 
         <div
