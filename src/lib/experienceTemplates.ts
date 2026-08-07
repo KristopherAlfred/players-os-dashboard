@@ -365,7 +365,6 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
     brand: {
       logoColor: s.accent,
       logoTint: true,
-      wordmark: s.wordmark,
       wordmarkColor: s.text,
       tagline: s.tagline,
       taglineColor: s.muted,
