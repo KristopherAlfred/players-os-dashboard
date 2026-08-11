@@ -1,19 +1,21 @@
 import { Panel } from "../components/PageShell";
 import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
 import { formatMetric } from "../lib/dametimeAnalyticsApi";
+import { useSocialSources } from "../lib/socialSources";
+import { NotConnectedCard, NoDataState, SkeletonPanel } from "../components/states/ConnectionStates";
 import { formatMetric as formatIgMetric } from "../lib/instagramAnalyticsApi";
 import { formatMetric as formatYtMetric } from "../lib/youtubeAnalyticsApi";
 import { formatMetric as formatFbMetric } from "../lib/facebookAnalyticsApi";
 import { formatMetric as formatTwMetric } from "../lib/twitterAnalyticsApi";
 
-const segments = [
-  { name: "Inner Circle Members", size: "48.2K", match: "Tier = Inner Circle" },
-  { name: "Tour Intent — West Coast", size: "124K", match: "Location + engagement score" },
-  { name: "Email Engaged (30d)", size: "89K", match: "Opened email in last 30 days" },
-  { name: "High LTV Superfans", size: "12.4K", match: "LTV > $200" },
-];
+function useAnySocialConnected() {
+  const { sources, loading } = useSocialSources();
+  const connected = sources ? Object.values(sources).some((s) => s.connected) : false;
+  return { loading, connected };
+}
 
 export function SegmentsPage() {
+  const { loading, connected } = useAnySocialConnected();
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -21,16 +23,39 @@ export function SegmentsPage() {
           + Create Segment
         </button>
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {segments.map((s) => (
-          <div key={s.name} className="rounded-lg border border-dt-border bg-dt-card p-4">
-            <p className="font-medium">{s.name}</p>
-            <p className="mt-2 text-2xl font-display font-semibold">{s.size}</p>
-            <p className="mt-1 text-xs text-dt-muted">{s.match}</p>
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <SkeletonPanel />
+      ) : !connected ? (
+        <NotConnectedCard
+          platform="A social account"
+          message="Connect a platform or your fan app to build live audience segments."
+        />
+      ) : (
+        <NoDataState
+          title="No segments yet"
+          message="Create a segment to see live fan counts here."
+        />
+      )}
     </div>
+  );
+}
+
+function FanJourneyFunnelGate() {
+  const { loading, connected } = useAnySocialConnected();
+  if (loading) return <SkeletonPanel />;
+  if (!connected) {
+    return (
+      <NotConnectedCard
+        platform="A social account"
+        message="Connect Instagram, YouTube, Facebook, X or your fan app to see the live fan journey funnel."
+      />
+    );
+  }
+  return (
+    <NoDataState
+      title="No analytics selected"
+      message="Pick a specific platform filter above to see its live fan journey."
+    />
   );
 }
 
@@ -39,26 +64,7 @@ export function BehaviorInsightsPage() {
     <AnalyticsPageGate
       mock={
         <Panel title="Fan Journey Funnel">
-          <div className="space-y-2">
-            {[
-              { step: "Landing Page", users: "1.26M", drop: "0%" },
-              { step: "Content View", users: "842K", drop: "33%" },
-              { step: "Email Capture", users: "75.3K", drop: "91%" },
-              { step: "Inner Circle Signup", users: "12.4K", drop: "84%" },
-              { step: "Purchase / Convert", users: "8.7K", drop: "30%" },
-            ].map((s, i) => (
-              <div key={s.step} className="flex items-center gap-4">
-                <span className="w-6 text-center text-xs font-bold text-dt-red">{i + 1}</span>
-                <div className="flex-1 rounded-lg border border-dt-border bg-dt-bg/50 p-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">{s.step}</span>
-                    <span>{s.users}</span>
-                  </div>
-                  {i > 0 && <p className="mt-1 text-xs text-dt-muted">{s.drop} drop-off from previous step</p>}
-                </div>
-              </div>
-            ))}
-          </div>
+          <FanJourneyFunnelGate />
         </Panel>
       }
       dametime={(analytics) => (

@@ -27,7 +27,6 @@ import {
   formatBeehiivDate,
   type BeehiivFeed,
 } from "../lib/beehiivApi";
-import { SLOANE_SOCIAL } from "../lib/sloaneSocial";
 import { TypographyControls } from "../components/TypographyControls";
 import { DtSelect } from "../components/DtSelect";
 import { titleTypographyStyle } from "../lib/typography";
@@ -232,14 +231,16 @@ export function NewsContentPage() {
           <span className="text-[11px] text-dt-muted">
             {beehiiv?.source === "live" ? "Live from Beehiiv" : beehiiv ? "Cached" : "—"}
           </span>
-          <a
-            href={SLOANE_SOCIAL.beehiivUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 text-[11px] text-white/70 hover:text-white"
-          >
-            Open <ExternalLink size={11} />
-          </a>
+          {beehiiv?.publication.url ? (
+            <a
+              href={beehiiv.publication.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[11px] text-white/70 hover:text-white"
+            >
+              Open <ExternalLink size={11} />
+            </a>
+          ) : null}
           <button
             type="button"
             onClick={() => void loadBeehiiv()}

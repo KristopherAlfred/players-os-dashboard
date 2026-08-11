@@ -1,5 +1,3 @@
-import { SLOANE_SOCIAL } from "./sloaneSocial";
-
 export type BeehiivPost = {
   id: string;
   title: string;
@@ -74,9 +72,9 @@ function parseBeehiivHtml(html: string, sitemap = ""): BeehiivFeed {
     syncedAt: new Date().toISOString(),
     source: "live",
     publication: {
-      id: "277a630a-5dde-4d4f-bcb5-ba871a7af973",
-      name: "Sloane Stephens Off-Court",
-      url: SLOANE_SOCIAL.beehiivUrl,
+      id: "",
+      name: "Off-Court",
+      url: "",
     },
     posts,
   };
@@ -98,7 +96,7 @@ export async function fetchBeehiivFeed(): Promise<BeehiivFeed | null> {
         fetchText(source.html),
         fetchText(source.sitemap).catch(() => ""),
       ]);
-      if (!html.includes("web_title") && !html.includes("Sloane")) continue;
+      if (!html.includes("web_title")) continue;
       const feed = parseBeehiivHtml(html, sitemap);
       if (feed.posts.length) return feed;
     } catch {
