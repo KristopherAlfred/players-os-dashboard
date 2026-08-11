@@ -1,6 +1,8 @@
 import { Panel } from "../components/PageShell";
 import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
 import { formatMetric } from "../lib/dametimeAnalyticsApi";
+import { useSocialSources } from "../lib/socialSources";
+import { NotConnectedCard, NoDataState, SkeletonPanel } from "../components/states/ConnectionStates";
 import {
   captionPreview,
   formatMetric as formatIgMetric,
@@ -18,19 +20,34 @@ import {
   textPreview as twTextPreview,
 } from "../lib/twitterAnalyticsApi";
 
-const campaigns = [
-  { name: "Tour Launch — Instagram", spend: "$12,400", conversions: 2840, roas: "4.2x", status: "Active" },
-  { name: "Inner Circle Push", spend: "$4,200", conversions: 920, roas: "6.1x", status: "Active" },
-  { name: "Email Re-engagement", spend: "$800", conversions: 410, roas: "8.4x", status: "Paused" },
-  { name: "TikTok Teaser", spend: "$8,600", conversions: 1920, roas: "3.8x", status: "Active" },
-];
+function useAnySocialConnected() {
+  const { sources, loading } = useSocialSources();
+  const connected = sources ? Object.values(sources).some((s) => s.connected) : false;
+  return { loading, connected };
+}
 
-const reports = [
-  { name: "Weekly Performance Summary", type: "Automated", last: "Jun 2, 2026" },
-  { name: "Audience Growth Report", type: "Manual", last: "May 29, 2026" },
-  { name: "Monetization Partner Export", type: "Scheduled", last: "May 25, 2026" },
-  { name: "Campaign ROI Breakdown", type: "Manual", last: "May 10, 2024" },
-];
+function AnalyticsOverviewGate({ title }: { title: string }) {
+  const { loading, connected } = useAnySocialConnected();
+  if (loading) return <SkeletonPanel />;
+  if (!connected) {
+    return (
+      <Panel title={title}>
+        <NotConnectedCard
+          platform="A social account"
+          message="Connect Instagram, YouTube, Facebook, X or your fan app to see live analytics here."
+        />
+      </Panel>
+    );
+  }
+  return (
+    <Panel title={title}>
+      <NoDataState
+        title="No analytics selected"
+        message="Pick a specific platform filter above to see its live analytics."
+      />
+    </Panel>
+  );
+}
 
 function postEngagement(post: { likes: number; comments: number; shares: number }) {
   return post.likes + post.comments + post.shares;
