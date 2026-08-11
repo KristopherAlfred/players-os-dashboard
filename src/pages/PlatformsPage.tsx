@@ -162,7 +162,7 @@ export function PlatformDetailPage() {
 
   // Recent content for a platform comes from that platform's live connector only —
   // never from bundled example content.
-  const feed: Array<{ title: string; type: string; date: string; engagement: string }> = [];
+  const feed: Array<{ title: string; published: string; engagement: string; views: string }> = [];
 
   if (loading) {
     return (
