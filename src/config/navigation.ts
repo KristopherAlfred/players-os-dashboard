@@ -137,14 +137,6 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: "Videos",
     subtitle: "YouTube analytics plus Exclusive uploads — same tabs fans use in {fanApp}.",
   },
-  "/content/doc-and-glo": {
-    title: "Doc & Glo",
-    subtitle: "{athlete}’s skincare line — sync products from the shop and publish them to the app.",
-  },
-  "/content/music": {
-    title: "Doc & Glo",
-    subtitle: "{athlete}’s skincare line — sync products from the shop and publish them to the app.",
-  },
   "/content/events": {
     title: "Events & Giveaways",
     subtitle: "Create and publish events and giveaways fans see in the {fanApp} app.",
