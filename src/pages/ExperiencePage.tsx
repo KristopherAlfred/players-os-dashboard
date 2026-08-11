@@ -141,7 +141,7 @@ type TitleFilter =
   | "lowercase"
   | "stacked"
   | "single_line"
-  | "sloane_style";
+  | "balanced_caps";
 
 const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
   { id: "as_typed", label: "As typed", hint: "Keep your wording" },
@@ -150,7 +150,7 @@ const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
   { id: "lowercase", label: "lowercase", hint: "exclusive videos" },
   { id: "stacked", label: "Stacked words", hint: "One word per line" },
   { id: "single_line", label: "Single line", hint: "No line breaks" },
-  { id: "sloane_style", label: "Balanced caps", hint: "2–3 short caps lines" },
+  { id: "balanced_caps", label: "Balanced caps", hint: "2–3 short caps lines" },
 ];
 
 function titleLines(title: string) {
@@ -187,7 +187,7 @@ function applyTitleFilter(title: string, filter: TitleFilter) {
         .join("\n");
     case "single_line":
       return flat.toUpperCase();
-    case "sloane_style": {
+    case "balanced_caps": {
       const words = flat.toUpperCase().split(/\s+/).filter(Boolean);
       if (words.length <= 2) return words.join("\n");
       if (words.length === 3) return `${words[0]}\n${words[1]}\n${words[2]}`;

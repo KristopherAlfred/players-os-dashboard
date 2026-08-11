@@ -25,7 +25,7 @@ export function AthleteThemeSync() {
     // picked Settings template.
     if (accent && prevAccent.current && accent !== prevAccent.current) {
       setAccentOverrideEnabled(true);
-      localStorage.removeItem("sloane-glo-theme-template.manual");
+      localStorage.removeItem("playersos-theme-template.manual");
     }
     prevAccent.current = accent;
     setAccentOverride(accent, accentHover);

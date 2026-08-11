@@ -721,11 +721,10 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     followTitle: DEFAULT_FOLLOW_TITLE,
     footerLine: DEFAULT_FOOTER_LINE,
     headlineRuns: [
-      { text: "Sloane " },
-      { text: '"', color: "#FFFFFF" },
-      { text: "GLO", color: HOT_PINK, fontSize: 36 },
-      { text: '"', color: "#FFFFFF" },
-      { text: " Stephens." },
+      { text: "Join " },
+      { text: "the ", color: "#FFFFFF" },
+      { text: "circle", color: HOT_PINK, fontSize: 36 },
+      { text: "." },
     ],
   }),
   youreIn: pageDefaults({
