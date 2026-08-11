@@ -39,13 +39,19 @@ export async function fetchPlatformConnections(): Promise<PlatformConnection[]> 
   return (data ?? []) as PlatformConnection[];
 }
 
-export async function setPlatformConnected(id: string, connected: boolean) {
+export async function setPlatformConnected(
+  id: string,
+  connected: boolean,
+  handle?: string | null,
+) {
   const { error } = await supabase.functions.invoke("dashboard-state", {
-    body: { action: "set_platform_connected", id, connected },
+    body: { action: "set_platform_connected", id, connected, handle: handle ?? null },
   });
 
   if (error) throw error;
+
 }
+
 
 export function formatSyncedAgo(iso: string | null): string {
   if (!iso) return "Not synced yet";

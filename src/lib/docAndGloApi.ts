@@ -143,7 +143,7 @@ export function createEmptyDocAndGloProduct(): DocAndGloProduct {
     price: "",
     currency: "USD",
     thumbnail: "",
-    shopUrl: "https://docandglo.com",
+    shopUrl: "",
     shopifyProductId: "",
     productType: "",
     status: "draft",

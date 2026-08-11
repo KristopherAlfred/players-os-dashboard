@@ -1,4 +1,6 @@
-import { isDameInstagramAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+import { isDameInstagramAnalytics } from "./sloaneSocial";
+import { handleMatches, resolveSocialHandle } from "./socialSources";
+
 
 export type InstagramPostAnalytics = {
   id: string;
@@ -81,24 +83,31 @@ async function readInstagramAnalytics(url: string): Promise<InstagramAnalytics |
   }
 }
 
+/**
+ * Live Instagram analytics for the logged-in athlete only. Returns `null` when
+ * they have not connected Instagram, or when the API answers with a different
+ * account — never falls back to another athlete's cached data.
+ */
 export async function fetchInstagramAnalytics(): Promise<InstagramAnalytics | null> {
+  const username = await resolveSocialHandle("instagram");
+  if (!username) return null;
+
   const base = getApiBase();
-  const username = SLOANE_SOCIAL.instagram;
   const urls = [
-    "/data/instagram-analytics.json",
-    `${base}/api/social/analytics?source=instagram&username=${username}&refresh=1`,
-    `${base}/api/instagram/analytics?username=${username}&refresh=1`,
-    `${base}/data/instagram-analytics.json`,
+    `${base}/api/social/analytics?source=instagram&username=${encodeURIComponent(username)}&refresh=1`,
+    `${base}/api/instagram/analytics?username=${encodeURIComponent(username)}&refresh=1`,
   ];
 
   for (const url of urls) {
     const data = await readInstagramAnalytics(url);
     if (!data) continue;
-    return url.includes("/data/") ? { ...data, source: "cache" } : data;
+    if (!handleMatches(username, data.profile?.username)) continue;
+    return data;
   }
 
   return null;
 }
+
 
 export function formatMetric(value: number, compact = false) {
   if (compact) {

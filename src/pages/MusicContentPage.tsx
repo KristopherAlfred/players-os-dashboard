@@ -1,3 +1,4 @@
+import { useAthlete } from "../contexts/AthleteContext";
 import { useEffect, useMemo, useState } from "react";
 import {
   Eye,
@@ -45,6 +46,7 @@ function findFeedItem(feed: MusicFeed | null, trackId: string) {
 }
 
 export function MusicContentPage() {
+  const { displayName, fanAppName } = useAthlete();
   const [feed, setFeed] = useState<MusicFeed | null>(null);
   const [spotifyTracks, setSpotifyTracks] = useState<SpotifyCatalogTrack[]>([]);
   const [catalogSource, setCatalogSource] = useState<"spotify" | "dame-dolla-catalog" | null>(null);
@@ -67,9 +69,9 @@ export function MusicContentPage() {
     setSpotifyTracks(tracks);
     setCatalogSource(source);
     if (source === "spotify") {
-      setStatus(`Synced ${tracks.length} live tracks from Sloane Stephens on Spotify`);
+      setStatus(`Synced ${tracks.length} live tracks from ${displayName} on Spotify`);
     } else {
-      setStatus(`Loaded ${tracks.length} Sloane Stephens tracks (built-in catalog)`);
+      setStatus(`Loaded ${tracks.length} ${displayName} tracks (built-in catalog)`);
     }
 
     if (!draft && tracks[0]) {
@@ -188,7 +190,7 @@ export function MusicContentPage() {
       const catalog = await fetchSpotifyCatalog(true);
       applyCatalog(catalog.tracks, catalog.source);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sloane Stephens sync failed");
+      setError(err instanceof Error ? err.message : "Spotify sync failed");
     } finally {
       setSyncing(false);
     }
@@ -237,7 +239,7 @@ export function MusicContentPage() {
       const payload: AppMusicItem = {
         ...draft,
         title: draft.title.trim(),
-        artist: draft.artist.trim() || "Sloane Stephens",
+        artist: draft.artist.trim() || displayName,
         duration: draft.duration.trim(),
         thumbnail: draft.thumbnail.trim(),
         spotifyUrl: draft.spotifyUrl.trim(),
@@ -254,7 +256,7 @@ export function MusicContentPage() {
       setSelectedId(payload.id);
       setStatus(
         payload.status === "published"
-          ? "Published — thumbnail & links live on Sloane Glo Music"
+          ? `Published — thumbnail & links live on ${fanAppName} Music`
           : "Draft saved",
       );
     } catch (err) {
@@ -324,7 +326,7 @@ export function MusicContentPage() {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-white/70">
-        <Loader2 className="mr-2 animate-spin" size={18} /> Loading Sloane Stephens catalog…
+        <Loader2 className="mr-2 animate-spin" size={18} /> Loading music catalog…
       </div>
     );
   }
@@ -346,13 +348,13 @@ export function MusicContentPage() {
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-dt-red/30 bg-dt-red/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-dt-red">
                 <Music2 size={12} />
-                Sloane Stephens Music
+                Music
               </div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 Curate Spotify tracks fans hear in the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Sync the Sloane Stephens catalog, swap thumbnails, add song or video links, feature cuts for Top songs, then publish. Connect Spotify later — for now manage tracks manually for Sloane Glo.
+                Sync your Spotify catalog, swap thumbnails, add song or video links, feature cuts for Top songs, then publish.
               </p>
             </div>
 
@@ -402,7 +404,7 @@ export function MusicContentPage() {
         <section className="flex min-h-[640px] flex-col overflow-hidden rounded-2xl border border-dt-border bg-dt-card xl:min-h-0">
           <div className="shrink-0 border-b border-dt-border px-4 py-3">
             <h3 className="font-display text-sm font-semibold tracking-wide text-white">Library</h3>
-            <p className="text-[11px] text-white/40">Sloane Stephens catalog + custom uploads</p>
+            <p className="text-[11px] text-white/40">Spotify catalog + custom uploads</p>
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
@@ -414,7 +416,7 @@ export function MusicContentPage() {
                 className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold text-white/85 hover:border-dt-red/40 disabled:opacity-60"
               >
                 {syncing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-                Sync Sloane Stephens
+                Sync Spotify
               </button>
               <button
                 type="button"
@@ -505,7 +507,7 @@ export function MusicContentPage() {
               })}
               {!library.length ? (
                 <li className="rounded-xl border border-dashed border-white/10 px-3 py-8 text-center text-xs text-white/40">
-                  Click Sync Sloane Stephens or add a custom track
+                  Click Sync Spotify or add a custom track
                 </li>
               ) : null}
             </ul>
@@ -620,7 +622,7 @@ export function MusicContentPage() {
                   value={draft.artist}
                   onChange={(e) => patchDraft({ artist: e.target.value })}
                   className={fieldClass()}
-                  placeholder="Sloane Stephens"
+                  placeholder={displayName}
                 />
               </label>
 

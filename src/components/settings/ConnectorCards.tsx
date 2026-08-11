@@ -8,6 +8,16 @@ import {
   type PlatformConnection,
 } from "../../lib/platformConnections";
 import { connectInstagram, syncInstagram } from "../../lib/instagramGraphApi";
+import { invalidateSocialSources } from "../../lib/socialSources";
+
+/** Platforms whose live analytics need the athlete's own handle / page / channel. */
+const HANDLE_HINTS: Record<string, string> = {
+  instagram: "your-instagram-username",
+  x: "your-x-handle",
+  facebook: "your-facebook-page",
+  tiktok: "your-tiktok-username",
+  youtube: "@your-channel or UC… channel id",
+};
 
 
 
@@ -16,6 +26,7 @@ export function ConnectorCards() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [handleDraft, setHandleDraft] = useState<{ id: string; value: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -32,15 +43,18 @@ export function ConnectorCards() {
     void load();
   }, [load]);
 
-  async function toggle(row: PlatformConnection, connected: boolean) {
+  async function toggle(row: PlatformConnection, connected: boolean, handle?: string | null) {
     setBusyId(row.id);
     try {
       if (row.platform === "instagram" && connected) {
         await connectInstagram();
         await syncInstagram();
+        if (handle) await setPlatformConnected(row.id, true, handle);
       } else {
-        await setPlatformConnected(row.id, connected);
+        await setPlatformConnected(row.id, connected, handle ?? null);
       }
+      invalidateSocialSources();
+      setHandleDraft(null);
       await load();
       setError(null);
     } catch (e) {
@@ -55,6 +69,7 @@ export function ConnectorCards() {
     setBusyId(row.id);
     try {
       await syncInstagram();
+      invalidateSocialSources();
       await load();
       setError(null);
     } catch (e) {
@@ -156,6 +171,53 @@ export function ConnectorCards() {
                           {busy ? "…" : "Disconnect"}
                         </button>
                       </>
+                    ) : HANDLE_HINTS[row.platform] ? (
+                      handleDraft?.id === row.id ? (
+                        <form
+                          className="flex w-full flex-col gap-2"
+                          onSubmit={(event) => {
+                            event.preventDefault();
+                            const value = handleDraft.value.trim();
+                            if (!value) return;
+                            void toggle(row, true, value);
+                          }}
+                        >
+                          <input
+                            autoFocus
+                            value={handleDraft.value}
+                            onChange={(event) =>
+                              setHandleDraft({ id: row.id, value: event.target.value })
+                            }
+                            placeholder={HANDLE_HINTS[row.platform]}
+                            className="w-full rounded-xl border border-dt-border bg-black/50 px-3 py-2 text-xs text-white outline-none placeholder:text-white/30 focus:border-dt-red/60"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              type="submit"
+                              disabled={busy || !handleDraft.value.trim()}
+                              className="flex-1 rounded-xl bg-dt-red px-3 py-2 text-xs font-semibold text-black transition hover:brightness-110 disabled:opacity-50"
+                            >
+                              {busy ? "Connecting…" : "Connect"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setHandleDraft(null)}
+                              className="rounded-xl border border-dt-border px-3 py-2 text-xs font-semibold text-white/60 transition hover:text-white"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => setHandleDraft({ id: row.id, value: "" })}
+                          className="w-full rounded-xl bg-dt-red px-3 py-2.5 text-xs font-semibold text-black transition hover:brightness-110 disabled:opacity-50"
+                        >
+                          Connect
+                        </button>
+                      )
                     ) : (
                       <button
                         type="button"

@@ -1,4 +1,5 @@
-import { isDameTwitterAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+import { isDameTwitterAnalytics } from "./sloaneSocial";
+import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type TwitterPostAnalytics = {
   id: string;
@@ -68,7 +69,7 @@ export function normalizePost(post: {
   return {
     id: post.id,
     text: post.text?.trim() || "Post on X",
-    permalink: post.permalink || `https://x.com/SloaneStephens/status/${post.id}`,
+    permalink: post.permalink || `https://x.com/i/web/status/${post.id}`,
     createdAt: post.createdAt || new Date().toISOString(),
     likes: Number(post.likes ?? post.stats?.likes ?? 0),
     replies: Number(post.replies ?? post.stats?.replies ?? 0),
@@ -95,15 +96,16 @@ export function buildTwitterAnalyticsFromPosts(
   const avgReplies = Math.round(totalReplies / count);
   const avgReposts = Math.round(totalReposts / count);
   const followers = Number(profile?.followers ?? 0);
+  const screenName = (profile?.screenName ?? profile?.handle ?? "").replace(/^@/, "");
 
   return {
     syncedAt: new Date().toISOString(),
     source: "cache",
     profile: {
-      screenName: profile?.screenName ?? "SloaneStephens",
-      name: profile?.name ?? "Sloane Stephens",
-      handle: profile?.handle ?? "@SloaneStephens",
-      permalink: profile?.permalink ?? "https://x.com/SloaneStephens",
+      screenName,
+      name: profile?.name ?? (screenName || "Connected X account"),
+      handle: profile?.handle ?? (screenName ? `@${screenName}` : ""),
+      permalink: profile?.permalink ?? (screenName ? `https://x.com/${screenName}` : ""),
       followers,
       followersLabel:
         profile?.followersLabel ??
@@ -129,22 +131,24 @@ export function buildTwitterAnalyticsFromPosts(
 }
 
 export async function fetchTwitterAnalytics(): Promise<TwitterAnalytics | null> {
+  const screen = await resolveSocialHandle("x");
+  if (!screen) return null;
+
   const base = getApiBase();
-  const screen = SLOANE_SOCIAL.twitter;
-  // Local Sloane cache first — fan API may still serve Dame.
+  const q = encodeURIComponent(screen);
   const urls = [
-    "/data/twitter-analytics.json",
-    `${base}/api/social/analytics?source=twitter&screen_name=${screen}&refresh=1`,
-    `${base}/api/twitter/analytics?screen_name=${screen}`,
-    `${base}/api/x/analytics?screen_name=${screen}`,
-    `${base}/data/twitter-analytics.json`,
+    `${base}/api/social/analytics?source=twitter&screen_name=${q}&refresh=1`,
+    `${base}/api/twitter/analytics?screen_name=${q}`,
+    `${base}/api/x/analytics?screen_name=${q}`,
   ];
 
   for (const url of urls) {
     try {
-      const data = await fetchJsonAnalytics(url, { allowEmpty: url.includes("/data/") });
+      const data = await fetchJsonAnalytics(url);
       if (!data || isDameTwitterAnalytics(data)) continue;
-      return url.includes("/data/") ? { ...data, source: "cache" } : data;
+      const actual = data.profile?.screenName ?? data.profile?.handle;
+      if (!handleMatches(screen, actual)) continue;
+      return data;
     } catch {
       // try next source
     }

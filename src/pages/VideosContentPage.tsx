@@ -13,6 +13,8 @@ import {
 import { Panel, StatCard } from "../components/PageShell";
 import { YouTubeAnalyticsView } from "../components/youtube/YouTubeAnalyticsDashboard";
 import { SourceError, SourceLoading } from "../components/dametime/DametimeAnalyticsStates";
+import { NotConnectedCard } from "../components/states/ConnectionStates";
+import { useSocialSources } from "../lib/socialSources";
 import {
   fetchDametimeAnalytics,
   formatMetric,
@@ -121,11 +123,14 @@ export function VideosContentPage() {
 
 function YouTubeVideosPanel() {
   const { fanAppName } = useAthlete();
+  const { sources, loading: sourcesLoading } = useSocialSources();
   const [analytics, setAnalytics] = useState<YouTubeAnalytics | null>(null);
   const [dameAnalytics, setDameAnalytics] = useState<DametimeAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const connected = sources?.youtube.connected ?? false;
 
   const load = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -136,7 +141,6 @@ function YouTubeVideosPanel() {
         fetchYouTubeAnalytics(),
         fetchDametimeAnalytics().catch(() => null),
       ]);
-      if (!data) throw new Error(`Could not load YouTube analytics from ${fanAppName}.`);
       setAnalytics(data);
       setDameAnalytics(dame);
     } catch (err) {
@@ -148,8 +152,13 @@ function YouTubeVideosPanel() {
   }, []);
 
   useEffect(() => {
+    if (sourcesLoading) return;
+    if (!connected) {
+      setLoading(false);
+      return;
+    }
     void load();
-  }, [load]);
+  }, [load, connected, sourcesLoading]);
 
   const youtubeAppClicks = useMemo(() => {
     const fromApi = dameAnalytics?.youtubeClicks ?? [];
@@ -186,8 +195,17 @@ function YouTubeVideosPanel() {
     [youtubeAppClicks],
   );
 
-  if (loading && !analytics) {
+  if (sourcesLoading || (loading && !analytics && connected)) {
     return <SourceLoading message="Loading YouTube analytics…" />;
+  }
+
+  if (!connected) {
+    return (
+      <NotConnectedCard
+        platform="YouTube"
+        message="Connect your YouTube channel to see live video analytics"
+      />
+    );
   }
 
   if (!analytics) {

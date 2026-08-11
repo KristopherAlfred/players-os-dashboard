@@ -1,6 +1,8 @@
 import { Panel } from "../components/PageShell";
 import { AnalyticsPageGate } from "../components/dametime/DametimeAnalyticsStates";
 import { formatMetric } from "../lib/dametimeAnalyticsApi";
+import { useSocialSources } from "../lib/socialSources";
+import { NotConnectedCard, NoDataState, SkeletonPanel } from "../components/states/ConnectionStates";
 import {
   captionPreview,
   formatMetric as formatIgMetric,
@@ -18,19 +20,34 @@ import {
   textPreview as twTextPreview,
 } from "../lib/twitterAnalyticsApi";
 
-const campaigns = [
-  { name: "Tour Launch — Instagram", spend: "$12,400", conversions: 2840, roas: "4.2x", status: "Active" },
-  { name: "Inner Circle Push", spend: "$4,200", conversions: 920, roas: "6.1x", status: "Active" },
-  { name: "Email Re-engagement", spend: "$800", conversions: 410, roas: "8.4x", status: "Paused" },
-  { name: "TikTok Teaser", spend: "$8,600", conversions: 1920, roas: "3.8x", status: "Active" },
-];
+function useAnySocialConnected() {
+  const { sources, loading } = useSocialSources();
+  const connected = sources ? Object.values(sources).some((s) => s.connected) : false;
+  return { loading, connected };
+}
 
-const reports = [
-  { name: "Weekly Performance Summary", type: "Automated", last: "Jun 2, 2026" },
-  { name: "Audience Growth Report", type: "Manual", last: "May 29, 2026" },
-  { name: "Monetization Partner Export", type: "Scheduled", last: "May 25, 2026" },
-  { name: "Campaign ROI Breakdown", type: "Manual", last: "May 10, 2024" },
-];
+function AnalyticsOverviewGate({ title }: { title: string }) {
+  const { loading, connected } = useAnySocialConnected();
+  if (loading) return <SkeletonPanel />;
+  if (!connected) {
+    return (
+      <Panel title={title}>
+        <NotConnectedCard
+          platform="A social account"
+          message="Connect Instagram, YouTube, Facebook, X or your fan app to see live analytics here."
+        />
+      </Panel>
+    );
+  }
+  return (
+    <Panel title={title}>
+      <NoDataState
+        title="No analytics selected"
+        message="Pick a specific platform filter above to see its live analytics."
+      />
+    </Panel>
+  );
+}
 
 function postEngagement(post: { likes: number; comments: number; shares: number }) {
   return post.likes + post.comments + post.shares;
@@ -43,36 +60,7 @@ function twPostEngagement(post: { likes: number; replies: number; reposts: numbe
 export function ConversionFunnelPage() {
   return (
     <AnalyticsPageGate
-      mock={
-        <Panel title="Conversion Funnel">
-          <div className="space-y-3">
-            {[
-              { stage: "Visitors", count: 1260000, pct: 100 },
-              { stage: "Engaged", count: 411600, pct: 33 },
-              { stage: "Captured Email/SMS", count: 75300, pct: 6 },
-              { stage: "Inner Circle", count: 12400, pct: 0.98 },
-              { stage: "Converted", count: 8700, pct: 0.69 },
-            ].map((f) => (
-              <div key={f.stage}>
-                <div className="mb-1 flex justify-between text-sm">
-                  <span className="font-medium">{f.stage}</span>
-                  <span>
-                    {f.count.toLocaleString()} ({f.pct}%)
-                  </span>
-                </div>
-                <div className="h-8 overflow-hidden rounded-md bg-dt-border">
-                  <div
-                    className="flex h-full items-center rounded-md bg-dt-red px-3 text-xs font-medium"
-                    style={{ width: `${Math.max(f.pct, 8)}%` }}
-                  >
-                    {f.pct}%
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Panel>
-      }
+      mock={<AnalyticsOverviewGate title="Conversion Funnel" />}
       dametime={(analytics) => (
         <Panel title="Conversion Funnel">
           <div className="space-y-3">
@@ -222,34 +210,10 @@ export function ConversionFunnelPage() {
 export function CampaignsPage() {
   return (
     <Panel title="Active Campaigns">
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-dt-border text-xs text-dt-muted">
-            <th className="pb-2">Campaign</th>
-            <th className="pb-2">Spend</th>
-            <th className="pb-2">Conversions</th>
-            <th className="pb-2">ROAS</th>
-            <th className="pb-2">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {campaigns.map((c) => (
-            <tr key={c.name} className="border-b border-dt-border/50 hover:bg-white/[0.02]">
-              <td className="py-3 font-medium">{c.name}</td>
-              <td className="py-3">{c.spend}</td>
-              <td className="py-3">{c.conversions.toLocaleString()}</td>
-              <td className="py-3 text-dt-green">{c.roas}</td>
-              <td className="py-3">
-                <span
-                  className={`rounded px-2 py-0.5 text-xs ${c.status === "Active" ? "bg-green-500/15 text-dt-green" : "bg-dt-border text-dt-muted"}`}
-                >
-                  {c.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <NoDataState
+        title="No campaigns yet"
+        message="Campaign tracking isn't connected for your account yet. Connect a platform or ad account to see live campaign performance here."
+      />
     </Panel>
   );
 }
@@ -263,27 +227,10 @@ export function ReportsPage() {
         </button>
       </div>
       <Panel title="Saved Reports">
-        {reports.map((r) => (
-          <div
-            key={r.name}
-            className="flex items-center justify-between border-b border-dt-border/50 py-3 last:border-0"
-          >
-            <div>
-              <p className="font-medium">{r.name}</p>
-              <p className="text-xs text-dt-muted">
-                {r.type} · Last run {r.last}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button type="button" className="rounded border border-dt-border px-3 py-1 text-xs">
-                Download
-              </button>
-              <button type="button" className="rounded border border-dt-border px-3 py-1 text-xs">
-                Schedule
-              </button>
-            </div>
-          </div>
-        ))}
+        <NoDataState
+          title="No saved reports yet"
+          message="Generate a report from your connected platforms to see it listed here."
+        />
       </Panel>
     </div>
   );

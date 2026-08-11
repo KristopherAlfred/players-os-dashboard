@@ -1,4 +1,5 @@
-import { isDameFacebookAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+import { isDameFacebookAnalytics } from "./sloaneSocial";
+import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type FacebookPostAnalytics = {
   id: string;
@@ -64,7 +65,7 @@ export function normalizePost(post: {
   return {
     id: post.id,
     text: post.text?.trim() || "Facebook post",
-    permalink: post.permalink || `https://www.facebook.com/${SLOANE_SOCIAL.facebook}/posts/${post.id}/`,
+    permalink: post.permalink || "",
     createdAt: post.createdAt || new Date().toISOString(),
     likes: Number(post.likes ?? post.stats?.likes ?? 0),
     comments: Number(post.comments ?? post.stats?.comments ?? 0),
@@ -95,10 +96,10 @@ export function buildFacebookAnalyticsFromPosts(
     syncedAt: new Date().toISOString(),
     source: "cache",
     page: {
-      id: page?.id ?? SLOANE_SOCIAL.facebook,
+      id: page?.id ?? "",
       name: page?.name ?? "Sloane Stephens",
-      slug: page?.slug ?? SLOANE_SOCIAL.facebook,
-      permalink: page?.permalink ?? SLOANE_SOCIAL.urls.facebook,
+      slug: page?.slug ?? "",
+      permalink: page?.permalink ?? "",
       followers,
       followersLabel:
         page?.followersLabel ??
@@ -121,56 +122,24 @@ export function buildFacebookAnalyticsFromPosts(
   };
 }
 
-async function enrichFollowerStats(analytics: FacebookAnalytics): Promise<FacebookAnalytics> {
-  if (analytics.kpis.followers > 0) return analytics;
-
-  const base = getApiBase();
-  const cacheUrls = ["/data/facebook-analytics.json", `${base}/data/facebook-analytics.json`];
-
-  for (const url of cacheUrls) {
-    try {
-      const cached = await fetchJsonAnalytics(url, { allowEmpty: true });
-      if (!cached?.kpis.followers || isDameFacebookAnalytics(cached)) continue;
-      return {
-        ...analytics,
-        page: {
-          ...analytics.page,
-          followers: cached.page.followers,
-          followersLabel: cached.page.followersLabel,
-          talkingAbout: cached.page.talkingAbout,
-        },
-        kpis: {
-          ...analytics.kpis,
-          followers: cached.kpis.followers,
-          engagementRate: cached.kpis.engagementRate,
-        },
-      };
-    } catch {
-      // try next
-    }
-  }
-
-  return analytics;
-}
-
 export async function fetchFacebookAnalytics(): Promise<FacebookAnalytics | null> {
+  const slug = await resolveSocialHandle("facebook");
+  if (!slug) return null;
+
   const base = getApiBase();
-  const slug = SLOANE_SOCIAL.facebook;
-  // Local Sloaneposts cache first — fan API may still serve Dame.
+  const q = encodeURIComponent(slug);
   const urls = [
-    "/data/facebook-analytics.json",
-    `${base}/api/social/analytics?source=facebook&page=${slug}&refresh=1`,
-    `${base}/api/facebook/analytics?page=${slug}`,
-    `${base}/api/facebook-analytics?page=${slug}`,
-    `${base}/data/facebook-analytics.json`,
+    `${base}/api/social/analytics?source=facebook&page=${q}&refresh=1`,
+    `${base}/api/facebook/analytics?page=${q}`,
+    `${base}/api/facebook-analytics?page=${q}`,
   ];
 
   for (const url of urls) {
     try {
-      const data = await fetchJsonAnalytics(url, { allowEmpty: url.includes("/data/") });
-      if (!data) continue;
-      const next = url.includes("/data/") ? { ...data, source: "cache" as const } : data;
-      return enrichFollowerStats(next);
+      const data = await fetchJsonAnalytics(url);
+      if (!data || isDameFacebookAnalytics(data)) continue;
+      if (!handleMatches(slug, data.page?.slug) && !handleMatches(slug, data.page?.id)) continue;
+      return data;
     } catch {
       // try next source
     }
