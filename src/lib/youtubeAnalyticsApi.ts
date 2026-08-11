@@ -228,16 +228,16 @@ function buildYouTubeAnalyticsFromFeed(feed: {
   const avgViews = Math.round(totalViews / videos.length);
   const avgLikes = Math.round(totalLikes / videos.length);
   const subscribers = Number(feed.channel?.subscribers ?? 0);
-  const handle = feed.channel?.handle ?? "@sloanestephens";
+  const handle = feed.channel?.handle ?? "";
 
   return {
     syncedAt: feed.syncedAt || new Date().toISOString(),
     source: "live",
     channel: {
-      id: feed.channel?.id ?? "UCL88E7XtLyJKmLoaGpwxxtQ",
-      name: feed.channel?.name ?? "Sloane Stephens",
+      id: feed.channel?.id ?? "",
+      name: feed.channel?.name ?? (handle.replace(/^@/, "") || "Connected YouTube channel"),
       handle,
-      permalink: `https://www.youtube.com/${handle.replace(/^@/, "@")}`,
+      permalink: handle ? `https://www.youtube.com/${handle.replace(/^@?/, "@")}` : "",
       subscribers,
       subscribersLabel: feed.channel?.subscribersLabel ?? (subscribers ? `${formatMetric(subscribers, true)} subscribers` : "Subscribers unavailable"),
     },

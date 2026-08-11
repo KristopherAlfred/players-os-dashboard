@@ -69,7 +69,7 @@ export function normalizePost(post: {
   return {
     id: post.id,
     text: post.text?.trim() || "Post on X",
-    permalink: post.permalink || `https://x.com/SloaneStephens/status/${post.id}`,
+    permalink: post.permalink || `https://x.com/i/web/status/${post.id}`,
     createdAt: post.createdAt || new Date().toISOString(),
     likes: Number(post.likes ?? post.stats?.likes ?? 0),
     replies: Number(post.replies ?? post.stats?.replies ?? 0),
@@ -96,15 +96,16 @@ export function buildTwitterAnalyticsFromPosts(
   const avgReplies = Math.round(totalReplies / count);
   const avgReposts = Math.round(totalReposts / count);
   const followers = Number(profile?.followers ?? 0);
+  const screenName = (profile?.screenName ?? profile?.handle ?? "").replace(/^@/, "");
 
   return {
     syncedAt: new Date().toISOString(),
     source: "cache",
     profile: {
-      screenName: profile?.screenName ?? "SloaneStephens",
-      name: profile?.name ?? "Sloane Stephens",
-      handle: profile?.handle ?? "@SloaneStephens",
-      permalink: profile?.permalink ?? "https://x.com/SloaneStephens",
+      screenName,
+      name: profile?.name ?? (screenName || "Connected X account"),
+      handle: profile?.handle ?? (screenName ? `@${screenName}` : ""),
+      permalink: profile?.permalink ?? (screenName ? `https://x.com/${screenName}` : ""),
       followers,
       followersLabel:
         profile?.followersLabel ??
