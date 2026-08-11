@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { Card } from "./ui/Card";
-import { liveActivity } from "../data/mockData";
 import { useOverviewMetrics } from "../contexts/OverviewMetricsContext";
+import { NoDataState } from "./states/ConnectionStates";
+import { CONNECT_PLATFORMS_ROUTE } from "../lib/socialSources";
 
 export function LiveActivityFeed() {
-  const { hasConnected } = useOverviewMetrics();
+  const { hasConnected, loading } = useOverviewMetrics();
 
   return (
     <Card
@@ -23,32 +24,23 @@ export function LiveActivityFeed() {
         )
       }
     >
-      {!hasConnected ? (
+      {loading ? (
+        <div className="flex h-[220px] items-center justify-center px-5 text-center text-[12px] text-dt-muted">
+          Loading activity…
+        </div>
+      ) : !hasConnected ? (
         <div className="flex h-[220px] flex-col items-center justify-center gap-2 px-5 text-center">
           <p className="text-[12px] text-dt-muted">No activity to show yet</p>
-          <Link to="/settings" className="text-[12px] font-medium text-dt-green hover:underline">
+          <Link to={CONNECT_PLATFORMS_ROUTE} className="text-[12px] font-medium text-dt-green hover:underline">
             Connect platforms
           </Link>
         </div>
       ) : (
-        <div className="max-h-[220px] overflow-y-auto px-3 py-2">
-          {liveActivity.map((item) => (
-            <div
-              key={`${item.user}-${item.time}`}
-              className="flex items-start gap-3 border-b border-dt-border/60 py-2.5 last:border-0"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dt-green/20 text-[10px] font-bold text-dt-green">
-                {item.avatar}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] text-white">
-                  <span className="font-medium">{item.user}</span>
-                  <span className="text-white"> — {item.action}</span>
-                </p>
-                <p className="text-[11px] text-white">{item.time}</p>
-              </div>
-            </div>
-          ))}
+        <div className="flex h-[220px] items-center justify-center px-4">
+          <NoDataState
+            title="No activity yet"
+            message="Your connected platforms are live — activity will appear here as fans engage."
+          />
         </div>
       )}
     </Card>

@@ -1,4 +1,5 @@
-import { isDameYouTubeAnalytics, SLOANE_SOCIAL } from "./sloaneSocial";
+import { isDameYouTubeAnalytics } from "./sloaneSocial";
+import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type YouTubeVideoAnalytics = {
   id: string;
@@ -68,10 +69,17 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
     durationSeconds?: number;
   }>;
 } | null> {
+  const connected = await resolveSocialHandle("youtube");
+  if (!connected) return null;
+
   const base = getApiBase();
+  const isChannelId = /^UC[\w-]{20,}$/.test(connected);
+  const idParam = isChannelId
+    ? `channelId=${encodeURIComponent(connected)}`
+    : `handle=${encodeURIComponent(connected)}`;
   const urls = [
-    `${base}/api/youtube/videos?refresh=1&limit=${limit}&channelId=${SLOANE_SOCIAL.youtubeChannelId}`,
-    `${base}/api/social/analytics?source=youtube&view=videos&refresh=1&limit=${limit}`,
+    `${base}/api/youtube/videos?refresh=1&limit=${limit}&${idParam}`,
+    `${base}/api/social/analytics?source=youtube&view=videos&refresh=1&limit=${limit}&${idParam}`,
   ];
 
   for (const url of urls) {
@@ -103,9 +111,9 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
       };
       if (!data?.videos?.length || !data.channel) continue;
       const channel = {
-        id: data.channel.id || SLOANE_SOCIAL.youtubeChannelId,
-        name: data.channel.name || "Sloane Stephens",
-        handle: data.channel.handle || `@${SLOANE_SOCIAL.youtubeHandle}`,
+        id: data.channel.id || (isChannelId ? connected : ""),
+        name: data.channel.name || "",
+        handle: data.channel.handle || `@${connected}`,
         avatar: data.channel.avatar,
         subscribers: data.channel.subscribers,
         subscribersLabel: data.channel.subscribersLabel,
@@ -119,6 +127,11 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
       ) {
         continue;
       }
+      // Identity guard: only ever return the athlete's own channel.
+      const matches = isChannelId
+        ? handleMatches(connected, channel.id)
+        : handleMatches(connected, channel.handle);
+      if (!matches) continue;
       return {
         syncedAt: data.syncedAt || new Date().toISOString(),
         source: data.source,
@@ -134,6 +147,9 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
 }
 
 export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> {
+  const connected = await resolveSocialHandle("youtube");
+  if (!connected) return null;
+
   const feed = await fetchYouTubeVideosFeed(48);
   if (feed?.videos.length) {
     const built = buildYouTubeAnalyticsFromFeed({
@@ -142,27 +158,29 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
       videos: feed.videos,
     });
     if (built && !isDameYouTubeAnalytics(built)) {
-      const withSource = { ...built, source: feed.source ?? "live" } as YouTubeAnalytics;
-      return enrichSubscriberStats(withSource);
+      return { ...built, source: feed.source ?? "live" } as YouTubeAnalytics;
     }
   }
 
   const base = getApiBase();
+  const isChannelId = /^UC[\w-]{20,}$/.test(connected);
+  const idParam = isChannelId
+    ? `channelId=${encodeURIComponent(connected)}`
+    : `handle=${encodeURIComponent(connected)}`;
   const apiUrls = [
-    "/data/youtube-analytics.json",
-    `${base}/api/social/analytics?source=youtube&refresh=1`,
-    `${base}/api/youtube/analytics?refresh=1`,
-    `${base}/api/youtube-analytics?refresh=1`,
-    `${base}/data/youtube-analytics.json`,
+    `${base}/api/social/analytics?source=youtube&refresh=1&${idParam}`,
+    `${base}/api/youtube/analytics?refresh=1&${idParam}`,
   ];
 
   for (const url of apiUrls) {
     try {
       const data = await fetchJsonAnalytics(url);
       if (!data) continue;
-      return url.includes("/data/")
-        ? enrichSubscriberStats({ ...data, source: "cache" })
-        : enrichSubscriberStats(data);
+      const matches = isChannelId
+        ? handleMatches(connected, data.channel?.id)
+        : handleMatches(connected, data.channel?.handle);
+      if (!matches) continue;
+      return data;
     } catch {
       // try next source
     }
@@ -171,35 +189,6 @@ export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> 
   return null;
 }
 
-async function enrichSubscriberStats(analytics: YouTubeAnalytics): Promise<YouTubeAnalytics> {
-  if (analytics.kpis.subscribers > 0) return analytics;
-
-  const base = getApiBase();
-  const cacheUrls = ["/data/youtube-analytics.json", `${base}/data/youtube-analytics.json`];
-
-  for (const url of cacheUrls) {
-    try {
-      const cached = await fetchJsonAnalytics(url);
-      if (!cached?.kpis.subscribers) continue;
-      return {
-        ...analytics,
-        channel: {
-          ...analytics.channel,
-          subscribers: cached.channel.subscribers,
-          subscribersLabel: cached.channel.subscribersLabel,
-        },
-        kpis: {
-          ...analytics.kpis,
-          subscribers: cached.kpis.subscribers,
-        },
-      };
-    } catch {
-      // try next
-    }
-  }
-
-  return analytics;
-}
 
 function buildYouTubeAnalyticsFromFeed(feed: {
   channel?: {

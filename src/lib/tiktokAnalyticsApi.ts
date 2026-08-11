@@ -1,4 +1,4 @@
-import { SLOANE_SOCIAL } from "./sloaneSocial";
+import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type TikTokVideoAnalytics = {
   id: string;
@@ -76,20 +76,22 @@ async function fetchJsonAnalytics(
 }
 
 export async function fetchTikTokAnalytics(): Promise<TikTokAnalytics | null> {
+  const username = await resolveSocialHandle("tiktok");
+  if (!username) return null;
+
   const base = getApiBase();
-  const username = SLOANE_SOCIAL.tiktok;
+  const q = encodeURIComponent(username);
   const urls = [
-    "/data/tiktok-analytics.json",
-    `${base}/api/social/analytics?source=tiktok&username=${username}&refresh=1`,
-    `${base}/api/tiktok/analytics?username=${username}`,
-    `${base}/data/tiktok-analytics.json`,
+    `${base}/api/social/analytics?source=tiktok&username=${q}&refresh=1`,
+    `${base}/api/tiktok/analytics?username=${q}`,
   ];
 
   for (const url of urls) {
     try {
-      const data = await fetchJsonAnalytics(url, { allowEmpty: url.includes("/data/") });
+      const data = await fetchJsonAnalytics(url);
       if (!data) continue;
-      return url.includes("/data/") ? { ...data, source: "cache" } : data;
+      if (!handleMatches(username, data.profile?.username)) continue;
+      return data;
     } catch {
       // try next
     }
@@ -122,26 +124,10 @@ export function captionPreview(caption: string, max = 80) {
 }
 
 export function tiktokProfileImage(profile: TikTokAnalytics["profile"]) {
-  return (
-    profile.avatar ||
-    "https://a.espncdn.com/i/headshots/tennis/players/full/1472.png"
-  );
+  return profile.avatar || "";
 }
 
 export function tiktokVideoCover(video: TikTokVideoAnalytics) {
-  return video.cover || tiktokProfileImage({
-    id: "",
-    username: SLOANE_SOCIAL.tiktok,
-    nickname: "Sloane Stephens",
-    handle: `@${SLOANE_SOCIAL.tiktok}`,
-    permalink: SLOANE_SOCIAL.urls.tiktok,
-    biography: "",
-    avatar: "",
-    verified: true,
-    followers: 0,
-    followersLabel: "",
-    following: 0,
-    likes: 0,
-    videoCount: 0,
-  });
+  return video.cover || "";
 }
+
