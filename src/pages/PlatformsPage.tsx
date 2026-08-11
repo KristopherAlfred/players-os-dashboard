@@ -19,7 +19,6 @@ import {
   type FollowerSnapshot,
   type PlatformConnection,
 } from "../lib/platformConnections";
-import { recentContent } from "../data/mockData";
 
 function formatCount(n: number | null | undefined) {
   if (!n) return "—";
@@ -161,12 +160,9 @@ export function PlatformDetailPage() {
     [snapshots, key],
   );
 
-  const feed = useMemo(() => {
-    const name = (connection?.display_name ?? platform).toLowerCase();
-    return recentContent.filter(
-      (item) => item.type.toLowerCase() === name || item.type.toLowerCase() === key,
-    );
-  }, [connection, platform, key]);
+  // Recent content for a platform comes from that platform's live connector only —
+  // never from bundled example content.
+  const feed: Array<{ title: string; type: string; date: string; engagement: string }> = [];
 
   if (loading) {
     return (
