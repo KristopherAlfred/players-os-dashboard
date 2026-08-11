@@ -86,7 +86,7 @@ const circleLook: ExperienceLook = {
       useGradientBg: true,
       accentColor: "#7CF3D6",
       effectPreset: "glass",
-      headline: "Join Sloane Glo",
+      headline: "Join The Circle",
       headlineGradientFrom: "#FFFFFF",
       headlineGradientTo: "#7CF3D6",
       body: "Exclusive drops, early access and behind-the-scenes moments — straight from the tour.",

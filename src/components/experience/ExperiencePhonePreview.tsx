@@ -750,7 +750,7 @@ function PageFreeformPreview({
                 🔒
               </div>
               <p className="text-center font-display text-[13px] tracking-wide text-white">
-                {page.unlockHeadline || page.headline || "JOIN SLOANE GLO"}
+                {page.unlockHeadline || page.headline || "JOIN THE CIRCLE"}
               </p>
               <p
                 className="mt-1.5 text-center text-[9px] leading-relaxed text-white"
@@ -1122,7 +1122,7 @@ function HomeHeaderPreview({
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent" />
             <div className="relative z-10 flex h-full flex-col justify-end p-3.5">
               <p className="font-display text-lg font-extrabold tracking-[0.12em] text-white">
-                {(experience.brand.wordmark || "SLOANE").split(" ")[0]}{" "}
+                {(experience.brand.wordmark || "FAN APP").split(" ")[0]}{" "}
                 <span style={{ color: experience.theme.accent }}>LIVE</span>
               </p>
               <p className="mt-0.5 text-[11px] text-white/55">

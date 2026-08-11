@@ -52,7 +52,6 @@ import {
   type NewsItem,
   type NewsStatus,
 } from "../../lib/newsApi";
-import { SLOANE_SOCIAL } from "../../lib/sloaneSocial";
 import {
   fetchYouTubeAnalytics,
   fetchYouTubeVideosFeed,
@@ -1087,7 +1086,7 @@ function VideosStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
   const [status, setStatus] = useState<string | null>(null);
   const [videoTab, setVideoTab] = useState<"youtube" | "exclusive">("exclusive");
   const [youtubeVideos, setYoutubeVideos] = useState<YouTubePreviewVideo[]>([]);
-  const [youtubeHandle, setYoutubeHandle] = useState(`@${SLOANE_SOCIAL.youtubeHandle}`);
+  const [youtubeHandle, setYoutubeHandle] = useState("");
   const [youtubeSyncing, setYoutubeSyncing] = useState(false);
 
   useEffect(() => {
@@ -1110,11 +1109,11 @@ function VideosStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
       ]);
       if (feedResult?.videos?.length) {
         setYoutubeVideos(feedResult.videos);
-        setYoutubeHandle(feedResult.channel.handle || `@${SLOANE_SOCIAL.youtubeHandle}`);
+        setYoutubeHandle(feedResult.channel.handle || "");
         setStatus(`YouTube synced · ${feedResult.videos.length} videos`);
       } else if (analytics?.recentVideos?.length) {
         setYoutubeVideos(analytics.recentVideos);
-        setYoutubeHandle(analytics.channel.handle || `@${SLOANE_SOCIAL.youtubeHandle}`);
+        setYoutubeHandle(analytics.channel.handle || "");
         setStatus(`YouTube synced · ${analytics.recentVideos.length} videos`);
       } else {
         setError("Could not load the YouTube feed for this channel");
@@ -1391,7 +1390,7 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
         setFeed(next);
         if (next.items[0]) setDraft({ ...next.items[0] });
       })
-      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load Doc & Glo"))
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load shop products"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -1446,7 +1445,7 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
         subtitle: draft.subtitle.trim(),
         description: draft.description.trim(),
         price: draft.price.trim(),
-        shopUrl: draft.shopUrl.trim() || SLOANE_SOCIAL.docAndGloUrl,
+        shopUrl: draft.shopUrl.trim(),
         status: nextStatus ?? draft.status,
         publishedAt: draft.publishedAt || new Date().toISOString(),
       };
@@ -1493,14 +1492,14 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-white/60">
-        <Loader2 className="mr-2 animate-spin" size={18} /> Loading Doc & Glo…
+        <Loader2 className="mr-2 animate-spin" size={18} /> Loading shop…
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <StudioHeader onBack={onBack} label="Doc & Glo" />
+      <StudioHeader onBack={onBack} label="Shop" />
       <Alerts error={error} status={status} />
 
       <div className="flex flex-wrap gap-2">
