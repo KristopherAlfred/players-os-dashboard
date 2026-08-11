@@ -1,4 +1,4 @@
-import { isDameFacebookAnalytics } from "./sloaneSocial";
+import { isDameFacebookAnalytics } from "./legacySocialGuards";
 import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type FacebookPostAnalytics = {

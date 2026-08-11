@@ -1,4 +1,4 @@
-import { isDameYouTubeAnalytics } from "./sloaneSocial";
+import { isDameYouTubeAnalytics } from "./legacySocialGuards";
 import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type YouTubeVideoAnalytics = {
