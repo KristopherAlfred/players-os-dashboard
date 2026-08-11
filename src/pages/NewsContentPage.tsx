@@ -254,7 +254,11 @@ export function NewsContentPage() {
           <div className="flex items-center gap-2 py-6 text-sm text-white/50">
             <Loader2 className="animate-spin" size={16} /> Loading Beehiiv…
           </div>
-        ) : !beehiiv?.posts.length ? (
+        ) : !beehiiv ? (
+          <p className="py-4 text-sm text-dt-muted">
+            Beehiiv is not connected yet — set your publication URL to show live posts here.
+          </p>
+        ) : !beehiiv.posts.length ? (
           <p className="py-4 text-sm text-dt-muted">No Beehiiv posts found yet.</p>
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">

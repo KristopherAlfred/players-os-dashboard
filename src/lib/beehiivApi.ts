@@ -31,7 +31,7 @@ async function fetchText(url: string) {
   return response.text();
 }
 
-function parseBeehiivHtml(html: string, sitemap = ""): BeehiivFeed {
+function parseBeehiivHtml(html: string, sitemap: string, configuredUrl: string): BeehiivFeed {
   const titleMatches = [...html.matchAll(/"web_title":"((?:\\.|[^"\\])*)"/g)].map((m) =>
     decodeTitle(m[1]),
   );
@@ -62,7 +62,7 @@ function parseBeehiivHtml(html: string, sitemap = ""): BeehiivFeed {
     id: slugs[index],
     title: titleMatches[index] || slugs[index],
     subtitle: "",
-    url: `https://sloanestephens.beehiiv.com/p/${slugs[index]}`,
+    url: `${configuredUrl}/p/${slugs[index]}`,
     publishedAt: lastmodBySlug.get(slugs[index]) || new Date().toISOString(),
     thumbnail: "",
     source: "beehiiv",
@@ -81,12 +81,18 @@ function parseBeehiivHtml(html: string, sitemap = ""): BeehiivFeed {
 }
 
 export async function fetchBeehiivFeed(): Promise<BeehiivFeed | null> {
-  // Production proxy (vercel rewrite) first, then direct, then bundled cache.
+  // Beehiiv has no per-athlete connection record yet — only fetch when this
+  // athlete's dashboard deployment has explicitly configured its own
+  // publication URL, otherwise treat as not connected (never show another
+  // athlete's newsletter).
+  const configuredUrl = import.meta.env.VITE_BEEHIIV_URL?.trim().replace(/\/$/, "");
+  if (!configuredUrl) return null;
+
   const sources = [
     { html: "/proxy/beehiiv/", sitemap: "/proxy/beehiiv/sitemap.xml" },
     {
-      html: "https://sloanestephens.beehiiv.com/",
-      sitemap: "https://sloanestephens.beehiiv.com/sitemap.xml",
+      html: `${configuredUrl}/`,
+      sitemap: `${configuredUrl}/sitemap.xml`,
     },
   ];
 
@@ -97,21 +103,14 @@ export async function fetchBeehiivFeed(): Promise<BeehiivFeed | null> {
         fetchText(source.sitemap).catch(() => ""),
       ]);
       if (!html.includes("web_title")) continue;
-      const feed = parseBeehiivHtml(html, sitemap);
+      const feed = parseBeehiivHtml(html, sitemap, configuredUrl);
       if (feed.posts.length) return feed;
     } catch {
       // try next
     }
   }
 
-  try {
-    const response = await fetch("/data/beehiiv-posts.json", { cache: "no-store" });
-    if (!response.ok) return null;
-    const data = (await response.json()) as BeehiivFeed;
-    return { ...data, source: "cache" };
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export function formatBeehiivDate(iso: string) {

@@ -289,7 +289,7 @@ export function DocAndGloContentPage() {
                 Curate the product line for the app
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
-                Sync products from docandglo.com, feature bestsellers, edit copy and images, then
+                Sync products from your Shopify store, feature bestsellers, edit copy and images, then
                 publish what fans see in {fanAppName}.
               </p>
             </div>
