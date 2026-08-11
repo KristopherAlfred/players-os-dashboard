@@ -267,4 +267,4 @@ export function applyPalette(basePalette: ThemePalette) {
   }
 }
 
-export const STORAGE_KEY = "sloane-glo-theme-template";
+export const STORAGE_KEY = "playersos-theme-template";

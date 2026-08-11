@@ -1,4 +1,4 @@
-import { isDameInstagramAnalytics } from "./sloaneSocial";
+import { isDameInstagramAnalytics } from "./legacySocialGuards";
 import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 

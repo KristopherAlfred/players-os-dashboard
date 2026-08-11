@@ -1,4 +1,4 @@
-import { isDameFacebookAnalytics } from "./sloaneSocial";
+import { isDameFacebookAnalytics } from "./legacySocialGuards";
 import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type FacebookPostAnalytics = {
@@ -97,7 +97,7 @@ export function buildFacebookAnalyticsFromPosts(
     source: "cache",
     page: {
       id: page?.id ?? "",
-      name: page?.name ?? "Sloane Stephens",
+      name: page?.name ?? "",
       slug: page?.slug ?? "",
       permalink: page?.permalink ?? "",
       followers,

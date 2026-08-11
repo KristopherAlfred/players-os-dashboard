@@ -63,7 +63,7 @@ export function SourceBanner() {
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           Instagram filter active — showing{" "}
-          {instagram.analytics?.source === "cache" ? "cached" : "live"} analytics for @sloanestephens.
+          {instagram.analytics?.source === "cache" ? "cached" : "live"} analytics for your connected account.
         </p>
         {!instagram.loading && instagram.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
@@ -79,7 +79,7 @@ export function SourceBanner() {
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           YouTube filter active — showing{" "}
-          {youtube.analytics?.source === "cache" ? "cached" : "live"} analytics for @sloanestephens.
+          {youtube.analytics?.source === "cache" ? "cached" : "live"} analytics for your connected account.
         </p>
         {!youtube.loading && youtube.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
@@ -95,7 +95,7 @@ export function SourceBanner() {
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           Facebook filter active — showing{" "}
-          {facebook.analytics?.source === "cache" ? "cached" : "live"} analytics for @sloanestephens.
+          {facebook.analytics?.source === "cache" ? "cached" : "live"} analytics for your connected account.
         </p>
         {!facebook.loading && facebook.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">
@@ -111,7 +111,7 @@ export function SourceBanner() {
       <div className="mb-3 rounded-lg border border-dt-red/30 bg-dt-red/10 px-3 py-2">
         <p className="text-xs font-medium text-white">
           X filter active — showing{" "}
-          {twitter.analytics?.source === "cache" ? "cached" : "live"} analytics for @sloanestephens.
+          {twitter.analytics?.source === "cache" ? "cached" : "live"} analytics for your connected account.
         </p>
         {!twitter.loading && twitter.analytics && (
           <p className="mt-0.5 text-[11px] text-dt-muted">

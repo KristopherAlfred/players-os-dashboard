@@ -297,7 +297,7 @@ export function OnboardingPage() {
                   className={inputClass}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Sloane Stephens"
+                  placeholder="e.g. your full name"
                   autoFocus
                 />
               </div>

@@ -24,7 +24,7 @@ async function getDashboardSupabase() {
   return sharedClient;
 }
 
-/** Broadcast Sloane's camera to Sloane Glo app viewers via WebRTC. */
+/** Broadcast the athlete's camera to fan app viewers via WebRTC. */
 export function useLiveHost(
   enabled: boolean,
   localStream: MediaStream | null,
@@ -49,7 +49,7 @@ export function useLiveHost(
     async function setup() {
       const supabase = await getDashboardSupabase();
       if (!supabase || cancelled) {
-        setError("Live video signaling unavailable — check Sloane Glo /api/config");
+        setError("Live video signaling unavailable — check the fan app /api/config");
         return;
       }
 

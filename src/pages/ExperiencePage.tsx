@@ -102,7 +102,7 @@ const ADD_TYPES: { type: HomeWidgetType; label: string; hint: string; Icon: type
   { type: "videos", label: "Videos", hint: "Exclusive clips", Icon: Film },
   { type: "news", label: "News", hint: "Newsletters", Icon: Newspaper },
   { type: "events", label: "Events", hint: "Giveaways", Icon: Gift },
-  { type: "music", label: "Doc & Glo", hint: "Skincare", Icon: Sparkles },
+  { type: "music", label: "Shop", hint: "Products", Icon: Sparkles },
 ];
 
 /** Mini glyph showing the box footprint inside a 2×2 grid. */
@@ -131,7 +131,7 @@ const typeMeta: Record<HomeWidgetType, { label: string; Icon: typeof Ticket }> =
   videos: { label: "Videos", Icon: Film },
   news: { label: "News", Icon: Newspaper },
   events: { label: "Events", Icon: CalendarDays },
-  music: { label: "Doc & Glo", Icon: Sparkles },
+  music: { label: "Shop", Icon: Sparkles },
 };
 
 type TitleFilter =
@@ -141,7 +141,7 @@ type TitleFilter =
   | "lowercase"
   | "stacked"
   | "single_line"
-  | "sloane_style";
+  | "balanced_caps";
 
 const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
   { id: "as_typed", label: "As typed", hint: "Keep your wording" },
@@ -150,7 +150,7 @@ const TITLE_FILTERS: { id: TitleFilter; label: string; hint: string }[] = [
   { id: "lowercase", label: "lowercase", hint: "exclusive videos" },
   { id: "stacked", label: "Stacked words", hint: "One word per line" },
   { id: "single_line", label: "Single line", hint: "No line breaks" },
-  { id: "sloane_style", label: "Balanced caps", hint: "2–3 short caps lines" },
+  { id: "balanced_caps", label: "Balanced caps", hint: "2–3 short caps lines" },
 ];
 
 function titleLines(title: string) {
@@ -187,7 +187,7 @@ function applyTitleFilter(title: string, filter: TitleFilter) {
         .join("\n");
     case "single_line":
       return flat.toUpperCase();
-    case "sloane_style": {
+    case "balanced_caps": {
       const words = flat.toUpperCase().split(/\s+/).filter(Boolean);
       if (words.length <= 2) return words.join("\n");
       if (words.length === 3) return `${words[0]}\n${words[1]}\n${words[2]}`;
@@ -1124,7 +1124,7 @@ export function ExperiencePage() {
                 className="text-[10px] font-semibold tracking-[0.28em]"
                 style={{ color: experience.brand.wordmarkColor }}
               >
-                {experience.brand.wordmark || "SLOANE GLO"}
+                {experience.brand.wordmark || fanAppName}
               </p>
               <p className="mt-1 text-[9px]" style={{ color: experience.brand.taglineColor }}>
                 {experience.brand.tagline}
@@ -1150,7 +1150,7 @@ export function ExperiencePage() {
                   <div className="absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent" />
                   <div className="relative z-10 flex h-full flex-col justify-end p-3.5">
                     <p className="font-display text-lg font-extrabold tracking-[0.12em] text-white">
-                      {experience.brand.wordmark.split(" ")[0] || "SLOANE"}{" "}
+                      {experience.brand.wordmark.split(" ")[0] || fanAppName.split(" ")[0]}{" "}
                       <span style={{ color: experience.theme.accent }}>LIVE</span>
                     </p>
                     <p className="mt-0.5 text-[11px] text-white/60">
@@ -1336,7 +1336,7 @@ export function ExperiencePage() {
                             ? "News"
                             : selected.type === "videos"
                               ? "Videos"
-                              : "Doc & Glo"}{" "}
+                              : "Shop"}{" "}
                           on the phone
                         </button>
                       ) : (

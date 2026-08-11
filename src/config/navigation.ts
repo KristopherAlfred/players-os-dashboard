@@ -42,15 +42,16 @@ export const navSections: NavSection[] = [
     items: [{ label: "Dashboard", path: "/" }],
   },
   {
-    label: "CONTENT",
-    icon: "film",
+    label: "FAN APP",
+    icon: "smartphone",
     items: [
       { label: "Social", path: "/content/social" },
       { label: "News", path: "/content/news" },
       { label: "Videos", path: "/content/videos" },
-      { label: "Doc & Glo", path: "/content/doc-and-glo" },
       { label: "Events & Giveaways", path: "/content/events" },
       { label: "Content Calendar", path: "/content/calendar" },
+      { label: "Bio Link", path: "/bio-link" },
+      { label: "Notifications", path: "/notifications" },
     ],
   },
   {
@@ -66,12 +67,6 @@ export const navSections: NavSection[] = [
     directPath: "/experience",
   },
   {
-    label: "NOTIFICATIONS",
-    icon: "bell",
-    items: [],
-    directPath: "/notifications",
-  },
-  {
     label: "PLATFORMS",
     icon: "layers",
     items: [],
@@ -83,9 +78,9 @@ export const navSections: NavSection[] = [
     items: [
       { label: "Fan Locations", path: "/fans/audience" },
       { label: "Email/SMS List", path: "/fans/subscribers" },
-      { label: "Bio Link", path: "/bio-link" },
     ],
   },
+
   {
     label: "PERFORMANCE",
     icon: "bar-chart-2",
@@ -141,14 +136,6 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/content/videos": {
     title: "Videos",
     subtitle: "YouTube analytics plus Exclusive uploads — same tabs fans use in {fanApp}.",
-  },
-  "/content/doc-and-glo": {
-    title: "Doc & Glo",
-    subtitle: "{athlete}’s skincare line — sync products from the shop and publish them to the app.",
-  },
-  "/content/music": {
-    title: "Doc & Glo",
-    subtitle: "{athlete}’s skincare line — sync products from the shop and publish them to the app.",
   },
   "/content/events": {
     title: "Events & Giveaways",

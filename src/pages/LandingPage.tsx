@@ -19,7 +19,7 @@ import {
 } from "../lib/dashboardAuth";
 
 const rosterAthletes = [
-  { id: "sloane", name: "Sloane Stephens", team: "WTA", league: "Tennis" },
+  { id: "athlete", name: "Your Athlete Profile", team: "", league: "" },
   { id: "sabrina", name: "Sabrina Ionescu", team: "New York Liberty", league: "WNBA" },
   { id: "lamar", name: "Lamar Jackson", team: "Baltimore Ravens", league: "NFL" },
   { id: "aaron", name: "A'ja Wilson", team: "Las Vegas Aces", league: "WNBA" },
@@ -54,7 +54,7 @@ export function LandingPage() {
     if (!email.trim() || !password.trim()) return;
 
     saveDashboardSession({
-      name: name.trim() || (role === "admin" ? "Sloane Glo Admin" : "Sloane Stephens"),
+      name: name.trim() || (role === "admin" ? "PlayersOS Admin" : "Athlete"),
       email: email.trim(),
       role,
     });
@@ -76,8 +76,8 @@ export function LandingPage() {
   function enterDashboard() {
     if (!isDashboardAuthed()) {
       saveDashboardSession({
-        name: signupName.trim() || "Sloane Glo Admin",
-        email: signupEmail.trim() || "admin@sloaneglo.com",
+        name: signupName.trim() || "PlayersOS Admin",
+        email: signupEmail.trim(),
         role: "admin",
       });
     }
@@ -206,7 +206,7 @@ export function LandingPage() {
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-dt-red py-3 text-sm font-semibold text-white shadow-lg shadow-dt-red/30 transition hover:bg-dt-red-hover"
                 >
                   <LogIn size={16} />
-                  Enter Sloane Glo Dashboard
+                  Enter PlayersOS Dashboard
                 </button>
 
                 <p className="text-center text-sm text-white">
@@ -354,7 +354,7 @@ export function LandingPage() {
               <h2 className="font-display text-xl font-semibold text-white">Verified (mock)</h2>
               <p className="mt-2 text-sm leading-relaxed text-white/65">
                 Nothing was emailed — verification is mocked for now. You&apos;re approved for{" "}
-                <span className="text-white">{selectedAthlete.name}</span>&apos;s Sloane Glo dashboard.
+                <span className="text-white">{selectedAthlete.name}</span>&apos;s PlayersOS dashboard.
               </p>
               <button
                 type="button"
@@ -377,7 +377,7 @@ export function LandingPage() {
         </div>
 
         <p className="mt-6 max-w-sm text-center text-sm font-semibold text-white sm:text-base">
-          Mock access for building Sloane Glo — real athlete approval comes later.
+          Mock access for building PlayersOS — real athlete approval comes later.
         </p>
       </div>
     </div>

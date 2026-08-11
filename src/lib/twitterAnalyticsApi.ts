@@ -1,4 +1,4 @@
-import { isDameTwitterAnalytics } from "./sloaneSocial";
+import { isDameTwitterAnalytics } from "./legacySocialGuards";
 import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type TwitterPostAnalytics = {

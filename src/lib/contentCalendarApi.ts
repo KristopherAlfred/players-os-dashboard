@@ -83,7 +83,7 @@ export function channelLabel(channel: CalendarChannel | "all"): string {
     case "video":
       return "Videos";
     case "music":
-      return "Doc & Glo";
+      return "Shop";
     case "event":
       return "Events";
     case "giveaway":

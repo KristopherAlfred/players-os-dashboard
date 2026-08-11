@@ -113,7 +113,7 @@ export async function fetchDametimeAnalytics(
   const secret = getAdminSecret();
   if (!secret) {
     throw new Error(
-      "Set VITE_ADMIN_EXPORT_SECRET on the dashboard (must match Sloane Glo ADMIN_EXPORT_SECRET), then redeploy.",
+      "Set VITE_ADMIN_EXPORT_SECRET on the dashboard (must match the fan app ADMIN_EXPORT_SECRET), then redeploy.",
     );
   }
 
@@ -141,20 +141,20 @@ export async function fetchDametimeAnalytics(
   } catch (err) {
     const detail = err instanceof Error ? err.message : "network error";
     throw new Error(
-      `Failed to reach Sloane Glo API (${getApiBase()}). ${detail}. If this keeps happening, confirm VITE_DAME_BIO_API_URL and that ADMIN_EXPORT_SECRET matches on both apps.`,
+      `Failed to reach fan app API (${getApiBase()}). ${detail}. If this keeps happening, confirm VITE_DAME_BIO_API_URL and that ADMIN_EXPORT_SECRET matches on both apps.`,
     );
   }
   if (response.status === 401) {
     throw new Error(
-      "Unauthorized — dashboard VITE_ADMIN_EXPORT_SECRET does not match Sloane Glo ADMIN_EXPORT_SECRET (redeploy after updating).",
+      "Unauthorized — dashboard VITE_ADMIN_EXPORT_SECRET does not match the fan app ADMIN_EXPORT_SECRET (redeploy after updating).",
     );
   }
   if (!response.ok) {
-    throw new Error(`Sloane Glo analytics unavailable (${response.status}).`);
+    throw new Error(`fan app analytics unavailable (${response.status}).`);
   }
   const data = (await response.json()) as DametimeAnalytics & { ok?: boolean };
   if (!data?.kpis) {
-    throw new Error("Sloane Glo analytics returned an unexpected payload.");
+    throw new Error("fan app analytics returned an unexpected payload.");
   }
   return {
     ...data,

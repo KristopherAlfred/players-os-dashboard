@@ -255,7 +255,7 @@ function presetsFor(id: string, order: number, size: HomeWidgetSize): Record<Exc
       ...shared,
       type: "music",
       title: "DOC &\nGLO",
-      linkTo: "/access/doc-and-glo",
+      linkTo: "/access/shop",
       cardClassName: "member-card-music-gradient",
       showMusicBars: false,
     },

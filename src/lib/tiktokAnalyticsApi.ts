@@ -116,7 +116,7 @@ export function formatPostDate(iso: string) {
 
 export function captionPreview(caption: string, max = 80) {
   const trimmed = caption
-    .replace(/\s+created by Sloane Stephens with .*$/i, "")
+    .replace(/\s+created by .* with .*$/i, "")
     .trim()
     .replace(/\s+/g, " ");
   if (!trimmed) return "TikTok video";

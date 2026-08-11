@@ -1,4 +1,4 @@
-/** Hard-reject Dame leftovers so the dashboard never paints Damian analytics for Sloane. */
+/** Hard-reject legacy demo-account analytics so no athlete ever sees someone else's data. */
 
 const DAME_USERNAMES = new Set([
   "damianlillard",
@@ -7,26 +7,6 @@ const DAME_USERNAMES = new Set([
 ]);
 
 const DAME_CHANNEL_IDS = new Set(["UCIhTfcMzbR5wyNeh57ju0ug"]);
-
-export const SLOANE_SOCIAL = {
-  instagram: "sloanestephens",
-  twitter: "SloaneStephens",
-  facebook: "Sloaneposts",
-  youtubeHandle: "sloanestephens",
-  youtubeChannelId: "UCL88E7XtLyJKmLoaGpwxxtQ",
-  tiktok: "sloanestephens",
-  beehiivUrl: "https://sloanestephens.beehiiv.com/",
-  docAndGloUrl: "https://docandglo.com/",
-  urls: {
-    instagram: "https://www.instagram.com/sloanestephens/",
-    twitter: "https://x.com/SloaneStephens",
-    facebook: "https://www.facebook.com/Sloaneposts/",
-    youtube: "https://www.youtube.com/@sloanestephens",
-    tiktok: "https://www.tiktok.com/@sloanestephens",
-    beehiiv: "https://sloanestephens.beehiiv.com/",
-    docAndGlo: "https://docandglo.com/",
-  },
-} as const;
 
 function norm(value: unknown) {
   return String(value ?? "")
@@ -84,6 +64,6 @@ export function isDameYouTubeAnalytics(data: {
   if (handle === "damianlillard") return true;
   if (norm(data.channel.name).includes("damian lillard")) return true;
   const title = data.recentVideos?.[0]?.title ?? "";
-  if (/dame\s*d\.?o\.?l\.?l\.?a|and still/i.test(title) && !/sloane/i.test(title)) return true;
+  if (/dame\s*d\.?o\.?l\.?l\.?a|and still/i.test(title)) return true;
   return false;
 }

@@ -218,7 +218,7 @@ export function SettingsPage() {
             <label className="block">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Email</span>
               <input
-                defaultValue="admin@sloaneglo.com"
+                placeholder="you@example.com"
                 className="mt-1.5 w-full rounded-xl border border-dt-border bg-black/50 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-dt-red/55 focus:ring-1 focus:ring-dt-red/25"
               />
             </label>

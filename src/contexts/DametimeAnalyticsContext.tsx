@@ -28,7 +28,7 @@ async function loadDametimeAnalytics() {
   } catch (err) {
     return {
       analytics: null,
-      error: err instanceof Error ? err.message : "Failed to load Sloane Glo analytics.",
+      error: err instanceof Error ? err.message : "Failed to load fan app analytics.",
     };
   }
 }
