@@ -1421,7 +1421,7 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
     try {
       const result = await syncDocAndGloCatalog();
       setFeed(result.feed);
-      setStatus(`Synced ${result.synced} products from docandglo.com`);
+      setStatus(`Synced ${result.synced} products from the shop`);
       if (!draft && result.feed.items[0]) setDraft({ ...result.feed.items[0] });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sync failed");
@@ -1510,7 +1510,7 @@ function DocAndGloStudio({ onBack, page, onPatchPage }: StudioBaseProps) {
           className="inline-flex items-center gap-1.5 rounded-lg bg-dt-red px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
         >
           {syncing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-          Sync products from docandglo.com
+          Sync products from the shop
         </button>
         <button
           type="button"
