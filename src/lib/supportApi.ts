@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 export type SupportReport = {
   id: string;
   fan_id: string | null;
@@ -10,7 +11,7 @@ export type SupportReport = {
 };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 function getAdminSecret() {

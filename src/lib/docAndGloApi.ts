@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 export type DocAndGloStatus = "draft" | "published";
 export type DocAndGloSource = "shopify" | "manual";
 
@@ -41,7 +42,7 @@ export type DocAndGloCatalogProduct = {
 };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 function getAdminSecret() {

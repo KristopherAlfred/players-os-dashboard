@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 export type SignupHeatmapPoint = {
   lat: number;
   lng: number;
@@ -15,7 +16,7 @@ export type SignupGeoStats = {
 };
 
 export async function fetchSignupGeoStats(): Promise<SignupGeoStats | null> {
-  const base = import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app";
+  const base = requireFanAppApiBase();
   const secret = import.meta.env.VITE_ADMIN_EXPORT_SECRET;
   if (!secret) return null;
 

@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 import { isDameFacebookAnalytics } from "./legacySocialGuards";
 import { handleMatches, resolveSocialHandle } from "./socialSources";
 
@@ -36,7 +37,7 @@ export type FacebookAnalytics = {
 };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 async function fetchJsonAnalytics(url: string, { allowEmpty = false } = {}): Promise<FacebookAnalytics | null> {

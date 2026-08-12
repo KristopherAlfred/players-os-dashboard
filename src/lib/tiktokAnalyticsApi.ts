@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 import { handleMatches, resolveSocialHandle } from "./socialSources";
 
 export type TikTokVideoAnalytics = {
@@ -45,7 +46,7 @@ export type TikTokAnalytics = {
 };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 function isDameTikTokAnalytics(data: TikTokAnalytics | null | undefined) {
