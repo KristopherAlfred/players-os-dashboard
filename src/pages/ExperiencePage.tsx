@@ -836,21 +836,14 @@ export function ExperiencePage() {
               setStatus("Logo saved — click it on any page to place it");
             }}
             onPlaceStamp={(stampId) => {
-              const pageKey =
-                section === "youreIn"
-                  ? "youreIn"
-                  : section === "settings"
-                    ? "settings"
-                    : section === "homePage"
-                      ? "home"
-                      : "landing";
+              const pageKey = editingPageKey ?? "landing";
               const stamp = (experience.stamps || []).find((s) => s.id === stampId);
               if (!stamp) return;
               patchPage(pageKey, {
                 layoutMode: "freeform",
                 stage: placeStampOnPage(experience.pages[pageKey], stamp),
               });
-              setStatus(`Placed logo on ${pageKey === "youreIn" ? "You're In" : pageKey}`);
+              setStatus(`Placed logo on ${EXPERIENCE_PAGE_LABELS[pageKey]}`);
             }}
             onRemoveStamp={(stampId) => {
               patchExperience((prev) => ({
@@ -865,7 +858,6 @@ export function ExperiencePage() {
                     },
                   ]),
                 ) as typeof prev.pages,
-                },
               }));
             }}
           />
