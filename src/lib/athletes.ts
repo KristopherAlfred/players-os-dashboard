@@ -56,10 +56,6 @@ export type AthleteBioLink = {
 const ATHLETE_COLUMNS =
   "id, profile_key, full_name, display_name, sport, sport_icon, gender, team_or_league, competition_level, league, position, bio_short, profile_photo_url, onboarding_completed";
 
-const THEME_COLUMNS =
-  "athlete_id, template_id, bg_solid, gradient_from, gradient_via, gradient_to, accent_color, accent_hover, button_bg, button_text, button_border_radius, background_image, logo_url, tagline, headline, subheadline, fan_app_name, is_published";
-
-const LINK_COLUMNS = "id, athlete_id, slug, destination_app_url, is_published, click_count";
 
 /** Strips punctuation/spacing so "Sloane  Stephens" matches "sloane stephens". */
 export function normalizeAthleteName(name: string): string {
