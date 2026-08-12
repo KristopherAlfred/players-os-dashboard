@@ -342,6 +342,8 @@ export type ExperienceConfig = {
   pages: ExperiencePages;
   /** Reusable logo stamps — click to place on the current page */
   stamps: ExperienceStamp[];
+  /** Fan-app bottom tab bar */
+  nav: ExperienceNav;
 };
 
 export const DEFAULT_EXPERIENCE_BRAND: ExperienceBrand = {
