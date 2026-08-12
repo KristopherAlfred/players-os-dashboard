@@ -137,7 +137,7 @@ export function PlatformSelector({
 }) {
   const { loading } = useStudioAccounts();
 
-  const selectable = PLATFORM_ORDER.filter((key) => supportsContentType(key, contentType));
+  const selectable = PLATFORM_ORDER;
   const allSelected = selectable.length > 0 && selectable.every((k) => selected.includes(k));
 
   function toggle(key: StudioPlatformKey) {
