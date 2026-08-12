@@ -242,6 +242,86 @@ export type ExperiencePages = {
   videos: ExperiencePageConfig;
   news: ExperiencePageConfig;
   docAndGlo: ExperiencePageConfig;
+  social: ExperiencePageConfig;
+  profile: ExperiencePageConfig;
+  foundation: ExperiencePageConfig;
+  events: ExperiencePageConfig;
+  live: ExperiencePageConfig;
+  bio: ExperiencePageConfig;
+};
+
+export type ExperiencePageKeyName = keyof ExperiencePages;
+
+/** Every editable fan-app page, in studio order. */
+export const EXPERIENCE_PAGE_KEYS: ExperiencePageKeyName[] = [
+  "landing",
+  "youreIn",
+  "home",
+  "social",
+  "videos",
+  "news",
+  "events",
+  "live",
+  "docAndGlo",
+  "foundation",
+  "bio",
+  "profile",
+  "settings",
+];
+
+export const EXPERIENCE_PAGE_LABELS: Record<ExperiencePageKeyName, string> = {
+  landing: "Landing",
+  youreIn: "You're In",
+  home: "Home",
+  social: "Social",
+  videos: "Videos",
+  news: "News",
+  events: "Events",
+  live: "Live",
+  docAndGlo: "Shop",
+  foundation: "Foundation",
+  bio: "Bio link",
+  profile: "Profile",
+  settings: "Settings",
+};
+
+/** Bottom tab bar of the fan app — fully reorderable / restylable. */
+export type ExperienceNavTab = {
+  id: string;
+  label: string;
+  /** Feature icon name (see FEATURE_ICONS) */
+  icon: string;
+  /** Page this tab opens */
+  pageKey: ExperiencePageKeyName;
+  hidden?: boolean;
+};
+
+export type ExperienceNav = {
+  tabs: ExperienceNavTab[];
+  bg: string;
+  borderColor: string;
+  activeColor: string;
+  inactiveColor: string;
+  radius: number;
+  showLabels: boolean;
+  hidden: boolean;
+};
+
+export const DEFAULT_EXPERIENCE_NAV: ExperienceNav = {
+  tabs: [
+    { id: "home", label: "Home", icon: "home", pageKey: "home" },
+    { id: "social", label: "Social", icon: "users", pageKey: "social" },
+    { id: "videos", label: "Videos", icon: "video", pageKey: "videos" },
+    { id: "news", label: "News", icon: "news", pageKey: "news" },
+    { id: "profile", label: "Profile", icon: "user", pageKey: "profile" },
+  ],
+  bg: "#050505",
+  borderColor: "rgba(255,255,255,0.10)",
+  activeColor: "#8FE3B8",
+  inactiveColor: "rgba(255,255,255,0.45)",
+  radius: 0,
+  showLabels: true,
+  hidden: false,
 };
 
 export type WidgetVisualStyle = {
