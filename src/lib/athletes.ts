@@ -123,31 +123,45 @@ export async function fetchAthleteById(id: string): Promise<Athlete | null> {
   return (data as unknown as Athlete) ?? null;
 }
 
+/**
+ * Themes, bio links, insights and connector rows are private at the database
+ * level, so they are read through the `athlete-state` function which scopes
+ * every row to the requested athlete.
+ */
 export async function fetchAthleteTheme(athleteId: string): Promise<AthleteTheme | null> {
-  const { data } = await supabase
-    .from("athlete_theme")
-    .select(THEME_COLUMNS)
-    .eq("athlete_id", athleteId)
-    .maybeSingle();
-  return (data as unknown as AthleteTheme) ?? null;
+  try {
+    const { theme } = await callAthleteState<{ theme: AthleteTheme | null }>({
+      action: "get_theme",
+      athlete_id: athleteId,
+    });
+    return theme ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchBioLink(athleteId: string): Promise<AthleteBioLink | null> {
-  const { data } = await supabase
-    .from("athlete_bio_links")
-    .select(LINK_COLUMNS)
-    .eq("athlete_id", athleteId)
-    .maybeSingle();
-  return (data as unknown as AthleteBioLink) ?? null;
+  try {
+    const { link } = await callAthleteState<{ link: AthleteBioLink | null }>({
+      action: "get_bio_link",
+      athlete_id: athleteId,
+    });
+    return link ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchBioLinkBySlug(slug: string): Promise<AthleteBioLink | null> {
-  const { data } = await supabase
-    .from("athlete_bio_links")
-    .select(LINK_COLUMNS)
-    .eq("slug", slug.toLowerCase())
-    .maybeSingle();
-  return (data as unknown as AthleteBioLink) ?? null;
+  try {
+    const { link } = await callAthleteState<{ link: AthleteBioLink | null }>({
+      action: "get_bio_link",
+      slug: slug.toLowerCase(),
+    });
+    return link ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/;
