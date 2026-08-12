@@ -55,6 +55,17 @@ export const navSections: NavSection[] = [
     ],
   },
   {
+    label: "CONTENT STUDIO",
+    icon: "clapperboard",
+    items: [
+      { label: "Content Calendar", path: "/studio/calendar" },
+      { label: "Create Content", path: "/studio/create" },
+      { label: "Scheduled Posts", path: "/studio/schedule" },
+      { label: "Media Library", path: "/studio/media" },
+      { label: "Content Analytics", path: "/studio/analytics" },
+    ],
+  },
+  {
     label: "LIVE",
     icon: "radio",
     items: [],
@@ -184,6 +195,26 @@ export const routeMeta: Record<string, RouteMeta> = {
   "/bio-link": {
     title: "Bio Link",
     subtitle: "Claim one short link that funnels social traffic into {fanApp}.",
+  },
+  "/studio/calendar": {
+    title: "Content Calendar",
+    subtitle: "Everything {fanApp} has drafted, scheduled, and published — one calendar.",
+  },
+  "/studio/create": {
+    title: "Create Content",
+    subtitle: "Compose once, tailor per platform, and publish to {fanApp}'s connected accounts.",
+  },
+  "/studio/schedule": {
+    title: "Scheduled Posts",
+    subtitle: "Queue, status, and per-platform publishing results.",
+  },
+  "/studio/media": {
+    title: "Media Library",
+    subtitle: "Photos, video, and graphics available to every {fanApp} post.",
+  },
+  "/studio/analytics": {
+    title: "Content Analytics",
+    subtitle: "Publishing performance across {fanApp}'s connected platforms.",
   },
   "/performance/traffic": {
     title: "Traffic Overview",
