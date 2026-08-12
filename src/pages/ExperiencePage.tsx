@@ -712,7 +712,7 @@ export function ExperiencePage() {
               {section === "ai" ? (
                 <ExperienceAiDesigner
                   experience={experience}
-                  pageKey="landing"
+                  pageKey={editingPageKey ?? "landing"}
                   context={{
                     fanAppName,
                     athlete: displayName,
@@ -723,7 +723,9 @@ export function ExperiencePage() {
                     patchExperience(updater);
                     setStatus(`${note} — publish to push live`);
                   }}
-                  onSetPageImage={(field, dataUrl) => patchPage("landing", { [field]: dataUrl })}
+                  onSetPageImage={(field, dataUrl) =>
+                    patchPage(editingPageKey ?? "landing", { [field]: dataUrl })
+                  }
                   onStatus={(message) => setStatus(message)}
                   onError={(message) => setError(message)}
                 />

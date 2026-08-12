@@ -62,6 +62,7 @@ export function designerConfigSnapshot(
     brand: experience.brand,
     theme: experience.theme,
     effects: experience.effects,
+    nav: experience.nav,
     pageKeys: Object.keys(experience.pages),
     page: {
       backgroundColor: page.backgroundColor,
