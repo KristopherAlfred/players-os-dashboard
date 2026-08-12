@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Columns3, List, Plus } from "lucide-react";
 import { PlatformIcon } from "./PlatformIcon";
 import { useContentStudio, type ContentRecord, type ContentStatus } from "../../lib/contentStudio/store";
-import { STUDIO_PLATFORMS, type StudioPlatformKey } from "../../lib/contentStudio/platforms";
+import { platformList, type StudioPlatformKey } from "../../lib/contentStudio/platforms";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -186,7 +186,7 @@ export function StudioCalendar({
           </button>
           {openMenu === "accounts" && (
             <div className="absolute left-0 top-full z-20 mt-1 w-52 rounded-xl border border-dt-border bg-dt-card p-1.5 shadow-xl">
-              {STUDIO_PLATFORMS.map((platform) => (
+              {platformList().map((platform) => (
                 <button
                   key={platform.key}
                   type="button"
