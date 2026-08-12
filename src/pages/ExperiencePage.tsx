@@ -66,10 +66,8 @@ type ExperienceSection =
   | "brand"
   | "theme"
   | "effects"
-  | "landing"
-  | "youreIn"
-  | "settings"
-  | "homePage";
+  | "nav"
+  | `page:${ExperiencePageKeyName}`;
 
 const SECTIONS: { id: ExperienceSection; label: string }[] = [
   { id: "ai", label: "✦ AI Designer" },
@@ -77,12 +75,20 @@ const SECTIONS: { id: ExperienceSection; label: string }[] = [
   { id: "brand", label: "Brand / Logo" },
   { id: "theme", label: "Colors" },
   { id: "effects", label: "Effects" },
-  { id: "landing", label: "Landing" },
-  { id: "youreIn", label: "You're In" },
-  { id: "settings", label: "Settings" },
-  { id: "homePage", label: "Home header" },
+  { id: "nav", label: "Tab bar" },
+  ...EXPERIENCE_PAGE_KEYS.map((key) => ({
+    id: `page:${key}` as ExperienceSection,
+    label: EXPERIENCE_PAGE_LABELS[key],
+  })),
   { id: "boxes", label: "Home boxes" },
 ];
+
+/** Which fan-app page the studio is editing, if any. */
+function sectionPageKey(section: ExperienceSection): ExperiencePageKeyName | null {
+  return section.startsWith("page:")
+    ? (section.slice(5) as ExperiencePageKeyName)
+    : null;
+}
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -295,6 +301,7 @@ export function ExperiencePage() {
   const { fanAppName, displayName, athlete } = useAthlete();
   const [layout, setLayout] = useState<HomeLayout | null>(null);
   const [section, setSection] = useState<ExperienceSection>("templates");
+  const editingPageKey = sectionPageKey(section);
   const [contentStudio, setContentStudio] = useState<ExperienceContentKind | null>(null);
   /** On the Templates tab the phone preview stays hidden until a template is picked. */
   const [templatePreviewOpen, setTemplatePreviewOpen] = useState(false);
@@ -641,7 +648,7 @@ export function ExperiencePage() {
           {section === "boxes" ? (
             <button
               type="button"
-              onClick={() => setSection("landing")}
+              onClick={() => setSection("page:landing")}
               className="text-[11px] font-semibold text-dt-red hover:underline"
             >
               Edit landing page →
@@ -766,29 +773,26 @@ export function ExperiencePage() {
                   }
                 />
               ) : null}
-              {section === "landing" ||
-              section === "youreIn" ||
-              section === "settings" ||
-              section === "homePage" ? (
-                <ExperiencePagePanel
-                  pageKey={section === "homePage" ? "home" : section}
-                  page={
-                    experience.pages[
-                      section === "homePage" ? "home" : section
-                    ]
+              {section === "nav" ? (
+                <ExperienceNavPanel
+                  nav={experience.nav}
+                  onChange={(patch) =>
+                    patchExperience((prev) => ({ ...prev, nav: { ...prev.nav, ...patch } }))
                   }
+                />
+              ) : null}
+              {editingPageKey ? (
+                <ExperiencePagePanel
+                  pageKey={editingPageKey}
+                  page={experience.pages[editingPageKey]}
                   brand={experience.brand}
                   onChangeBrand={(patch) =>
                     patchExperience((prev) => ({ ...prev, brand: { ...prev.brand, ...patch } }))
                   }
-                  onChange={(patch) =>
-                    patchPage(section === "homePage" ? "home" : section, patch)
-                  }
+                  onChange={(patch) => patchPage(editingPageKey, patch)}
                   onUpload={(field, file) =>
                     void uploadIntoExperience((dataUrl) => {
-                      patchPage(section === "homePage" ? "home" : section, {
-                        [field]: dataUrl,
-                      });
+                      patchPage(editingPageKey, { [field]: dataUrl });
                     }, file)
                   }
                 />
@@ -798,31 +802,13 @@ export function ExperiencePage() {
           {section === "templates" && !templatePreviewOpen ? null : (
           <ExperiencePhonePreview
             experience={experience}
-            mode={section === "templates" || section === "ai" ? "theme" : section}
-            pageKey={
-              section === "youreIn"
-                ? "youreIn"
-                : section === "settings"
-                  ? "settings"
-                  : section === "homePage"
-                    ? "home"
-                    : "landing"
-            }
+            mode={editingPageKey ? "page" : "theme"}
+            label={editingPageKey ? EXPERIENCE_PAGE_LABELS[editingPageKey] : undefined}
+            pageKey={editingPageKey ?? "landing"}
             onPatchBrand={(patch) =>
               patchExperience((prev) => ({ ...prev, brand: { ...prev.brand, ...patch } }))
             }
-            onPatchPage={(patch) =>
-              patchPage(
-                section === "youreIn"
-                  ? "youreIn"
-                  : section === "settings"
-                    ? "settings"
-                    : section === "homePage"
-                      ? "home"
-                      : "landing",
-                patch,
-              )
-            }
+            onPatchPage={(patch) => patchPage(editingPageKey ?? "landing", patch)}
             onSaveLogo={() => {
               const stamp = createStampFromBrand(experience.brand);
               if (!stamp) {
@@ -858,24 +844,15 @@ export function ExperiencePage() {
               patchExperience((prev) => ({
                 ...prev,
                 stamps: (prev.stamps || []).filter((s) => s.id !== stampId),
-                pages: {
-                  ...prev.pages,
-                  landing: {
-                    ...prev.pages.landing,
-                    stage: (prev.pages.landing.stage || []).filter((item) => item.stampId !== stampId),
-                  },
-                  youreIn: {
-                    ...prev.pages.youreIn,
-                    stage: (prev.pages.youreIn.stage || []).filter((item) => item.stampId !== stampId),
-                  },
-                  settings: {
-                    ...prev.pages.settings,
-                    stage: (prev.pages.settings.stage || []).filter((item) => item.stampId !== stampId),
-                  },
-                  home: {
-                    ...prev.pages.home,
-                    stage: (prev.pages.home.stage || []).filter((item) => item.stampId !== stampId),
-                  },
+                pages: Object.fromEntries(
+                  Object.entries(prev.pages).map(([key, page]) => [
+                    key,
+                    {
+                      ...page,
+                      stage: (page.stage || []).filter((item) => item.stampId !== stampId),
+                    },
+                  ]),
+                ) as typeof prev.pages,
                 },
               }));
             }}
