@@ -41,14 +41,32 @@ export type InstagramSyncResult = {
   error?: string;
 };
 
+export const META_NOT_CONFIGURED =
+  "Instagram isn't set up yet — the Meta app credentials (META_APP_ID / META_APP_SECRET) still need to be added to this project.";
+
+/** Reads the JSON error an edge function returned with a non-2xx status. */
+async function readFunctionError(error: unknown): Promise<string | null> {
+  const res = (error as { context?: Response } | null)?.context;
+  if (!res || typeof res.text !== "function") return null;
+  try {
+    const body = await res.clone().text();
+    return (JSON.parse(body) as { error?: string })?.error ?? body ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** Opens the Meta login popup and resolves once the window is closed. */
 export async function connectInstagram(): Promise<void> {
   const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(
     "instagram-auth",
     { body: {} },
   );
-  if (error) throw new Error(data?.error ?? error.message);
-  if (!data?.url) throw new Error(data?.error ?? "Could not start Instagram login");
+  const message =
+    data?.error ?? (error ? (await readFunctionError(error)) ?? error.message : null);
+  if (message?.includes("Meta app credentials")) throw new Error(META_NOT_CONFIGURED);
+  if (error) throw new Error(message ?? "Could not start Instagram login");
+  if (!data?.url) throw new Error(message ?? "Could not start Instagram login");
 
   const popup = window.open(data.url, "instagram-auth", "width=600,height=760");
   if (!popup) throw new Error("Popup blocked — allow popups and try again.");
