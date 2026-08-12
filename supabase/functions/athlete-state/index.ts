@@ -179,6 +179,129 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ---------------------------------------------------------------
+    // Reads. The underlying tables are private (RLS is fail-closed for
+    // anon), so the dashboard fetches athlete-scoped rows through here.
+    // ---------------------------------------------------------------
+    const athleteIdParam = () => {
+      const id = str((body as Record<string, unknown>).athlete_id, 36);
+      return id && UUID.test(id) ? id : null;
+    };
+
+    if (action === "get_theme") {
+      const athleteId = athleteIdParam();
+      if (!athleteId) return json({ error: "Invalid athlete_id" }, 400);
+      const { data, error } = await supabase
+        .from("athlete_theme")
+        .select("*")
+        .eq("athlete_id", athleteId)
+        .maybeSingle();
+      if (error) throw error;
+      return json({ theme: data ?? null });
+    }
+
+    if (action === "get_bio_link") {
+      const athleteId = athleteIdParam();
+      const slug = str((body as Record<string, unknown>).slug, 40)?.toLowerCase() ?? null;
+      if (!athleteId && !slug) return json({ error: "Invalid request" }, 400);
+      let query = supabase
+        .from("athlete_bio_links")
+        .select("id, athlete_id, slug, destination_app_url, is_published, click_count");
+      query = athleteId ? query.eq("athlete_id", athleteId) : query.eq("slug", slug!);
+      const { data, error } = await query.maybeSingle();
+      if (error) throw error;
+      return json({ link: data ?? null });
+    }
+
+    if (action === "get_insights") {
+      const athleteId = athleteIdParam();
+      if (!athleteId) return json({ error: "Invalid athlete_id" }, 400);
+      const rawLimit = (body as Record<string, unknown>).limit;
+      const limit = typeof rawLimit === "number" ? Math.max(1, Math.min(50, rawLimit)) : 6;
+      const { data, error } = await supabase
+        .from("athlete_ai_insights")
+        .select("id, athlete_id, insight_type, summary, recommendation, created_at")
+        .eq("athlete_id", athleteId)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return json({ insights: data ?? [] });
+    }
+
+    if (action === "get_onboarding_state") {
+      const profileKey = str((body as Record<string, unknown>).profile_key, 64);
+      if (!profileKey) return json({ error: "Invalid profile_key" }, 400);
+      const { data, error } = await supabase
+        .from("onboarding_state")
+        .select("has_completed_onboarding")
+        .eq("profile_key", profileKey)
+        .maybeSingle();
+      if (error) throw error;
+      return json({ has_completed_onboarding: Boolean(data?.has_completed_onboarding) });
+    }
+
+    if (action === "get_platform_connections") {
+      const athleteId = athleteIdParam();
+      let query = supabase
+        .from("platform_connections")
+        .select("id, platform, display_name, handle, connected, last_synced_at, follower_count")
+        .order("connected", { ascending: false })
+        .order("display_name", { ascending: true });
+      if (athleteId) query = query.eq("athlete_id", athleteId);
+      const { data, error } = await query;
+      if (error) throw error;
+      return json({ connections: data ?? [] });
+    }
+
+    if (action === "get_follower_snapshots") {
+      const athleteId = athleteIdParam();
+      const since = str((body as Record<string, unknown>).since, 10);
+      let query = supabase
+        .from("platform_follower_snapshots")
+        .select("platform, captured_on, follower_count")
+        .order("captured_on", { ascending: true });
+      if (since) query = query.gte("captured_on", since);
+      if (athleteId) query = query.eq("athlete_id", athleteId);
+      const { data, error } = await query;
+      if (error) throw error;
+      return json({ snapshots: data ?? [] });
+    }
+
+    if (action === "get_instagram") {
+      const athleteId = athleteIdParam();
+      const rawLimit = (body as Record<string, unknown>).limit;
+      const limit = typeof rawLimit === "number" ? Math.max(1, Math.min(50, rawLimit)) : 12;
+
+      let authQuery = supabase
+        .from("instagram_auth")
+        .select("ig_user_id, athlete_id")
+        .order("connected_at", { ascending: false })
+        .limit(1);
+      if (athleteId) authQuery = authQuery.eq("athlete_id", athleteId);
+      const { data: auth } = await authQuery.maybeSingle();
+      const igUserId = auth?.ig_user_id ?? null;
+      if (!igUserId) return json({ stats: null, media: [] });
+
+      const [{ data: stats }, { data: media }] = await Promise.all([
+        supabase
+          .from("instagram_account_stats")
+          .select("*")
+          .eq("ig_user_id", igUserId)
+          .order("last_synced_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("instagram_media")
+          .select(
+            "media_id, caption, media_type, media_product_type, media_url, thumbnail_url, permalink, like_count, comments_count, saved, reach, impressions, timestamp",
+          )
+          .eq("ig_user_id", igUserId)
+          .order("timestamp", { ascending: false })
+          .limit(limit),
+      ]);
+      return json({ stats: stats ?? null, media: media ?? [] });
+    }
+
     return json({ error: "Unknown action" }, 400);
   } catch (err) {
     console.error("athlete-state failed:", err instanceof Error ? err.message : String(err));
