@@ -25,18 +25,12 @@ async function currentAthleteId(): Promise<string | null> {
 
 export async function fetchPlatformConnections(): Promise<PlatformConnection[]> {
   const athleteId = await currentAthleteId();
-  let query = supabase
-    .from("platform_connections")
-    .select("id, platform, display_name, handle, connected, last_synced_at, follower_count")
-    .order("connected", { ascending: false })
-    .order("display_name", { ascending: true });
-
-  if (athleteId) query = query.eq("athlete_id", athleteId);
-
-  const { data, error } = await query;
+  const { data, error } = await supabase.functions.invoke("athlete-state", {
+    body: { action: "get_platform_connections", athlete_id: athleteId },
+  });
 
   if (error) throw error;
-  return (data ?? []) as PlatformConnection[];
+  return ((data as { connections?: PlatformConnection[] })?.connections ?? []) as PlatformConnection[];
 }
 
 export async function setPlatformConnected(
