@@ -27,6 +27,7 @@ import type {
   ExperienceBrand,
   ExperienceBuiltinStageId,
   ExperienceConfig,
+  ExperienceNav,
   ExperiencePageConfig,
   ExperienceStageItem,
   ExperienceStamp,
