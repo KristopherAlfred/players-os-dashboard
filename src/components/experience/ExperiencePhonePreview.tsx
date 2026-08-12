@@ -358,6 +358,47 @@ function StampTray({
   );
 }
 
+/** Fan-app bottom tab bar, as configured in the studio. */
+export function NavTabBarPreview({
+  nav,
+  activePageKey,
+}: {
+  nav: ExperienceNav;
+  activePageKey?: string;
+}) {
+  const tabs = (nav?.tabs ?? []).filter((tab) => !tab.hidden);
+  if (!tabs.length) return null;
+  return (
+    <div
+      className="absolute inset-x-0 bottom-0 z-[140] flex items-stretch justify-around border-t px-1 py-1.5"
+      style={{
+        background: nav.bg,
+        borderColor: nav.borderColor,
+        borderTopLeftRadius: nav.radius,
+        borderTopRightRadius: nav.radius,
+      }}
+    >
+      {tabs.map((tab) => {
+        const active = tab.pageKey === activePageKey;
+        const color = active ? nav.activeColor : nav.inactiveColor;
+        return (
+          <div key={tab.id} className="flex flex-1 flex-col items-center gap-0.5">
+            <FeatureIcon name={tab.icon} color={color} />
+            {nav.showLabels ? (
+              <span
+                className="text-[7px] font-semibold uppercase tracking-[0.12em]"
+                style={{ color }}
+              >
+                {tab.label}
+              </span>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function PageFreeformPreview({
   experience,
   page,
