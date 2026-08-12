@@ -36,8 +36,19 @@ import {
   type HomeWidgetSize,
   type HomeWidgetType,
 } from "../lib/homeLayoutApi";
-import type { ExperienceConfig, ExperiencePageConfig, WidgetVisualStyle } from "../lib/experienceConfig";
-import { createStampFromBrand, placeStampOnPage, widgetStyleCss } from "../lib/experienceConfig";
+import type {
+  ExperienceConfig,
+  ExperiencePageConfig,
+  ExperiencePageKeyName,
+  WidgetVisualStyle,
+} from "../lib/experienceConfig";
+import {
+  createStampFromBrand,
+  EXPERIENCE_PAGE_KEYS,
+  EXPERIENCE_PAGE_LABELS,
+  placeStampOnPage,
+  widgetStyleCss,
+} from "../lib/experienceConfig";
 import { makeLogoBackgroundTransparent } from "../lib/logoTransparency";
 import { titleTypographyStyle } from "../lib/typography";
 import { TypographyControls } from "../components/TypographyControls";
@@ -50,6 +61,7 @@ import {
   BrandHeaderFields,
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
+import { ExperienceNavPanel } from "../components/experience/ExperienceNavPanel";
 import { ExperienceTemplateGallery } from "../components/experience/ExperienceTemplateGallery";
 import { ExperienceAiDesigner } from "../components/experience/ExperienceAiDesigner";
 import { applyExperienceTemplate, detectExperienceTemplate } from "../lib/experienceTemplates";
