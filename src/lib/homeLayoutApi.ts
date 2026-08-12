@@ -1,4 +1,4 @@
-import { requireFanAppApiBase } from "./fanAppApiBase";
+import { hasFanAppApi, requireFanAppApiBase } from "./fanAppApiBase";
 import type {
   ExperienceBrand,
   ExperienceConfig,
@@ -309,5 +309,6 @@ function presetsFor(id: string, order: number, size: HomeWidgetSize): Record<Exc
 export function resolveAssetUrl(src: string) {
   if (!src) return "";
   if (src.startsWith("data:") || src.startsWith("http://") || src.startsWith("https://")) return src;
+  if (!hasFanAppApi()) return src;
   return `${getApiBase()}${src.startsWith("/") ? "" : "/"}${src}`;
 }
