@@ -919,6 +919,7 @@ export const DEFAULT_EXPERIENCE_CONFIG: ExperienceConfig = {
   effects: DEFAULT_EXPERIENCE_EFFECTS,
   pages: DEFAULT_EXPERIENCE_PAGES,
   stamps: [],
+  nav: DEFAULT_EXPERIENCE_NAV,
 };
 
 function asString(value: unknown, fallback = "") {
