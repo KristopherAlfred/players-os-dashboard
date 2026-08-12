@@ -2,7 +2,7 @@ import { Play } from "lucide-react";
 import { PlatformIcon } from "./PlatformIcon";
 import { PlatformAvatar } from "./PlatformSelector";
 import { MediaThumb } from "./MediaUploader";
-import { PLATFORMS, type StudioPlatformKey } from "../../lib/contentStudio/platforms";
+import { type StudioPlatformKey } from "../../lib/contentStudio/platforms";
 import { formatCount, useStudioAccounts } from "../../lib/contentStudio/accounts";
 import { resolveVariant, useContentStudio, type ContentRecord } from "../../lib/contentStudio/store";
 
@@ -20,12 +20,11 @@ export function ProfilePreview({
   const { accounts } = useStudioAccounts();
   const { content, mediaById } = useContentStudio();
   const account = accounts[platform];
-  const def = PLATFORMS[platform];
 
   const draftAsset = mediaById.get(resolveVariant(record, platform).mediaIds[0] ?? "");
   const history = content
-    .filter((r: ContentRecord) => r.id !== record.id && r.destinations.includes(platform))
-    .sort((a: ContentRecord, b: ContentRecord) => (b.scheduledFor ?? b.createdAt).localeCompare(a.scheduledFor ?? a.createdAt))
+    .filter((r: ContentRecord) => r.id !== record.id && r.platforms.includes(platform))
+    .sort((a: ContentRecord, b: ContentRecord) => (b.scheduledAt ?? b.createdAt).localeCompare(a.scheduledAt ?? a.createdAt))
     .map((r: ContentRecord) => mediaById.get(resolveVariant(r, platform).mediaIds[0] ?? ""))
     .filter(Boolean)
     .slice(0, 11);
