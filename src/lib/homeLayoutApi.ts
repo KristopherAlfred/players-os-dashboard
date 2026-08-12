@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 import type {
   ExperienceBrand,
   ExperienceConfig,
@@ -86,7 +87,7 @@ export { normalizeWidgetVisualStyle, DEFAULT_EXPERIENCE_CONFIG };
 export type { ExperienceConfig, WidgetVisualStyle };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 function getAdminSecret() {

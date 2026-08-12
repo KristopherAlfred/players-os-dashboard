@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 export type NotificationStatus = "draft" | "published";
 export type NotificationSurface = "all" | "home";
 
@@ -21,7 +22,7 @@ export type NotificationFeed = {
 };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 function getAdminSecret() {

@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 import type { TitleFontFamily, TitleFontSize } from "./typography";
 
 export type NewsCategory = "newsletters" | "insights" | "news";
@@ -27,7 +28,7 @@ export type NewsFeed = {
 };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 function getAdminSecret() {

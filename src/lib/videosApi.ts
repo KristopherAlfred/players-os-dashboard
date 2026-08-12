@@ -1,3 +1,4 @@
+import { requireFanAppApiBase } from "./fanAppApiBase";
 import type { TitleFontFamily, TitleFontSize } from "./typography";
 
 export type VideoStatus = "draft" | "published";
@@ -25,7 +26,7 @@ export type ExclusiveVideoFeed = {
 };
 
 function getApiBase() {
-  return (import.meta.env.VITE_DAME_BIO_API_URL ?? "https://sloane-bio.vercel.app").replace(/\/$/, "");
+  return (requireFanAppApiBase()).replace(/\/$/, "");
 }
 
 function getAdminSecret() {
