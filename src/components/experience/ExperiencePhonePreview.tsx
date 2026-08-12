@@ -98,6 +98,10 @@ const FEATURE_ICONS: Record<string, LucideIcon> = {
   camera: Camera,
   sparkle: Sparkle,
   check: Check,
+  home: Home,
+  news: Newspaper,
+  user: User,
+  live: Radio,
 };
 
 function FeatureIcon({ name, color }: { name: string; color: string }) {
