@@ -15,6 +15,7 @@ import {
   Bell,
   Layers,
   Smartphone,
+  Clapperboard,
   X,
 } from "lucide-react";
 import {
@@ -43,6 +44,7 @@ const iconMap: Record<string, typeof LayoutDashboard> = {
   bell: Bell,
   layers: Layers,
   smartphone: Smartphone,
+  clapperboard: Clapperboard,
 };
 
 const sectionGlowStyle = {
