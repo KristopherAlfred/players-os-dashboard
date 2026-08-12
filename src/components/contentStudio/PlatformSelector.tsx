@@ -59,9 +59,9 @@ export function PlatformAccountRow({
   const account = accounts[platform];
   const def = PLATFORMS[platform];
   const typeOk = supportsContentType(platform, contentType);
-  // Unconnected platforms stay selectable so their preview can be inspected;
-  // only content types the platform cannot handle are blocked.
-  const disabled = !typeOk;
+  // Every destination stays selectable so its preview can be inspected, even when
+  // the account isn't connected yet or the content type isn't publishable there.
+  const disabled = false;
 
   return (
     <div
@@ -69,7 +69,7 @@ export function PlatformAccountRow({
         selected
           ? "border-dt-red/50 bg-dt-red/[0.08]"
           : "border-dt-border bg-black/30 hover:border-white/20"
-      } ${disabled ? "opacity-70" : ""}`}
+      }`}
     >
       <button
         type="button"
@@ -78,7 +78,7 @@ export function PlatformAccountRow({
         aria-label={`Select ${def.label}`}
         className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border transition ${
           selected ? "border-dt-red bg-dt-red text-white" : "border-white/25 bg-transparent text-transparent"
-        } ${disabled ? "cursor-not-allowed border-white/10" : ""}`}
+        }`}
       >
         <Check size={12} strokeWidth={3} />
       </button>
@@ -98,30 +98,29 @@ export function PlatformAccountRow({
         </p>
       </div>
 
-      {!typeOk ? (
-        <span
-          className="shrink-0 rounded-lg border border-white/10 px-2 py-1 text-[10px] font-semibold text-white/40"
-          title={`${def.label} cannot publish this content type`}
-        >
-          Unsupported
-        </span>
-      ) : !account.connected ? (
-        <div className="flex shrink-0 items-center gap-1.5">
-          <span className="rounded-lg border border-white/15 bg-white/[0.06] px-2 py-1 text-[10px] font-semibold text-white/60">
-            Preview
-          </span>
-          <Link
-            to={CONNECT_PLATFORMS_ROUTE}
-            className="rounded-lg border border-dt-red/50 px-2.5 py-1 text-[11px] font-semibold text-dt-red transition hover:bg-dt-red/10"
-          >
-            Connect
-          </Link>
-        </div>
-      ) : (
+      {account.connected && typeOk ? (
         <span className="shrink-0 rounded-lg border border-dt-green/30 bg-dt-green/10 px-2 py-1 text-[10px] font-semibold text-dt-green">
           Ready
         </span>
+      ) : (
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span
+            className="rounded-lg border border-white/15 bg-white/[0.06] px-2 py-1 text-[10px] font-semibold text-white/60"
+            title={typeOk ? "Preview only until connected" : `Preview only — ${def.label} can't publish this content type`}
+          >
+            Preview
+          </span>
+          {!account.connected && (
+            <Link
+              to={CONNECT_PLATFORMS_ROUTE}
+              className="rounded-lg border border-dt-red/50 px-2.5 py-1 text-[11px] font-semibold text-dt-red transition hover:bg-dt-red/10"
+            >
+              Connect
+            </Link>
+          )}
+        </div>
       )}
+
 
     </div>
   );
@@ -138,7 +137,7 @@ export function PlatformSelector({
 }) {
   const { loading } = useStudioAccounts();
 
-  const selectable = PLATFORM_ORDER.filter((key) => supportsContentType(key, contentType));
+  const selectable = PLATFORM_ORDER;
   const allSelected = selectable.length > 0 && selectable.every((k) => selected.includes(k));
 
   function toggle(key: StudioPlatformKey) {
