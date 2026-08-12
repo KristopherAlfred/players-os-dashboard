@@ -531,6 +531,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      is_athlete_owner: { Args: { _athlete_id: string }; Returns: boolean }
       seed_athlete_platform_connections: {
         Args: { _athlete_id: string }
         Returns: undefined
