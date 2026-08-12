@@ -18,15 +18,15 @@ export function ProfilePreview({
   platform: StudioPlatformKey;
 }) {
   const { accounts } = useStudioAccounts();
-  const { records, mediaById } = useContentStudio();
+  const { content, mediaById } = useContentStudio();
   const account = accounts[platform];
   const def = PLATFORMS[platform];
 
   const draftAsset = mediaById.get(resolveVariant(record, platform).mediaIds[0] ?? "");
-  const history = records
-    .filter((r) => r.id !== record.id && r.destinations.includes(platform))
-    .sort((a, b) => (b.scheduledFor ?? b.createdAt).localeCompare(a.scheduledFor ?? a.createdAt))
-    .map((r) => mediaById.get(resolveVariant(r, platform).mediaIds[0] ?? ""))
+  const history = content
+    .filter((r: ContentRecord) => r.id !== record.id && r.destinations.includes(platform))
+    .sort((a: ContentRecord, b: ContentRecord) => (b.scheduledFor ?? b.createdAt).localeCompare(a.scheduledFor ?? a.createdAt))
+    .map((r: ContentRecord) => mediaById.get(resolveVariant(r, platform).mediaIds[0] ?? ""))
     .filter(Boolean)
     .slice(0, 11);
 
@@ -47,7 +47,7 @@ export function ProfilePreview({
           <div className="mt-1 flex gap-4 text-[10px] text-white/55">
             <span>
               <strong className="text-white">{formatCount(account.followers)}</strong>{" "}
-              {def.followerNoun ?? "followers"}
+              {platform === "youtube" ? "subscribers" : "followers"}
             </span>
             <span>
               <strong className="text-white">{history.length + 1}</strong> posts
@@ -58,7 +58,7 @@ export function ProfilePreview({
 
       {listStyle ? (
         <div className="divide-y divide-white/6">
-          {[{ asset: draftAsset, isDraft: true }, ...history.map((asset) => ({ asset, isDraft: false }))]
+          {[{ asset: draftAsset, isDraft: true }, ...history.map((asset: typeof history[number]) => ({ asset, isDraft: false }))]
             .slice(0, 5)
             .map((row, index) => (
               <div key={index} className="flex gap-3 p-3">
