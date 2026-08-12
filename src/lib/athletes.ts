@@ -56,10 +56,6 @@ export type AthleteBioLink = {
 const ATHLETE_COLUMNS =
   "id, profile_key, full_name, display_name, sport, sport_icon, gender, team_or_league, competition_level, league, position, bio_short, profile_photo_url, onboarding_completed";
 
-const THEME_COLUMNS =
-  "athlete_id, template_id, bg_solid, gradient_from, gradient_via, gradient_to, accent_color, accent_hover, button_bg, button_text, button_border_radius, background_image, logo_url, tagline, headline, subheadline, fan_app_name, is_published";
-
-const LINK_COLUMNS = "id, athlete_id, slug, destination_app_url, is_published, click_count";
 
 /** Strips punctuation/spacing so "Sloane  Stephens" matches "sloane stephens". */
 export function normalizeAthleteName(name: string): string {
@@ -123,31 +119,45 @@ export async function fetchAthleteById(id: string): Promise<Athlete | null> {
   return (data as unknown as Athlete) ?? null;
 }
 
+/**
+ * Themes, bio links, insights and connector rows are private at the database
+ * level, so they are read through the `athlete-state` function which scopes
+ * every row to the requested athlete.
+ */
 export async function fetchAthleteTheme(athleteId: string): Promise<AthleteTheme | null> {
-  const { data } = await supabase
-    .from("athlete_theme")
-    .select(THEME_COLUMNS)
-    .eq("athlete_id", athleteId)
-    .maybeSingle();
-  return (data as unknown as AthleteTheme) ?? null;
+  try {
+    const { theme } = await callAthleteState<{ theme: AthleteTheme | null }>({
+      action: "get_theme",
+      athlete_id: athleteId,
+    });
+    return theme ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchBioLink(athleteId: string): Promise<AthleteBioLink | null> {
-  const { data } = await supabase
-    .from("athlete_bio_links")
-    .select(LINK_COLUMNS)
-    .eq("athlete_id", athleteId)
-    .maybeSingle();
-  return (data as unknown as AthleteBioLink) ?? null;
+  try {
+    const { link } = await callAthleteState<{ link: AthleteBioLink | null }>({
+      action: "get_bio_link",
+      athlete_id: athleteId,
+    });
+    return link ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchBioLinkBySlug(slug: string): Promise<AthleteBioLink | null> {
-  const { data } = await supabase
-    .from("athlete_bio_links")
-    .select(LINK_COLUMNS)
-    .eq("slug", slug.toLowerCase())
-    .maybeSingle();
-  return (data as unknown as AthleteBioLink) ?? null;
+  try {
+    const { link } = await callAthleteState<{ link: AthleteBioLink | null }>({
+      action: "get_bio_link",
+      slug: slug.toLowerCase(),
+    });
+    return link ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/;

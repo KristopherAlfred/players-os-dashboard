@@ -25,18 +25,12 @@ async function currentAthleteId(): Promise<string | null> {
 
 export async function fetchPlatformConnections(): Promise<PlatformConnection[]> {
   const athleteId = await currentAthleteId();
-  let query = supabase
-    .from("platform_connections")
-    .select("id, platform, display_name, handle, connected, last_synced_at, follower_count")
-    .order("connected", { ascending: false })
-    .order("display_name", { ascending: true });
-
-  if (athleteId) query = query.eq("athlete_id", athleteId);
-
-  const { data, error } = await query;
+  const { data, error } = await supabase.functions.invoke("athlete-state", {
+    body: { action: "get_platform_connections", athlete_id: athleteId },
+  });
 
   if (error) throw error;
-  return (data ?? []) as PlatformConnection[];
+  return ((data as { connections?: PlatformConnection[] })?.connections ?? []) as PlatformConnection[];
 }
 
 export async function setPlatformConnected(
@@ -73,18 +67,12 @@ export type FollowerSnapshot = {
 export async function fetchFollowerSnapshots(days = 30): Promise<FollowerSnapshot[]> {
   const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
   const athleteId = await currentAthleteId();
-  let query = supabase
-    .from("platform_follower_snapshots")
-    .select("platform, captured_on, follower_count")
-    .gte("captured_on", since)
-    .order("captured_on", { ascending: true });
-
-  if (athleteId) query = query.eq("athlete_id", athleteId);
-
-  const { data, error } = await query;
+  const { data, error } = await supabase.functions.invoke("athlete-state", {
+    body: { action: "get_follower_snapshots", athlete_id: athleteId, since },
+  });
 
   if (error) throw error;
-  return (data ?? []) as FollowerSnapshot[];
+  return ((data as { snapshots?: FollowerSnapshot[] })?.snapshots ?? []) as FollowerSnapshot[];
 }
 
 export async function recordFollowerSnapshots() {

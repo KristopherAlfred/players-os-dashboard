@@ -80,31 +80,23 @@ export async function syncInstagram(): Promise<InstagramSyncResult> {
 }
 
 
-export async function fetchInstagramAccountStats(): Promise<InstagramAccountStats | null> {
-  const { data, error } = await supabase
-    .from("instagram_account_stats")
-    .select(
-      "ig_user_id, username, name, biography, profile_picture_url, website, followers_count, follows_count, media_count, reach, impressions, profile_views, last_synced_at",
-    )
-    .order("last_synced_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
+/** Instagram tables are private; reads go through the athlete-state function. */
+async function fetchInstagramBundle(limit = 12) {
+  const { data, error } = await supabase.functions.invoke("athlete-state", {
+    body: { action: "get_instagram", limit },
+  });
   if (error) throw error;
-  return (data as InstagramAccountStats | null) ?? null;
+  return (data ?? {}) as { stats?: InstagramAccountStats | null; media?: InstagramMediaRow[] };
+}
+
+export async function fetchInstagramAccountStats(): Promise<InstagramAccountStats | null> {
+  const { stats } = await fetchInstagramBundle(1);
+  return stats ?? null;
 }
 
 export async function fetchInstagramMedia(limit = 12): Promise<InstagramMediaRow[]> {
-  const { data, error } = await supabase
-    .from("instagram_media")
-    .select(
-      "media_id, caption, media_type, media_product_type, media_url, thumbnail_url, permalink, like_count, comments_count, saved, reach, impressions, timestamp",
-    )
-    .order("timestamp", { ascending: false })
-    .limit(limit);
-
-  if (error) throw error;
-  return (data ?? []) as InstagramMediaRow[];
+  const { media } = await fetchInstagramBundle(limit);
+  return media ?? [];
 }
 
 export function instagramEngagementRate(

@@ -1,4 +1,4 @@
-import { requireFanAppApiBase } from "./fanAppApiBase";
+import { hasFanAppApi, requireFanAppApiBase } from "./fanAppApiBase";
 import type {
   ExperienceBrand,
   ExperienceConfig,
@@ -103,12 +103,54 @@ async function layoutRequest(init?: RequestInit) {
   return data;
 }
 
+const LOCAL_LAYOUT_KEY = "playersos_home_layout_v1";
+
+function defaultLocalLayout(): HomeLayout {
+  const types: HomeWidgetType[] = ["videos", "news", "events", "music"];
+  return {
+    version: 1,
+    updatedAt: new Date().toISOString(),
+    heroEnabled: true,
+    widgets: types.map((type, index) => createWidget(type, index)),
+    experience: DEFAULT_EXPERIENCE_CONFIG,
+  };
+}
+
+function readLocalLayout(): HomeLayout {
+  try {
+    const raw = localStorage.getItem(LOCAL_LAYOUT_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as HomeLayout;
+      if (parsed && Array.isArray(parsed.widgets)) return parsed;
+    }
+  } catch {
+    /* ignore */
+  }
+  return defaultLocalLayout();
+}
+
+function writeLocalLayout(layout: HomeLayout): HomeLayout {
+  const next = { ...layout, updatedAt: new Date().toISOString() };
+  try {
+    localStorage.setItem(LOCAL_LAYOUT_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore quota errors */
+  }
+  return next;
+}
+
 export async function fetchHomeLayout(): Promise<HomeLayout> {
-  const data = (await layoutRequest()) as { layout: HomeLayout };
-  return scrubHomeLayoutImages(data.layout);
+  if (!hasFanAppApi()) return readLocalLayout();
+  try {
+    const data = (await layoutRequest()) as { layout: HomeLayout };
+    return scrubHomeLayoutImages(data.layout);
+  } catch {
+    return readLocalLayout();
+  }
 }
 
 export async function publishHomeLayout(layout: HomeLayout): Promise<HomeLayout> {
+  if (!hasFanAppApi()) return writeLocalLayout(layout);
   const secret = getAdminSecret();
   if (!secret) throw new Error("Set VITE_ADMIN_EXPORT_SECRET to publish home layouts");
   const data = (await layoutRequest({
@@ -121,6 +163,7 @@ export async function publishHomeLayout(layout: HomeLayout): Promise<HomeLayout>
   })) as { layout: HomeLayout };
   return scrubHomeLayoutImages(data.layout);
 }
+
 
 export function scrubStarterWidgetImage(src: string | undefined | null): string {
   if (!src) return "";
@@ -266,5 +309,6 @@ function presetsFor(id: string, order: number, size: HomeWidgetSize): Record<Exc
 export function resolveAssetUrl(src: string) {
   if (!src) return "";
   if (src.startsWith("data:") || src.startsWith("http://") || src.startsWith("https://")) return src;
+  if (!hasFanAppApi()) return src;
   return `${getApiBase()}${src.startsWith("/") ? "" : "/"}${src}`;
 }
