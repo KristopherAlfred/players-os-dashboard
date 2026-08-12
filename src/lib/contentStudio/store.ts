@@ -120,7 +120,9 @@ function subscribe(workspaceId: string, fn: () => void) {
   const set = listeners.get(workspaceId) ?? new Set();
   set.add(fn);
   listeners.set(workspaceId, set);
-  return () => set.delete(fn);
+  return () => {
+    set.delete(fn);
+  };
 }
 
 export function newId(prefix = "c") {
