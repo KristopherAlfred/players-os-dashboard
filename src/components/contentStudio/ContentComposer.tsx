@@ -17,7 +17,6 @@ import { ProfilePreview } from "./ProfilePreview";
 import {
   CONTENT_TYPES,
   PLATFORMS,
-  captionLimit,
   supportsContentType,
   type ContentType,
   type StudioPlatformKey,
@@ -124,7 +123,7 @@ export function ContentComposer({
       list.push("This content type usually needs at least one media asset.");
     }
     for (const platform of activePlatforms) {
-      const limit = captionLimit(platform);
+      const limit = PLATFORMS[platform].captionLimit;
       const variant = resolveVariant(record, platform);
       const length = `${variant.caption} ${variant.hashtags}`.trim().length;
       if (limit && length > limit) {
@@ -133,7 +132,7 @@ export function ContentComposer({
       if ((platform === "youtube" || platform === "spotify") && !variant.title.trim()) {
         list.push(`${PLATFORMS[platform].label}: a title is required.`);
       }
-      if (PLATFORMS[platform].requiresMedia && variant.mediaIds.length === 0) {
+      if ((platform === "instagram" || platform === "tiktok") && variant.mediaIds.length === 0) {
         list.push(`${PLATFORMS[platform].label}: media is required.`);
       }
     }
@@ -288,9 +287,7 @@ export function ContentComposer({
                   <Field
                     label="Caption / description"
                     hint={
-                      captionLimit(previewPlatform)
-                        ? `${resolveVariant(record, previewPlatform).caption.length} / ${captionLimit(previewPlatform)}`
-                        : undefined
+                      `${resolveVariant(record, previewPlatform).caption.length} / ${PLATFORMS[previewPlatform].captionLimit}`
                     }
                   >
                     <textarea
