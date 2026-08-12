@@ -22,14 +22,11 @@ function aiError(error: unknown, fallback: string): Error {
 }
 
 export async function fetchAthleteInsights(athleteId: string, limit = 6): Promise<AthleteAiInsight[]> {
-  const { data, error } = await supabase
-    .from("athlete_ai_insights")
-    .select("id, athlete_id, insight_type, summary, recommendation, created_at")
-    .eq("athlete_id", athleteId)
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  const { data, error } = await supabase.functions.invoke("athlete-state", {
+    body: { action: "get_insights", athlete_id: athleteId, limit },
+  });
   if (error) throw new Error(error.message);
-  return (data ?? []) as AthleteAiInsight[];
+  return ((data as { insights?: AthleteAiInsight[] })?.insights ?? []) as AthleteAiInsight[];
 }
 
 export async function generateAthleteInsights(athleteId: string): Promise<AthleteAiInsight[]> {
