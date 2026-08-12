@@ -59,7 +59,9 @@ export function PlatformAccountRow({
   const account = accounts[platform];
   const def = PLATFORMS[platform];
   const typeOk = supportsContentType(platform, contentType);
-  const disabled = !account.connected || !typeOk;
+  // Unconnected platforms stay selectable so their preview can be inspected;
+  // only content types the platform cannot handle are blocked.
+  const disabled = !typeOk;
 
   return (
     <div
@@ -92,29 +94,35 @@ export function PlatformAccountRow({
                account.followers !== null ? `${formatCount(account.followers)} followers` : null]
                 .filter(Boolean)
                 .join(" · ")
-            : CONNECTION_LABELS[account.connection]}
+            : `${CONNECTION_LABELS[account.connection]} · preview only`}
         </p>
       </div>
 
-      {!account.connected ? (
-        <Link
-          to={CONNECT_PLATFORMS_ROUTE}
-          className="shrink-0 rounded-lg border border-dt-red/50 px-2.5 py-1 text-[11px] font-semibold text-dt-red transition hover:bg-dt-red/10"
-        >
-          Connect
-        </Link>
-      ) : !typeOk ? (
+      {!typeOk ? (
         <span
           className="shrink-0 rounded-lg border border-white/10 px-2 py-1 text-[10px] font-semibold text-white/40"
           title={`${def.label} cannot publish this content type`}
         >
           Unsupported
         </span>
+      ) : !account.connected ? (
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="rounded-lg border border-white/15 bg-white/[0.06] px-2 py-1 text-[10px] font-semibold text-white/60">
+            Preview
+          </span>
+          <Link
+            to={CONNECT_PLATFORMS_ROUTE}
+            className="rounded-lg border border-dt-red/50 px-2.5 py-1 text-[11px] font-semibold text-dt-red transition hover:bg-dt-red/10"
+          >
+            Connect
+          </Link>
+        </div>
       ) : (
         <span className="shrink-0 rounded-lg border border-dt-green/30 bg-dt-green/10 px-2 py-1 text-[10px] font-semibold text-dt-green">
           Ready
         </span>
       )}
+
     </div>
   );
 }
