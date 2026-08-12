@@ -61,7 +61,8 @@ export type PhonePreviewMode =
   | "youreIn"
   | "settings"
   | "homePage"
-  | "boxes";
+  | "boxes"
+  | "page";
 
 export type ExperiencePageKey = keyof ExperienceConfig["pages"];
 
@@ -1224,11 +1225,13 @@ const MODE_LABEL: Record<PhonePreviewMode, string> = {
   settings: "Settings",
   homePage: "Home header",
   boxes: "Home boxes",
+  page: "Page",
 };
 
 export function ExperiencePhonePreview({
   experience,
   mode,
+  label,
   pageKey,
   onPatchPage,
   onPatchBrand,
@@ -1238,6 +1241,7 @@ export function ExperiencePhonePreview({
 }: {
   experience: ExperienceConfig;
   mode: PhonePreviewMode;
+  label?: string;
   pageKey: ExperiencePageKey;
   onPatchPage?: (patch: Partial<ExperiencePageConfig>) => void;
   onPatchBrand?: (patch: Partial<ExperienceBrand>) => void;
@@ -1264,7 +1268,7 @@ export function ExperiencePhonePreview({
       experience={experience}
       page={experience.pages[pageKey]}
       pageKey={pageKey}
-      label={MODE_LABEL[mode]}
+      label={label ?? MODE_LABEL[mode]}
       onPatchPage={onPatchPage}
       onPatchBrand={onPatchBrand}
       onSaveLogo={onSaveLogo}
