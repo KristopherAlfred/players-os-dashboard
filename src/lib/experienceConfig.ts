@@ -1255,6 +1255,7 @@ export function normalizeExperienceConfig(raw: unknown): ExperienceConfig {
     effects: normalizeExperienceEffects(c.effects),
     pages: normalizeExperiencePages(c.pages),
     stamps: normalizeExperienceStamps(c.stamps),
+    nav: normalizeExperienceNav(c.nav),
   };
 }
 
