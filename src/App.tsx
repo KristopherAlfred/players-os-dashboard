@@ -29,6 +29,11 @@ import { AthleteProvider } from "./contexts/AthleteContext";
 import { isDashboardAuthed } from "./lib/dashboardAuth";
 import { BioLinkPage } from "./pages/BioLinkPage";
 import { BioLinkRedirectPage } from "./pages/BioLinkRedirectPage";
+import { ContentStudioCalendarPage } from "./pages/contentStudio/ContentStudioCalendarPage";
+import { CreateContentPage } from "./pages/contentStudio/CreateContentPage";
+import { ScheduledPostsPage } from "./pages/contentStudio/ScheduledPostsPage";
+import { MediaLibraryPage } from "./pages/contentStudio/MediaLibraryPage";
+import { ContentAnalyticsPage } from "./pages/contentStudio/ContentAnalyticsPage";
 
 export default function App() {
   return (
@@ -80,6 +85,12 @@ export default function App() {
           <Route path="content/playlists" element={<Navigate to="/content/social" replace />} />
           <Route path="content/upload" element={<Navigate to="/experience" replace />} />
           <Route path="athletes/hub" element={<Navigate to="/experience" replace />} />
+          <Route path="studio" element={<Navigate to="/studio/calendar" replace />} />
+          <Route path="studio/calendar" element={<ContentStudioCalendarPage />} />
+          <Route path="studio/create" element={<CreateContentPage />} />
+          <Route path="studio/schedule" element={<ScheduledPostsPage />} />
+          <Route path="studio/media" element={<MediaLibraryPage />} />
+          <Route path="studio/analytics" element={<ContentAnalyticsPage />} />
           <Route path="live" element={<LivePage />} />
           <Route path="experience" element={<ExperiencePage />} />
           <Route path="notifications" element={<NotificationsPage />} />
