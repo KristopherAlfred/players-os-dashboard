@@ -9,9 +9,13 @@ import {
   Flame,
   Gift,
   Heart,
+  Home,
   Lock,
   Menu,
   Music,
+  Newspaper,
+  Radio,
+  User,
   ShoppingBag,
   Sparkle,
   Star,
@@ -27,6 +31,7 @@ import type {
   ExperienceBrand,
   ExperienceBuiltinStageId,
   ExperienceConfig,
+  ExperienceNav,
   ExperiencePageConfig,
   ExperienceStageItem,
   ExperienceStamp,
@@ -56,7 +61,8 @@ export type PhonePreviewMode =
   | "youreIn"
   | "settings"
   | "homePage"
-  | "boxes";
+  | "boxes"
+  | "page";
 
 export type ExperiencePageKey = keyof ExperienceConfig["pages"];
 
@@ -93,6 +99,10 @@ const FEATURE_ICONS: Record<string, LucideIcon> = {
   camera: Camera,
   sparkle: Sparkle,
   check: Check,
+  home: Home,
+  news: Newspaper,
+  user: User,
+  live: Radio,
 };
 
 function FeatureIcon({ name, color }: { name: string; color: string }) {
@@ -354,6 +364,47 @@ function StampTray({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Fan-app bottom tab bar, as configured in the studio. */
+export function NavTabBarPreview({
+  nav,
+  activePageKey,
+}: {
+  nav: ExperienceNav;
+  activePageKey?: string;
+}) {
+  const tabs = (nav?.tabs ?? []).filter((tab) => !tab.hidden);
+  if (!tabs.length) return null;
+  return (
+    <div
+      className="absolute inset-x-0 bottom-0 z-[140] flex items-stretch justify-around border-t px-1 py-1.5"
+      style={{
+        background: nav.bg,
+        borderColor: nav.borderColor,
+        borderTopLeftRadius: nav.radius,
+        borderTopRightRadius: nav.radius,
+      }}
+    >
+      {tabs.map((tab) => {
+        const active = tab.pageKey === activePageKey;
+        const color = active ? nav.activeColor : nav.inactiveColor;
+        return (
+          <div key={tab.id} className="flex flex-1 flex-col items-center gap-0.5">
+            <FeatureIcon name={tab.icon} color={color} />
+            {nav.showLabels ? (
+              <span
+                className="text-[7px] font-semibold uppercase tracking-[0.12em]"
+                style={{ color }}
+              >
+                {tab.label}
+              </span>
+            ) : null}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -784,6 +835,9 @@ function PageFreeformPreview({
             </div>
           </div>
         ) : null}
+        {!experience.nav?.hidden && pageKey !== "landing" && pageKey !== "youreIn" ? (
+          <NavTabBarPreview nav={experience.nav} activePageKey={pageKey} />
+        ) : null}
       </div>
       {showLandingChrome ? (
         <div className="border-t border-white/10 bg-black/80 px-3 py-2">
@@ -1171,11 +1225,13 @@ const MODE_LABEL: Record<PhonePreviewMode, string> = {
   settings: "Settings",
   homePage: "Home header",
   boxes: "Home boxes",
+  page: "Page",
 };
 
 export function ExperiencePhonePreview({
   experience,
   mode,
+  label,
   pageKey,
   onPatchPage,
   onPatchBrand,
@@ -1185,6 +1241,7 @@ export function ExperiencePhonePreview({
 }: {
   experience: ExperienceConfig;
   mode: PhonePreviewMode;
+  label?: string;
   pageKey: ExperiencePageKey;
   onPatchPage?: (patch: Partial<ExperiencePageConfig>) => void;
   onPatchBrand?: (patch: Partial<ExperienceBrand>) => void;
@@ -1211,7 +1268,7 @@ export function ExperiencePhonePreview({
       experience={experience}
       page={experience.pages[pageKey]}
       pageKey={pageKey}
-      label={MODE_LABEL[mode]}
+      label={label ?? MODE_LABEL[mode]}
       onPatchPage={onPatchPage}
       onPatchBrand={onPatchBrand}
       onSaveLogo={onSaveLogo}

@@ -242,6 +242,86 @@ export type ExperiencePages = {
   videos: ExperiencePageConfig;
   news: ExperiencePageConfig;
   docAndGlo: ExperiencePageConfig;
+  social: ExperiencePageConfig;
+  profile: ExperiencePageConfig;
+  foundation: ExperiencePageConfig;
+  events: ExperiencePageConfig;
+  live: ExperiencePageConfig;
+  bio: ExperiencePageConfig;
+};
+
+export type ExperiencePageKeyName = keyof ExperiencePages;
+
+/** Every editable fan-app page, in studio order. */
+export const EXPERIENCE_PAGE_KEYS: ExperiencePageKeyName[] = [
+  "landing",
+  "youreIn",
+  "home",
+  "social",
+  "videos",
+  "news",
+  "events",
+  "live",
+  "docAndGlo",
+  "foundation",
+  "bio",
+  "profile",
+  "settings",
+];
+
+export const EXPERIENCE_PAGE_LABELS: Record<ExperiencePageKeyName, string> = {
+  landing: "Landing",
+  youreIn: "You're In",
+  home: "Home",
+  social: "Social",
+  videos: "Videos",
+  news: "News",
+  events: "Events",
+  live: "Live",
+  docAndGlo: "Shop",
+  foundation: "Foundation",
+  bio: "Bio link",
+  profile: "Profile",
+  settings: "Settings",
+};
+
+/** Bottom tab bar of the fan app — fully reorderable / restylable. */
+export type ExperienceNavTab = {
+  id: string;
+  label: string;
+  /** Feature icon name (see FEATURE_ICONS) */
+  icon: string;
+  /** Page this tab opens */
+  pageKey: ExperiencePageKeyName;
+  hidden?: boolean;
+};
+
+export type ExperienceNav = {
+  tabs: ExperienceNavTab[];
+  bg: string;
+  borderColor: string;
+  activeColor: string;
+  inactiveColor: string;
+  radius: number;
+  showLabels: boolean;
+  hidden: boolean;
+};
+
+export const DEFAULT_EXPERIENCE_NAV: ExperienceNav = {
+  tabs: [
+    { id: "home", label: "Home", icon: "home", pageKey: "home" },
+    { id: "social", label: "Social", icon: "users", pageKey: "social" },
+    { id: "videos", label: "Videos", icon: "video", pageKey: "videos" },
+    { id: "news", label: "News", icon: "news", pageKey: "news" },
+    { id: "profile", label: "Profile", icon: "user", pageKey: "profile" },
+  ],
+  bg: "#050505",
+  borderColor: "rgba(255,255,255,0.10)",
+  activeColor: "#8FE3B8",
+  inactiveColor: "rgba(255,255,255,0.45)",
+  radius: 0,
+  showLabels: true,
+  hidden: false,
 };
 
 export type WidgetVisualStyle = {
@@ -262,6 +342,8 @@ export type ExperienceConfig = {
   pages: ExperiencePages;
   /** Reusable logo stamps — click to place on the current page */
   stamps: ExperienceStamp[];
+  /** Fan-app bottom tab bar */
+  nav: ExperienceNav;
 };
 
 export const DEFAULT_EXPERIENCE_BRAND: ExperienceBrand = {
@@ -778,6 +860,57 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
     layoutMode: "freeform",
   }),
+  social: pageDefaults({
+    headline: "Stay connected",
+    subhead: "INSTAGRAM · TIKTOK · X",
+    body: "Every post, clip and update in one feed.",
+    effectPreset: "soft",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
+  }),
+  profile: pageDefaults({
+    headline: "Your profile",
+    subhead: "MEMBER",
+    body: "Manage your account, track activity, and unlock more.",
+    effectPreset: "glass",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
+  }),
+  foundation: pageDefaults({
+    headline: "Join the movement",
+    subhead: "FOUNDATION",
+    body: "Change lives through access, education and opportunity.",
+    ctaLabel: "Get involved",
+    effectPreset: "soft",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
+  }),
+  events: pageDefaults({
+    headline: "Events & giveaways",
+    subhead: "DROPS · TICKETS",
+    body: "Meetups, ticket drops and members-only giveaways.",
+    ctaLabel: "Enter now",
+    effectPreset: "glow",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
+  }),
+  live: pageDefaults({
+    headline: "Live now",
+    subhead: "STREAMS",
+    body: "Go behind the scenes in real time.",
+    ctaLabel: "Watch live",
+    effectPreset: "neon",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
+  }),
+  bio: pageDefaults({
+    headline: "Everything in one link",
+    subhead: "BIO LINK",
+    body: "All your links, drops and socials in one place.",
+    effectPreset: "glass",
+    stage: DEFAULT_CONTENT_STAGE.map((item) => ({ ...item })),
+    layoutMode: "freeform",
+  }),
 };
 
 export const DEFAULT_EXPERIENCE_CONFIG: ExperienceConfig = {
@@ -786,6 +919,7 @@ export const DEFAULT_EXPERIENCE_CONFIG: ExperienceConfig = {
   effects: DEFAULT_EXPERIENCE_EFFECTS,
   pages: DEFAULT_EXPERIENCE_PAGES,
   stamps: [],
+  nav: DEFAULT_EXPERIENCE_NAV,
 };
 
 function asString(value: unknown, fallback = "") {
@@ -1076,14 +1210,40 @@ export function normalizeExperienceStamps(raw: unknown): ExperienceStamp[] {
 
 export function normalizeExperiencePages(raw: unknown): ExperiencePages {
   const p = (raw ?? {}) as Partial<ExperiencePages>;
+  const out = {} as ExperiencePages;
+  for (const key of EXPERIENCE_PAGE_KEYS) {
+    out[key] = normalizeExperiencePage(p[key], DEFAULT_EXPERIENCE_PAGES[key]);
+  }
+  return out;
+}
+
+export function normalizeExperienceNav(raw: unknown): ExperienceNav {
+  const n = (raw ?? {}) as Partial<ExperienceNav>;
+  const tabsRaw = Array.isArray(n.tabs) ? n.tabs : DEFAULT_EXPERIENCE_NAV.tabs;
+  const tabs: ExperienceNavTab[] = [];
+  for (const row of tabsRaw) {
+    if (!row || typeof row !== "object") continue;
+    const t = row as Partial<ExperienceNavTab>;
+    const pageKey = (EXPERIENCE_PAGE_KEYS as string[]).includes(String(t.pageKey))
+      ? (t.pageKey as ExperiencePageKeyName)
+      : "home";
+    tabs.push({
+      id: asString(t.id, `tab_${tabs.length}`),
+      label: asString(t.label, EXPERIENCE_PAGE_LABELS[pageKey]),
+      icon: asString(t.icon, "star"),
+      pageKey,
+      hidden: Boolean(t.hidden),
+    });
+  }
   return {
-    landing: normalizeExperiencePage(p.landing, DEFAULT_EXPERIENCE_PAGES.landing),
-    youreIn: normalizeExperiencePage(p.youreIn, DEFAULT_EXPERIENCE_PAGES.youreIn),
-    settings: normalizeExperiencePage(p.settings, DEFAULT_EXPERIENCE_PAGES.settings),
-    home: normalizeExperiencePage(p.home, DEFAULT_EXPERIENCE_PAGES.home),
-    videos: normalizeExperiencePage(p.videos, DEFAULT_EXPERIENCE_PAGES.videos),
-    news: normalizeExperiencePage(p.news, DEFAULT_EXPERIENCE_PAGES.news),
-    docAndGlo: normalizeExperiencePage(p.docAndGlo, DEFAULT_EXPERIENCE_PAGES.docAndGlo),
+    tabs: tabs.length ? tabs.slice(0, 6) : DEFAULT_EXPERIENCE_NAV.tabs.map((t) => ({ ...t })),
+    bg: asString(n.bg, DEFAULT_EXPERIENCE_NAV.bg),
+    borderColor: asString(n.borderColor, DEFAULT_EXPERIENCE_NAV.borderColor),
+    activeColor: asString(n.activeColor, DEFAULT_EXPERIENCE_NAV.activeColor),
+    inactiveColor: asString(n.inactiveColor, DEFAULT_EXPERIENCE_NAV.inactiveColor),
+    radius: Math.max(0, Math.min(999, asNumber(n.radius, DEFAULT_EXPERIENCE_NAV.radius))),
+    showLabels: asBool(n.showLabels, true),
+    hidden: asBool(n.hidden, false),
   };
 }
 
@@ -1095,6 +1255,7 @@ export function normalizeExperienceConfig(raw: unknown): ExperienceConfig {
     effects: normalizeExperienceEffects(c.effects),
     pages: normalizeExperiencePages(c.pages),
     stamps: normalizeExperienceStamps(c.stamps),
+    nav: normalizeExperienceNav(c.nav),
   };
 }
 
