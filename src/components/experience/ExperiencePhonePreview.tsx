@@ -784,6 +784,9 @@ function PageFreeformPreview({
             </div>
           </div>
         ) : null}
+        {!experience.nav?.hidden && pageKey !== "landing" && pageKey !== "youreIn" ? (
+          <NavTabBarPreview nav={experience.nav} activePageKey={pageKey} />
+        ) : null}
       </div>
       {showLandingChrome ? (
         <div className="border-t border-white/10 bg-black/80 px-3 py-2">
