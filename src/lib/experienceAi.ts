@@ -3,6 +3,7 @@ import {
   createButtonId,
   normalizeButtons,
   normalizeFeatures,
+  normalizeExperienceNav,
   normalizeMemberProof,
   type ExperienceButton,
   type ExperienceConfig,
@@ -20,6 +21,8 @@ export type ExperiencePatch = {
   theme?: Record<string, unknown>;
   effects?: Record<string, unknown>;
   page?: Record<string, unknown>;
+  /** Bottom tab bar patch (tabs, colors, visibility) */
+  nav?: Record<string, unknown>;
   /** Per-page patches keyed by page id (landing, home, videos, news, docAndGlo, youreIn, settings) */
   pages?: Record<string, Record<string, unknown>>;
   /** Kill every glow/shadow in the app before applying the rest of the patch */
@@ -242,8 +245,13 @@ export function applyExperiencePatch(
     }
   }
 
+  const nav = patch.nav
+    ? normalizeExperienceNav({ ...prev.nav, ...patch.nav })
+    : prev.nav;
+
   return {
     ...prev,
+    nav,
     brand: { ...prev.brand, ...(patch.brand ?? {}) },
     theme: { ...prev.theme, ...(patch.theme ?? {}) },
     effects,
@@ -255,6 +263,7 @@ export function applyExperiencePatch(
 export function describePatch(patch: ExperiencePatch): string[] {
   const out: string[] = [];
   if (patch.killGlow) out.push("glow: removed everywhere");
+  if (patch.nav) out.push("tab bar restyled");
   if (patch.clearButtons) out.push("buttons: cleared");
   if (patch.addButtons?.length) out.push(`buttons: +${patch.addButtons.length}`);
   for (const key of Object.keys(patch.pages ?? {})) out.push(`page ${key} restyled`);

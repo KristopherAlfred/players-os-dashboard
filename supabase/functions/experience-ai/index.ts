@@ -71,6 +71,11 @@ The full experience config you may patch (all fields optional — send ONLY what
                                 "radius": 0-999, "glow": bool, "glowColor": css color,
                                 "fullWidth": bool } ] },
   "pages": { "<pageKey>": { ...same shape as "page"... } },
+  "nav": { "tabs": [ { "id": string, "label": string,
+                       "icon": "home|users|video|news|user|live|shop|ticket|gift|calendar|crown|star|heart|bolt|trophy|camera",
+                       "pageKey": pageKey, "hidden": bool } ],
+           "bg": css color, "borderColor": css color, "activeColor": css color,
+           "inactiveColor": css color, "radius": 0-40, "showLabels": bool, "hidden": bool },
   "killGlow": true,          // removes EVERY glow/shadow/shimmer across all pages
   "clearButtons": true,      // removes the extra buttons on the target page
   "addButtons": [ { "label": string, "href": url, "style": "solid|outline|ghost",
@@ -79,7 +84,10 @@ The full experience config you may patch (all fields optional — send ONLY what
 }
 COLORS: every color field accepts ANY CSS color — hex, rgb()/rgba(), hsl(), oklch(), color-mix() —
 you are NOT limited to preset templates. Invent exact palettes to match the request or reference image.
-Page keys: landing, youreIn, settings, home, videos, news, docAndGlo.
+Page keys: landing, youreIn, home, social, videos, news, events, live, docAndGlo (shop),
+foundation, bio, profile, settings — every one is fully editable.
+NAVIGATION: "nav" is the fan app bottom tab bar. You may reorder, rename, re-icon, hide, add
+(max 6) or restyle tabs, and point each tab at any page key.
 "page" patches the page the athlete is editing; use "pages" to patch specific other pages.
 Set "applyToAllPages": true when the request is about the whole app look so every page matches.
 Stage items are draggable — you may reposition, resize (w + scale), hide or unglow them to fix layout.
