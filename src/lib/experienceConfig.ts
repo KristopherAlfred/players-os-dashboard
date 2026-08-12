@@ -1207,14 +1207,40 @@ export function normalizeExperienceStamps(raw: unknown): ExperienceStamp[] {
 
 export function normalizeExperiencePages(raw: unknown): ExperiencePages {
   const p = (raw ?? {}) as Partial<ExperiencePages>;
+  const out = {} as ExperiencePages;
+  for (const key of EXPERIENCE_PAGE_KEYS) {
+    out[key] = normalizeExperiencePage(p[key], DEFAULT_EXPERIENCE_PAGES[key]);
+  }
+  return out;
+}
+
+export function normalizeExperienceNav(raw: unknown): ExperienceNav {
+  const n = (raw ?? {}) as Partial<ExperienceNav>;
+  const tabsRaw = Array.isArray(n.tabs) ? n.tabs : DEFAULT_EXPERIENCE_NAV.tabs;
+  const tabs: ExperienceNavTab[] = [];
+  for (const row of tabsRaw) {
+    if (!row || typeof row !== "object") continue;
+    const t = row as Partial<ExperienceNavTab>;
+    const pageKey = (EXPERIENCE_PAGE_KEYS as string[]).includes(String(t.pageKey))
+      ? (t.pageKey as ExperiencePageKeyName)
+      : "home";
+    tabs.push({
+      id: asString(t.id, `tab_${tabs.length}`),
+      label: asString(t.label, EXPERIENCE_PAGE_LABELS[pageKey]),
+      icon: asString(t.icon, "star"),
+      pageKey,
+      hidden: Boolean(t.hidden),
+    });
+  }
   return {
-    landing: normalizeExperiencePage(p.landing, DEFAULT_EXPERIENCE_PAGES.landing),
-    youreIn: normalizeExperiencePage(p.youreIn, DEFAULT_EXPERIENCE_PAGES.youreIn),
-    settings: normalizeExperiencePage(p.settings, DEFAULT_EXPERIENCE_PAGES.settings),
-    home: normalizeExperiencePage(p.home, DEFAULT_EXPERIENCE_PAGES.home),
-    videos: normalizeExperiencePage(p.videos, DEFAULT_EXPERIENCE_PAGES.videos),
-    news: normalizeExperiencePage(p.news, DEFAULT_EXPERIENCE_PAGES.news),
-    docAndGlo: normalizeExperiencePage(p.docAndGlo, DEFAULT_EXPERIENCE_PAGES.docAndGlo),
+    tabs: tabs.length ? tabs.slice(0, 6) : DEFAULT_EXPERIENCE_NAV.tabs.map((t) => ({ ...t })),
+    bg: asString(n.bg, DEFAULT_EXPERIENCE_NAV.bg),
+    borderColor: asString(n.borderColor, DEFAULT_EXPERIENCE_NAV.borderColor),
+    activeColor: asString(n.activeColor, DEFAULT_EXPERIENCE_NAV.activeColor),
+    inactiveColor: asString(n.inactiveColor, DEFAULT_EXPERIENCE_NAV.inactiveColor),
+    radius: Math.max(0, Math.min(999, asNumber(n.radius, DEFAULT_EXPERIENCE_NAV.radius))),
+    showLabels: asBool(n.showLabels, true),
+    hidden: asBool(n.hidden, false),
   };
 }
 
