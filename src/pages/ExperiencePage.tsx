@@ -61,6 +61,8 @@ import {
   BrandHeaderFields,
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
+import { ExperiencePageNavigator } from "../components/experience/ExperiencePageNavigator";
+
 import { ExperienceAppPreview } from "../components/experience/ExperienceAppPreview";
 import { ExperienceNavPanel } from "../components/experience/ExperienceNavPanel";
 import { ExperienceTemplateGallery } from "../components/experience/ExperienceTemplateGallery";
