@@ -1,4 +1,5 @@
 import { SPORT_PHOTOS } from "./sportPhotos";
+import { buildTemplatePages } from "./experienceTemplatePages";
 import { TEMPLATE_ART } from "./templateArt";
 import type {
   ExperienceBrand,
@@ -775,9 +776,21 @@ export function applyExperienceTemplate(
   const ctaText = template.theme.buttonText;
   /** Every template loads its artwork into the preview — delete it there if unwanted. */
   const art = template.landing?.heroImage ?? template.photo;
+  /** Full designed page set (home, social, videos, news, shop, profile…). */
+  const templatePages = buildTemplatePages(template);
   const pages = Object.fromEntries(
     Object.entries(config.pages).map(([key, page]) => {
       let next = ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page;
+      const built = templatePages[key as keyof typeof templatePages];
+      if (built) {
+        next = {
+          ...next,
+          ...built,
+          features: (built.features ?? next.features).map((f) => ({ ...f })),
+          memberProof: { ...next.memberProof, ...(built.memberProof ?? {}) },
+          stage: (built.stage ?? next.stage).map((s) => ({ ...s })),
+        };
+      }
       if (key === "landing") {
         if (template.landing) {
           next = {
