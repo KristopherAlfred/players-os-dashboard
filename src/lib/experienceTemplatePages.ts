@@ -139,22 +139,25 @@ const PAGE_SPECS: Record<Exclude<ExperiencePageKeyName, "landing">, PageSpec> = 
 };
 
 /** Layout used by every non-landing page: hero band up top, content stacked under. */
-function pageStage(spec: PageSpec, accent: string, text: string, glow: boolean) {
+function pageStage(spec: PageSpec, accent: string, text: string, glow: boolean, cards: boolean) {
   const g = { glow: false, glowColor: accent, glowIntensity: 0 };
+  const top = spec.hero ? 44 : 14;
   return [
     { id: "logo", x: 5, y: 3, w: 11, z: 22, ...g },
     { id: "wordmark", x: 18, y: 3.5, w: 52, z: 21, ...g, glowColor: text },
     { id: "tagline", x: 18, y: 7.5, w: 55, z: 20, hidden: true, ...g },
     { id: "hero", x: 0, y: 11, w: 100, z: 5, hidden: !spec.hero, ...g },
     { id: "titleArt", x: 10, y: 40, w: 70, z: 12, hidden: true, ...g },
-    { id: "subhead", x: 6, y: spec.hero ? 44 : 14, w: 88, z: 14, ...g, glowIntensity: glow ? 18 : 0 },
-    { id: "headline", x: 6, y: spec.hero ? 48 : 18, w: 88, z: 15, scale: 106, ...g, glowColor: text },
-    { id: "body", x: 6, y: spec.hero ? 57 : 28, w: 88, z: 13, ...g, glowColor: text },
-    { id: "featureRow", x: 4, y: spec.hero ? 64 : 38, w: 92, z: 16, ...g },
+    { id: "subhead", x: 6, y: top, w: 88, z: 14, ...g, glowIntensity: glow ? 18 : 0 },
+    { id: "headline", x: 6, y: top + 4, w: 88, z: 15, scale: 106, ...g, glowColor: text },
+    { id: "body", x: 6, y: top + 13, w: 88, z: 13, ...g, glowColor: text },
+    { id: "cardGrid", x: 4, y: top + 20, w: 92, z: 16, hidden: !cards, ...g },
+    { id: "featureRow", x: 4, y: top + 20, w: 92, z: 16, hidden: cards, ...g },
     { id: "cta", x: 5, y: spec.proof ? 80 : 84, w: 90, z: 18, glow, glowColor: accent, glowIntensity: glow ? 28 : 0 },
     { id: "memberProof", x: 5, y: 88, w: 90, z: 17, hidden: !spec.proof, ...g },
   ];
 }
+
 
 /**
  * Turn a template into per-page partial configs (every field still editable).
