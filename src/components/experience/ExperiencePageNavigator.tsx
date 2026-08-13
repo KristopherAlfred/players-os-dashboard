@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Eye, Pencil } from "lucide-react";
+import { Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 
 import type { ExperienceConfig, ExperiencePageKeyName } from "../../lib/experienceConfig";
 import {
-  EXPERIENCE_PAGE_KEYS,
+  experiencePageKeys,
   experiencePageLabel,
   getStageItem,
+  isCustomExperiencePage,
   pageBackgroundCss,
 } from "../../lib/experienceConfig";
 
@@ -20,6 +21,9 @@ export function ExperiencePageNavigator({
   onSelect,
   onPlay,
   onRename,
+  onAddPage,
+  onDuplicatePage,
+  onDeletePage,
 }: {
   experience: ExperienceConfig;
   activePageKey: ExperiencePageKeyName | null;
@@ -27,26 +31,60 @@ export function ExperiencePageNavigator({
   onPlay?: () => void;
   /** Rename a page (templates ship their own names; athletes can change them). */
   onRename?: (key: ExperiencePageKeyName, label: string) => void;
+  onAddPage?: () => void;
+  onDuplicatePage?: (key: ExperiencePageKeyName) => void;
+  /** Only custom pages can be deleted. */
+  onDeletePage?: (key: ExperiencePageKeyName) => void;
 }) {
   const [renaming, setRenaming] = useState<ExperiencePageKeyName | null>(null);
+  const pageKeys = experiencePageKeys(experience);
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2.5">
       <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
         <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">
-          App pages · {EXPERIENCE_PAGE_KEYS.length}
+          App pages · {pageKeys.length}
         </p>
-        {onPlay ? (
-          <button
-            type="button"
-            onClick={onPlay}
-            className="flex items-center gap-1 rounded-full border border-white/20 px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.14em] text-white/70 transition hover:border-white/45 hover:text-white"
-          >
-            <Eye size={9} /> Play app
-          </button>
-        ) : null}
+        <div className="flex items-center gap-1">
+          {onAddPage ? (
+            <button
+              type="button"
+              onClick={onAddPage}
+              className="flex items-center gap-1 rounded-full border border-white/20 px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.14em] text-white/70 transition hover:border-white/45 hover:text-white"
+            >
+              <Plus size={9} /> Page
+            </button>
+          ) : null}
+          {onDuplicatePage && activePageKey ? (
+            <button
+              type="button"
+              onClick={() => onDuplicatePage(activePageKey)}
+              className="flex items-center gap-1 rounded-full border border-white/20 px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.14em] text-white/70 transition hover:border-white/45 hover:text-white"
+            >
+              <Copy size={9} /> Duplicate
+            </button>
+          ) : null}
+          {onDeletePage && activePageKey && isCustomExperiencePage(activePageKey) ? (
+            <button
+              type="button"
+              onClick={() => onDeletePage(activePageKey)}
+              className="flex items-center gap-1 rounded-full border border-red-400/40 px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.14em] text-red-300 transition hover:border-red-400 hover:text-red-200"
+            >
+              <Trash2 size={9} /> Delete
+            </button>
+          ) : null}
+          {onPlay ? (
+            <button
+              type="button"
+              onClick={onPlay}
+              className="flex items-center gap-1 rounded-full border border-white/20 px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.14em] text-white/70 transition hover:border-white/45 hover:text-white"
+            >
+              <Eye size={9} /> Play app
+            </button>
+          ) : null}
+        </div>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {EXPERIENCE_PAGE_KEYS.map((key) => {
+        {pageKeys.map((key) => {
           const page = experience.pages[key];
           const active = key === activePageKey;
           const hero = getStageItem(page, "hero");
