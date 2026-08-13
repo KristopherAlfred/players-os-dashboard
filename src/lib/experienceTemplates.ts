@@ -1133,14 +1133,25 @@ export function applyExperienceTemplate(
     }),
   ) as ExperienceConfig["pages"];
 
+  const navTabs = TEMPLATE_NAV_TABS[template.id];
+
   return {
     ...config,
     brand: { ...config.brand, ...template.brand },
     theme: { ...config.theme, ...template.theme },
     effects: { ...config.effects, ...template.effects },
+    nav: navTabs
+      ? {
+          ...config.nav,
+          tabs: navTabs.map((t) => ({ ...t })),
+          activeColor: template.theme.accent ?? config.nav.activeColor,
+          bg: template.theme.bg ?? config.nav.bg,
+        }
+      : config.nav,
     pages,
   };
 }
+
 
 
 /** Best-guess of which template the current theme came from (accent match). */
