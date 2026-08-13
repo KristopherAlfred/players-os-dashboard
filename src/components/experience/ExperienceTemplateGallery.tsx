@@ -172,10 +172,13 @@ export function ExperienceTemplateGallery({
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate text-[10px] font-bold uppercase tracking-[0.1em] text-white">
-                      {template.label}
+                      {template.athlete ?? template.label}
                     </p>
-                    <p className="truncate text-[8px] text-white/40">{template.vibe}</p>
+                    <p className="truncate text-[8px] text-white/40">
+                      {template.athlete ? `${template.label} · ${template.vibe}` : template.vibe}
+                    </p>
                   </div>
+
                   <div className="flex shrink-0 gap-0.5">
                     {template.swatches.map((c) => (
                       <span
