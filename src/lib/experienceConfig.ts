@@ -437,6 +437,8 @@ export type ExperienceConfig = {
   theme: ExperienceTheme;
   effects: ExperienceEffects;
   pages: ExperiencePages;
+  /** Studio order of pages, including custom pages added by the athlete or AI */
+  pageOrder?: string[];
   /** Reusable logo stamps — click to place on the current page */
   stamps: ExperienceStamp[];
   /** Fan-app bottom tab bar */
