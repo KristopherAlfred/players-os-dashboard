@@ -918,6 +918,9 @@ export function ExperiencePage() {
             onSelect={(key) => setSection(`page:${key}`)}
             onPlay={() => setAppPreviewOpen(true)}
             onRename={(key, label) => patchPage(key, { studioLabel: label })}
+            onAddPage={() => addCustomPage()}
+            onDuplicatePage={(key) => addCustomPage(key)}
+            onDeletePage={(key) => deleteCustomPage(key)}
           />
           <ExperiencePhonePreview
             experience={experience}
