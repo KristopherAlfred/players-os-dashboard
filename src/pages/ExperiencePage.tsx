@@ -367,6 +367,8 @@ export function ExperiencePage() {
   );
 
   const experience = useMemo(() => getExperienceFromLayout(layout), [layout]);
+  const pageKeys = useMemo(() => experiencePageKeys(experience), [experience]);
+  const SECTIONS = useMemo(() => buildSections(pageKeys, experience.pages), [pageKeys, experience.pages]);
   const activeTemplateId = useMemo(() => detectExperienceTemplate(experience), [experience]);
 
   const ordered = useMemo(
