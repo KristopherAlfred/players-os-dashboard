@@ -685,6 +685,8 @@ export function ExperiencePage() {
         <div className="flex flex-wrap gap-1.5 rounded-2xl border border-dt-border bg-dt-card p-2">
           {SECTIONS.map((item) => {
             const active = section === item.id;
+            const pk = sectionPageKey(item.id);
+            const label = pk ? experiencePageLabel(experience.pages, pk) : item.label;
             return (
               <button
                 key={item.id}
@@ -699,7 +701,7 @@ export function ExperiencePage() {
                     : "text-white/45 hover:bg-white/[0.04] hover:text-white/80"
                 }`}
               >
-                {item.label}
+                {label}
               </button>
             );
           })}
@@ -719,7 +721,9 @@ export function ExperiencePage() {
           <section className="overflow-hidden rounded-2xl border border-dt-border bg-dt-card">
             <div className="border-b border-dt-border px-4 py-3">
               <h3 className="font-display text-sm font-semibold tracking-wide text-white">
-                {SECTIONS.find((s) => s.id === section)?.label}
+                {editingPageKey
+                  ? experiencePageLabel(experience.pages, editingPageKey)
+                  : SECTIONS.find((s) => s.id === section)?.label}
               </h3>
               <p className="text-[11px] text-white/40">Changes sync to {fanAppName} when you publish</p>
             </div>
