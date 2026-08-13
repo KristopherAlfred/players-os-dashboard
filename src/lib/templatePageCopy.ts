@@ -524,18 +524,12 @@ export const TEMPLATE_NAV_TABS: Record<string, ExperienceNavTab[]> = {
     tab("events", "Events", "calendar", "events"),
     tab("profile", "Profile", "user", "profile"),
   ],
-  speedster: [
-    tab("home", "Today", "home", "home"),
-    tab("videos", "Sessions", "video", "videos"),
-    tab("events", "Meets", "calendar", "events"),
-    tab("shop", "Gear", "shop", "docAndGlo"),
-    tab("profile", "Squad", "users", "profile"),
-  ],
-  champ23: [
+  "serve-return-repeat": [
     tab("home", "Home", "home", "home"),
-    tab("videos", "Playbook", "video", "videos"),
-    tab("shop", "Shop", "shop", "docAndGlo"),
-    tab("events", "Events", "calendar", "events"),
-    tab("profile", "Club", "crown", "profile"),
+    tab("videos", "Film", "video", "videos"),
+    tab("news", "Tour", "news", "news"),
+    tab("shop", "Doc & Glo", "shop", "docAndGlo"),
+    tab("profile", "Circle", "user", "profile"),
   ],
+
 };
