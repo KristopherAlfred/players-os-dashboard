@@ -386,7 +386,7 @@ function StampTray({
 }) {
   const stamps = experience.stamps || [];
   return (
-    <div className="space-y-2 border-t border-white/10 bg-black/85 p-3">
+    <div className="space-y-2 p-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-red">Logo stamps</p>
         {onSaveLogo ? (
@@ -972,7 +972,10 @@ function PageFreeformPreview({
 
 
   return (
-    <PhoneFrame label={label} hint="Drag to move · corner handle to resize · × to delete">
+    <PhoneFrame
+      label={label}
+      hint="Drag to move · corner handle to resize · × to delete"
+      screen={
       <div
         className="relative h-[560px] w-full"
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
@@ -1054,8 +1057,10 @@ function PageFreeformPreview({
           <NavTabBarPreview nav={experience.nav} activePageKey={pageKey} />
         ) : null}
       </div>
+      }
+    >
       {showLandingChrome ? (
-        <div className="border-t border-white/10 bg-black/80 px-3 py-2">
+        <div className="px-3 py-2.5">
           <button
             type="button"
             onClick={() => setShowUnlock((v) => !v)}
@@ -1070,7 +1075,7 @@ function PageFreeformPreview({
         </div>
       ) : null}
       {onPatchPage ? (
-        <div className="space-y-2 border-t border-white/10 bg-black/80 p-3">
+        <div className="space-y-2.5 p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-dt-red">
             {selected ? `Editing · ${selectedLabel}` : selectedLabel}
           </p>
