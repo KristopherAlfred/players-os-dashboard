@@ -1,6 +1,8 @@
 import { SPORT_PHOTOS } from "./sportPhotos";
 import { buildTemplatePages } from "./experienceTemplatePages";
+import { TEMPLATE_NAV_TABS } from "./templatePageCopy";
 import { TEMPLATE_ART } from "./templateArt";
+
 import type {
   ExperienceBrand,
   ExperienceConfig,
