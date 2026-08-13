@@ -1,6 +1,7 @@
 import type { ExperiencePageConfig, ExperiencePageKeyName } from "./experienceConfig";
 import type { ExperienceTemplate } from "./experienceTemplates";
 import { TEMPLATE_PAGE_COPY } from "./templatePageCopy";
+import { TEMPLATE_PAGE_ART } from "./templatePageArt";
 
 
 /**
@@ -210,7 +211,7 @@ export function buildTemplatePages(
       accentColor: accent,
       effectPreset: light ? "soft" : landing.effectPreset || "glass",
       layoutMode: "freeform",
-      heroImage: spec.hero ? art : "",
+      heroImage: heroArt,
       heroFit: "cover",
       heroPosition: "center",
       heroScale: 100,
