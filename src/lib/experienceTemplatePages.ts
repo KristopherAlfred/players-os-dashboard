@@ -182,8 +182,21 @@ export function buildTemplatePages(
 
   const out: Partial<Record<ExperiencePageKeyName, Partial<ExperiencePageConfig>>> = {};
 
+  const copyMap = TEMPLATE_PAGE_COPY[template.id] ?? {};
+
   (Object.keys(PAGE_SPECS) as (keyof typeof PAGE_SPECS)[]).forEach((key) => {
-    const spec = PAGE_SPECS[key];
+    const base = PAGE_SPECS[key];
+    const copy = copyMap[key] ?? {};
+    const spec: PageSpec = {
+      ...base,
+      subhead: copy.subhead ?? base.subhead,
+      headline: copy.headline ?? base.headline,
+      body: copy.body ?? base.body,
+      cta: copy.cta ?? base.cta,
+      features: copy.features ?? base.features,
+      icons: copy.icons ?? base.icons,
+    };
+    const cards = copy.cards ?? [];
     out[key] = {
       backgroundColor: bg,
       backgroundGradientFrom: light ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.12)",
@@ -221,6 +234,22 @@ export function buildTemplatePages(
         icon: spec.icons[i],
         label,
       })),
+      cardBg: panel,
+      cardBorderColor: line,
+      cardRadius: 18,
+      cardTitleColor: text,
+      cardTextColor: muted,
+      cardIconColor: accent,
+      cardColumns: 2,
+      cards: cards.map(([title, subtitle], i) => ({
+        id: `c${i + 1}`,
+        title,
+        subtitle,
+        icon: spec.icons[i] ?? "star",
+        image: "",
+        linkPageKey: (["videos", "news", "docAndGlo", "profile"][i] ??
+          "home") as ExperiencePageKeyName,
+      })),
       memberProof: {
         ...(landing.memberProof ?? {}),
         count: landing.memberProof?.count || "25K+",
@@ -234,13 +263,14 @@ export function buildTemplatePages(
         labelColor: muted,
         radius: 14,
       } as ExperiencePageConfig["memberProof"],
-      stage: pageStage(spec, accent, text, glow) as ExperiencePageConfig["stage"],
+      stage: pageStage(spec, accent, text, glow, cards.length > 0) as ExperiencePageConfig["stage"],
       // reset per-word styling so template copy renders in the new palette
       headlineRuns: [],
       subheadRuns: [],
       bodyRuns: [],
     };
   });
+
 
   return out;
 }
