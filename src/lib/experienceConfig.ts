@@ -181,6 +181,8 @@ export type ExperienceMemberProof = {
 
 
 export type ExperiencePageConfig = {
+  /** Custom page name shown in the studio / navigator / tab pickers (templates can rename pages). */
+  studioLabel: string;
   backgroundColor: string;
   backgroundGradientFrom: string;
   backgroundGradientTo: string;
@@ -333,6 +335,15 @@ export const EXPERIENCE_PAGE_LABELS: Record<ExperiencePageKeyName, string> = {
   profile: "Profile",
   settings: "Settings",
 };
+
+/** Page name shown in the studio: the template/athlete override when set, else the default. */
+export function experiencePageLabel(
+  pages: ExperiencePages | undefined,
+  key: ExperiencePageKeyName,
+): string {
+  const custom = pages?.[key]?.studioLabel?.trim();
+  return custom || EXPERIENCE_PAGE_LABELS[key];
+}
 
 /** Bottom tab bar of the fan app — fully reorderable / restylable. */
 export type ExperienceNavTab = {
@@ -764,6 +775,7 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     cardTextColor: "rgba(255,255,255,0.65)",
     cardIconColor: "#8FE3B8",
     cardColumns: 2,
+    studioLabel: "",
 
     ...partial,
   };
@@ -1220,6 +1232,7 @@ export function normalizeExperiencePage(
     heroOverlayTo: asString(p.heroOverlayTo, fallback.heroOverlayTo ?? "rgba(0,0,0,0.85)"),
     heroOverlayOpacity: Math.max(0, Math.min(100, asNumber(p.heroOverlayOpacity, fallback.heroOverlayOpacity ?? 100))),
     navLabel: asString(p.navLabel, fallback.navLabel ?? ""),
+    studioLabel: asString(p.studioLabel, fallback.studioLabel ?? "").slice(0, 24),
     navTextColor: asString(p.navTextColor, fallback.navTextColor ?? "#FFFFFF"),
     navBadgeLabel: asString(p.navBadgeLabel, fallback.navBadgeLabel ?? ""),
     navBadgeColor: asString(p.navBadgeColor, fallback.navBadgeColor ?? "#8FE3B8"),

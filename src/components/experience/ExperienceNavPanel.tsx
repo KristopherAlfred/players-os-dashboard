@@ -3,7 +3,7 @@ import { GripVertical, Plus, Trash2 } from "lucide-react";
 
 import {
   EXPERIENCE_PAGE_KEYS,
-  EXPERIENCE_PAGE_LABELS,
+  experiencePageLabel,
   type ExperienceNav,
   type ExperienceNavTab,
   type ExperiencePageKeyName,
@@ -31,9 +31,12 @@ const ICON_CHOICES = [
 /** Drag-and-drop editor for the fan-app bottom tab bar. */
 export function ExperienceNavPanel({
   nav,
+  pages,
   onChange,
 }: {
   nav: ExperienceNav;
+  /** Page configs, so the page picker can show custom / template page names. */
+  pages?: import("../../lib/experienceConfig").ExperiencePages;
   onChange: (patch: Partial<ExperienceNav>) => void;
 }) {
   const [dragId, setDragId] = useState<string | null>(null);
@@ -105,7 +108,7 @@ export function ExperienceNavPanel({
               >
                 {EXPERIENCE_PAGE_KEYS.map((key) => (
                   <option key={key} value={key}>
-                    {EXPERIENCE_PAGE_LABELS[key]}
+                    {experiencePageLabel(pages, key)}
                   </option>
                 ))}
               </select>

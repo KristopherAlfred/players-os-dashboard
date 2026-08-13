@@ -10,6 +10,8 @@ import type { ExperiencePageKeyName, ExperienceNavTab } from "./experienceConfig
  * defaults. Everything stays fully editable in the studio and by the AI.
  */
 export type TemplatePageCopy = {
+  /** Custom page name for this template (e.g. Kelce's "Film Room" instead of "Videos"). */
+  label?: string;
   subhead?: string;
   headline?: string;
   body?: string;
@@ -426,7 +428,7 @@ const circle: PageCopyMap = {
 };
 
 /** Page copy per template id. */
-export const TEMPLATE_PAGE_COPY: Record<string, PageCopyMap> = {
+const RAW_TEMPLATE_PAGE_COPY: Record<string, PageCopyMap> = {
   "inner-circle": kelce,
   "move-mind": billings,
   "own-your-power": powers,
@@ -437,6 +439,39 @@ export const TEMPLATE_PAGE_COPY: Record<string, PageCopyMap> = {
   champ23: champ,
   "join-the-circle": circle,
 };
+
+/**
+ * Custom page names per template. These rename the fan-app pages everywhere in
+ * the studio (navigator, section list, tab picker) so a Kelce app shows
+ * "Film Room" instead of "Videos". Athletes can still rename any page.
+ */
+const TEMPLATE_PAGE_LABELS: Record<
+  string,
+  Partial<Record<Exclude<ExperiencePageKeyName, "landing">, string>>
+> = {
+  "inner-circle": { videos: "Film Room", news: "News & Notes", docAndGlo: "Shop", foundation: "Ventures", profile: "Inner Circle" },
+  "move-mind": { home: "Today", videos: "Move", news: "Mind", events: "Gather", foundation: "Manifest", profile: "Me" },
+  "own-your-power": { home: "Home", live: "Live", videos: "Clips", events: "Events", profile: "Squad" },
+  "built-different": { videos: "Film", foundation: "Impact", docAndGlo: "Gear" },
+  "built-to-lead": { videos: "Film", events: "Access", foundation: "Academy" },
+  "trust-the-vision": { videos: "The Vault", news: "Culture", foundation: "Vision" },
+  speedster: { home: "Today", videos: "Sessions", events: "Meets", docAndGlo: "Gear", profile: "Squad" },
+  champ23: { videos: "Playbook", profile: "The Club", docAndGlo: "Shop" },
+  "join-the-circle": { profile: "The Circle" },
+};
+
+export const TEMPLATE_PAGE_COPY: Record<string, PageCopyMap> = Object.fromEntries(
+  Object.entries(RAW_TEMPLATE_PAGE_COPY).map(([id, map]) => {
+    const labels = TEMPLATE_PAGE_LABELS[id] ?? {};
+    const merged: PageCopyMap = { ...map };
+    for (const [key, label] of Object.entries(labels)) {
+      const pageKey = key as Exclude<ExperiencePageKeyName, "landing">;
+      merged[pageKey] = { ...(merged[pageKey] ?? {}), label };
+    }
+    return [id, merged];
+  }),
+);
+
 
 const tab = (
   id: string,

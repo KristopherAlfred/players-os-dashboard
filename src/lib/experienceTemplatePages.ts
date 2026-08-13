@@ -198,6 +198,7 @@ export function buildTemplatePages(
     };
     const cards = copy.cards ?? [];
     out[key] = {
+      studioLabel: copy.label ?? "",
       backgroundColor: bg,
       backgroundGradientFrom: light ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.12)",
       backgroundGradientTo: bg,

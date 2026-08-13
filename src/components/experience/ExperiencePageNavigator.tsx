@@ -1,9 +1,10 @@
-import { Eye } from "lucide-react";
+import { useState } from "react";
+import { Eye, Pencil } from "lucide-react";
 
 import type { ExperienceConfig, ExperiencePageKeyName } from "../../lib/experienceConfig";
 import {
   EXPERIENCE_PAGE_KEYS,
-  EXPERIENCE_PAGE_LABELS,
+  experiencePageLabel,
   getStageItem,
   pageBackgroundCss,
 } from "../../lib/experienceConfig";
@@ -18,12 +19,16 @@ export function ExperiencePageNavigator({
   activePageKey,
   onSelect,
   onPlay,
+  onRename,
 }: {
   experience: ExperienceConfig;
   activePageKey: ExperiencePageKeyName | null;
   onSelect: (key: ExperiencePageKeyName) => void;
   onPlay?: () => void;
+  /** Rename a page (templates ship their own names; athletes can change them). */
+  onRename?: (key: ExperiencePageKeyName, label: string) => void;
 }) {
+  const [renaming, setRenaming] = useState<ExperiencePageKeyName | null>(null);
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2.5">
       <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
@@ -51,7 +56,7 @@ export function ExperiencePageNavigator({
               key={key}
               type="button"
               onClick={() => onSelect(key)}
-              title={EXPERIENCE_PAGE_LABELS[key]}
+              title={experiencePageLabel(experience.pages, key)}
               className={`group shrink-0 text-left transition ${active ? "" : "opacity-75 hover:opacity-100"}`}
             >
               <div
@@ -79,13 +84,36 @@ export function ExperiencePageNavigator({
                   style={{ background: page.ctaBg || experience.theme.buttonBg }}
                 />
               </div>
-              <p
-                className={`mt-1 w-[42px] truncate text-center text-[7px] font-bold uppercase tracking-[0.08em] ${
-                  active ? "text-white" : "text-white/45"
-                }`}
-              >
-                {EXPERIENCE_PAGE_LABELS[key]}
-              </p>
+              {renaming === key ? (
+                <input
+                  autoFocus
+                  defaultValue={experiencePageLabel(experience.pages, key)}
+                  onClick={(e) => e.stopPropagation()}
+                  onBlur={(e) => {
+                    onRename?.(key, e.target.value.trim());
+                    setRenaming(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                    if (e.key === "Escape") setRenaming(null);
+                  }}
+                  className="mt-1 w-[42px] rounded border border-white/25 bg-black px-0.5 text-center text-[7px] font-bold uppercase text-white outline-none"
+                />
+              ) : (
+                <p
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    if (onRename) setRenaming(key);
+                  }}
+                  title={onRename ? "Double-click to rename" : undefined}
+                  className={`mt-1 flex w-[42px] items-center justify-center gap-[1px] truncate text-center text-[7px] font-bold uppercase tracking-[0.08em] ${
+                    active ? "text-white" : "text-white/45"
+                  }`}
+                >
+                  <span className="truncate">{experiencePageLabel(experience.pages, key)}</span>
+                  {active && onRename ? <Pencil size={6} className="shrink-0 opacity-60" /> : null}
+                </p>
+              )}
             </button>
           );
         })}
