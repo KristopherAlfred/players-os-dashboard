@@ -31,9 +31,12 @@ const ICON_CHOICES = [
 /** Drag-and-drop editor for the fan-app bottom tab bar. */
 export function ExperienceNavPanel({
   nav,
+  pages,
   onChange,
 }: {
   nav: ExperienceNav;
+  /** Page configs, so the page picker can show custom / template page names. */
+  pages?: import("../../lib/experienceConfig").ExperiencePages;
   onChange: (patch: Partial<ExperienceNav>) => void;
 }) {
   const [dragId, setDragId] = useState<string | null>(null);
@@ -105,7 +108,7 @@ export function ExperienceNavPanel({
               >
                 {EXPERIENCE_PAGE_KEYS.map((key) => (
                   <option key={key} value={key}>
-                    {experiencePageLabel(experience?.pages, key)}
+                    {experiencePageLabel(pages, key)}
                   </option>
                 ))}
               </select>
