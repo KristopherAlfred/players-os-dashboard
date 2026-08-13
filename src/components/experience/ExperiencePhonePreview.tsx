@@ -1317,7 +1317,10 @@ function SettingsPreview({ experience }: { experience: ExperienceConfig }) {
     { label: logout, description: "Sign out of your account" },
   ];
   return (
-    <PhoneFrame label="Account Settings" hint="Default settings layout — edit title & colors in the panel">
+    <PhoneFrame
+      label="Account Settings"
+      hint="Default settings layout — edit title & colors in the panel"
+      screen={
       <div
         className="flex h-[560px] flex-col"
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
@@ -1355,6 +1358,8 @@ function SettingsPreview({ experience }: { experience: ExperienceConfig }) {
           </div>
         </div>
       </div>
+      }
+    >
       <StampTray experience={experience} />
     </PhoneFrame>
   );
@@ -1376,7 +1381,7 @@ function HomeHeaderPreview({
     <PhoneFrame
       label="Home header"
       hint="LIVE hero + home background — box grid is under Home boxes"
-    >
+      screen={
       <div
         className="flex h-[560px] flex-col"
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
@@ -1426,6 +1431,8 @@ function HomeHeaderPreview({
           </p>
         </div>
       </div>
+      }
+    >
       <StampTray
         experience={experience}
         onSaveLogo={onSaveLogo}
