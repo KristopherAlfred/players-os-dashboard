@@ -336,6 +336,12 @@ type FullTemplateSpec = {
   light?: boolean;
   /** key in SPORT_PHOTOS */
   photo: string;
+  /** script signature line rendered as its own layer */
+  signature?: string;
+  /** editable pill in the top nav */
+  badge?: string;
+  /** 2x2 card grid — title / subtitle / icon / destination page */
+  cards?: [string, string][];
   tags: string[];
 };
 
@@ -424,6 +430,40 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
         icon: icons[i],
         label,
       })),
+      heroOverlayFrom: s.light ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.18)",
+      heroOverlayTo: s.light ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.88)",
+      heroOverlayOpacity: 100,
+      navLabel: s.wordmark,
+      navTextColor: s.text,
+      navBadgeLabel: s.badge ?? "Inner Circle",
+      navBadgeColor: s.accent,
+      navBadgeBorderColor: line,
+      navBadgeRadius: 999,
+      showNavBadge: true,
+      showNavBell: true,
+      showNavAvatar: true,
+      navAvatarSrc: "",
+      signatureText: s.signature ?? "",
+      signatureImage: "",
+      signatureColor: s.accent,
+      signatureFont: "default",
+      cardBg: panel,
+      cardBorderColor: line,
+      cardRadius: 18,
+      cardTitleColor: featureText,
+      cardTextColor: s.muted,
+      cardIconColor: s.accent,
+      cardColumns: 2,
+      cards: (s.cards ?? s.features.map((label) => [label, ""] as [string, string])).map(
+        ([title, subtitle], i) => ({
+          id: `c${i + 1}`,
+          title,
+          subtitle,
+          icon: icons[i] ?? "star",
+          image: "",
+          linkPageKey: ["community", "videos", "news", "shop"][i] ?? "home",
+        }),
+      ),
       memberProof: {
         count: s.count,
         label: s.countLabel,
@@ -445,9 +485,12 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
         { id: "subhead", x: 6, y: 50, w: 88, z: 14, hidden: true, glow: false, glowColor: s.accent, glowIntensity: 0 },
         { id: "headline", x: 6, y: 55, w: 84, z: 15, scale: 108, glow: false, glowColor: s.text, glowIntensity: 0 },
         { id: "body", x: 6, y: 66, w: 84, z: 13, glow: false, glowColor: s.text, glowIntensity: 0 },
-        { id: "featureRow", x: 4, y: 74, w: 92, z: 16, glow: false, glowColor: s.accent, glowIntensity: 0 },
-        { id: "cta", x: 5, y: 84, w: 90, z: 18, glow: !s.light, glowColor: s.accent, glowIntensity: 30 },
-        { id: "memberProof", x: 5, y: 91, w: 90, z: 17, glow: false, glowColor: s.accent, glowIntensity: 0 },
+        { id: "navBar", x: 4, y: 12, w: 92, z: 24, glow: false, glowColor: s.accent, glowIntensity: 0 },
+        { id: "signature", x: 6, y: 64, w: 44, z: 19, hidden: !s.signature, glow: false, glowColor: s.accent, glowIntensity: 0 },
+        { id: "cardGrid", x: 4, y: 70, w: 92, z: 16, glow: false, glowColor: s.accent, glowIntensity: 0 },
+        { id: "featureRow", x: 4, y: 74, w: 92, z: 16, hidden: true, glow: false, glowColor: s.accent, glowIntensity: 0 },
+        { id: "cta", x: 5, y: 86, w: 90, z: 18, glow: !s.light, glowColor: s.accent, glowIntensity: 30 },
+        { id: "memberProof", x: 5, y: 93, w: 90, z: 17, glow: false, glowColor: s.accent, glowIntensity: 0 },
       ],
     },
   };
