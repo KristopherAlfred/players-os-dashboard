@@ -1610,6 +1610,14 @@ export function ExperiencePage() {
           onClose={() => setAppPreviewOpen(false)}
         />
       ) : null}
+      {templateAppPreview ? (
+        <ExperienceAppPreview
+          experience={templateAppPreview}
+          startPage="landing"
+          onClose={() => setTemplateAppPreview(null)}
+        />
+      ) : null}
+
     </div>
   );
 }
