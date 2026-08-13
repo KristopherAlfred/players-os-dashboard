@@ -3,6 +3,7 @@ import { GripVertical, Plus, Trash2 } from "lucide-react";
 
 import {
   EXPERIENCE_PAGE_KEYS,
+  experiencePageKeys,
   experiencePageLabel,
   type ExperienceNav,
   type ExperienceNavTab,
