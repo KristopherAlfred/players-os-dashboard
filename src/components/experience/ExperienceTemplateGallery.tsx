@@ -29,7 +29,7 @@ function pageCount(template: ExperienceTemplate) {
 }
 
 function isAthleteTemplate(template: ExperienceTemplate) {
-  return Boolean(TEMPLATE_PAGE_COPY[template.id]);
+  return Boolean(template.athlete);
 }
 
 /**
@@ -59,7 +59,7 @@ export function ExperienceTemplateGallery({
     const q = query.trim().toLowerCase();
     if (!q) return ordered;
     return ordered.filter((t) =>
-      `${t.label} ${t.vibe} ${(t.tags ?? []).join(" ")}`.toLowerCase().includes(q),
+      `${t.label} ${t.athlete ?? ""} ${t.vibe} ${(t.tags ?? []).join(" ")}`.toLowerCase().includes(q),
     );
   }, [filter, query]);
 
