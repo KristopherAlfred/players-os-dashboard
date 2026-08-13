@@ -527,7 +527,6 @@ function PageFreeformPreview({
         </p>
       );
     } else if (role === "hero") {
-      if (!showLandingChrome) return null;
       body = page.heroImage ? (
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
@@ -548,7 +547,7 @@ function PageFreeformPreview({
         </div>
       );
     } else if (role === "titleArt") {
-      if (!showLandingChrome || !page.titleImage) return null;
+      if (!page.titleImage) return null;
       body = (
         <img
           src={resolveExperiencePreviewUrl(page.titleImage)}
@@ -623,7 +622,7 @@ function PageFreeformPreview({
         />
       );
     } else if (role === "featureRow") {
-      if (!showLandingChrome || !(page.features || []).length) return null;
+      if (!(page.features || []).length) return null;
       body = (
         <div className="grid w-full grid-cols-2 gap-2" style={stageGlowStyle(item, "box")}>
           {(page.features || []).map((feat) => (
@@ -645,7 +644,6 @@ function PageFreeformPreview({
         </div>
       );
     } else if (role === "memberProof") {
-      if (!showLandingChrome) return null;
       const proof = page.memberProof;
       if (!proof?.count && !(proof?.avatars || []).length) return null;
       body = (
@@ -689,7 +687,6 @@ function PageFreeformPreview({
         </div>
       );
     } else if (role === "cta") {
-      if (!showLandingChrome) return null;
       const ctaGradient =
         page.ctaGradientFrom && page.ctaGradientTo
           ? `linear-gradient(${page.ctaGradientAngle ?? 90}deg, ${page.ctaGradientFrom}, ${page.ctaGradientTo})`
