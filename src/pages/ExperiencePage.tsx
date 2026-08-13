@@ -44,8 +44,9 @@ import type {
 } from "../lib/experienceConfig";
 import {
   createStampFromBrand,
-  EXPERIENCE_PAGE_KEYS,
-  EXPERIENCE_PAGE_LABELS,
+  DEFAULT_EXPERIENCE_PAGES,
+  experiencePageKeys,
+  isCustomExperiencePage,
   experiencePageLabel,
   placeStampOnPage,
   widgetStyleCss,
@@ -87,20 +88,24 @@ type ExperienceSection =
   | "nav"
   | `page:${ExperiencePageKeyName}`;
 
-const SECTIONS: { id: ExperienceSection; label: string }[] = [
-  { id: "ai", label: "✦ AI Designer" },
-  { id: "templates", label: "Templates" },
-  { id: "brand", label: "Brand / Logo" },
-  { id: "theme", label: "Colors" },
-  { id: "effects", label: "Effects" },
-  { id: "nav", label: "Tab bar" },
-  ...EXPERIENCE_PAGE_KEYS.map((key) => ({
-    id: `page:${key}` as ExperienceSection,
-    label: EXPERIENCE_PAGE_LABELS[key],
-
-  })),
-  { id: "boxes", label: "Home boxes" },
-];
+function buildSections(
+  pageKeys: string[],
+  pages: ExperienceConfig["pages"] | undefined,
+): { id: ExperienceSection; label: string }[] {
+  return [
+    { id: "ai", label: "✦ AI Designer" },
+    { id: "templates", label: "Templates" },
+    { id: "brand", label: "Brand / Logo" },
+    { id: "theme", label: "Colors" },
+    { id: "effects", label: "Effects" },
+    { id: "nav", label: "Tab bar" },
+    ...pageKeys.map((key) => ({
+      id: `page:${key}` as ExperienceSection,
+      label: experiencePageLabel(pages, key),
+    })),
+    { id: "boxes", label: "Home boxes" },
+  ];
+}
 
 /** Which fan-app page the studio is editing, if any. */
 function sectionPageKey(section: ExperienceSection): ExperiencePageKeyName | null {
@@ -363,6 +368,8 @@ export function ExperiencePage() {
   );
 
   const experience = useMemo(() => getExperienceFromLayout(layout), [layout]);
+  const pageKeys = useMemo(() => experiencePageKeys(experience), [experience]);
+  const SECTIONS = useMemo(() => buildSections(pageKeys, experience.pages), [pageKeys, experience.pages]);
   const activeTemplateId = useMemo(() => detectExperienceTemplate(experience), [experience]);
 
   const ordered = useMemo(
@@ -408,6 +415,51 @@ export function ExperiencePage() {
       },
     }));
   }
+
+  /** Add a brand-new custom page (cloned from an existing page when given). */
+  function addCustomPage(sourceKey?: string) {
+    const key = `custom_${Date.now().toString(36)}`;
+    patchExperience((prev) => {
+      const source = sourceKey ? prev.pages[sourceKey] : undefined;
+      const base = source
+        ? JSON.parse(JSON.stringify(source))
+        : JSON.parse(JSON.stringify(DEFAULT_EXPERIENCE_PAGES.home));
+      const label = source
+        ? `${experiencePageLabel(prev.pages, sourceKey!)} copy`
+        : "New page";
+      const order = experiencePageKeys(prev);
+      const insertAt = sourceKey ? order.indexOf(sourceKey) + 1 : order.length;
+      const pageOrder = [...order];
+      pageOrder.splice(insertAt, 0, key);
+      return {
+        ...prev,
+        pages: { ...prev.pages, [key]: { ...base, studioLabel: label } },
+        pageOrder,
+      };
+    });
+    setSection(`page:${key}`);
+    setStatus("Page added — rename it by double-clicking its thumbnail");
+  }
+
+  function deleteCustomPage(pageKey: string) {
+    if (!isCustomExperiencePage(pageKey)) return;
+    patchExperience((prev) => {
+      const pages = { ...prev.pages };
+      delete pages[pageKey];
+      return {
+        ...prev,
+        pages,
+        pageOrder: experiencePageKeys(prev).filter((k) => k !== pageKey),
+        nav: {
+          ...prev.nav,
+          tabs: prev.nav.tabs.filter((t) => t.pageKey !== pageKey),
+        },
+      };
+    });
+    setSection("page:home");
+    setStatus("Page deleted");
+  }
+
 
   async function uploadIntoExperience(
     apply: (dataUrl: string) => void,
@@ -866,6 +918,9 @@ export function ExperiencePage() {
             onSelect={(key) => setSection(`page:${key}`)}
             onPlay={() => setAppPreviewOpen(true)}
             onRename={(key, label) => patchPage(key, { studioLabel: label })}
+            onAddPage={() => addCustomPage()}
+            onDuplicatePage={(key) => addCustomPage(key)}
+            onDeletePage={(key) => deleteCustomPage(key)}
           />
           <ExperiencePhonePreview
             experience={experience}

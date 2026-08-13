@@ -285,7 +285,7 @@ export type ExperiencePageConfig = {
 };
 
 
-export type ExperiencePages = {
+export type ExperienceBuiltinPages = {
   landing: ExperiencePageConfig;
   youreIn: ExperiencePageConfig;
   settings: ExperiencePageConfig;
@@ -301,10 +301,15 @@ export type ExperiencePages = {
   bio: ExperiencePageConfig;
 };
 
-export type ExperiencePageKeyName = keyof ExperiencePages;
+/** Built-in pages plus any custom pages the athlete/AI adds. */
+export type ExperiencePages = ExperienceBuiltinPages &
+  Record<string, ExperiencePageConfig>;
 
-/** Every editable fan-app page, in studio order. */
-export const EXPERIENCE_PAGE_KEYS: ExperiencePageKeyName[] = [
+export type ExperienceBuiltinPageKey = keyof ExperienceBuiltinPages;
+export type ExperiencePageKeyName = string;
+
+/** Every built-in editable fan-app page, in studio order. */
+export const EXPERIENCE_PAGE_KEYS: ExperienceBuiltinPageKey[] = [
   "landing",
   "youreIn",
   "home",
@@ -320,7 +325,7 @@ export const EXPERIENCE_PAGE_KEYS: ExperiencePageKeyName[] = [
   "settings",
 ];
 
-export const EXPERIENCE_PAGE_LABELS: Record<ExperiencePageKeyName, string> = {
+export const EXPERIENCE_PAGE_LABELS: Record<string, string> = {
   landing: "Landing",
   youreIn: "You're In",
   home: "Home",
@@ -336,13 +341,45 @@ export const EXPERIENCE_PAGE_LABELS: Record<ExperiencePageKeyName, string> = {
   settings: "Settings",
 };
 
+export const CUSTOM_PAGE_PREFIX = "custom_";
+
+export function isCustomExperiencePage(key: string): boolean {
+  return key.startsWith(CUSTOM_PAGE_PREFIX);
+}
+
+function prettifyPageKey(key: string): string {
+  const raw = isCustomExperiencePage(key) ? key.slice(CUSTOM_PAGE_PREFIX.length) : key;
+  const cleaned = raw.replace(/[_-]+/g, " ").replace(/\d{6,}/g, "").trim();
+  if (!cleaned) return "New page";
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
 /** Page name shown in the studio: the template/athlete override when set, else the default. */
 export function experiencePageLabel(
   pages: ExperiencePages | undefined,
   key: ExperiencePageKeyName,
 ): string {
   const custom = pages?.[key]?.studioLabel?.trim();
-  return custom || EXPERIENCE_PAGE_LABELS[key];
+  return custom || EXPERIENCE_PAGE_LABELS[key] || prettifyPageKey(key);
+}
+
+/** All page keys for a config, in studio order (built-ins + custom pages). */
+export function experiencePageKeys(config: {
+  pages: ExperiencePages;
+  pageOrder?: string[];
+}): string[] {
+  const available = Object.keys(config.pages ?? {});
+  const ordered: string[] = [];
+  for (const key of config.pageOrder ?? []) {
+    if (available.includes(key) && !ordered.includes(key)) ordered.push(key);
+  }
+  for (const key of EXPERIENCE_PAGE_KEYS) {
+    if (available.includes(key) && !ordered.includes(key)) ordered.push(key);
+  }
+  for (const key of available) {
+    if (!ordered.includes(key)) ordered.push(key);
+  }
+  return ordered;
 }
 
 /** Bottom tab bar of the fan app — fully reorderable / restylable. */
@@ -400,6 +437,8 @@ export type ExperienceConfig = {
   theme: ExperienceTheme;
   effects: ExperienceEffects;
   pages: ExperiencePages;
+  /** Studio order of pages, including custom pages added by the athlete or AI */
+  pageOrder?: string[];
   /** Reusable logo stamps — click to place on the current page */
   stamps: ExperienceStamp[];
   /** Fan-app bottom tab bar */
@@ -1364,6 +1403,11 @@ export function normalizeExperiencePages(raw: unknown): ExperiencePages {
   for (const key of EXPERIENCE_PAGE_KEYS) {
     out[key] = normalizeExperiencePage(p[key], DEFAULT_EXPERIENCE_PAGES[key]);
   }
+  for (const key of Object.keys(p)) {
+    if (out[key]) continue;
+    if (!p[key] || typeof p[key] !== "object") continue;
+    out[key] = normalizeExperiencePage(p[key], DEFAULT_EXPERIENCE_PAGES.home);
+  }
   return out;
 }
 
@@ -1374,9 +1418,8 @@ export function normalizeExperienceNav(raw: unknown): ExperienceNav {
   for (const row of tabsRaw) {
     if (!row || typeof row !== "object") continue;
     const t = row as Partial<ExperienceNavTab>;
-    const pageKey = (EXPERIENCE_PAGE_KEYS as string[]).includes(String(t.pageKey))
-      ? (t.pageKey as ExperiencePageKeyName)
-      : "home";
+    const rawPageKey = typeof t.pageKey === "string" ? t.pageKey.trim() : "";
+    const pageKey: ExperiencePageKeyName = rawPageKey || "home";
     tabs.push({
       id: asString(t.id, `tab_${tabs.length}`),
       label: asString(t.label, EXPERIENCE_PAGE_LABELS[pageKey]),
@@ -1404,6 +1447,9 @@ export function normalizeExperienceConfig(raw: unknown): ExperienceConfig {
     theme: normalizeExperienceTheme(c.theme),
     effects: normalizeExperienceEffects(c.effects),
     pages: normalizeExperiencePages(c.pages),
+    pageOrder: Array.isArray(c.pageOrder)
+      ? c.pageOrder.filter((k): k is string => typeof k === "string")
+      : undefined,
     stamps: normalizeExperienceStamps(c.stamps),
     nav: normalizeExperienceNav(c.nav),
   };
