@@ -17,8 +17,6 @@ import ownYourPower from "../assets/templates/own-your-power.jpg";
 import builtDifferent from "../assets/templates/built-different.jpg";
 import builtToLead from "../assets/templates/built-to-lead.jpg";
 import trustTheVision from "../assets/templates/trust-the-vision.jpg";
-import speedster from "../assets/templates/speedster.jpg";
-import champ23 from "../assets/templates/champ23.jpg";
 import serveReturnRepeat from "../assets/templates/serve-return-repeat.jpg";
 
 /** Hero artwork for each full-layout template, keyed by template id. */
@@ -42,7 +40,5 @@ export const TEMPLATE_ART: Record<string, string> = {
   "built-different": builtDifferent,
   "built-to-lead": builtToLead,
   "trust-the-vision": trustTheVision,
-  speedster,
-  champ23,
   "serve-return-repeat": serveReturnRepeat,
 };
