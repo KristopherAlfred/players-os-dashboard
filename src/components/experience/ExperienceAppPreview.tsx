@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 import {
   ArrowRight,
+  Bell,
   CalendarDays,
   Camera,
   Check,
@@ -241,6 +242,127 @@ function PageView({
               {proof.label}
             </span>
           </div>
+        </div>
+      );
+    } else if (role === "navBar") {
+      const hasNav =
+        Boolean(page.navLabel) ||
+        (page.showNavBadge !== false && Boolean(page.navBadgeLabel)) ||
+        page.showNavBell !== false ||
+        page.showNavAvatar !== false;
+      if (!hasNav) return null;
+      body = (
+        <div className="flex w-full items-center gap-2">
+          {page.navLabel ? (
+            <span
+              className="text-[10px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: page.navTextColor || "#FFFFFF" }}
+            >
+              {page.navLabel}
+            </span>
+          ) : null}
+          {page.showNavBadge !== false && page.navBadgeLabel ? (
+            <span
+              className="px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.12em]"
+              style={{
+                color: page.navBadgeColor,
+                border: `1px solid ${page.navBadgeBorderColor || "rgba(255,255,255,0.25)"}`,
+                borderRadius: page.navBadgeRadius ?? 999,
+                background: "rgba(0,0,0,0.35)",
+              }}
+            >
+              {page.navBadgeLabel}
+            </span>
+          ) : null}
+          <div className="ml-auto flex items-center gap-2">
+            {page.showNavBell !== false ? (
+              <span
+                className="flex h-6 w-6 items-center justify-center rounded-full border"
+                style={{ borderColor: "rgba(255,255,255,0.2)", background: "rgba(0,0,0,0.35)" }}
+              >
+                <Bell size={11} strokeWidth={2} style={{ color: page.navTextColor || "#FFFFFF" }} />
+              </span>
+            ) : null}
+            {page.showNavAvatar !== false ? (
+              page.navAvatarSrc ? (
+                <img
+                  src={resolveExperiencePreviewUrl(page.navAvatarSrc)}
+                  alt=""
+                  className="h-6 w-6 rounded-full border border-white/25 object-cover"
+                />
+              ) : (
+                <span
+                  className="flex h-6 w-6 items-center justify-center rounded-full border"
+                  style={{ borderColor: "rgba(255,255,255,0.2)", background: "rgba(0,0,0,0.45)" }}
+                >
+                  <User size={11} strokeWidth={2} style={{ color: page.navTextColor || "#FFFFFF" }} />
+                </span>
+              )
+            ) : null}
+          </div>
+        </div>
+      );
+    } else if (role === "signature") {
+      if (!page.signatureImage && !page.signatureText) return null;
+      body = page.signatureImage ? (
+        <img src={resolveExperiencePreviewUrl(page.signatureImage)} alt="" className="w-full object-contain" />
+      ) : (
+        <p
+          className="whitespace-nowrap text-[22px] italic leading-none"
+          style={{ color: page.signatureColor || "#FFFFFF" }}
+        >
+          {page.signatureText}
+        </p>
+      );
+    } else if (role === "cardGrid") {
+      const cards = page.cards || [];
+      if (!cards.length) return null;
+      body = (
+        <div className="grid w-full gap-2" style={{ gridTemplateColumns: `repeat(${page.cardColumns || 2}, minmax(0, 1fr))` }}>
+          {cards.map((card) => (
+            <button
+              key={card.id}
+              type="button"
+              onClick={() => onNavigate(card.linkPageKey as ExperiencePageKeyName)}
+              className="relative flex min-h-[72px] flex-col justify-end overflow-hidden p-2 text-left transition active:scale-[0.97]"
+              style={{
+                background: page.cardBg,
+                border: `1px solid ${page.cardBorderColor}`,
+                borderRadius: page.cardRadius,
+              }}
+            >
+              {card.image ? (
+                <>
+                  <img
+                    src={resolveExperiencePreviewUrl(card.image)}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <span
+                    className="absolute inset-0"
+                    style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.82))" }}
+                  />
+                </>
+              ) : null}
+              <span className="relative flex items-center justify-between">
+                <Glyph name={card.icon} color={page.cardIconColor} />
+                <span
+                  className="flex h-4 w-4 items-center justify-center rounded-full"
+                  style={{ background: "rgba(255,255,255,0.14)" }}
+                >
+                  <ArrowRight size={9} strokeWidth={2.4} style={{ color: page.cardTitleColor }} />
+                </span>
+              </span>
+              <span className="relative mt-1.5 text-[10px] font-bold leading-tight" style={{ color: page.cardTitleColor }}>
+                {card.title}
+              </span>
+              {card.subtitle ? (
+                <span className="relative text-[8px] leading-tight" style={{ color: page.cardTextColor }}>
+                  {card.subtitle}
+                </span>
+              ) : null}
+            </button>
+          ))}
         </div>
       );
     } else if (role === "cta") {
