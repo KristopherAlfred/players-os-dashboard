@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import {
   ArrowRight,
+  Bell,
   CalendarDays,
   Camera,
   Check,
@@ -50,6 +51,7 @@ import {
   upsertStageItem,
 } from "../../lib/experienceConfig";
 import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
+import { resolveTitleFontFamily } from "../../lib/typography";
 import { TintedBrandLogo } from "./TintedBrandLogo";
 import { StyledTextRuns, WordStyleEditor, runsForPageField } from "./StyledText";
 
@@ -78,6 +80,9 @@ const STAGE_LABELS: Record<ExperienceBuiltinStageId, string> = {
   cta: "CTA button",
   featureRow: "Feature strip",
   memberProof: "Members row",
+  navBar: "Top nav",
+  signature: "Signature",
+  cardGrid: "Feature cards",
 };
 
 const FEATURE_ICONS: Record<string, LucideIcon> = {
@@ -170,6 +175,7 @@ function DraggableStageItem({
   children: ReactNode;
 }) {
   const drag = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const [centerGuide, setCenterGuide] = useState(false);
   const resize = useRef<{ startX: number; startY: number; origW: number; origScale: number } | null>(null);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -194,14 +200,23 @@ function DraggableStageItem({
     const rect = parent.getBoundingClientRect();
     const dx = ((e.clientX - drag.current.startX) / rect.width) * 100;
     const dy = ((e.clientY - drag.current.startY) / rect.height) * 100;
-    onMove(
-      Math.max(0, Math.min(90, drag.current.origX + dx)),
-      Math.max(0, Math.min(92, drag.current.origY + dy)),
-    );
+    let x = Math.max(0, Math.min(90, drag.current.origX + dx));
+    let y = Math.max(0, Math.min(92, drag.current.origY + dy));
+    // snap-to-grid (2%) plus horizontal-center alignment snap
+    const snap = (value: number) => Math.round(value / 2) * 2;
+    x = snap(x);
+    y = snap(y);
+    const width = item.w || 80;
+    const centered = Math.abs(x + width / 2 - 50) <= 2.5;
+    if (centered) x = 50 - width / 2;
+    setCenterGuide(centered);
+    onMove(x, y);
   };
+
 
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     drag.current = null;
+    setCenterGuide(false);
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {
@@ -265,6 +280,9 @@ function DraggableStageItem({
       style={stageItemCss(item) as CSSProperties}
     >
       {children}
+      {centerGuide ? (
+        <span className="pointer-events-none absolute left-1/2 top-[-1000px] z-[190] h-[2000px] w-px bg-cyan-300/70" />
+      ) : null}
       {selected ? (
         <>
           {onDelete ? (
@@ -686,6 +704,143 @@ function PageFreeformPreview({
           </div>
         </div>
       );
+    } else if (role === "navBar") {
+      const hasNav =
+        Boolean(page.navLabel) ||
+        (page.showNavBadge !== false && Boolean(page.navBadgeLabel)) ||
+        page.showNavBell !== false ||
+        page.showNavAvatar !== false;
+      if (!hasNav) return null;
+      body = (
+        <div className="flex w-full items-center gap-2" style={stageGlowStyle(item, "box")}>
+          {page.navLabel ? (
+            <span
+              className="text-[10px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: page.navTextColor || "#FFFFFF" }}
+            >
+              {page.navLabel}
+            </span>
+          ) : null}
+          {page.showNavBadge !== false && page.navBadgeLabel ? (
+            <span
+              className="px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.12em]"
+              style={{
+                color: page.navBadgeColor,
+                border: `1px solid ${page.navBadgeBorderColor || "rgba(255,255,255,0.25)"}`,
+                borderRadius: page.navBadgeRadius ?? 999,
+                background: "rgba(0,0,0,0.35)",
+              }}
+            >
+              {page.navBadgeLabel}
+            </span>
+          ) : null}
+          <div className="ml-auto flex items-center gap-2">
+            {page.showNavBell !== false ? (
+              <span
+                className="flex h-6 w-6 items-center justify-center rounded-full border"
+                style={{ borderColor: "rgba(255,255,255,0.2)", background: "rgba(0,0,0,0.35)" }}
+              >
+                <Bell size={11} strokeWidth={2} style={{ color: page.navTextColor || "#FFFFFF" }} />
+              </span>
+            ) : null}
+            {page.showNavAvatar !== false ? (
+              page.navAvatarSrc ? (
+                <img
+                  src={resolveExperiencePreviewUrl(page.navAvatarSrc)}
+                  alt=""
+                  draggable={false}
+                  className="h-6 w-6 rounded-full border border-white/25 object-cover"
+                />
+              ) : (
+                <span
+                  className="flex h-6 w-6 items-center justify-center rounded-full border"
+                  style={{ borderColor: "rgba(255,255,255,0.2)", background: "rgba(0,0,0,0.45)" }}
+                >
+                  <User size={11} strokeWidth={2} style={{ color: page.navTextColor || "#FFFFFF" }} />
+                </span>
+              )
+            ) : null}
+          </div>
+        </div>
+      );
+    } else if (role === "signature") {
+      if (!page.signatureImage && !page.signatureText) return null;
+      body = page.signatureImage ? (
+        <img
+          src={resolveExperiencePreviewUrl(page.signatureImage)}
+          alt=""
+          draggable={false}
+          className="w-full object-contain"
+          style={stageGlowStyle(item, "image")}
+        />
+      ) : (
+        <p
+          className="whitespace-nowrap text-[20px] italic leading-none"
+          style={{
+            color: page.signatureColor || "#FFFFFF",
+            fontFamily: resolveTitleFontFamily(page.signatureFont),
+            ...stageGlowStyle(item, "text"),
+          }}
+        >
+          {page.signatureText}
+        </p>
+      );
+    } else if (role === "cardGrid") {
+      const cards = page.cards || [];
+      if (!cards.length) return null;
+      body = (
+        <div
+          className="grid w-full gap-2"
+          style={{ gridTemplateColumns: `repeat(${page.cardColumns || 2}, minmax(0, 1fr))`, ...stageGlowStyle(item, "box") }}
+        >
+          {cards.map((card) => (
+            <div
+              key={card.id}
+              className="relative flex min-h-[62px] flex-col justify-end overflow-hidden p-2"
+              style={{
+                background: page.cardBg,
+                border: `1px solid ${page.cardBorderColor}`,
+                borderRadius: page.cardRadius,
+              }}
+            >
+              {card.image ? (
+                <>
+                  <img
+                    src={resolveExperiencePreviewUrl(card.image)}
+                    alt=""
+                    draggable={false}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <span
+                    className="absolute inset-0"
+                    style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.82))" }}
+                  />
+                </>
+              ) : null}
+              <span className="relative flex items-center justify-between">
+                <FeatureIcon name={card.icon} color={page.cardIconColor} />
+                <span
+                  className="flex h-4 w-4 items-center justify-center rounded-full"
+                  style={{ background: "rgba(255,255,255,0.14)" }}
+                >
+                  <ArrowRight size={9} strokeWidth={2.4} style={{ color: page.cardTitleColor }} />
+                </span>
+              </span>
+              <span
+                className="relative mt-1.5 text-[10px] font-bold leading-tight"
+                style={{ color: page.cardTitleColor }}
+              >
+                {card.title}
+              </span>
+              {card.subtitle ? (
+                <span className="relative text-[8px] leading-tight" style={{ color: page.cardTextColor }}>
+                  {card.subtitle}
+                </span>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      );
     } else if (role === "cta") {
       const ctaGradient =
         page.ctaGradientFrom && page.ctaGradientTo
@@ -771,6 +926,17 @@ function PageFreeformPreview({
         style={{ background: pageBackgroundCss(page) || themeBackgroundCss(experience.theme) }}
         onClick={() => setSelectedId(null)}
       >
+        {(page.heroOverlayOpacity ?? 0) > 0 && page.backgroundImage ? (
+          <div
+            className="pointer-events-none absolute inset-0 z-[1]"
+            style={{
+              background: `linear-gradient(180deg, ${page.heroOverlayFrom || "rgba(0,0,0,0.15)"}, ${
+                page.heroOverlayTo || "rgba(0,0,0,0.85)"
+              })`,
+              opacity: (page.heroOverlayOpacity ?? 100) / 100,
+            }}
+          />
+        ) : null}
         {stageIds.map(renderItem)}
         {page.showMenuButton ? (
           <div

@@ -76,7 +76,10 @@ export type ExperienceBuiltinStageId =
   | "cta"
   | "featureRow"
   | "memberProof"
-  | "titleArt";
+  | "titleArt"
+  | "navBar"
+  | "signature"
+  | "cardGrid";
 
 
 /** Built-in stage ids, or stamp instance ids like `stamp_…`. */
@@ -145,6 +148,22 @@ export type ExperienceFeature = {
   icon: string;
   label: string;
 };
+
+/**
+ * Self-contained feature card in the landing card grid. Every part is its own
+ * editable field — photo, title, subtitle, icon and destination page.
+ */
+export type ExperienceCard = {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  image: string;
+  /** Page key in the fan app this card routes to. */
+  linkPageKey: string;
+};
+
+
 
 /** Social-proof row: member avatars, a count and content thumbnails. */
 export type ExperienceMemberProof = {
@@ -231,6 +250,36 @@ export type ExperiencePageConfig = {
   featureRadius: number;
   /** Member social-proof row */
   memberProof: ExperienceMemberProof;
+  /** Dark readability wash rendered between the background photo and the text layers */
+  heroOverlayFrom: string;
+  heroOverlayTo: string;
+  /** 0–100 strength of that wash */
+  heroOverlayOpacity: number;
+  /** Top nav layer: page label, community badge, bell, avatar */
+  navLabel: string;
+  navTextColor: string;
+  navBadgeLabel: string;
+  navBadgeColor: string;
+  navBadgeBorderColor: string;
+  navBadgeRadius: number;
+  showNavBadge: boolean;
+  showNavBell: boolean;
+  showNavAvatar: boolean;
+  navAvatarSrc: string;
+  /** Signature / personal mark layer — script text or an uploaded signature image */
+  signatureText: string;
+  signatureImage: string;
+  signatureColor: string;
+  signatureFont: TitleFontFamily;
+  /** Feature card grid (own photo, title, subtitle, icon and destination per card) */
+  cards: ExperienceCard[];
+  cardBg: string;
+  cardBorderColor: string;
+  cardRadius: number;
+  cardTitleColor: string;
+  cardTextColor: string;
+  cardIconColor: string;
+  cardColumns: number;
 };
 
 
@@ -402,9 +451,12 @@ export const STAGE_ITEM_IDS: ExperienceBuiltinStageId[] = [
   "tagline",
   "hero",
   "titleArt",
+  "navBar",
   "subhead",
   "headline",
+  "signature",
   "body",
+  "cardGrid",
   "featureRow",
   "cta",
   "memberProof",
@@ -458,11 +510,14 @@ export const DEFAULT_LANDING_STAGE: ExperienceStageItem[] = [
   { id: "logo", x: 4, y: 4, w: 14, z: 22, glow: true, glowColor: "#8FE3B8", glowIntensity: 40 },
   { id: "wordmark", x: 20, y: 5, w: 55, z: 21, glow: false, glowColor: "#FFFFFF", glowIntensity: 30 },
   { id: "tagline", x: 20, y: 9.5, w: 55, z: 20, glow: false, glowColor: "#8FE3B8", glowIntensity: 30 },
+  { id: "navBar", x: 4, y: 13, w: 92, z: 24, glow: false, glowColor: "#FFFFFF", glowIntensity: 20 },
   { id: "hero", x: 8, y: 16, w: 84, z: 5, glow: true, glowColor: "#8FE3B8", glowIntensity: 35 },
   { id: "titleArt", x: 10, y: 48, w: 70, z: 12, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
   { id: "subhead", x: 8, y: 52, w: 84, z: 14, glow: false, glowColor: "#8FE3B8", glowIntensity: 40 },
   { id: "headline", x: 8, y: 60, w: 84, z: 15, glow: true, glowColor: "#FFFFFF", glowIntensity: 25 },
+  { id: "signature", x: 8, y: 68, w: 46, z: 19, glow: false, glowColor: "#FFFFFF", glowIntensity: 25 },
   { id: "body", x: 8, y: 68, w: 84, z: 13, glow: false, glowColor: "#8FE3B8", glowIntensity: 30 },
+  { id: "cardGrid", x: 5, y: 73, w: 90, z: 16, glow: false, glowColor: "#8FE3B8", glowIntensity: 20 },
   { id: "featureRow", x: 6, y: 76, w: 88, z: 16, glow: false, glowColor: "#8FE3B8", glowIntensity: 25 },
   { id: "cta", x: 8, y: 84, w: 84, z: 18, glow: true, glowColor: "#8FE3B8", glowIntensity: 45 },
   { id: "memberProof", x: 6, y: 91, w: 88, z: 17, glow: false, glowColor: "#8FE3B8", glowIntensity: 20 },
@@ -595,6 +650,38 @@ export function normalizeMemberProof(
   };
 }
 
+export function createCardId() {
+  return `card_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/** Four starter cards matching the 2x2 landing grid. */
+export const DEFAULT_CARDS: ExperienceCard[] = [
+  { id: "card_inner", title: "Inner Circle", subtitle: "Members only", icon: "crown", image: "", linkPageKey: "community" },
+  { id: "card_videos", title: "Videos", subtitle: "Behind the scenes", icon: "video", image: "", linkPageKey: "videos" },
+  { id: "card_news", title: "News", subtitle: "Latest drops", icon: "news", image: "", linkPageKey: "news" },
+  { id: "card_shop", title: "Shop", subtitle: "Gear & merch", icon: "shop", image: "", linkPageKey: "shop" },
+];
+
+export function normalizeCards(raw: unknown, fallback: ExperienceCard[] = []): ExperienceCard[] {
+  if (!Array.isArray(raw)) return (fallback || []).map((c) => ({ ...c }));
+  return raw
+    .filter((row) => row && typeof row === "object")
+    .slice(0, 8)
+    .map((row) => {
+      const c = row as Partial<ExperienceCard>;
+      return {
+        id: String(c.id || "") || createCardId(),
+        title: String(c.title ?? "").slice(0, 32),
+        subtitle: String(c.subtitle ?? "").slice(0, 48),
+        icon: String(c.icon || "star").toLowerCase(),
+        image: typeof c.image === "string" ? c.image : "",
+        linkPageKey: String(c.linkPageKey || "home"),
+      };
+    });
+}
+
+
+
 function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePageConfig {
 
   return {
@@ -652,6 +739,31 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     featureTextColor: "#FFFFFF",
     featureRadius: 18,
     memberProof: { ...DEFAULT_MEMBER_PROOF },
+    heroOverlayFrom: "rgba(0,0,0,0.15)",
+    heroOverlayTo: "rgba(0,0,0,0.85)",
+    heroOverlayOpacity: 100,
+    navLabel: "",
+    navTextColor: "#FFFFFF",
+    navBadgeLabel: "",
+    navBadgeColor: "#8FE3B8",
+    navBadgeBorderColor: "rgba(255,255,255,0.25)",
+    navBadgeRadius: 999,
+    showNavBadge: true,
+    showNavBell: true,
+    showNavAvatar: true,
+    navAvatarSrc: "",
+    signatureText: "",
+    signatureImage: "",
+    signatureColor: "#FFFFFF",
+    signatureFont: "default",
+    cards: [],
+    cardBg: "rgba(255,255,255,0.05)",
+    cardBorderColor: "rgba(255,255,255,0.14)",
+    cardRadius: 20,
+    cardTitleColor: "#FFFFFF",
+    cardTextColor: "rgba(255,255,255,0.65)",
+    cardIconColor: "#8FE3B8",
+    cardColumns: 2,
 
     ...partial,
   };
@@ -1104,6 +1216,31 @@ export function normalizeExperiencePage(
     featureTextColor: asString(p.featureTextColor, fallback.featureTextColor ?? "#FFFFFF"),
     featureRadius: Math.max(0, Math.min(999, asNumber(p.featureRadius, fallback.featureRadius ?? 18))),
     memberProof: normalizeMemberProof(p.memberProof, fallback.memberProof ?? DEFAULT_MEMBER_PROOF),
+    heroOverlayFrom: asString(p.heroOverlayFrom, fallback.heroOverlayFrom ?? "rgba(0,0,0,0.15)"),
+    heroOverlayTo: asString(p.heroOverlayTo, fallback.heroOverlayTo ?? "rgba(0,0,0,0.85)"),
+    heroOverlayOpacity: Math.max(0, Math.min(100, asNumber(p.heroOverlayOpacity, fallback.heroOverlayOpacity ?? 100))),
+    navLabel: asString(p.navLabel, fallback.navLabel ?? ""),
+    navTextColor: asString(p.navTextColor, fallback.navTextColor ?? "#FFFFFF"),
+    navBadgeLabel: asString(p.navBadgeLabel, fallback.navBadgeLabel ?? ""),
+    navBadgeColor: asString(p.navBadgeColor, fallback.navBadgeColor ?? "#8FE3B8"),
+    navBadgeBorderColor: asString(p.navBadgeBorderColor, fallback.navBadgeBorderColor ?? "rgba(255,255,255,0.25)"),
+    navBadgeRadius: Math.max(0, Math.min(999, asNumber(p.navBadgeRadius, fallback.navBadgeRadius ?? 999))),
+    showNavBadge: asBool(p.showNavBadge, fallback.showNavBadge ?? true),
+    showNavBell: asBool(p.showNavBell, fallback.showNavBell ?? true),
+    showNavAvatar: asBool(p.showNavAvatar, fallback.showNavAvatar ?? true),
+    navAvatarSrc: asString(p.navAvatarSrc, fallback.navAvatarSrc ?? ""),
+    signatureText: asString(p.signatureText, fallback.signatureText ?? ""),
+    signatureImage: asString(p.signatureImage, fallback.signatureImage ?? ""),
+    signatureColor: asString(p.signatureColor, fallback.signatureColor ?? "#FFFFFF"),
+    signatureFont: normalizeTitleFontFamily(p.signatureFont) ?? fallback.signatureFont ?? "default",
+    cards: normalizeCards(p.cards, fallback.cards ?? []),
+    cardBg: asString(p.cardBg, fallback.cardBg ?? "rgba(255,255,255,0.05)"),
+    cardBorderColor: asString(p.cardBorderColor, fallback.cardBorderColor ?? "rgba(255,255,255,0.14)"),
+    cardRadius: Math.max(0, Math.min(999, asNumber(p.cardRadius, fallback.cardRadius ?? 20))),
+    cardTitleColor: asString(p.cardTitleColor, fallback.cardTitleColor ?? "#FFFFFF"),
+    cardTextColor: asString(p.cardTextColor, fallback.cardTextColor ?? "rgba(255,255,255,0.65)"),
+    cardIconColor: asString(p.cardIconColor, fallback.cardIconColor ?? "#8FE3B8"),
+    cardColumns: Math.max(1, Math.min(3, asNumber(p.cardColumns, fallback.cardColumns ?? 2))),
   };
 }
 
