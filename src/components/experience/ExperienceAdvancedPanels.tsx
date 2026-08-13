@@ -805,6 +805,110 @@ export function ExperiencePagePanel({
 
       <div className="space-y-3 rounded-xl border border-dt-border p-3">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
+          Background photo wash
+        </p>
+        <p className="text-[11px] text-white/40">
+          The photo layer stays just a photo — this gradient sits above it so text stays readable.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Wash top">
+            <TextInput
+              value={page.heroOverlayFrom || ""}
+              onChange={(heroOverlayFrom) => onChange({ heroOverlayFrom })}
+              className="font-mono text-xs"
+            />
+          </Field>
+          <Field label="Wash bottom">
+            <TextInput
+              value={page.heroOverlayTo || ""}
+              onChange={(heroOverlayTo) => onChange({ heroOverlayTo })}
+              className="font-mono text-xs"
+            />
+          </Field>
+        </div>
+        <Field label={`Wash strength (${page.heroOverlayOpacity ?? 100}%)`}>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={page.heroOverlayOpacity ?? 100}
+            onChange={(e) => onChange({ heroOverlayOpacity: Number(e.target.value) })}
+            className="w-full"
+          />
+        </Field>
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">Top nav layer</p>
+        <Field label="Page label">
+          <TextInput value={page.navLabel || ""} onChange={(navLabel) => onChange({ navLabel })} />
+        </Field>
+        <Field label="Badge / pill label" hint='e.g. "Inner Circle"'>
+          <TextInput value={page.navBadgeLabel || ""} onChange={(navBadgeLabel) => onChange({ navBadgeLabel })} />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Nav text color">
+            <ColorInput value={page.navTextColor || "#FFFFFF"} onChange={(navTextColor) => onChange({ navTextColor })} />
+          </Field>
+          <Field label="Badge color">
+            <ColorInput value={page.navBadgeColor || "#8FE3B8"} onChange={(navBadgeColor) => onChange({ navBadgeColor })} />
+          </Field>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <Toggle
+            checked={page.showNavBadge !== false}
+            onChange={(showNavBadge) => onChange({ showNavBadge })}
+            label="Badge"
+          />
+          <Toggle checked={page.showNavBell !== false} onChange={(showNavBell) => onChange({ showNavBell })} label="Bell" />
+          <Toggle
+            checked={page.showNavAvatar !== false}
+            onChange={(showNavAvatar) => onChange({ showNavAvatar })}
+            label="Avatar"
+          />
+        </div>
+        <Field label="Avatar image URL">
+          <TextInput value={page.navAvatarSrc || ""} onChange={(navAvatarSrc) => onChange({ navAvatarSrc })} />
+        </Field>
+        <input
+          type="file"
+          accept="image/*"
+          className="block w-full text-[10px] text-white/60"
+          onChange={(e) => readImageFile(e.target.files?.[0] ?? null, (navAvatarSrc) => onChange({ navAvatarSrc }))}
+        />
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">Signature layer</p>
+        <Field label="Signature text" hint="Leave blank if you upload a signature graphic">
+          <TextInput value={page.signatureText || ""} onChange={(signatureText) => onChange({ signatureText })} />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Signature color">
+            <ColorInput
+              value={page.signatureColor || "#FFFFFF"}
+              onChange={(signatureColor) => onChange({ signatureColor })}
+            />
+          </Field>
+          <Field label="Signature font">
+            <FontSelect value={page.signatureFont} onChange={(signatureFont) => onChange({ signatureFont })} />
+          </Field>
+        </div>
+        <Field label="Signature image URL">
+          <TextInput value={page.signatureImage || ""} onChange={(signatureImage) => onChange({ signatureImage })} />
+        </Field>
+        <input
+          type="file"
+          accept="image/*"
+          className="block w-full text-[10px] text-white/60"
+          onChange={(e) => readImageFile(e.target.files?.[0] ?? null, (signatureImage) => onChange({ signatureImage }))}
+        />
+      </div>
+
+      <CardGridEditor page={page} onChange={onChange} />
+
+      <div className="space-y-3 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
           Hero / player image
         </p>
         <p className="text-[11px] text-white/40">
