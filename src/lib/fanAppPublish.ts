@@ -25,12 +25,15 @@ async function callAthleteState<T>(payload: Record<string, unknown>): Promise<T>
     const res = (error as { context?: Response }).context;
     if (res && typeof res.text === "function") {
       const raw = await res.text().catch(() => "");
+      let message = "";
       try {
         const parsed = JSON.parse(raw) as { error?: unknown };
-        if (parsed?.error) throw new Error(String(parsed.error));
+        message = parsed?.error ? String(parsed.error) : "";
       } catch {
-        if (raw) throw new Error(raw.slice(0, 300));
+        message = raw.slice(0, 300);
       }
+      if (message) throw new Error(message);
+
     }
     throw error;
   }
