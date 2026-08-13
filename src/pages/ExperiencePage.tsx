@@ -95,6 +95,7 @@ const SECTIONS: { id: ExperienceSection; label: string }[] = [
   ...EXPERIENCE_PAGE_KEYS.map((key) => ({
     id: `page:${key}` as ExperienceSection,
     label: EXPERIENCE_PAGE_LABELS[key],
+
   })),
   { id: "boxes", label: "Home boxes" },
 ];
@@ -808,6 +809,7 @@ export function ExperiencePage() {
               {section === "nav" ? (
                 <ExperienceNavPanel
                   nav={experience.nav}
+                  pages={experience.pages}
                   onChange={(patch) =>
                     patchExperience((prev) => ({ ...prev, nav: { ...prev.nav, ...patch } }))
                   }
@@ -838,12 +840,13 @@ export function ExperiencePage() {
             activePageKey={editingPageKey}
             onSelect={(key) => setSection(`page:${key}`)}
             onPlay={() => setAppPreviewOpen(true)}
+            onRename={(key, label) => patchPage(key, { studioLabel: label })}
           />
           <ExperiencePhonePreview
             experience={experience}
 
             mode={editingPageKey ? "page" : "theme"}
-            label={editingPageKey ? EXPERIENCE_PAGE_LABELS[editingPageKey] : undefined}
+            label={editingPageKey ? experiencePageLabel(experience.pages, editingPageKey) : undefined}
             pageKey={editingPageKey ?? "landing"}
             onPatchBrand={(patch) =>
               patchExperience((prev) => ({ ...prev, brand: { ...prev.brand, ...patch } }))
@@ -871,7 +874,7 @@ export function ExperiencePage() {
                 layoutMode: "freeform",
                 stage: placeStampOnPage(experience.pages[pageKey], stamp),
               });
-              setStatus(`Placed logo on ${EXPERIENCE_PAGE_LABELS[pageKey]}`);
+              setStatus(`Placed logo on ${experiencePageLabel(experience.pages, pageKey)}`);
             }}
             onRemoveStamp={(stampId) => {
               patchExperience((prev) => ({
