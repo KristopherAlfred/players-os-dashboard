@@ -1,6 +1,7 @@
 import type { ExperiencePageConfig, ExperiencePageKeyName } from "./experienceConfig";
 import type { ExperienceTemplate } from "./experienceTemplates";
 import { TEMPLATE_PAGE_COPY } from "./templatePageCopy";
+import { TEMPLATE_PAGE_ART } from "./templatePageArt";
 
 
 /**
@@ -196,7 +197,11 @@ export function buildTemplatePages(
       features: copy.features ?? base.features,
       icons: copy.icons ?? base.icons,
     };
+    const pageArt = TEMPLATE_PAGE_ART[template.id]?.[key] || "";
+    const heroArt = pageArt || (spec.hero ? art : "");
+    spec.hero = !!heroArt;
     const cards = copy.cards ?? [];
+
     out[key] = {
       studioLabel: copy.label ?? "",
       backgroundColor: bg,
@@ -206,7 +211,7 @@ export function buildTemplatePages(
       accentColor: accent,
       effectPreset: light ? "soft" : landing.effectPreset || "glass",
       layoutMode: "freeform",
-      heroImage: spec.hero ? art : "",
+      heroImage: heroArt,
       heroFit: "cover",
       heroPosition: "center",
       heroScale: 100,
