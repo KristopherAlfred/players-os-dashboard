@@ -61,6 +61,7 @@ import {
   BrandHeaderFields,
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
+import { ExperienceAppPreview } from "../components/experience/ExperienceAppPreview";
 import { ExperienceNavPanel } from "../components/experience/ExperienceNavPanel";
 import { ExperienceTemplateGallery } from "../components/experience/ExperienceTemplateGallery";
 import { ExperienceAiDesigner } from "../components/experience/ExperienceAiDesigner";
@@ -317,6 +318,7 @@ export function ExperiencePage() {
   const [contentStudio, setContentStudio] = useState<ExperienceContentKind | null>(null);
   /** On the Templates tab the phone preview stays hidden until a template is picked. */
   const [templatePreviewOpen, setTemplatePreviewOpen] = useState(false);
+  const [appPreviewOpen, setAppPreviewOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -618,6 +620,13 @@ export function ExperiencePage() {
                   {dirty ? "Unsaved" : "Synced"}
                 </p>
               </div>
+              <button
+                type="button"
+                onClick={() => setAppPreviewOpen(true)}
+                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl border border-white/15 bg-black/40 px-5 text-sm font-semibold text-white transition hover:border-dt-red/60"
+              >
+                <Eye size={16} /> Preview app
+              </button>
               <button
                 type="button"
                 onClick={() => void onPublish()}
@@ -1587,6 +1596,13 @@ export function ExperiencePage() {
             )}
           </section>
       </div>
+      ) : null}
+      {appPreviewOpen ? (
+        <ExperienceAppPreview
+          experience={experience}
+          startPage={editingPageKey ?? "landing"}
+          onClose={() => setAppPreviewOpen(false)}
+        />
       ) : null}
     </div>
   );
