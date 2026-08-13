@@ -319,6 +319,8 @@ export function ExperiencePage() {
   /** On the Templates tab the phone preview stays hidden until a template is picked. */
   const [templatePreviewOpen, setTemplatePreviewOpen] = useState(false);
   const [appPreviewOpen, setAppPreviewOpen] = useState(false);
+  const [templateAppPreview, setTemplateAppPreview] = useState<ExperienceConfig | null>(null);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
