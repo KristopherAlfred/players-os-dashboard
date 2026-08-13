@@ -10,6 +10,8 @@ import type { ExperiencePageKeyName, ExperienceNavTab } from "./experienceConfig
  * defaults. Everything stays fully editable in the studio and by the AI.
  */
 export type TemplatePageCopy = {
+  /** Custom page name for this template (e.g. Kelce's "Film Room" instead of "Videos"). */
+  label?: string;
   subhead?: string;
   headline?: string;
   body?: string;
