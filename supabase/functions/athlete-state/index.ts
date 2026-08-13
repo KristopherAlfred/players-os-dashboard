@@ -210,7 +210,15 @@ Deno.serve(async (req) => {
         .upsert(patch, { onConflict: "athlete_id" })
         .select("id, athlete_id, slug, app_name, config, is_published, view_count, published_at")
         .single();
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505" || /duplicate key/i.test(error.message ?? "")) {
+          return json({ error: "Link name already taken" }, 409);
+        }
+        if (error.code === "23503") {
+          return json({ error: "Athlete profile not found — finish onboarding first" }, 400);
+        }
+        return json({ error: error.message || "Could not publish" }, 400);
+      }
       return json({ ok: true, app: data });
     }
 
@@ -368,7 +376,13 @@ Deno.serve(async (req) => {
 
     return json({ error: "Unknown action" }, 400);
   } catch (err) {
-    console.error("athlete-state failed:", err instanceof Error ? err.message : String(err));
-    return json({ error: "Request failed" }, 500);
+    const detail =
+      err instanceof Error
+        ? err.message
+        : typeof err === "object" && err !== null
+          ? JSON.stringify(err)
+          : String(err);
+    console.error("athlete-state failed:", detail);
+    return json({ error: detail || "Request failed" }, 500);
   }
 });
