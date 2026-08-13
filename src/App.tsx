@@ -29,6 +29,7 @@ import { AthleteProvider } from "./contexts/AthleteContext";
 import { isDashboardAuthed } from "./lib/dashboardAuth";
 import { BioLinkPage } from "./pages/BioLinkPage";
 import { BioLinkRedirectPage } from "./pages/BioLinkRedirectPage";
+import { FanAppPublicPage } from "./pages/FanAppPublicPage";
 import { ContentStudioCalendarPage } from "./pages/contentStudio/ContentStudioCalendarPage";
 import { CreateContentPage } from "./pages/contentStudio/CreateContentPage";
 import { ScheduledPostsPage } from "./pages/contentStudio/ScheduledPostsPage";
@@ -40,6 +41,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/go/:slug" element={<BioLinkRedirectPage />} />
+        <Route path="/app/:slug" element={<FanAppPublicPage />} />
         <Route
           path="/welcome"
           element={

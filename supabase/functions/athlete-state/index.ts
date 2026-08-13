@@ -179,6 +179,70 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ---- Publish the designed fan app to a public /app/:slug link ----
+    if (action === "publish_fan_app") {
+      const athleteId = str((body as Record<string, unknown>).athlete_id, 36);
+      const slug = str((body as Record<string, unknown>).slug, 40)?.toLowerCase() ?? "";
+      const config = (body as Record<string, unknown>).config;
+      if (!athleteId || !UUID.test(athleteId)) return json({ error: "Invalid athlete_id" }, 400);
+      if (!SLUG.test(slug)) return json({ error: "Invalid slug" }, 400);
+      if (!config || typeof config !== "object") return json({ error: "Invalid config" }, 400);
+
+      const { data: taken } = await supabase
+        .from("athlete_fan_apps")
+        .select("athlete_id")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (taken && taken.athlete_id !== athleteId) return json({ error: "Link name already taken" }, 409);
+
+      const isPublished = (body as Record<string, unknown>).is_published;
+      const patch: Record<string, unknown> = {
+        athlete_id: athleteId,
+        slug,
+        app_name: str((body as Record<string, unknown>).app_name, 120),
+        config,
+        is_published: typeof isPublished === "boolean" ? isPublished : true,
+        published_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await supabase
+        .from("athlete_fan_apps")
+        .upsert(patch, { onConflict: "athlete_id" })
+        .select("id, athlete_id, slug, app_name, config, is_published, view_count, published_at")
+        .single();
+      if (error) throw error;
+      return json({ ok: true, app: data });
+    }
+
+    if (action === "get_fan_app") {
+      const id = str((body as Record<string, unknown>).athlete_id, 36);
+      if (!id || !UUID.test(id)) return json({ error: "Invalid athlete_id" }, 400);
+      const { data, error } = await supabase
+        .from("athlete_fan_apps")
+        .select("id, athlete_id, slug, app_name, config, is_published, view_count, published_at")
+        .eq("athlete_id", id)
+        .maybeSingle();
+      if (error) throw error;
+      return json({ app: data ?? null });
+    }
+
+    if (action === "register_fan_app_view") {
+      const slug = str((body as Record<string, unknown>).slug, 40)?.toLowerCase() ?? "";
+      if (!SLUG.test(slug)) return json({ error: "Invalid slug" }, 400);
+      const { data: app } = await supabase
+        .from("athlete_fan_apps")
+        .select("id, view_count")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (!app) return json({ error: "Not found" }, 404);
+      await supabase
+        .from("athlete_fan_apps")
+        .update({ view_count: Number(app.view_count ?? 0) + 1 })
+        .eq("id", app.id);
+      return json({ ok: true });
+    }
+
+
     // ---------------------------------------------------------------
     // Reads. The underlying tables are private (RLS is fail-closed for
     // anon), so the dashboard fetches athlete-scoped rows through here.

@@ -93,6 +93,53 @@ export type Database = {
           },
         ]
       }
+      athlete_fan_apps: {
+        Row: {
+          app_name: string | null
+          athlete_id: string
+          config: Json
+          created_at: string
+          id: string
+          is_published: boolean
+          published_at: string | null
+          slug: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          app_name?: string | null
+          athlete_id: string
+          config?: Json
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          app_name?: string | null
+          athlete_id?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "athlete_fan_apps_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: true
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       athlete_theme: {
         Row: {
           accent_color: string

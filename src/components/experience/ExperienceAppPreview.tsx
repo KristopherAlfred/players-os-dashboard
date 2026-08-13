@@ -615,3 +615,6 @@ export function ExperienceAppPreview({
     </div>
   );
 }
+
+/** The bare fan-app screen renderer — reused by the public /app/:slug viewer. */
+export { PageView as FanAppPageView };

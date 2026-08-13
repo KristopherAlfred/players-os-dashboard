@@ -66,6 +66,7 @@ import { ExperiencePhonePreview } from "../components/experience/ExperiencePhone
 import { ExperiencePageNavigator } from "../components/experience/ExperiencePageNavigator";
 
 import { ExperienceAppPreview } from "../components/experience/ExperienceAppPreview";
+import { FanAppPublishCard } from "../components/experience/FanAppPublishCard";
 import { ExperienceNavPanel } from "../components/experience/ExperienceNavPanel";
 import { ExperiencePhotoLibrary } from "../components/experience/ExperiencePhotoLibrary";
 import { rememberStudioUpload } from "../lib/experiencePhotoLibrary";
@@ -912,6 +913,7 @@ export function ExperiencePage() {
           </section>
           {section === "templates" && !templatePreviewOpen ? null : (
           <div className="flex flex-col gap-3">
+          <FanAppPublishCard athleteId={athlete?.id ?? null} appName={fanAppName} experience={experience} />
           <ExperiencePageNavigator
             experience={experience}
             activePageKey={editingPageKey}
