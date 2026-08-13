@@ -1448,6 +1448,9 @@ export function normalizeExperienceConfig(raw: unknown): ExperienceConfig {
     theme: normalizeExperienceTheme(c.theme),
     effects: normalizeExperienceEffects(c.effects),
     pages: normalizeExperiencePages(c.pages),
+    pageOrder: Array.isArray(c.pageOrder)
+      ? c.pageOrder.filter((k): k is string => typeof k === "string")
+      : undefined,
     stamps: normalizeExperienceStamps(c.stamps),
     nav: normalizeExperienceNav(c.nav),
   };
