@@ -1,5 +1,7 @@
 import type { ExperiencePageConfig, ExperiencePageKeyName } from "./experienceConfig";
 import type { ExperienceTemplate } from "./experienceTemplates";
+import { TEMPLATE_PAGE_COPY } from "./templatePageCopy";
+
 
 /**
  * Builds a complete, designed page set for a template.
