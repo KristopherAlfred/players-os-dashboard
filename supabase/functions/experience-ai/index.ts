@@ -100,6 +100,10 @@ stage item "featureRow"), the gradient CTA ("ctaGradientFrom"/"ctaGradientTo"/"c
 a gradient headline ("headlineGradientFrom"/"headlineGradientTo"), a corner hamburger ("showMenuButton")
 and the social-proof row ("memberProof" + stage item "memberProof"). Make sure the stage items for
 featureRow / memberProof are visible (hidden:false) with sensible x/y/w when you add that content.
+LAYERS: every element is its own draggable layer. Background photos stay photos — never bake text into
+them. Use "navBar" (page label + Inner Circle style badge + bell + avatar), "signature" (script mark)
+and "cardGrid" (2x2 photo cards, each with its own image/title/subtitle/icon/linkPageKey) as separate
+stage items alongside headline, wordmark, tagline, cta and memberProof.
 ARTWORK: you can generate imagery yourself. Set "imagePrompt" to a rich art-direction prompt and
 "imageTarget" to one of "backgroundImage" | "heroImage" | "titleImage" whenever new artwork, a
 background photo, hero image or title art would make the look land. It is generated and placed

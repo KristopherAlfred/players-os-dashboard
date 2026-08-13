@@ -1,8 +1,10 @@
 import { useAthlete } from "../../contexts/AthleteContext";
 import type { ReactNode } from "react";
 import { TITLE_FONT_OPTIONS, type TitleFontFamily } from "../../lib/typography";
+import { createCardId } from "../../lib/experienceConfig";
 import type {
   ExperienceBrand,
+  ExperienceCard,
   ExperienceEffects,
   ExperiencePageConfig,
   ExperiencePages,
@@ -19,6 +21,188 @@ import {
 import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
 import { TintedBrandLogo } from "./TintedBrandLogo";
 import { WordStyleEditor, runsForPageField } from "./StyledText";
+
+function readImageFile(file: File | null, apply: (dataUrl: string) => void) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => apply(String(reader.result || ""));
+  reader.readAsDataURL(file);
+}
+
+const CARD_ICON_CHOICES = [
+  "crown",
+  "video",
+  "news",
+  "shop",
+  "star",
+  "users",
+  "ticket",
+  "music",
+  "bolt",
+  "heart",
+  "flame",
+  "lock",
+  "calendar",
+  "trophy",
+  "camera",
+  "sparkle",
+  "live",
+  "home",
+  "user",
+];
+
+/** Each card is an independent, reorderable component: photo, icon, title, subtitle, destination. */
+function CardGridEditor({
+  page,
+  onChange,
+}: {
+  page: ExperiencePageConfig;
+  onChange: (patch: Partial<ExperiencePageConfig>) => void;
+}) {
+  const cards = page.cards || [];
+
+  const patchCard = (index: number, patch: Partial<ExperienceCard>) => {
+    const next = cards.map((card, i) => (i === index ? { ...card, ...patch } : card));
+    onChange({ cards: next });
+  };
+
+  const move = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= cards.length) return;
+    const next = [...cards];
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange({ cards: next });
+  };
+
+  return (
+    <div className="space-y-3 rounded-xl border border-dt-border p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">Feature card grid</p>
+        <button
+          type="button"
+          onClick={() =>
+            onChange({
+              cards: [
+                ...cards,
+                {
+                  id: createCardId(),
+                  title: "New card",
+                  subtitle: "",
+                  icon: "star",
+                  image: "",
+                  linkPageKey: "home",
+                },
+              ],
+            })
+          }
+          className="rounded-lg border border-dt-red/50 bg-dt-red/15 px-2 py-1 text-[10px] font-semibold text-dt-red"
+        >
+          Add card
+        </button>
+      </div>
+      <p className="text-[11px] text-white/40">
+        Every card is its own layer — photo, icon, title, subtitle and destination page.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Columns">
+          <select
+            value={page.cardColumns || 2}
+            onChange={(e) => onChange({ cardColumns: Number(e.target.value) })}
+            className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm"
+          >
+            <option value={1}>1 per row</option>
+            <option value={2}>2 per row</option>
+            <option value={3}>3 per row</option>
+          </select>
+        </Field>
+        <Field label={`Card radius (${page.cardRadius ?? 20}px)`}>
+          <input
+            type="range"
+            min={0}
+            max={40}
+            value={page.cardRadius ?? 20}
+            onChange={(e) => onChange({ cardRadius: Number(e.target.value) })}
+            className="w-full"
+          />
+        </Field>
+        <Field label="Card title color">
+          <ColorInput value={page.cardTitleColor || "#FFFFFF"} onChange={(cardTitleColor) => onChange({ cardTitleColor })} />
+        </Field>
+        <Field label="Card icon color">
+          <ColorInput value={page.cardIconColor || "#8FE3B8"} onChange={(cardIconColor) => onChange({ cardIconColor })} />
+        </Field>
+      </div>
+
+      {cards.length === 0 ? (
+        <p className="text-[11px] text-white/35">No cards yet — add one to build the grid.</p>
+      ) : null}
+
+      {cards.map((card, index) => (
+        <div key={card.id} className="space-y-2 rounded-lg border border-white/10 p-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Card {index + 1}</p>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => move(index, -1)}
+                className="rounded border border-white/15 px-1.5 text-[10px] text-white/60"
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                onClick={() => move(index, 1)}
+                className="rounded border border-white/15 px-1.5 text-[10px] text-white/60"
+              >
+                ↓
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange({ cards: cards.filter((_, i) => i !== index) })}
+                className="rounded border border-white/15 px-1.5 text-[10px] text-red-300"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+          <Field label="Title">
+            <TextInput value={card.title} onChange={(title) => patchCard(index, { title })} />
+          </Field>
+          <Field label="Subtitle">
+            <TextInput value={card.subtitle} onChange={(subtitle) => patchCard(index, { subtitle })} />
+          </Field>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Field label="Icon">
+              <select
+                value={card.icon}
+                onChange={(e) => patchCard(index, { icon: e.target.value })}
+                className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm"
+              >
+                {CARD_ICON_CHOICES.map((icon) => (
+                  <option key={icon} value={icon}>
+                    {icon}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Links to page">
+              <TextInput value={card.linkPageKey} onChange={(linkPageKey) => patchCard(index, { linkPageKey })} />
+            </Field>
+          </div>
+          <Field label="Card photo URL">
+            <TextInput value={card.image} onChange={(image) => patchCard(index, { image })} />
+          </Field>
+          <input
+            type="file"
+            accept="image/*"
+            className="block w-full text-[10px] text-white/60"
+            onChange={(e) => readImageFile(e.target.files?.[0] ?? null, (image) => patchCard(index, { image }))}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -802,6 +986,110 @@ export function ExperiencePagePanel({
           </Field>
         </>
       ) : null}
+
+      <div className="space-y-3 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
+          Background photo wash
+        </p>
+        <p className="text-[11px] text-white/40">
+          The photo layer stays just a photo — this gradient sits above it so text stays readable.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Wash top">
+            <TextInput
+              value={page.heroOverlayFrom || ""}
+              onChange={(heroOverlayFrom) => onChange({ heroOverlayFrom })}
+              className="font-mono text-xs"
+            />
+          </Field>
+          <Field label="Wash bottom">
+            <TextInput
+              value={page.heroOverlayTo || ""}
+              onChange={(heroOverlayTo) => onChange({ heroOverlayTo })}
+              className="font-mono text-xs"
+            />
+          </Field>
+        </div>
+        <Field label={`Wash strength (${page.heroOverlayOpacity ?? 100}%)`}>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={page.heroOverlayOpacity ?? 100}
+            onChange={(e) => onChange({ heroOverlayOpacity: Number(e.target.value) })}
+            className="w-full"
+          />
+        </Field>
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">Top nav layer</p>
+        <Field label="Page label">
+          <TextInput value={page.navLabel || ""} onChange={(navLabel) => onChange({ navLabel })} />
+        </Field>
+        <Field label="Badge / pill label" hint='e.g. "Inner Circle"'>
+          <TextInput value={page.navBadgeLabel || ""} onChange={(navBadgeLabel) => onChange({ navBadgeLabel })} />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Nav text color">
+            <ColorInput value={page.navTextColor || "#FFFFFF"} onChange={(navTextColor) => onChange({ navTextColor })} />
+          </Field>
+          <Field label="Badge color">
+            <ColorInput value={page.navBadgeColor || "#8FE3B8"} onChange={(navBadgeColor) => onChange({ navBadgeColor })} />
+          </Field>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <Toggle
+            checked={page.showNavBadge !== false}
+            onChange={(showNavBadge) => onChange({ showNavBadge })}
+            label="Badge"
+          />
+          <Toggle checked={page.showNavBell !== false} onChange={(showNavBell) => onChange({ showNavBell })} label="Bell" />
+          <Toggle
+            checked={page.showNavAvatar !== false}
+            onChange={(showNavAvatar) => onChange({ showNavAvatar })}
+            label="Avatar"
+          />
+        </div>
+        <Field label="Avatar image URL">
+          <TextInput value={page.navAvatarSrc || ""} onChange={(navAvatarSrc) => onChange({ navAvatarSrc })} />
+        </Field>
+        <input
+          type="file"
+          accept="image/*"
+          className="block w-full text-[10px] text-white/60"
+          onChange={(e) => readImageFile(e.target.files?.[0] ?? null, (navAvatarSrc) => onChange({ navAvatarSrc }))}
+        />
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-dt-border p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">Signature layer</p>
+        <Field label="Signature text" hint="Leave blank if you upload a signature graphic">
+          <TextInput value={page.signatureText || ""} onChange={(signatureText) => onChange({ signatureText })} />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Signature color">
+            <ColorInput
+              value={page.signatureColor || "#FFFFFF"}
+              onChange={(signatureColor) => onChange({ signatureColor })}
+            />
+          </Field>
+          <Field label="Signature font">
+            <FontSelect value={page.signatureFont} onChange={(signatureFont) => onChange({ signatureFont })} />
+          </Field>
+        </div>
+        <Field label="Signature image URL">
+          <TextInput value={page.signatureImage || ""} onChange={(signatureImage) => onChange({ signatureImage })} />
+        </Field>
+        <input
+          type="file"
+          accept="image/*"
+          className="block w-full text-[10px] text-white/60"
+          onChange={(e) => readImageFile(e.target.files?.[0] ?? null, (signatureImage) => onChange({ signatureImage }))}
+        />
+      </div>
+
+      <CardGridEditor page={page} onChange={onChange} />
 
       <div className="space-y-3 rounded-xl border border-dt-border p-3">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-white/55">
