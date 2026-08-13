@@ -65,7 +65,7 @@ export function rememberStudioUpload(
   try {
     const existing = readStudioUploads(athleteId).filter((item) => item.src !== src);
     const next: PhotoLibraryItem[] = [
-      { id: `upload_${Date.now()}`, src, label, source: "upload" },
+      { id: `upload_${Date.now()}`, src, label, source: "upload" as const },
       ...existing,
     ].slice(0, MAX_UPLOADS);
     localStorage.setItem(uploadKey(athleteId), JSON.stringify(next));
