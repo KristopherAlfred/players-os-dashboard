@@ -749,8 +749,12 @@ export function ExperiencePage() {
                     setTemplatePreviewOpen(true);
                     setStatus(`${template.label} template applied — publish to push live`);
                   }}
+                  onPreview={(template) =>
+                    setTemplateAppPreview(applyExperienceTemplate(experience, template))
+                  }
                 />
               ) : null}
+
               {section === "brand" ? (
                 <ExperienceBrandPanel
                   brand={experience.brand}
