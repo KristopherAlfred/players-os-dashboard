@@ -429,6 +429,42 @@ const sloane: PageCopyMap = {
   },
 };
 
+const circle: PageCopyMap = {
+  youreIn: {
+    subhead: "WELCOME TO THE CIRCLE",
+    headline: "YOU'RE IN",
+    body: "Drops, early access, giveaways and real connection — unlocked.",
+    cta: "ENTER THE CIRCLE",
+    features: ["EXCLUSIVE DROPS", "EARLY ACCESS", "GIVEAWAYS", "COMMUNITY"],
+    icons: ["star", "clock", "gift", "users"],
+  },
+  home: {
+    subhead: "JOIN THE CIRCLE",
+    headline: "WELCOME BACK",
+    body: "Everything new this week — drops, clips and members-only moments.",
+    cta: "SEE WHAT'S NEW",
+    features: ["NEW DROPS", "LATEST CLIPS", "UPCOMING", "MEMBERS ONLY"],
+    icons: ["shop", "video", "calendar", "lock"],
+    cards: [
+      ["Exclusive Drops", "Members first"],
+      ["Latest Clips", "Behind the scenes"],
+      ["Upcoming", "Events & streams"],
+      ["Members Only", "Your perks"],
+    ],
+  },
+  profile: {
+    label: "The Circle",
+    subhead: "YOUR MEMBERSHIP",
+    headline: "THE CIRCLE",
+    body: "Your perks, saved content and member status.",
+    cta: "MANAGE MEMBERSHIP",
+    features: ["PERKS", "SAVED", "REWARDS", "SETTINGS"],
+    icons: ["crown", "star", "gift", "lock"],
+  },
+};
+
+
+
 /** Page copy per template id. */
 const RAW_TEMPLATE_PAGE_COPY: Record<string, PageCopyMap> = {
   "inner-circle": kelce,
