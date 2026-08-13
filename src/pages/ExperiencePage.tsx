@@ -87,20 +87,24 @@ type ExperienceSection =
   | "nav"
   | `page:${ExperiencePageKeyName}`;
 
-const SECTIONS: { id: ExperienceSection; label: string }[] = [
-  { id: "ai", label: "✦ AI Designer" },
-  { id: "templates", label: "Templates" },
-  { id: "brand", label: "Brand / Logo" },
-  { id: "theme", label: "Colors" },
-  { id: "effects", label: "Effects" },
-  { id: "nav", label: "Tab bar" },
-  ...EXPERIENCE_PAGE_KEYS.map((key) => ({
-    id: `page:${key}` as ExperienceSection,
-    label: EXPERIENCE_PAGE_LABELS[key],
-
-  })),
-  { id: "boxes", label: "Home boxes" },
-];
+function buildSections(
+  pageKeys: string[],
+  pages: ExperienceConfig["pages"] | undefined,
+): { id: ExperienceSection; label: string }[] {
+  return [
+    { id: "ai", label: "✦ AI Designer" },
+    { id: "templates", label: "Templates" },
+    { id: "brand", label: "Brand / Logo" },
+    { id: "theme", label: "Colors" },
+    { id: "effects", label: "Effects" },
+    { id: "nav", label: "Tab bar" },
+    ...pageKeys.map((key) => ({
+      id: `page:${key}` as ExperienceSection,
+      label: experiencePageLabel(pages, key),
+    })),
+    { id: "boxes", label: "Home boxes" },
+  ];
+}
 
 /** Which fan-app page the studio is editing, if any. */
 function sectionPageKey(section: ExperienceSection): ExperiencePageKeyName | null {
