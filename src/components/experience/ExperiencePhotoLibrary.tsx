@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 
 import { useExperiencePhotoLibrary } from "../../lib/experiencePhotoLibrary";
-import { resolveAssetUrl } from "../../lib/experienceConfig";
+import { resolveAssetUrl } from "../../lib/homeLayoutApi";
 
 type PhotoSlot = "heroImage" | "backgroundImage" | "titleImage";
 
