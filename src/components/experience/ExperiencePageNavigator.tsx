@@ -60,7 +60,7 @@ export function ExperiencePageNavigator({
                     ? "border-[rgb(var(--theme-accent-rgb))] shadow-[0_0_0_1px_rgba(var(--theme-accent-rgb),0.5)]"
                     : "border-white/12 group-hover:border-white/35"
                 }`}
-                style={{ background: pageBackgroundCss(page, experience.theme) }}
+                style={{ background: pageBackgroundCss(page) }}
               >
                 {showHero ? (
                   <img
