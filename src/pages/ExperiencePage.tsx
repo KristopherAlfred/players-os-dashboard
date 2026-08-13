@@ -416,6 +416,51 @@ export function ExperiencePage() {
     }));
   }
 
+  /** Add a brand-new custom page (cloned from an existing page when given). */
+  function addCustomPage(sourceKey?: string) {
+    const key = `custom_${Date.now().toString(36)}`;
+    patchExperience((prev) => {
+      const source = sourceKey ? prev.pages[sourceKey] : undefined;
+      const base = source
+        ? JSON.parse(JSON.stringify(source))
+        : JSON.parse(JSON.stringify(DEFAULT_EXPERIENCE_PAGES.home));
+      const label = source
+        ? `${experiencePageLabel(prev.pages, sourceKey!)} copy`
+        : "New page";
+      const order = experiencePageKeys(prev);
+      const insertAt = sourceKey ? order.indexOf(sourceKey) + 1 : order.length;
+      const pageOrder = [...order];
+      pageOrder.splice(insertAt, 0, key);
+      return {
+        ...prev,
+        pages: { ...prev.pages, [key]: { ...base, studioLabel: label } },
+        pageOrder,
+      };
+    });
+    setSection(`page:${key}`);
+    setStatus("Page added — rename it by double-clicking its thumbnail");
+  }
+
+  function deleteCustomPage(pageKey: string) {
+    if (!isCustomExperiencePage(pageKey)) return;
+    patchExperience((prev) => {
+      const pages = { ...prev.pages };
+      delete pages[pageKey];
+      return {
+        ...prev,
+        pages,
+        pageOrder: experiencePageKeys(prev).filter((k) => k !== pageKey),
+        nav: {
+          ...prev.nav,
+          tabs: prev.nav.tabs.filter((t) => t.pageKey !== pageKey),
+        },
+      };
+    });
+    setSection("page:home");
+    setStatus("Page deleted");
+  }
+
+
   async function uploadIntoExperience(
     apply: (dataUrl: string) => void,
     file: File | null,
