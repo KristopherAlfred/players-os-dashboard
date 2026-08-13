@@ -886,7 +886,9 @@ export function ExperiencePage() {
               }));
             }}
           />
+          </div>
           )}
+
         </div>
       ) : null}
 
