@@ -4,7 +4,7 @@ import {
   EXPERIENCE_TEMPLATES,
   type ExperienceTemplate,
 } from "../../lib/experienceTemplates";
-import { TEMPLATE_NAV_TABS, TEMPLATE_PAGE_COPY } from "../../lib/templatePageCopy";
+import { TEMPLATE_NAV_TABS } from "../../lib/templatePageCopy";
 import { EXPERIENCE_PAGE_KEYS } from "../../lib/experienceConfig";
 import { TemplateMiniPreview } from "./TemplateMiniPreview";
 
@@ -29,7 +29,7 @@ function pageCount(template: ExperienceTemplate) {
 }
 
 function isAthleteTemplate(template: ExperienceTemplate) {
-  return Boolean(TEMPLATE_PAGE_COPY[template.id]);
+  return Boolean(template.athlete);
 }
 
 /**
@@ -59,7 +59,7 @@ export function ExperienceTemplateGallery({
     const q = query.trim().toLowerCase();
     if (!q) return ordered;
     return ordered.filter((t) =>
-      `${t.label} ${t.vibe} ${(t.tags ?? []).join(" ")}`.toLowerCase().includes(q),
+      `${t.label} ${t.athlete ?? ""} ${t.vibe} ${(t.tags ?? []).join(" ")}`.toLowerCase().includes(q),
     );
   }, [filter, query]);
 
@@ -172,10 +172,13 @@ export function ExperienceTemplateGallery({
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate text-[10px] font-bold uppercase tracking-[0.1em] text-white">
-                      {template.label}
+                      {template.athlete ?? template.label}
                     </p>
-                    <p className="truncate text-[8px] text-white/40">{template.vibe}</p>
+                    <p className="truncate text-[8px] text-white/40">
+                      {template.athlete ? `${template.label} · ${template.vibe}` : template.vibe}
+                    </p>
                   </div>
+
                   <div className="flex shrink-0 gap-0.5">
                     {template.swatches.map((c) => (
                       <span

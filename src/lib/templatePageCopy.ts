@@ -350,61 +350,82 @@ const kyrie: PageCopyMap = {
   },
 };
 
-const speedster: PageCopyMap = {
+const sloane: PageCopyMap = {
   youreIn: {
-    subhead: "WELCOME TO THE SQUAD",
+    subhead: "WELCOME TO THE CIRCLE",
     headline: "YOU'RE IN",
-    body: "Speed sessions, split plans and power blocks — unlocked.",
-    cta: "START TRAINING",
-    features: ["WORKOUTS", "RACE PLANS", "STRENGTH", "SQUAD"],
-    icons: ["bolt", "trophy", "flame", "users"],
+    body: "Match film, training weeks, Doc & Glo drops and foundation access — unlocked.",
+    cta: "ENTER THE CIRCLE",
+    features: ["MATCH FILM", "TRAINING", "DOC & GLO", "FOUNDATION"],
+    icons: ["video", "bolt", "shop", "users"],
   },
   home: {
-    subhead: "TRAIN SMART. RACE FAST.",
+    subhead: "SERVE. RETURN. REPEAT.",
     headline: "WELCOME BACK",
-    body: "This week's block, race calendar and everything new in the squad.",
-    cta: "TODAY'S SESSION",
-    features: ["THIS WEEK", "RACE CALENDAR", "STRENGTH", "SQUAD"],
-    icons: ["bolt", "calendar", "flame", "users"],
+    body: "This week on tour, new film and the latest from Doc & Glo.",
+    cta: "SEE WHAT'S NEW",
+    features: ["THIS WEEK", "NEW FILM", "DOC & GLO", "FOUNDATION"],
+    icons: ["calendar", "video", "shop", "users"],
     cards: [
-      ["Workouts", "Speed sessions"],
-      ["Race Strategy", "Split plans"],
-      ["Strength", "Power blocks"],
-      ["Squad", "Members only"],
+      ["Match Film", "Point breakdowns"],
+      ["Training", "On-court weeks"],
+      ["Doc & Glo", "Shop the line"],
+      ["Foundation", "Kids on court"],
     ],
   },
   videos: {
+    label: "Match Film",
     subhead: "PRESS PLAY",
-    headline: "THE SESSIONS",
-    body: "Block starts, drill breakdowns and full training days.",
+    headline: "MATCH FILM",
+    body: "Full points, practice sets and the tactics behind every win.",
     cta: "PLAY LATEST",
-    features: ["STARTS", "DRILLS", "MEETS", "ARCHIVE"],
-    icons: ["bolt", "star", "trophy", "clock"],
+    features: ["POINTS", "PRACTICE", "TOURNAMENTS", "ARCHIVE"],
+    icons: ["video", "bolt", "trophy", "clock"],
   },
-};
-
-const champ: PageCopyMap = {
-  youreIn: {
-    subhead: "WELCOME TO THE CLUB",
-    headline: "YOU'RE IN",
-    body: "Playbook, drops and the fan club — all unlocked.",
-    cta: "ENTER THE CLUB",
-    features: ["PLAYBOOK", "DROPS", "FAN CLUB", "EVENTS"],
-    icons: ["trophy", "shop", "crown", "calendar"],
+  news: {
+    label: "On Tour",
+    subhead: "FROM THE ROAD",
+    headline: "ON TOUR",
+    body: "Draw updates, results and life between the slams.",
+    cta: "READ THE LATEST",
+    features: ["RESULTS", "DRAWS", "PRESS", "ARCHIVE"],
+    icons: ["news", "trophy", "star", "clock"],
   },
-  home: {
-    subhead: "LEVEL UP. HOOP ON.",
-    headline: "WELCOME BACK",
-    body: "New film, fresh gear and what's next on the calendar.",
-    cta: "SEE WHAT'S NEW",
-    features: ["NEW FILM", "LATEST DROP", "UPCOMING", "FAN CLUB"],
-    icons: ["video", "shop", "calendar", "crown"],
-    cards: [
-      ["Playbook", "Film & drills"],
-      ["Latest Drop", "Shop the gear"],
-      ["Fan Club", "Members only"],
-      ["Events", "Games & meetups"],
-    ],
+  events: {
+    label: "Access",
+    subhead: "BE THERE",
+    headline: "COURTSIDE ACCESS",
+    body: "Clinics, watch parties and player-box experiences for members.",
+    cta: "SEE EVENTS",
+    features: ["CLINICS", "WATCH PARTIES", "PLAYER BOX", "MEET & GREET"],
+    icons: ["calendar", "users", "ticket", "star"],
+  },
+  docAndGlo: {
+    label: "Doc & Glo",
+    subhead: "SKIN CONFIDENCE",
+    headline: "DOC & GLO",
+    body: "Clean sunscreen and skincare built for athletes, by an athlete.",
+    cta: "SHOP THE LINE",
+    features: ["SPF", "SKINCARE", "BUNDLES", "MEMBER PERKS"],
+    icons: ["shop", "sparkle", "gift", "crown"],
+  },
+  foundation: {
+    label: "Foundation",
+    subhead: "GIVE BACK",
+    headline: "SLOANE STEPHENS FOUNDATION",
+    body: "Getting rackets in more hands and keeping kids on court.",
+    cta: "GET INVOLVED",
+    features: ["PROGRAMS", "SCHOOLS", "DONATE", "VOLUNTEER"],
+    icons: ["users", "star", "gift", "sparkle"],
+  },
+  profile: {
+    label: "The Circle",
+    subhead: "YOUR MEMBERSHIP",
+    headline: "THE CIRCLE",
+    body: "Your perks, saved film and member status.",
+    cta: "MANAGE MEMBERSHIP",
+    features: ["PERKS", "SAVED", "REWARDS", "SETTINGS"],
+    icons: ["crown", "star", "gift", "lock"],
   },
 };
 
@@ -412,20 +433,37 @@ const circle: PageCopyMap = {
   youreIn: {
     subhead: "WELCOME TO THE CIRCLE",
     headline: "YOU'RE IN",
-    body: "Drops, early access and behind-the-scenes are officially unlocked.",
+    body: "Drops, early access, giveaways and real connection — unlocked.",
     cta: "ENTER THE CIRCLE",
-    features: ["EXCLUSIVE DROPS", "EARLY ACCESS", "GIVEAWAYS", "THE CIRCLE"],
+    features: ["EXCLUSIVE DROPS", "EARLY ACCESS", "GIVEAWAYS", "COMMUNITY"],
     icons: ["star", "clock", "gift", "users"],
   },
   home: {
-    subhead: "TODAY IN THE CIRCLE",
+    subhead: "JOIN THE CIRCLE",
     headline: "WELCOME BACK",
-    body: "Everything new since your last visit — clips, drops and what's coming.",
+    body: "Everything new this week — drops, clips and members-only moments.",
     cta: "SEE WHAT'S NEW",
-    features: ["LATEST CLIPS", "NEW DROPS", "UPCOMING", "MEMBERS ONLY"],
-    icons: ["video", "shop", "calendar", "lock"],
+    features: ["NEW DROPS", "LATEST CLIPS", "UPCOMING", "MEMBERS ONLY"],
+    icons: ["shop", "video", "calendar", "lock"],
+    cards: [
+      ["Exclusive Drops", "Members first"],
+      ["Latest Clips", "Behind the scenes"],
+      ["Upcoming", "Events & streams"],
+      ["Members Only", "Your perks"],
+    ],
+  },
+  profile: {
+    label: "The Circle",
+    subhead: "YOUR MEMBERSHIP",
+    headline: "THE CIRCLE",
+    body: "Your perks, saved content and member status.",
+    cta: "MANAGE MEMBERSHIP",
+    features: ["PERKS", "SAVED", "REWARDS", "SETTINGS"],
+    icons: ["crown", "star", "gift", "lock"],
   },
 };
+
+
 
 /** Page copy per template id. */
 const RAW_TEMPLATE_PAGE_COPY: Record<string, PageCopyMap> = {
@@ -435,8 +473,7 @@ const RAW_TEMPLATE_PAGE_COPY: Record<string, PageCopyMap> = {
   "built-different": curry,
   "built-to-lead": cp3,
   "trust-the-vision": kyrie,
-  speedster,
-  champ23: champ,
+  "serve-return-repeat": sloane,
   "join-the-circle": circle,
 };
 
@@ -455,8 +492,7 @@ const TEMPLATE_PAGE_LABELS: Record<
   "built-different": { videos: "Film", foundation: "Impact", docAndGlo: "Gear" },
   "built-to-lead": { videos: "Film", events: "Access", foundation: "Academy" },
   "trust-the-vision": { videos: "The Vault", news: "Culture", foundation: "Vision" },
-  speedster: { home: "Today", videos: "Sessions", events: "Meets", docAndGlo: "Gear", profile: "Squad" },
-  champ23: { videos: "Playbook", profile: "The Club", docAndGlo: "Shop" },
+  "serve-return-repeat": { videos: "Match Film", news: "On Tour", events: "Access", docAndGlo: "Doc & Glo", profile: "The Circle" },
   "join-the-circle": { profile: "The Circle" },
 };
 
@@ -524,18 +560,12 @@ export const TEMPLATE_NAV_TABS: Record<string, ExperienceNavTab[]> = {
     tab("events", "Events", "calendar", "events"),
     tab("profile", "Profile", "user", "profile"),
   ],
-  speedster: [
-    tab("home", "Today", "home", "home"),
-    tab("videos", "Sessions", "video", "videos"),
-    tab("events", "Meets", "calendar", "events"),
-    tab("shop", "Gear", "shop", "docAndGlo"),
-    tab("profile", "Squad", "users", "profile"),
-  ],
-  champ23: [
+  "serve-return-repeat": [
     tab("home", "Home", "home", "home"),
-    tab("videos", "Playbook", "video", "videos"),
-    tab("shop", "Shop", "shop", "docAndGlo"),
-    tab("events", "Events", "calendar", "events"),
-    tab("profile", "Club", "crown", "profile"),
+    tab("videos", "Film", "video", "videos"),
+    tab("news", "Tour", "news", "news"),
+    tab("shop", "Doc & Glo", "shop", "docAndGlo"),
+    tab("profile", "Circle", "user", "profile"),
   ],
+
 };

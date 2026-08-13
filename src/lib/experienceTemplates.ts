@@ -33,6 +33,8 @@ export type ExperienceTemplate = {
   tags?: string[];
   /** Hero photo shown in the mini preview card. */
   photo?: string;
+  /** Real athlete this reference template was designed for. */
+  athlete?: string;
 };
 
 export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
@@ -345,6 +347,8 @@ type FullTemplateSpec = {
   /** 2x2 card grid — title / subtitle / icon / destination page */
   cards?: [string, string][];
   tags: string[];
+  /** Real athlete this reference template was designed for. */
+  athlete?: string;
 };
 
 function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
@@ -358,6 +362,7 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
     label: s.label,
     vibe: s.vibe,
     tags: s.tags,
+    athlete: s.athlete,
     photo: TEMPLATE_ART[s.id] ?? SPORT_PHOTOS[s.photo] ?? SPORT_PHOTOS.other,
     swatches: [s.bg, s.bgVia, s.accent, s.ctaTo ?? s.accentHover],
     theme: {
@@ -810,6 +815,7 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   /* ---- Athlete reference templates (built from the provided sheets) ---- */
   {
     id: "inner-circle",
+    athlete: "Travis Kelce",
     photo: "football",
     tags: ["dark", "luxury", "gold"],
     label: "Inner Circle",
@@ -844,6 +850,7 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "move-mind",
+    athlete: "Monique Billings",
     photo: "other",
     tags: ["warm", "wellness", "luxury"],
     label: "Move Mind Manifest",
@@ -878,6 +885,7 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "own-your-power",
+    athlete: "Aerial Powers",
     photo: "basketball",
     tags: ["dark", "neon", "bold"],
     label: "Own Your Power",
@@ -912,6 +920,7 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "built-different",
+    athlete: "Stephen Curry",
     photo: "basketball",
     tags: ["dark", "luxury", "gold"],
     label: "Built Different",
@@ -946,6 +955,7 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "built-to-lead",
+    athlete: "Chris Paul",
     photo: "basketball",
     tags: ["dark", "bold", "crimson"],
     label: "Built To Lead",
@@ -980,6 +990,7 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
   },
   {
     id: "trust-the-vision",
+    athlete: "Kyrie Irving",
     photo: "basketball",
     tags: ["dark", "cosmic", "mint"],
     label: "Trust The Vision",
@@ -1013,72 +1024,39 @@ const SPORT_TEMPLATE_SPECS: FullTemplateSpec[] = [
     muted: "rgba(255,255,255,0.65)",
   },
   {
-    id: "speedster",
-    photo: "track",
-    tags: ["dark", "sport", "orange"],
-    label: "Track Life",
-    vibe: "Track & field — stadium orange under the lights",
-    wordmark: "PLAYERSOS",
-    tagline: "Train smart. Race fast. Leave a legacy.",
-    signature: "Speedster",
+    id: "serve-return-repeat",
+    athlete: "Sloane Stephens",
+    photo: "tennis",
+    tags: ["dark", "luxury", "rose"],
+    label: "Serve. Return. Repeat.",
+    vibe: "Night-session tennis — deep teal court with rose gold light",
+    wordmark: "SLOANE STEPHENS",
+    tagline: "Grand Slam champion. Doc & Glo founder.",
+    signature: "Sloane",
     badge: "Inner Circle",
     cards: [
-      ["Workouts", "Speed sessions"],
-      ["Race Strategy", "Split plans"],
-      ["Strength", "Power blocks"],
+      ["Match Film", "Point breakdowns"],
+      ["Doc & Glo", "Shop the line"],
+      ["Foundation", "Kids on court"],
       ["Community", "Join the circle"],
     ],
-    headline: "WELCOME BACK,\nSPEEDSTER!",
-    body: "Pro drills, race breakdowns and exclusive access to every meet.",
-    cta: "JOIN TRACK LIFE",
-    features: ["WORKOUTS", "RACE STRATEGY", "STRENGTH", "COMMUNITY"],
-    icons: ["bolt", "trophy", "sparkle", "users"],
-    count: "12K+",
+    headline: "SERVE. RETURN.\nREPEAT.",
+    body: "Match film, training weeks, Doc & Glo drops and the foundation work — all in one place.",
+    cta: "JOIN THE CIRCLE",
+    features: ["MATCH FILM", "TRAINING", "DOC & GLO", "FOUNDATION"],
+    icons: ["video", "bolt", "shop", "users"],
+    count: "40K+",
     countLabel: "Members",
-    extra: "+12",
-    bg: "#0a0503",
-    bgVia: "#2a1005",
-    accent: "#F26722",
-    accentHover: "#FF9C5E",
-    ctaBg: "#EB5E15",
-    ctaTo: "#FF8A3D",
-    ctaText: "#FFFFFF",
+    extra: "+22",
+    bg: "#050a0b",
+    bgVia: "#0d2a2b",
+    accent: "#E8A6A0",
+    accentHover: "#F7D2CD",
+    ctaBg: "#D2837C",
+    ctaTo: "#F2B6AF",
+    ctaText: "#1a0d0c",
     text: "#FFFFFF",
-    muted: "rgba(255,255,255,0.64)",
-  },
-  {
-    id: "champ23",
-    photo: "basketball",
-    tags: ["dark", "sport", "orange"],
-    label: "Court General",
-    vibe: "Hoops culture — amber arena haze",
-    wordmark: "PLAYERSOS",
-    tagline: "Level up. Hoop on.",
-    signature: "Champ",
-    badge: "Inner Circle",
-    cards: [
-      ["Playbook", "Film & drills"],
-      ["Latest Drop", "Shop the gear"],
-      ["Fan Club", "Members only"],
-      ["Experiences", "Game day access"],
-    ],
-    headline: "WELCOME BACK,\nHOOPER!",
-    body: "Your hub for elite basketball experiences, exclusive content and rewards.",
-    cta: "JOIN NOW",
-    features: ["EXCLUSIVE VIDEOS", "NEWS & EVENTS", "TICKETS", "TRAIN LIKE ELITE"],
-    icons: ["video", "news", "ticket", "bolt"],
-    count: "18K+",
-    countLabel: "Members",
-    extra: "+18",
-    bg: "#070403",
-    bgVia: "#1f0f05",
-    accent: "#E9631C",
-    accentHover: "#FF9552",
-    ctaBg: "#E05513",
-    ctaTo: "#F8873A",
-    ctaText: "#FFFFFF",
-    text: "#FFFFFF",
-    muted: "rgba(255,255,255,0.64)",
+    muted: "rgba(255,255,255,0.66)",
   },
 ];
 
