@@ -38,7 +38,7 @@ import type {
 } from "../../lib/experienceConfig";
 import {
   DEFAULT_LANDING_STAGE,
-  EXPERIENCE_PAGE_LABELS,
+  experiencePageLabel,
   getStageItem,
   pageBackgroundCss,
   stageGlowStyle,
@@ -533,7 +533,7 @@ export function ExperienceAppPreview({
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-dt-red">Preview mode</p>
           <h3 className="font-display text-lg text-white">
-            {EXPERIENCE_PAGE_LABELS[pageKey]} · tap the app like a fan would
+            {experiencePageLabel(experience?.pages, pageKey)} · tap the app like a fan would
           </h3>
         </div>
         <div className="flex items-center gap-2">

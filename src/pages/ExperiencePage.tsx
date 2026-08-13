@@ -46,6 +46,7 @@ import {
   createStampFromBrand,
   EXPERIENCE_PAGE_KEYS,
   EXPERIENCE_PAGE_LABELS,
+  experiencePageLabel,
   placeStampOnPage,
   widgetStyleCss,
 } from "../lib/experienceConfig";

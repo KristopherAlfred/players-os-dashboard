@@ -3,7 +3,7 @@ import { GripVertical, Plus, Trash2 } from "lucide-react";
 
 import {
   EXPERIENCE_PAGE_KEYS,
-  EXPERIENCE_PAGE_LABELS,
+  experiencePageLabel,
   type ExperienceNav,
   type ExperienceNavTab,
   type ExperiencePageKeyName,
@@ -105,7 +105,7 @@ export function ExperienceNavPanel({
               >
                 {EXPERIENCE_PAGE_KEYS.map((key) => (
                   <option key={key} value={key}>
-                    {EXPERIENCE_PAGE_LABELS[key]}
+                    {experiencePageLabel(experience?.pages, key)}
                   </option>
                 ))}
               </select>
