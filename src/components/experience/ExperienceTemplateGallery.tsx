@@ -4,7 +4,7 @@ import {
   EXPERIENCE_TEMPLATES,
   type ExperienceTemplate,
 } from "../../lib/experienceTemplates";
-import { TEMPLATE_NAV_TABS, TEMPLATE_PAGE_COPY } from "../../lib/templatePageCopy";
+import { TEMPLATE_NAV_TABS } from "../../lib/templatePageCopy";
 import { EXPERIENCE_PAGE_KEYS } from "../../lib/experienceConfig";
 import { TemplateMiniPreview } from "./TemplateMiniPreview";
 
