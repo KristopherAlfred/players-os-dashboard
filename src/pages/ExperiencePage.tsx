@@ -66,6 +66,8 @@ import { ExperiencePageNavigator } from "../components/experience/ExperiencePage
 
 import { ExperienceAppPreview } from "../components/experience/ExperienceAppPreview";
 import { ExperienceNavPanel } from "../components/experience/ExperienceNavPanel";
+import { ExperiencePhotoLibrary } from "../components/experience/ExperiencePhotoLibrary";
+import { rememberStudioUpload } from "../lib/experiencePhotoLibrary";
 import { ExperienceTemplateGallery } from "../components/experience/ExperienceTemplateGallery";
 import { ExperienceAiDesigner } from "../components/experience/ExperienceAiDesigner";
 import { applyExperienceTemplate, detectExperienceTemplate } from "../lib/experienceTemplates";
@@ -418,6 +420,9 @@ export function ExperiencePage() {
         ? await makeLogoBackgroundTransparent(file)
         : await readFileAsDataUrl(file);
       apply(dataUrl);
+      if (!options?.punchBlackBackground) {
+        rememberStudioUpload(athlete?.id ?? null, dataUrl, file.name || "Upload");
+      }
       setStatus("Image uploaded");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
@@ -818,6 +823,22 @@ export function ExperiencePage() {
                     patchExperience((prev) => ({ ...prev, nav: { ...prev.nav, ...patch } }))
                   }
                 />
+              ) : null}
+              {editingPageKey ? (
+                <div className="mb-4">
+                  <ExperiencePhotoLibrary
+                    pageLabel={experiencePageLabel(experience.pages, editingPageKey)}
+                    onApply={(slot, src) => {
+                      patchPage(editingPageKey, { [slot]: src });
+                      setStatus(`Photo applied to ${slot === "heroImage" ? "hero" : slot === "backgroundImage" ? "background" : "title art"}`);
+                    }}
+                    onUpload={(file) =>
+                      void uploadIntoExperience((dataUrl) => {
+                        patchPage(editingPageKey, { heroImage: dataUrl });
+                      }, file)
+                    }
+                  />
+                </div>
               ) : null}
               {editingPageKey ? (
                 <ExperiencePagePanel
