@@ -1403,6 +1403,11 @@ export function normalizeExperiencePages(raw: unknown): ExperiencePages {
   for (const key of EXPERIENCE_PAGE_KEYS) {
     out[key] = normalizeExperiencePage(p[key], DEFAULT_EXPERIENCE_PAGES[key]);
   }
+  for (const key of Object.keys(p)) {
+    if (out[key]) continue;
+    if (!p[key] || typeof p[key] !== "object") continue;
+    out[key] = normalizeExperiencePage(p[key], DEFAULT_EXPERIENCE_PAGES.home);
+  }
   return out;
 }
 
