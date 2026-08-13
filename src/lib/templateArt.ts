@@ -11,6 +11,14 @@ import aceClub from "../assets/templates/ace-club.jpg";
 import coldAir from "../assets/templates/cold-air.jpg";
 import levelUp from "../assets/templates/level-up.jpg";
 import joinTheCircle from "../assets/templates/join-the-circle.jpg";
+import innerCircle from "../assets/templates/inner-circle.jpg";
+import moveMind from "../assets/templates/move-mind.jpg";
+import ownYourPower from "../assets/templates/own-your-power.jpg";
+import builtDifferent from "../assets/templates/built-different.jpg";
+import builtToLead from "../assets/templates/built-to-lead.jpg";
+import trustTheVision from "../assets/templates/trust-the-vision.jpg";
+import speedster from "../assets/templates/speedster.jpg";
+import champ23 from "../assets/templates/champ23.jpg";
 
 /** Hero artwork for each full-layout template, keyed by template id. */
 export const TEMPLATE_ART: Record<string, string> = {
@@ -27,4 +35,12 @@ export const TEMPLATE_ART: Record<string, string> = {
   "cold-air": coldAir,
   "level-up": levelUp,
   "join-the-circle": joinTheCircle,
+  "inner-circle": innerCircle,
+  "move-mind": moveMind,
+  "own-your-power": ownYourPower,
+  "built-different": builtDifferent,
+  "built-to-lead": builtToLead,
+  "trust-the-vision": trustTheVision,
+  speedster,
+  champ23,
 };
