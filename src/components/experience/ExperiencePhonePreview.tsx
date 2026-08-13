@@ -116,20 +116,72 @@ function FeatureIcon({ name, color }: { name: string; color: string }) {
 }
 
 
-function PhoneFrame({ children, label, hint }: { children: ReactNode; label: string; hint?: string }) {
+/**
+ * Studio device shell: a realistic phone (bezel, island, status bar, home
+ * indicator) with the editing panels docked in a clean card underneath.
+ */
+function PhoneFrame({
+  screen,
+  children,
+  label,
+  hint,
+}: {
+  screen: ReactNode;
+  children?: ReactNode;
+  label: string;
+  hint?: string;
+}) {
   return (
-    <div className="sticky top-4 self-start">
-      <p className="mb-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">
-        Live phone · {label}
-      </p>
-      {hint ? <p className="mb-2 text-center text-[10px] text-white/35">{hint}</p> : null}
-      <div className="exp-phone-shell relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[2.35rem] border border-white/15 bg-black shadow-[0_0_48px_rgba(var(--theme-accent-rgb),0.12)]">
-        <div className="pointer-events-none absolute left-1/2 top-2 z-50 h-5 w-28 -translate-x-1/2 rounded-full bg-black/90" />
-        <div className="relative min-h-[560px] overflow-hidden">{children}</div>
+    <div className="sticky top-4 self-start space-y-3">
+      <div className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/50 px-3 py-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[rgb(var(--theme-accent-rgb))] shadow-[0_0_8px_rgba(var(--theme-accent-rgb),0.9)]" />
+          <p className="truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">{label}</p>
+        </div>
+        <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/40">
+          Live
+        </span>
       </div>
+
+      <div className="mx-auto w-full max-w-[318px]">
+        <div className="exp-phone-shell rounded-[2.75rem] border border-white/12 bg-gradient-to-b from-white/[0.16] via-white/[0.04] to-white/[0.02] p-[9px]">
+          <div className="relative overflow-hidden rounded-[2.2rem] bg-black">
+            {/* status bar */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-[180] flex h-9 items-center justify-between px-5 pt-1.5 text-[9px] font-semibold text-white/85">
+              <span>9:41</span>
+              <span className="flex items-center gap-1">
+                <span className="flex items-end gap-[2px]">
+                  <span className="h-1 w-[2px] rounded-sm bg-white/70" />
+                  <span className="h-1.5 w-[2px] rounded-sm bg-white/70" />
+                  <span className="h-2 w-[2px] rounded-sm bg-white/70" />
+                  <span className="h-2.5 w-[2px] rounded-sm bg-white/40" />
+                </span>
+                <span className="ml-0.5 h-2.5 w-5 rounded-[3px] border border-white/50 p-[1.5px]">
+                  <span className="block h-full w-3/4 rounded-[1px] bg-white/75" />
+                </span>
+              </span>
+            </div>
+            <span className="pointer-events-none absolute left-1/2 top-2 z-[190] h-5 w-[86px] -translate-x-1/2 rounded-full bg-black ring-1 ring-white/10" />
+            <div className="relative">{screen}</div>
+            <span className="pointer-events-none absolute bottom-1.5 left-1/2 z-[190] h-1 w-24 -translate-x-1/2 rounded-full bg-white/30" />
+            <span className="pointer-events-none absolute inset-0 z-[195] rounded-[2.2rem] ring-1 ring-inset ring-white/10" />
+          </div>
+        </div>
+      </div>
+
+      {hint ? (
+        <p className="text-center text-[10px] leading-relaxed text-white/35">{hint}</p>
+      ) : null}
+
+      {children ? (
+        <div className="divide-y divide-white/[0.07] overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b]">
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 }
+
 
 function BrandMark({ experience }: { experience: ExperienceConfig }) {
   const { brand } = experience;
