@@ -319,6 +319,8 @@ export function ExperiencePage() {
   /** On the Templates tab the phone preview stays hidden until a template is picked. */
   const [templatePreviewOpen, setTemplatePreviewOpen] = useState(false);
   const [appPreviewOpen, setAppPreviewOpen] = useState(false);
+  const [templateAppPreview, setTemplateAppPreview] = useState<ExperienceConfig | null>(null);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -747,8 +749,12 @@ export function ExperiencePage() {
                     setTemplatePreviewOpen(true);
                     setStatus(`${template.label} template applied — publish to push live`);
                   }}
+                  onPreview={(template) =>
+                    setTemplateAppPreview(applyExperienceTemplate(experience, template))
+                  }
                 />
               ) : null}
+
               {section === "brand" ? (
                 <ExperienceBrandPanel
                   brand={experience.brand}
@@ -1604,6 +1610,14 @@ export function ExperiencePage() {
           onClose={() => setAppPreviewOpen(false)}
         />
       ) : null}
+      {templateAppPreview ? (
+        <ExperienceAppPreview
+          experience={templateAppPreview}
+          startPage="landing"
+          onClose={() => setTemplateAppPreview(null)}
+        />
+      ) : null}
+
     </div>
   );
 }
