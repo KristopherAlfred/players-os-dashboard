@@ -20,12 +20,26 @@ export type FanAppRecord = {
 
 async function callAthleteState<T>(payload: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke("athlete-state", { body: payload });
-  if (error) throw error;
+  if (error) {
+    // Surface the real server message instead of the generic non-2xx wrapper.
+    const res = (error as { context?: Response }).context;
+    if (res && typeof res.text === "function") {
+      const raw = await res.text().catch(() => "");
+      try {
+        const parsed = JSON.parse(raw) as { error?: unknown };
+        if (parsed?.error) throw new Error(String(parsed.error));
+      } catch {
+        if (raw) throw new Error(raw.slice(0, 300));
+      }
+    }
+    throw error;
+  }
   if (data && typeof data === "object" && "error" in data) {
     throw new Error(String((data as { error: unknown }).error));
   }
   return data as T;
 }
+
 
 function hydrate(row: Record<string, unknown> | null): FanAppRecord | null {
   if (!row) return null;
