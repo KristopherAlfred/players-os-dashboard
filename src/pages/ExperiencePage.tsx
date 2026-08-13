@@ -829,8 +829,16 @@ export function ExperiencePage() {
             </div>
           </section>
           {section === "templates" && !templatePreviewOpen ? null : (
+          <div className="flex flex-col gap-3">
+          <ExperiencePageNavigator
+            experience={experience}
+            activePageKey={editingPageKey}
+            onSelect={(key) => setSection(`page:${key}`)}
+            onPlay={() => setAppPreviewOpen(true)}
+          />
           <ExperiencePhonePreview
             experience={experience}
+
             mode={editingPageKey ? "page" : "theme"}
             label={editingPageKey ? EXPERIENCE_PAGE_LABELS[editingPageKey] : undefined}
             pageKey={editingPageKey ?? "landing"}
