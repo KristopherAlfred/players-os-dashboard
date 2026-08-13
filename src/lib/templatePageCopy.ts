@@ -578,7 +578,7 @@ const TEMPLATE_PAGE_LABELS: Record<
   "inner-circle": { videos: "Film Room", news: "News & Notes", docAndGlo: "Shop", foundation: "Ventures", profile: "Inner Circle" },
   "move-mind": { home: "Today", videos: "Move", news: "Mind", events: "Gather", foundation: "Manifest", profile: "Me" },
   "own-your-power": { home: "Home", live: "Live", videos: "Clips", events: "Events", profile: "Squad" },
-  "built-different": { videos: "Film", foundation: "Impact", docAndGlo: "Gear" },
+  "built-different": { social: "Community", videos: "Videos", news: "News", events: "Experiences", foundation: "Impact", docAndGlo: "Ventures", profile: "Inner Circle" },
   "built-to-lead": { videos: "Film", events: "Access", foundation: "Academy" },
   "trust-the-vision": { videos: "The Vault", news: "Culture", foundation: "Vision" },
   "serve-return-repeat": { videos: "Match Film", news: "On Tour", events: "Access", docAndGlo: "Doc & Glo", profile: "The Circle" },
@@ -630,9 +630,9 @@ export const TEMPLATE_NAV_TABS: Record<string, ExperienceNavTab[]> = {
   ],
   "built-different": [
     tab("home", "Home", "home", "home"),
-    tab("videos", "Film", "video", "videos"),
+    tab("social", "Social", "users", "social"),
+    tab("videos", "Videos", "video", "videos"),
     tab("news", "News", "news", "news"),
-    tab("foundation", "Impact", "heart", "foundation"),
     tab("profile", "Profile", "user", "profile"),
   ],
   "built-to-lead": [
