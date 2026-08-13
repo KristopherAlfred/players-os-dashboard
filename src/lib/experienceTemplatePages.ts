@@ -196,7 +196,11 @@ export function buildTemplatePages(
       features: copy.features ?? base.features,
       icons: copy.icons ?? base.icons,
     };
+    const pageArt = TEMPLATE_PAGE_ART[template.id]?.[key] || "";
+    const heroArt = pageArt || (spec.hero ? art : "");
+    spec.hero = !!heroArt;
     const cards = copy.cards ?? [];
+
     out[key] = {
       studioLabel: copy.label ?? "",
       backgroundColor: bg,
