@@ -1,0 +1,95 @@
+import { Eye } from "lucide-react";
+
+import type { ExperienceConfig, ExperiencePageKeyName } from "../../lib/experienceConfig";
+import {
+  EXPERIENCE_PAGE_KEYS,
+  EXPERIENCE_PAGE_LABELS,
+  getStageItem,
+  pageBackgroundCss,
+} from "../../lib/experienceConfig";
+
+/**
+ * Page navigator strip: a tiny live thumbnail of every fan-app page in the
+ * template. Click one to edit it — the phone preview and the right-hand panel
+ * follow. "Play app" opens the editor-free, tap-through preview.
+ */
+export function ExperiencePageNavigator({
+  experience,
+  activePageKey,
+  onSelect,
+  onPlay,
+}: {
+  experience: ExperienceConfig;
+  activePageKey: ExperiencePageKeyName | null;
+  onSelect: (key: ExperiencePageKeyName) => void;
+  onPlay?: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2.5">
+      <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
+        <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">
+          App pages · {EXPERIENCE_PAGE_KEYS.length}
+        </p>
+        {onPlay ? (
+          <button
+            type="button"
+            onClick={onPlay}
+            className="flex items-center gap-1 rounded-full border border-white/20 px-2 py-[3px] text-[8px] font-bold uppercase tracking-[0.14em] text-white/70 transition hover:border-white/45 hover:text-white"
+          >
+            <Eye size={9} /> Play app
+          </button>
+        ) : null}
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {EXPERIENCE_PAGE_KEYS.map((key) => {
+          const page = experience.pages[key];
+          const active = key === activePageKey;
+          const hero = getStageItem(page, "hero");
+          const showHero = Boolean(page.heroImage) && !hero?.hidden;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onSelect(key)}
+              title={EXPERIENCE_PAGE_LABELS[key]}
+              className={`group shrink-0 text-left transition ${active ? "" : "opacity-75 hover:opacity-100"}`}
+            >
+              <div
+                className={`relative h-[74px] w-[42px] overflow-hidden rounded-lg border ${
+                  active
+                    ? "border-[rgb(var(--theme-accent-rgb))] shadow-[0_0_0_1px_rgba(var(--theme-accent-rgb),0.5)]"
+                    : "border-white/12 group-hover:border-white/35"
+                }`}
+                style={{ background: pageBackgroundCss(page) }}
+              >
+                {showHero ? (
+                  <img
+                    src={page.heroImage}
+                    alt=""
+                    className="absolute inset-x-0 top-[16%] h-[52%] w-full object-cover opacity-90"
+                  />
+                ) : null}
+                <span
+                  className="absolute left-1 right-1 top-[72%] block h-[3px] rounded-full"
+                  style={{ background: page.accentColor || experience.theme.accent }}
+                />
+                <span className="absolute left-1 right-1 top-[80%] block h-[2px] rounded-full bg-white/25" />
+                <span
+                  className="absolute inset-x-1 bottom-1 block h-[7px] rounded-full"
+                  style={{ background: page.ctaBg || experience.theme.buttonBg }}
+                />
+              </div>
+              <p
+                className={`mt-1 w-[42px] truncate text-center text-[7px] font-bold uppercase tracking-[0.08em] ${
+                  active ? "text-white" : "text-white/45"
+                }`}
+              >
+                {EXPERIENCE_PAGE_LABELS[key]}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

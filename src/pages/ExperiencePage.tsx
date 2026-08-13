@@ -61,6 +61,8 @@ import {
   BrandHeaderFields,
 } from "../components/experience/ExperienceAdvancedPanels";
 import { ExperiencePhonePreview } from "../components/experience/ExperiencePhonePreview";
+import { ExperiencePageNavigator } from "../components/experience/ExperiencePageNavigator";
+
 import { ExperienceAppPreview } from "../components/experience/ExperienceAppPreview";
 import { ExperienceNavPanel } from "../components/experience/ExperienceNavPanel";
 import { ExperienceTemplateGallery } from "../components/experience/ExperienceTemplateGallery";
@@ -829,8 +831,16 @@ export function ExperiencePage() {
             </div>
           </section>
           {section === "templates" && !templatePreviewOpen ? null : (
+          <div className="flex flex-col gap-3">
+          <ExperiencePageNavigator
+            experience={experience}
+            activePageKey={editingPageKey}
+            onSelect={(key) => setSection(`page:${key}`)}
+            onPlay={() => setAppPreviewOpen(true)}
+          />
           <ExperiencePhonePreview
             experience={experience}
+
             mode={editingPageKey ? "page" : "theme"}
             label={editingPageKey ? EXPERIENCE_PAGE_LABELS[editingPageKey] : undefined}
             pageKey={editingPageKey ?? "landing"}
@@ -878,7 +888,9 @@ export function ExperiencePage() {
               }));
             }}
           />
+          </div>
           )}
+
         </div>
       ) : null}
 
