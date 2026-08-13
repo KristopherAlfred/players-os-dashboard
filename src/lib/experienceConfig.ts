@@ -1418,9 +1418,8 @@ export function normalizeExperienceNav(raw: unknown): ExperienceNav {
   for (const row of tabsRaw) {
     if (!row || typeof row !== "object") continue;
     const t = row as Partial<ExperienceNavTab>;
-    const pageKey = (EXPERIENCE_PAGE_KEYS as string[]).includes(String(t.pageKey))
-      ? (t.pageKey as ExperiencePageKeyName)
-      : "home";
+    const rawPageKey = typeof t.pageKey === "string" ? t.pageKey.trim() : "";
+    const pageKey: ExperiencePageKeyName = rawPageKey || "home";
     tabs.push({
       id: asString(t.id, `tab_${tabs.length}`),
       label: asString(t.label, EXPERIENCE_PAGE_LABELS[pageKey]),
