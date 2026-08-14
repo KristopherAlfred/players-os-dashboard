@@ -100,6 +100,7 @@ type CloudVideo = {
   comment_count: number;
   published_at: string | null;
   duration_seconds: number;
+  thumbnail_url?: string | null;
 };
 
 /** Analytics straight from the athlete's own connected channel (null when not connected). */
@@ -118,9 +119,12 @@ export async function fetchYouTubeAnalyticsFromCloud(): Promise<YouTubeAnalytics
       title: video.title ?? "Untitled video",
       viewCount: Number(video.view_count ?? 0),
       likeCount: Number(video.like_count ?? 0),
+      commentCount: Number(video.comment_count ?? 0),
       publishedAt: video.published_at ?? new Date().toISOString(),
       permalink: `https://www.youtube.com/watch?v=${video.video_id}`,
       durationSeconds: Number(video.duration_seconds ?? 0),
+      thumbnailUrl:
+        video.thumbnail_url ?? `https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`,
     }));
 
     const totalViews = Number(stats.total_views ?? 0);
