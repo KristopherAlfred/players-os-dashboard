@@ -43,6 +43,7 @@ import {
   pageBackgroundCss,
   stageGlowStyle,
   stageItemCss,
+  stageAlignClass,
   stageItemRole,
   themeBackgroundCss,
 } from "../../lib/experienceConfig";
@@ -176,7 +177,7 @@ function PageView({
       if (!page.subhead) return null;
       body = (
         <p
-          className="whitespace-pre-line text-center text-[11px] font-semibold uppercase leading-relaxed tracking-[0.14em]"
+          className={`whitespace-pre-line ${stageAlignClass(item)} text-[11px] font-semibold uppercase leading-relaxed tracking-[0.14em]`}
           style={{ color: page.accentColor, ...stageGlowStyle(item, "text") }}
         >
           {page.subhead}
@@ -189,7 +190,7 @@ function PageView({
           : "";
       body = (
         <p
-          className="whitespace-pre-line text-center font-display text-2xl font-extrabold leading-tight"
+          className={`whitespace-pre-line ${stageAlignClass(item)} font-display text-2xl font-extrabold leading-[1.05] tracking-[-0.01em]`}
           style={
             gradient
               ? {
@@ -209,7 +210,7 @@ function PageView({
       if (!page.body) return null;
       body = (
         <p
-          className="whitespace-pre-line text-center text-[11px] leading-relaxed"
+          className={`whitespace-pre-line ${stageAlignClass(item)} text-[11px] leading-relaxed`}
           style={{ color: experience.theme.muted, ...stageGlowStyle(item, "text") }}
         >
           {page.body}

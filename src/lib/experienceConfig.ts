@@ -106,10 +106,20 @@ export type ExperienceStageItem = {
   /** Display scale percent (40–200), default 100 */
   scale?: number;
   hidden?: boolean;
+  /** Text/content alignment inside the layer box. Defaults to center. */
+  align?: "left" | "center" | "right";
   fillFrom?: string;
   fillTo?: string;
   borderColor?: string;
 };
+
+/** Tailwind text-align class for a layer (defaults to centered). */
+export function stageAlignClass(item?: { align?: "left" | "center" | "right" }): string {
+  if (item?.align === "left") return "text-left";
+  if (item?.align === "right") return "text-right";
+  return "text-center";
+}
+
 
 /** Saved reusable logos you can drop on any page. */
 export type ExperienceStamp = {
@@ -1320,6 +1330,11 @@ function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceS
     glowIntensity: Math.max(0, Math.min(100, asNumber(row.glowIntensity, prev.glowIntensity))),
     scale: Math.max(40, Math.min(220, asNumber(row.scale, prev.scale ?? 100))),
     hidden: asBool(row.hidden, prev.hidden ?? false),
+    align:
+      row.align === "left" || row.align === "right" || row.align === "center"
+        ? row.align
+        : prev.align,
+
     fillFrom: asString(row.fillFrom, prev.fillFrom ?? ""),
     fillTo: asString(row.fillTo, prev.fillTo ?? ""),
     borderColor: asString(row.borderColor, prev.borderColor ?? ""),
