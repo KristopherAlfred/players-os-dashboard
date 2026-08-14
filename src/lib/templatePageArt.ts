@@ -1,6 +1,6 @@
 import type { ExperiencePageKeyName } from "./experienceConfig";
 
-import curryHero from "../assets/templates/curry/hero-rings.jpg";
+import curryLandingAsset from "../assets/templates/curry/curry-landing.png.asset.json";
 import curryLookingUp from "../assets/templates/curry/looking-up.jpg";
 import curryCourtside from "../assets/templates/curry/courtside.jpg";
 import curryFamily from "../assets/templates/curry/family.jpg";
@@ -8,6 +8,8 @@ import curryDribble from "../assets/templates/curry/dribble.jpg";
 import curryTrophy from "../assets/templates/curry/trophy.jpg";
 import curryJerseyBack from "../assets/templates/curry/jersey-back.jpg";
 import currySuit from "../assets/templates/curry/suit.jpg";
+
+const curryHero = curryLandingAsset.url;
 
 /**
  * Per-page hero artwork for a template. Each fan-app page can ship its own
