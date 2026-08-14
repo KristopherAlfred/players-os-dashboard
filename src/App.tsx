@@ -35,11 +35,13 @@ import { CreateContentPage } from "./pages/contentStudio/CreateContentPage";
 import { ScheduledPostsPage } from "./pages/contentStudio/ScheduledPostsPage";
 import { MediaLibraryPage } from "./pages/contentStudio/MediaLibraryPage";
 import { ContentAnalyticsPage } from "./pages/contentStudio/ContentAnalyticsPage";
+import YouTubeOAuthPage from "./pages/YouTubeOAuthPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/oauth/youtube" element={<YouTubeOAuthPage />} />
         <Route path="/go/:slug" element={<BioLinkRedirectPage />} />
         <Route path="/app/:slug" element={<FanAppPublicPage />} />
         <Route
