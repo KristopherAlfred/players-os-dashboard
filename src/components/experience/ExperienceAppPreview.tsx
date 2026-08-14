@@ -142,16 +142,18 @@ function PageView({
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
           alt=""
-          className={full ? "h-full w-full" : "w-full rounded-xl"}
+          className={full ? "absolute left-0 top-0 w-full" : "w-full rounded-xl"}
           draggable={false}
           style={{
-            objectFit: page.heroFit || "cover",
-            objectPosition: page.heroPosition || "center",
+            objectFit: full ? "contain" : page.heroFit || "cover",
+            objectPosition: page.heroPosition || "top center",
             transform: `scale(${scale})`,
+            transformOrigin: "top center",
             ...stageGlowStyle(item, "image"),
           }}
         />
       );
+
       body = full ? (
         <div className="relative h-full w-full overflow-hidden">
           {img}
