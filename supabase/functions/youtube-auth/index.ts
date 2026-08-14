@@ -43,19 +43,22 @@ function decodeState(raw: string): { athleteId: string | null; origin: string | 
 
 /**
  * The functions gateway serves our responses as text/plain under a sandbox CSP,
- * so an HTML page here can never render. Redirect back to the app instead.
+ * so an HTML page here can never render. Redirect back to the app instead — the
+ * /oauth/youtube page shows the connecting state and closes the popup itself.
  */
 function finishPopup(message: string, ok: boolean, origin: string | null) {
-  if (origin) {
-    const target = new URL("/settings", origin);
-    target.searchParams.set("youtube", ok ? "connected" : "error");
-    target.searchParams.set("youtube_message", message);
-    return new Response(null, { status: 302, headers: { ...corsHeaders, Location: target.toString() } });
+  const target = origin ?? Deno.env.get("APP_ORIGIN") ?? null;
+  if (target) {
+    const url = new URL("/oauth/youtube", target);
+    url.searchParams.set("youtube", ok ? "connected" : "error");
+    url.searchParams.set("youtube_message", message);
+    return new Response(null, { status: 302, headers: { ...corsHeaders, Location: url.toString() } });
   }
   return new Response(`${ok ? "YouTube connected" : "Connection failed"}: ${message}\nYou can close this window.`, {
     headers: { ...corsHeaders, "Content-Type": "text/plain; charset=utf-8" },
   });
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
