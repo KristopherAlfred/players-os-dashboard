@@ -573,6 +573,147 @@ export type Database = {
           },
         ]
       }
+      youtube_auth: {
+        Row: {
+          access_token: string
+          athlete_id: string | null
+          channel_id: string
+          channel_title: string | null
+          connected_at: string
+          handle: string | null
+          id: string
+          refresh_token: string | null
+          token_expires_at: string | null
+        }
+        Insert: {
+          access_token: string
+          athlete_id?: string | null
+          channel_id: string
+          channel_title?: string | null
+          connected_at?: string
+          handle?: string | null
+          id?: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+        }
+        Update: {
+          access_token?: string
+          athlete_id?: string | null
+          channel_id?: string
+          channel_title?: string | null
+          connected_at?: string
+          handle?: string | null
+          id?: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_auth_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_channel_stats: {
+        Row: {
+          athlete_id: string | null
+          channel_id: string
+          handle: string | null
+          last_synced_at: string
+          subscribers: number
+          thumbnail_url: string | null
+          title: string | null
+          total_videos: number
+          total_views: number
+        }
+        Insert: {
+          athlete_id?: string | null
+          channel_id: string
+          handle?: string | null
+          last_synced_at?: string
+          subscribers?: number
+          thumbnail_url?: string | null
+          title?: string | null
+          total_videos?: number
+          total_views?: number
+        }
+        Update: {
+          athlete_id?: string | null
+          channel_id?: string
+          handle?: string | null
+          last_synced_at?: string
+          subscribers?: number
+          thumbnail_url?: string | null
+          title?: string | null
+          total_videos?: number
+          total_views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_channel_stats_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_videos: {
+        Row: {
+          athlete_id: string | null
+          channel_id: string
+          comment_count: number
+          description: string | null
+          duration_seconds: number
+          last_synced_at: string
+          like_count: number
+          published_at: string | null
+          thumbnail_url: string | null
+          title: string | null
+          video_id: string
+          view_count: number
+        }
+        Insert: {
+          athlete_id?: string | null
+          channel_id: string
+          comment_count?: number
+          description?: string | null
+          duration_seconds?: number
+          last_synced_at?: string
+          like_count?: number
+          published_at?: string | null
+          thumbnail_url?: string | null
+          title?: string | null
+          video_id: string
+          view_count?: number
+        }
+        Update: {
+          athlete_id?: string | null
+          channel_id?: string
+          comment_count?: number
+          description?: string | null
+          duration_seconds?: number
+          last_synced_at?: string
+          like_count?: number
+          published_at?: string | null
+          thumbnail_url?: string | null
+          title?: string | null
+          video_id?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_videos_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
