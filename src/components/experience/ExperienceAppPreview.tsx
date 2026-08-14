@@ -148,8 +148,8 @@ function PageView({
           draggable={false}
           style={{
             objectFit: full ? "cover" : page.heroFit || "cover",
-            objectPosition: page.heroPosition || "top center",
-            transform: `scale(${scale})`,
+            objectPosition: heroObjectPosition(page),
+            transform: heroTransform(page, scale),
             transformOrigin: "top center",
             ...stageGlowStyle(item, "image"),
           }}

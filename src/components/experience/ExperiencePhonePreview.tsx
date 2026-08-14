@@ -609,8 +609,8 @@ function PageFreeformPreview({
           draggable={false}
           style={{
             objectFit: heroFull ? "cover" : page.heroFit || "contain",
-            objectPosition: page.heroPosition || "top center",
-            transform: `scale(${scale})`,
+            objectPosition: heroObjectPosition(page),
+            transform: heroTransform(page, scale),
             transformOrigin: "top center",
             ...stageGlowStyle(item, "image"),
           }}
