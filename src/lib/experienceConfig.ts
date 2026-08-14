@@ -1364,7 +1364,12 @@ export function normalizeExperiencePage(
 }
 
 
-function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceStageItem): ExperienceStageItem {
+function normalizeStageItem(
+  row: Partial<ExperienceStageItem>,
+  prevRaw?: ExperienceStageItem | null,
+): ExperienceStageItem {
+  const prev: ExperienceStageItem =
+    prevRaw ?? ({ id: String(row.id || ""), x: 10, y: 10, w: 60, z: 20 } as ExperienceStageItem);
   const role = stageItemRole({ ...prev, ...row, id: String(row.id || prev.id) });
   return {
     id: String(row.id || prev.id),
