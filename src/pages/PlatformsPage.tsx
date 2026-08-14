@@ -256,7 +256,10 @@ export function PlatformDetailPage() {
         )}
       </Panel>
 
+      {key === "youtube" ? <YouTubeContentSection /> : null}
+
       <Panel title="Recent content">
+
         {feed.length ? (
           <ul className="divide-y divide-dt-border">
             {feed.map((item) => (
