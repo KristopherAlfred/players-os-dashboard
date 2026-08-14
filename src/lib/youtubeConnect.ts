@@ -157,6 +157,7 @@ export async function fetchYouTubeAnalyticsFromCloud(): Promise<YouTubeAnalytics
       },
       recentVideos: videos.slice(0, 12),
       topVideos: [...videos].sort((a, b) => b.viewCount - a.viewCount).slice(0, 8),
+      allVideos: videos,
     };
   } catch {
     return null;
