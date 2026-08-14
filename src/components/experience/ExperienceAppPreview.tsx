@@ -196,8 +196,35 @@ function PageView({
       );
     } else if (role === "featureRow") {
       if (!(page.features || []).length) return null;
-      body = (
-        <div className="grid w-full grid-cols-2 gap-2">
+      const cols = page.featureColumns ?? 2;
+      body = cols >= 4 ? (
+        <div
+          className="grid w-full grid-cols-4"
+          style={{
+            background: page.featureBg,
+            border: `1px solid ${page.featureBorderColor}`,
+            borderRadius: page.featureRadius,
+          }}
+        >
+          {page.features.map((feat, i) => (
+            <button
+              key={feat.id}
+              type="button"
+              className="flex flex-col items-center gap-1.5 px-1.5 py-2.5 text-center transition active:scale-[0.97]"
+              style={i ? { borderLeft: `1px solid ${page.featureBorderColor}` } : undefined}
+            >
+              <Glyph name={feat.icon} color={page.featureIconColor} />
+              <span
+                className="text-[8px] font-semibold uppercase leading-[1.25] tracking-[0.04em]"
+                style={{ color: page.featureTextColor }}
+              >
+                {feat.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="grid w-full gap-2" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
           {page.features.map((feat) => (
             <button
               key={feat.id}
