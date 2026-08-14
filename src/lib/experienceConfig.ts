@@ -1364,7 +1364,12 @@ export function normalizeExperiencePage(
 }
 
 
-function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceStageItem): ExperienceStageItem {
+function normalizeStageItem(
+  row: Partial<ExperienceStageItem>,
+  prevRaw?: ExperienceStageItem | null,
+): ExperienceStageItem {
+  const prev: ExperienceStageItem =
+    prevRaw ?? ({ id: String(row.id || ""), x: 10, y: 10, w: 60, z: 20 } as ExperienceStageItem);
   const role = stageItemRole({ ...prev, ...row, id: String(row.id || prev.id) });
   return {
     id: String(row.id || prev.id),
@@ -1429,7 +1434,11 @@ function normalizeStage(raw: unknown, fallback: ExperienceStageItem[]): Experien
     const id = String(row.id || "");
     if (!id || id === "brand") continue;
     if (isBuiltinStageId(id)) {
-      const prev = byId.get(id) || DEFAULT_LANDING_STAGE.find((d) => d.id === id)!;
+      const prev =
+        byId.get(id) ||
+        DEFAULT_LANDING_STAGE.find((d) => d.id === id) ||
+        DEFAULT_CONTENT_STAGE.find((d) => d.id === id) ||
+        null;
       byId.set(id, normalizeStageItem(row, prev));
       continue;
     }
