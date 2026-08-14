@@ -231,20 +231,30 @@ Deno.serve(async (req) => {
       }
     }
 
-    await supabase
-      .from("platform_connections")
-      .update({
-        connected: true,
-        handle: handle ?? channel.snippet?.title ?? null,
-        follower_count: subscribers,
-        last_synced_at: now,
-      })
-      .eq("platform", "youtube");
+    {
+      let connQuery = supabase
+        .from("platform_connections")
+        .update({
+          connected: true,
+          handle: handle ?? channel.snippet?.title ?? null,
+          follower_count: subscribers,
+          last_synced_at: now,
+        })
+        .eq("platform", "youtube");
+      if (auth.athlete_id) connQuery = connQuery.eq("athlete_id", auth.athlete_id);
+      await connQuery;
+    }
 
     await supabase.from("platform_follower_snapshots").upsert(
-      { platform: "youtube", captured_on: now.slice(0, 10), follower_count: subscribers },
-      { onConflict: "platform,captured_on" },
+      {
+        athlete_id: auth.athlete_id ?? null,
+        platform: "youtube",
+        captured_on: now.slice(0, 10),
+        follower_count: subscribers,
+      },
+      { onConflict: "athlete_id,platform,captured_on" },
     );
+
 
     return json({
       ok: true,

@@ -191,14 +191,22 @@ Deno.serve(async (req) => {
       })
       .eq("platform", "instagram");
 
+    const { data: igAuth } = await supabase
+      .from("instagram_auth")
+      .select("athlete_id")
+      .eq("ig_user_id", profile.id)
+      .maybeSingle();
+
     await supabase.from("platform_follower_snapshots").upsert(
       {
+        athlete_id: igAuth?.athlete_id ?? null,
         platform: "instagram",
         captured_on: now.slice(0, 10),
         follower_count: followers,
       },
-      { onConflict: "platform,captured_on" },
+      { onConflict: "athlete_id,platform,captured_on" },
     );
+
 
     return json({
       ok: true,

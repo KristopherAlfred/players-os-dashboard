@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
     const { data: connections, error } = await supabase
       .from("platform_connections")
-      .select("platform, connected, follower_count")
+      .select("platform, connected, follower_count, athlete_id")
       .eq("connected", true);
 
     if (error) throw error;
@@ -27,10 +27,12 @@ Deno.serve(async (req) => {
     const rows = (connections ?? [])
       .filter((c) => typeof c.follower_count === "number" && c.follower_count > 0)
       .map((c) => ({
+        athlete_id: c.athlete_id ?? null,
         platform: c.platform,
         captured_on: today,
         follower_count: c.follower_count,
       }));
+
 
     if (rows.length === 0) {
       return new Response(
@@ -41,7 +43,7 @@ Deno.serve(async (req) => {
 
     const { error: upsertError } = await supabase
       .from("platform_follower_snapshots")
-      .upsert(rows, { onConflict: "platform,captured_on" });
+      .upsert(rows, { onConflict: "athlete_id,platform,captured_on" });
 
     if (upsertError) throw upsertError;
 

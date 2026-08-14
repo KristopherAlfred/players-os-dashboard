@@ -273,8 +273,9 @@ export function PlatformDetailPage() {
       </div>
 
       <Panel title="Follower growth">
-        {series.length >= 2 ? (
+        {series.length >= 1 ? (
           <div className="h-64">
+
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={series} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
                 <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -293,15 +294,16 @@ export function PlatformDetailPage() {
                   dataKey="followers"
                   stroke="var(--theme-accent)"
                   strokeWidth={2}
-                  dot={false}
+                  dot={{ r: 3, fill: "var(--theme-accent)", strokeWidth: 0 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         ) : (
           <p className="text-sm text-dt-muted">
-            Not enough snapshot history yet — the growth chart appears once two or more daily snapshots exist.
+            No follower history yet — a daily snapshot is recorded every time this platform syncs.
           </p>
+
         )}
       </Panel>
 
