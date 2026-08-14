@@ -120,6 +120,25 @@ export function stageAlignClass(item?: { align?: "left" | "center" | "right" }):
   return "text-center";
 }
 
+/** Crop focal point (object-position) for a page's hero art. */
+export function heroObjectPosition(page: {
+  heroOffsetX?: number;
+  heroOffsetY?: number;
+  heroPosition?: string;
+}): string {
+  if (typeof page.heroOffsetX === "number" || typeof page.heroOffsetY === "number") {
+    return `${page.heroOffsetX ?? 50}% ${page.heroOffsetY ?? 50}%`;
+  }
+  return page.heroPosition || "top center";
+}
+
+/** Combined scale + rotation transform for a page's hero art. */
+export function heroTransform(page: { heroScale?: number; heroRotate?: number }, scale?: number): string {
+  const s = scale ?? (page.heroScale || 100) / 100;
+  const r = page.heroRotate || 0;
+  return `scale(${s})${r ? ` rotate(${r}deg)` : ""}`;
+}
+
 
 /** Saved reusable logos you can drop on any page. */
 export type ExperienceStamp = {
@@ -213,6 +232,12 @@ export type ExperiencePageConfig = {
   heroScale: number;
   heroFit: "contain" | "cover";
   heroPosition: string;
+  /** Free crop: horizontal focal point 0–100 (overrides heroPosition when set). */
+  heroOffsetX?: number;
+  /** Free crop: vertical focal point 0–100. */
+  heroOffsetY?: number;
+  /** Rotation in degrees (-180 to 180). */
+  heroRotate?: number;
   /** Content studio: green/hero band height in px */
   heroBandHeight: number;
   /** Content studio: vertical offset of tabs+list under the hero (px, can be negative) */
@@ -766,6 +791,9 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     heroScale: 100,
     heroFit: "contain",
     heroPosition: "right center",
+    heroOffsetX: 50,
+    heroOffsetY: 50,
+    heroRotate: 0,
     heroBandHeight: 220,
     contentOffsetY: 0,
     layoutMode: "freeform",
@@ -1243,6 +1271,9 @@ export function normalizeExperiencePage(
     heroScale: Math.max(40, Math.min(180, asNumber(p.heroScale, fallback.heroScale ?? 100))),
     heroFit: p.heroFit === "cover" ? "cover" : "contain",
     heroPosition: asString(p.heroPosition, fallback.heroPosition || "right center"),
+    heroOffsetX: Math.max(0, Math.min(100, asNumber(p.heroOffsetX, fallback.heroOffsetX ?? 50))),
+    heroOffsetY: Math.max(0, Math.min(100, asNumber(p.heroOffsetY, fallback.heroOffsetY ?? 50))),
+    heroRotate: Math.max(-180, Math.min(180, asNumber(p.heroRotate, fallback.heroRotate ?? 0))),
     heroBandHeight: Math.max(120, Math.min(420, asNumber(p.heroBandHeight, fallback.heroBandHeight ?? 220))),
     contentOffsetY: Math.max(-160, Math.min(240, asNumber(p.contentOffsetY, fallback.contentOffsetY ?? 0))),
     layoutMode: p.layoutMode === "stack" ? "stack" : "freeform",

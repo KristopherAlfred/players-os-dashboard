@@ -14,7 +14,6 @@ import type {
 import {
   GRADIENT_BACKGROUND_PRESETS,
   EXPERIENCE_LOGOS,
-  HERO_POSITION_OPTIONS,
   type ExperienceAsset,
   type GradientBackgroundPreset,
 } from "../../lib/experienceAssets";
@@ -1106,9 +1105,11 @@ export function ExperiencePagePanel({
               className="mx-auto max-h-40 w-full"
               style={{
                 objectFit: page.heroFit || "contain",
-                objectPosition: page.heroPosition || "right center",
-                transform: `scale(${(page.heroScale || 100) / 100})`,
-                transformOrigin: "center bottom",
+                objectPosition: `${page.heroOffsetX ?? 50}% ${page.heroOffsetY ?? 50}%`,
+                transform: `scale(${(page.heroScale || 100) / 100})${
+                  page.heroRotate ? ` rotate(${page.heroRotate}deg)` : ""
+                }`,
+                transformOrigin: "center center",
               }}
             />
           </div>
@@ -1125,7 +1126,7 @@ export function ExperiencePagePanel({
           onChange={(e) => onUpload("heroImage", e.target.files?.[0] ?? null)}
         />
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label={`Size (${page.heroScale || 100}%)`}>
+          <Field label={`Zoom (${page.heroScale || 100}%)`}>
             <input
               type="range"
               min={40}
@@ -1145,18 +1146,57 @@ export function ExperiencePagePanel({
               <option value="cover">Cover (fill)</option>
             </select>
           </Field>
-          <Field label="Position">
-            <select
-              value={page.heroPosition || "right center"}
-              onChange={(e) => onChange({ heroPosition: e.target.value })}
-              className="w-full rounded-md border border-dt-border bg-dt-bg px-3 py-2 text-sm"
-            >
-              {HERO_POSITION_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id}>
-                  {opt.label}
-                </option>
+          <Field label={`Crop left ↔ right (${page.heroOffsetX ?? 50}%)`}>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={page.heroOffsetX ?? 50}
+              onChange={(e) => onChange({ heroOffsetX: Number(e.target.value) })}
+              className="w-full"
+            />
+          </Field>
+          <Field label={`Crop top ↕ bottom (${page.heroOffsetY ?? 50}%)`}>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={page.heroOffsetY ?? 50}
+              onChange={(e) => onChange({ heroOffsetY: Number(e.target.value) })}
+              className="w-full"
+            />
+          </Field>
+          <Field label={`Rotate (${page.heroRotate ?? 0}°)`}>
+            <input
+              type="range"
+              min={-180}
+              max={180}
+              value={page.heroRotate ?? 0}
+              onChange={(e) => onChange({ heroRotate: Number(e.target.value) })}
+              className="w-full"
+            />
+          </Field>
+          <Field label="Quick presets">
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { label: "Reset", patch: { heroOffsetX: 50, heroOffsetY: 50, heroRotate: 0, heroScale: 100 } },
+                { label: "Top", patch: { heroOffsetY: 0 } },
+                { label: "Bottom", patch: { heroOffsetY: 100 } },
+                { label: "Left", patch: { heroOffsetX: 0 } },
+                { label: "Right", patch: { heroOffsetX: 100 } },
+                { label: "-90°", patch: { heroRotate: -90 } },
+                { label: "+90°", patch: { heroRotate: 90 } },
+              ].map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => onChange(preset.patch)}
+                  className="rounded-md border border-white/15 px-2 py-1 text-[10px] text-white/70 hover:bg-white/10"
+                >
+                  {preset.label}
+                </button>
               ))}
-            </select>
+            </div>
           </Field>
         </div>
       </div>
