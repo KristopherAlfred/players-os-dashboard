@@ -11,6 +11,9 @@ import {
   YAxis,
 } from "recharts";
 import { PageShell, Panel, StatCard } from "../components/PageShell";
+import { YouTubeContentLibrary } from "../components/youtube/YouTubeContentLibrary";
+import { fetchYouTubeAnalytics, type YouTubeAnalytics } from "../lib/youtubeAnalyticsApi";
+
 import { BRAND_COLORS, brandIconMap } from "../components/settings/BrandIcons";
 import {
   fetchFollowerSnapshots,
