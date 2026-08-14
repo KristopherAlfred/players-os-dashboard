@@ -276,6 +276,8 @@ Deno.serve(async (req) => {
         ...history,
         { role: "user", content },
       ],
+      response_format: { type: "json_object" },
+      max_tokens: 4000,
     });
 
     const raw = String(data?.choices?.[0]?.message?.content ?? "");
