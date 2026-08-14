@@ -256,28 +256,30 @@ export function PlatformDetailPage() {
         )}
       </Panel>
 
-      {key === "youtube" ? <YouTubeContentSection /> : null}
+      {key === "youtube" ? (
+        <YouTubeContentSection />
+      ) : (
+        <Panel title="Recent content">
+          {feed.length ? (
+            <ul className="divide-y divide-dt-border">
+              {feed.map((item) => (
+                <li key={item.title} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-white">{item.title}</p>
+                    <p className="text-xs text-dt-muted">
+                      {item.published} · {item.engagement}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xs font-medium text-dt-green">{item.views}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-dt-muted">No recent posts synced for this platform yet.</p>
+          )}
+        </Panel>
+      )}
 
-      <Panel title="Recent content">
-
-        {feed.length ? (
-          <ul className="divide-y divide-dt-border">
-            {feed.map((item) => (
-              <li key={item.title} className="flex items-center justify-between gap-4 py-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm text-white">{item.title}</p>
-                  <p className="text-xs text-dt-muted">
-                    {item.published} · {item.engagement}
-                  </p>
-                </div>
-                <span className="shrink-0 text-xs font-medium text-dt-green">{item.views}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-dt-muted">No recent posts synced for this platform yet.</p>
-        )}
-      </Panel>
     </PageShell>
   );
 }
