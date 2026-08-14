@@ -35,6 +35,8 @@ export type YouTubeAnalytics = {
   };
   recentVideos: YouTubeVideoAnalytics[];
   topVideos: YouTubeVideoAnalytics[];
+  /** Every video we have for this channel — powers the full content library. */
+  allVideos?: YouTubeVideoAnalytics[];
 };
 
 function getApiBase() {
