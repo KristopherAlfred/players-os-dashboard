@@ -20,7 +20,53 @@ import {
   type PlatformConnection,
 } from "../lib/platformConnections";
 
+function YouTubeContentSection() {
+  const [analytics, setAnalytics] = useState<YouTubeAnalytics | null>(null);
+  const [state, setState] = useState<"loading" | "ready" | "empty">("loading");
+
+  useEffect(() => {
+    let active = true;
+    fetchYouTubeAnalytics()
+      .then((data) => {
+        if (!active) return;
+        if (data) {
+          setAnalytics(data);
+          setState("ready");
+        } else {
+          setState("empty");
+        }
+      })
+      .catch(() => active && setState("empty"));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (state === "loading") {
+    return (
+      <Panel title="All content">
+        <div className="flex items-center gap-2 py-6 text-sm text-dt-muted">
+          <Loader2 size={16} className="animate-spin" /> Loading your YouTube library…
+        </div>
+      </Panel>
+    );
+  }
+
+  if (state === "empty" || !analytics) {
+    return (
+      <Panel title="All content">
+        <p className="text-sm text-dt-muted">
+          Connect YouTube in Settings and run a sync to pull your full upload history here.
+        </p>
+      </Panel>
+    );
+  }
+
+  return <YouTubeContentLibrary analytics={analytics} />;
+}
+
 function formatCount(n: number | null | undefined) {
+
   if (!n) return "—";
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
