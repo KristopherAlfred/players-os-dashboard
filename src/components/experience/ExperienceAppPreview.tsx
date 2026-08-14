@@ -136,11 +136,12 @@ function PageView({
       );
     } else if (role === "hero") {
       if (!page.heroImage) return null;
-      body = (
+      const full = (item.h ?? 0) > 0;
+      const img = (
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
           alt=""
-          className="w-full rounded-xl"
+          className={full ? "h-full w-full" : "w-full rounded-xl"}
           draggable={false}
           style={{
             objectFit: page.heroFit || "cover",
@@ -149,6 +150,24 @@ function PageView({
             ...stageGlowStyle(item, "image"),
           }}
         />
+      );
+      body = full ? (
+        <div className="relative h-full w-full overflow-hidden">
+          {img}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, ${page.heroOverlayFrom || "rgba(0,0,0,0.10)"} 0%, ${
+                page.heroOverlayFrom || "rgba(0,0,0,0.10)"
+              } 34%, ${page.heroOverlayTo || page.backgroundColor || "rgba(0,0,0,0.92)"} 62%, ${
+                page.backgroundColor || page.heroOverlayTo || "#000"
+              } 78%)`,
+              opacity: (page.heroOverlayOpacity ?? 100) / 100,
+            }}
+          />
+        </div>
+      ) : (
+        img
       );
     } else if (role === "titleArt") {
       if (!page.titleImage) return null;
@@ -424,23 +443,21 @@ function PageView({
           <button
             type="button"
             onClick={onCta}
-            className="flex w-full items-center justify-center gap-2 py-2.5 text-sm font-bold transition active:scale-[0.98]"
+            className="relative flex w-full items-center justify-center gap-2 overflow-hidden py-3 text-[13px] font-extrabold uppercase tracking-[0.14em] transition active:scale-[0.985]"
             style={{
               background: grad || page.ctaBg,
               color: page.ctaText,
               borderRadius: page.ctaRadius ?? experience.theme.buttonRadius,
+              boxShadow: `0 12px 30px -12px ${page.ctaGradientTo || page.ctaBg}, inset 0 1px 0 rgba(255,255,255,0.28)`,
               ...stageGlowStyle(item, "box"),
             }}
           >
-            <span>{page.ctaLabel || "Join My Circle"}</span>
-            {page.ctaShowArrow ? (
-              <span
-                className="flex h-5 w-5 items-center justify-center rounded-full"
-                style={{ background: "rgba(0,0,0,0.22)" }}
-              >
-                <ArrowRight size={12} strokeWidth={2.4} />
-              </span>
-            ) : null}
+            <span
+              className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+              style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18), transparent)" }}
+            />
+            <span className="relative">{page.ctaLabel || "Join My Circle"}</span>
+            {page.ctaShowArrow ? <ArrowRight className="relative" size={14} strokeWidth={3} /> : null}
           </button>
           {(page.extraButtons || []).map((btn) => (
             <a

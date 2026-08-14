@@ -597,20 +597,41 @@ function PageFreeformPreview({
         </p>
       );
     } else if (role === "hero") {
-      body = page.heroImage ? (
+      const heroFull = (item.h ?? 0) > 0;
+      const heroImg = page.heroImage ? (
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
           alt=""
-          className="w-full rounded-xl"
+          className={heroFull ? "h-full w-full" : "w-full rounded-xl"}
           draggable={false}
           style={{
-            objectFit: page.heroFit || "contain",
-            objectPosition: page.heroPosition || "right center",
+            objectFit: page.heroFit || (heroFull ? "cover" : "contain"),
+            objectPosition: page.heroPosition || "center",
             transform: `scale(${scale})`,
             transformOrigin: "center center",
             ...stageGlowStyle(item, "image"),
           }}
         />
+      ) : null;
+      body = page.heroImage ? (
+        heroFull ? (
+          <div className="relative h-full w-full overflow-hidden">
+            {heroImg}
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, ${page.heroOverlayFrom || "rgba(0,0,0,0.10)"} 0%, ${
+                  page.heroOverlayFrom || "rgba(0,0,0,0.10)"
+                } 34%, ${page.heroOverlayTo || page.backgroundColor || "rgba(0,0,0,0.92)"} 62%, ${
+                  page.backgroundColor || page.heroOverlayTo || "#000"
+                } 78%)`,
+                opacity: (page.heroOverlayOpacity ?? 100) / 100,
+              }}
+            />
+          </div>
+        ) : (
+          heroImg
+        )
       ) : (
         <div className="flex h-28 items-end justify-end rounded-xl border border-dashed border-white/25 bg-black/30 p-2">
           <span className="text-[9px] text-white/35">Hero placement</span>
@@ -930,24 +951,23 @@ function PageFreeformPreview({
         <div className="flex w-full flex-col gap-2">
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-2 py-2.5 text-sm font-bold"
+            className="relative flex w-full items-center justify-center gap-2 overflow-hidden py-3 text-[13px] font-extrabold uppercase tracking-[0.14em]"
             style={{
               background: ctaGradient || page.ctaBg,
               color: page.ctaText,
               borderRadius: page.ctaRadius ?? experience.theme.buttonRadius,
+              boxShadow: `0 12px 30px -12px ${page.ctaGradientTo || page.ctaBg}, inset 0 1px 0 rgba(255,255,255,0.28)`,
               ...stageGlowStyle(item, "box"),
             }}
           >
-            <span>{page.ctaLabel || "Join My Circle"}</span>
-            {page.ctaShowArrow ? (
-              <span
-                className="flex h-5 w-5 items-center justify-center rounded-full"
-                style={{ background: "rgba(0,0,0,0.22)" }}
-              >
-                <ArrowRight size={12} strokeWidth={2.4} />
-              </span>
-            ) : null}
+            <span
+              className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+              style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18), transparent)" }}
+            />
+            <span className="relative">{page.ctaLabel || "Join My Circle"}</span>
+            {page.ctaShowArrow ? <ArrowRight className="relative" size={14} strokeWidth={3} /> : null}
           </button>
+
 
           {(page.extraButtons || []).map((btn) => (
             <button
