@@ -263,6 +263,7 @@ function buildYouTubeAnalyticsFromFeed(feed: {
     },
     recentVideos,
     topVideos,
+    allVideos: videos,
   };
 }
 
