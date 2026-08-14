@@ -182,7 +182,7 @@ export function ConnectorCards() {
                           {busy ? "…" : "Disconnect"}
                         </button>
                       </>
-                    ) : HANDLE_HINTS[row.platform] ? (
+                    ) : HANDLE_HINTS[row.platform] && row.platform !== "youtube" ? (
                       handleDraft?.id === row.id ? (
                         <form
                           className="flex w-full flex-col gap-2"
