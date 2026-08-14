@@ -556,7 +556,9 @@ export function ExperienceAppPreview({
 }) {
   const [pageKey, setPageKey] = useState<ExperiencePageKeyName>(startPage);
   const [unlock, setUnlock] = useState(false);
-  const page = experience.pages[pageKey];
+  const page = experience.pages[pageKey] ?? experience.pages.landing;
+
+
 
   const cta = () => {
     if (pageKey === "landing") {
