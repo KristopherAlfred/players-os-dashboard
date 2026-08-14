@@ -82,7 +82,7 @@ export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
       backgroundGradientTo: "#08090B",
       useGradientBg: true,
       accentColor: "#FFFFFF",
-      effectPreset: "flat",
+      effectPreset: "none",
       layoutMode: "freeform",
       heroImage: "",
       heroFit: "cover",
