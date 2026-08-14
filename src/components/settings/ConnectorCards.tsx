@@ -8,7 +8,7 @@ import {
   type PlatformConnection,
 } from "../../lib/platformConnections";
 import { connectInstagram, syncInstagram } from "../../lib/instagramGraphApi";
-import { connectYouTube, syncYouTube } from "../../lib/youtubeConnect";
+import { connectYouTube, isYouTubeConnected, syncYouTube } from "../../lib/youtubeConnect";
 import { invalidateSocialSources } from "../../lib/socialSources";
 
 /** Platforms wired to a real OAuth connector (login popup + live sync). */
@@ -141,8 +141,13 @@ export function ConnectorCards() {
   async function resync(row: PlatformConnection) {
     setBusyId(row.id);
     try {
-      if (row.platform === "youtube") await syncYouTube();
-      else await syncInstagram();
+      if (row.platform === "youtube") {
+        if (!(await isYouTubeConnected())) {
+          throw new Error("Connect your YouTube channel with Google first, then sync.");
+        }
+        await syncYouTube();
+      } else await syncInstagram();
+
       invalidateSocialSources();
       await load();
       setError(null);

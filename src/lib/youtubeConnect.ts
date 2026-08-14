@@ -46,7 +46,22 @@ export async function connectYouTube(): Promise<void> {
     }
     window.addEventListener("message", onMessage);
   });
+
+  // The popup can close without consent (cancelled / denied scopes). Confirm the
+  // channel really landed in the backend before anyone tries to sync it.
+  if (!(await isYouTubeConnected())) {
+    throw new Error("YouTube wasn't connected — finish the Google sign-in and approve all scopes.");
+  }
 }
+
+/** True once Google consent completed and tokens are stored for this athlete. */
+export async function isYouTubeConnected(): Promise<boolean> {
+  const { data, error } = await supabase.functions.invoke<{ connected?: boolean }>("youtube-sync", {
+    body: { action: "read" },
+  });
+  return !error && Boolean(data?.connected);
+}
+
 
 export type YouTubeSyncResult = {
   ok?: boolean;
