@@ -14,7 +14,6 @@ import type {
 import {
   GRADIENT_BACKGROUND_PRESETS,
   EXPERIENCE_LOGOS,
-  HERO_POSITION_OPTIONS,
   type ExperienceAsset,
   type GradientBackgroundPreset,
 } from "../../lib/experienceAssets";
