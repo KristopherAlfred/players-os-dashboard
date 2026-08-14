@@ -1,5 +1,6 @@
 import type { OverviewMetrics } from "./overviewAnalytics";
 import { formatMetric } from "./overviewAnalytics";
+import type { ContentViewsBreakdown } from "./contentViews";
 import type { PlatformConnection } from "./platformConnections";
 
 export type StatIcon = "users" | "user-check" | "mail" | "heart" | "eye" | "trending-up";
@@ -43,6 +44,7 @@ function growthLabel(metrics: OverviewMetrics | null) {
 export function buildDashboardStats(
   connections: PlatformConnection[],
   metrics: OverviewMetrics | null,
+  contentViews?: ContentViewsBreakdown | null,
 ): DashboardStat[] {
   const anyConnected = connections.some((c) => c.connected);
   const connectedList = connections.filter((c) => c.connected);
@@ -71,9 +73,25 @@ export function buildDashboardStats(
     },
     {
       label: "Content Views",
-      requires: ["youtube"],
+      // Views come from any platform that reports them (YouTube, Instagram, TikTok…).
+      requires: ["youtube", "instagram", "tiktok", "facebook", "x"],
       icon: "eye",
-      resolve: () => ({ value: AWAITING, hint: "YouTube sync pending" }),
+      resolve: () => {
+        if (!contentViews) return { value: AWAITING, hint: "Loading platform views" };
+        if (contentViews.total > 0) {
+          const sources = contentViews.perPlatform.map((row) => row.label).join(" + ");
+          return {
+            value: formatMetric(contentViews.total, true),
+            hint: `Across ${sources}`,
+          };
+        }
+        return {
+          value: "0",
+          hint: contentViews.missing.length
+            ? `No views reported yet (${contentViews.missing.join(", ")})`
+            : "No views reported yet",
+        };
+      },
     },
     {
       label: "Engagement Rate",

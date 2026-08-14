@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useOverviewMetrics } from "../contexts/OverviewMetricsContext";
 import { buildDashboardStats } from "../lib/dashboardStats";
+import { useContentViews } from "../lib/contentViews";
 
 const iconMap: Record<string, typeof Users> = {
   users: Users,
@@ -37,7 +38,8 @@ function AccentLoader({ className = "" }: { className?: string }) {
 
 export function KpiCards() {
   const { metrics, connections, loading } = useOverviewMetrics();
-  const stats = buildDashboardStats(connections, metrics);
+  const contentViews = useContentViews(connections.length);
+  const stats = buildDashboardStats(connections, metrics, contentViews);
 
   return (
     <div data-tour="kpi-cards" className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
