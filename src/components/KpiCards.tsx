@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useOverviewMetrics } from "../contexts/OverviewMetricsContext";
 import { buildDashboardStats } from "../lib/dashboardStats";
+import { useContentViews } from "../lib/contentViews";
 
 const iconMap: Record<string, typeof Users> = {
   users: Users,
