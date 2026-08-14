@@ -181,12 +181,13 @@ Deno.serve(async (req) => {
       .eq("platform", "youtube");
 
     return finishPopup(
-      `${channel.snippet?.title ?? "Your channel"} is now linked. Head back to the dashboard and hit Sync now.`,
+      `${channel.snippet?.title ?? "Your channel"} is now linked.`,
       true,
+      appOrigin,
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("youtube-auth failed:", message);
-    return isCallback ? htmlClose(message, false, appOrigin) : json({ error: message }, 500);
+    return isCallback ? finishPopup(message, false, appOrigin) : json({ error: message }, 500);
   }
 });
