@@ -46,6 +46,7 @@ import {
   removeStageItem,
   stageGlowStyle,
   stageItemCss,
+  stageAlignClass,
   stageItemRole,
   themeBackgroundCss,
   upsertStageItem,

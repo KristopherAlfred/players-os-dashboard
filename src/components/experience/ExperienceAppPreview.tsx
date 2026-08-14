@@ -43,6 +43,7 @@ import {
   pageBackgroundCss,
   stageGlowStyle,
   stageItemCss,
+  stageAlignClass,
   stageItemRole,
   themeBackgroundCss,
 } from "../../lib/experienceConfig";
