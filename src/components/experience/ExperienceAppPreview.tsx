@@ -44,6 +44,8 @@ import {
   stageGlowStyle,
   stageItemCss,
   stageAlignClass,
+  heroObjectPosition,
+  heroTransform,
   stageItemRole,
   themeBackgroundCss,
 } from "../../lib/experienceConfig";
