@@ -603,13 +603,13 @@ function PageFreeformPreview({
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
           alt=""
-          className={heroFull ? "h-full w-full" : "w-full rounded-xl"}
+          className={heroFull ? "absolute left-0 top-0 w-full" : "w-full rounded-xl"}
           draggable={false}
           style={{
-            objectFit: page.heroFit || (heroFull ? "cover" : "contain"),
-            objectPosition: page.heroPosition || "center",
+            objectFit: heroFull ? "contain" : page.heroFit || "contain",
+            objectPosition: page.heroPosition || "top center",
             transform: `scale(${scale})`,
-            transformOrigin: "center center",
+            transformOrigin: "top center",
             ...stageGlowStyle(item, "image"),
           }}
         />
@@ -618,6 +618,7 @@ function PageFreeformPreview({
         heroFull ? (
           <div className="relative h-full w-full overflow-hidden">
             {heroImg}
+
             <div
               className="pointer-events-none absolute inset-0"
               style={{
