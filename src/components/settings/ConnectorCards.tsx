@@ -14,6 +14,71 @@ import { invalidateSocialSources } from "../../lib/socialSources";
 /** Platforms wired to a real OAuth connector (login popup + live sync). */
 const OAUTH_PLATFORMS = new Set(["instagram", "youtube"]);
 
+/** Google Cloud setup helper — shows the exact redirect URI to whitelist. */
+function YouTubeSetupNote() {
+  const [copied, setCopied] = useState(false);
+  const callbackUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/youtube-auth/callback`;
+
+  return (
+    <div className="mx-4 mt-4 rounded-2xl border border-dt-border bg-black/25 p-4">
+      <p className="text-xs font-semibold text-white">YouTube setup (Google Cloud)</p>
+      <ol className="mt-2 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-white/50">
+        <li>
+          Open{" "}
+          <a
+            href="https://console.cloud.google.com/apis/credentials"
+            target="_blank"
+            rel="noreferrer"
+            className="text-dt-red underline"
+          >
+            Google Cloud → APIs &amp; Services → Credentials
+          </a>{" "}
+          and create an OAuth client ID of type “Web application”.
+        </li>
+        <li>
+          In{" "}
+          <a
+            href="https://console.cloud.google.com/apis/library/youtube.googleapis.com"
+            target="_blank"
+            rel="noreferrer"
+            className="text-dt-red underline"
+          >
+            API Library
+          </a>
+          , enable <span className="text-white/70">YouTube Data API v3</span> and{" "}
+          <span className="text-white/70">YouTube Analytics API</span>.
+        </li>
+        <li>
+          On the OAuth consent screen add the scopes <code>youtube.readonly</code>,{" "}
+          <code>yt-analytics.readonly</code> and <code>youtube.upload</code>, then add your Google
+          account as a test user (or publish the app).
+        </li>
+        <li>Paste this exact “Authorized redirect URI” into the OAuth client:</li>
+      </ol>
+      <div className="mt-2 flex items-center gap-2">
+        <code className="min-w-0 flex-1 truncate rounded-lg border border-dt-border bg-black/50 px-3 py-2 text-[11px] text-white/70">
+          {callbackUrl}
+        </code>
+        <button
+          type="button"
+          onClick={() => {
+            void navigator.clipboard.writeText(callbackUrl);
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 1500);
+          }}
+          className="rounded-lg border border-dt-border px-3 py-2 text-[11px] font-semibold text-white/70 transition hover:text-white"
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+      <p className="mt-2 text-[11px] text-white/40">
+        Then hit Connect on the YouTube card — sign in with the Google account that owns the channel.
+      </p>
+    </div>
+  );
+}
+
+
 
 /** Platforms whose live analytics need the athlete's own handle / page / channel. */
 const HANDLE_HINTS: Record<string, string> = {
