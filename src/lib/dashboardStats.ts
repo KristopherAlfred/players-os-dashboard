@@ -1,6 +1,7 @@
 import type { OverviewMetrics } from "./overviewAnalytics";
 import { formatMetric } from "./overviewAnalytics";
 import type { ContentViewsBreakdown } from "./contentViews";
+import type { EngagementBreakdown } from "./engagementRates";
 import type { PlatformConnection } from "./platformConnections";
 
 export type StatIcon = "users" | "user-check" | "mail" | "heart" | "eye" | "trending-up";
@@ -45,6 +46,7 @@ export function buildDashboardStats(
   connections: PlatformConnection[],
   metrics: OverviewMetrics | null,
   contentViews?: ContentViewsBreakdown | null,
+  engagement?: EngagementBreakdown | null,
 ): DashboardStat[] {
   const anyConnected = connections.some((c) => c.connected);
   const connectedList = connections.filter((c) => c.connected);
@@ -95,9 +97,25 @@ export function buildDashboardStats(
     },
     {
       label: "Engagement Rate",
-      requires: ["instagram", "tiktok", "x", "facebook"],
+      // Engagement comes from any platform that reports it, YouTube included.
+      requires: ["youtube", "instagram", "tiktok", "x", "facebook"],
       icon: "heart",
-      resolve: () => ({ value: AWAITING, hint: "Social sync pending" }),
+      resolve: () => {
+        if (!engagement) return { value: AWAITING, hint: "Loading platform engagement" };
+        if (engagement.perPlatform.length > 0) {
+          const sources = engagement.perPlatform.map((row) => row.label).join(" + ");
+          return {
+            value: `${engagement.average.toFixed(2)}%`,
+            hint: `Avg across ${sources}`,
+          };
+        }
+        return {
+          value: "0%",
+          hint: engagement.missing.length
+            ? `No engagement reported yet (${engagement.missing.join(", ")})`
+            : "No engagement reported yet",
+        };
+      },
     },
     {
       label: "Email/SMS Captures",
