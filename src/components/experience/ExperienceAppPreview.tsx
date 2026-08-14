@@ -256,11 +256,16 @@ function PageView({
             borderRadius: proof.radius,
           }}
         >
-          {proof.extraLabel ? (
-            <span className="flex h-5 items-center justify-center rounded-full border border-white/25 bg-black/60 px-1.5 text-[8px] font-bold text-white">
-              {proof.extraLabel}
-            </span>
-          ) : null}
+          <div className="flex -space-x-2">
+            {(proof.avatars || []).slice(0, 4).map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={resolveExperiencePreviewUrl(src)}
+                alt=""
+                className="h-5 w-5 rounded-full border border-white/25 object-cover"
+              />
+            ))}
+          </div>
           <div className="flex flex-col leading-tight">
             <span className="text-[11px] font-bold" style={{ color: proof.countColor }}>
               {proof.count}
@@ -268,6 +273,21 @@ function PageView({
             <span className="text-[8px]" style={{ color: proof.labelColor }}>
               {proof.label}
             </span>
+          </div>
+          <div className="ml-auto flex items-center gap-1">
+            {(proof.thumbs || []).slice(0, 3).map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={resolveExperiencePreviewUrl(src)}
+                alt=""
+                className="h-6 w-5 rounded-[4px] object-cover"
+              />
+            ))}
+            {proof.extraLabel ? (
+              <span className="flex h-5 items-center justify-center rounded-full border border-white/25 bg-black/60 px-1.5 text-[8px] font-bold text-white">
+                {proof.extraLabel}
+              </span>
+            ) : null}
           </div>
         </div>
       );
