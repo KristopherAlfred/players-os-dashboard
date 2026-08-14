@@ -228,6 +228,7 @@ function buildYouTubeAnalyticsFromFeed(feed: {
     publishedAt: video.publishedAt || new Date().toISOString(),
     permalink: video.permalink || `https://www.youtube.com/watch?v=${video.id}`,
     durationSeconds: Number(video.durationSeconds ?? 0),
+    thumbnailUrl: `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`,
   }));
 
   if (!videos.length) return null;
