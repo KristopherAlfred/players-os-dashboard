@@ -615,6 +615,20 @@ export const DEFAULT_LANDING_STAGE: ExperienceStageItem[] = [
 ];
 
 
+export const DEFAULT_YOUREIN_STAGE: ExperienceStageItem[] = [
+  { id: "hero", x: 0, y: 0, w: 100, h: 100, z: 5, glow: false, glowColor: "#8FE3B8", glowIntensity: 0 },
+  { id: "logo", x: 44, y: 5, w: 13, z: 22, glow: false, glowColor: "#8FE3B8", glowIntensity: 0 },
+  { id: "wordmark", x: 20, y: 13, w: 60, z: 21, align: "center", glow: false, glowColor: "#FFFFFF", glowIntensity: 0 },
+  { id: "joinedBadge", x: 5, y: 24, w: 90, z: 19, glow: true, glowColor: "#8FE3B8", glowIntensity: 30 },
+  { id: "subhead", x: 8, y: 45, w: 84, z: 14, align: "center", glow: false, glowColor: "#8FE3B8", glowIntensity: 18 },
+  { id: "headline", x: 6, y: 49, w: 88, z: 15, scale: 118, align: "center", glow: false, glowColor: "#FFFFFF", glowIntensity: 0 },
+  { id: "body", x: 10, y: 60, w: 80, z: 13, align: "center", glow: false, glowColor: "#FFFFFF", glowIntensity: 0 },
+  { id: "featureRow", x: 4, y: 68, w: 92, z: 16, glow: false, glowColor: "#8FE3B8", glowIntensity: 0 },
+  { id: "cta", x: 6, y: 79, w: 88, z: 18, glow: true, glowColor: "#8FE3B8", glowIntensity: 34 },
+  { id: "memberProof", x: 6, y: 88, w: 88, z: 17, glow: false, glowColor: "#8FE3B8", glowIntensity: 0 },
+];
+
+
 export function isBuiltinStageId(id: string): id is ExperienceBuiltinStageId {
   return (STAGE_ITEM_IDS as string[]).includes(id);
 }
@@ -1019,15 +1033,18 @@ export const DEFAULT_EXPERIENCE_PAGES: ExperiencePages = {
     ],
   }),
   youreIn: pageDefaults({
-    headline: "You're in",
-    subhead: "Welcome to the Glo Circle",
-    body: "We're preparing your experience…",
+    headline: "YOU'RE IN",
+    subhead: "WELCOME TO THE INSIDE",
+    body: "You're officially part of the circle. Drops, early access and behind-the-scenes are unlocked.",
     loaderLabel: "Preparing your experience...",
     accentColor: "#8FE3B8",
     effectPreset: "burst",
-    ctaLabel: "Enter",
-    useGradientBg: false,
+    ctaLabel: "ENTER THE APP",
+    ctaShowArrow: true,
+    useGradientBg: true,
     backgroundImage: "",
+    layoutMode: "freeform",
+    stage: DEFAULT_YOUREIN_STAGE.map((item) => ({ ...item })),
   }),
     settings: pageDefaults({
       title: "Account Settings",
