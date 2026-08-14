@@ -722,7 +722,7 @@ function PageFreeformPreview({
           ))}
         </div>
       ) : (
-        <div className={`grid w-full gap-2 grid-cols-${cols}`} style={stageGlowStyle(item, "box")}>
+        <div className="grid w-full gap-2" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, ...stageGlowStyle(item, "box") }}>
           {(page.features || []).map((feat) => (
             <div
               key={feat.id}
