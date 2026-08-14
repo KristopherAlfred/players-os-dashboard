@@ -250,6 +250,8 @@ export type ExperiencePageConfig = {
   featureIconColor: string;
   featureTextColor: string;
   featureRadius: number;
+  /** Columns in the feature strip (2 = cards grid, 4 = single centered row) */
+  featureColumns?: number;
   /** Member social-proof row */
   memberProof: ExperienceMemberProof;
   /** Dark readability wash rendered between the background photo and the text layers */
