@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
 
     const { error: upsertError } = await supabase
       .from("platform_follower_snapshots")
-      .upsert(rows, { onConflict: "platform,captured_on" });
+      .upsert(rows, { onConflict: "athlete_id,platform,captured_on" });
 
     if (upsertError) throw upsertError;
 
