@@ -106,10 +106,20 @@ export type ExperienceStageItem = {
   /** Display scale percent (40–200), default 100 */
   scale?: number;
   hidden?: boolean;
+  /** Text/content alignment inside the layer box. Defaults to center. */
+  align?: "left" | "center" | "right";
   fillFrom?: string;
   fillTo?: string;
   borderColor?: string;
 };
+
+/** Tailwind text-align class for a layer (defaults to centered). */
+export function stageAlignClass(item?: { align?: "left" | "center" | "right" }): string {
+  if (item?.align === "left") return "text-left";
+  if (item?.align === "right") return "text-right";
+  return "text-center";
+}
+
 
 /** Saved reusable logos you can drop on any page. */
 export type ExperienceStamp = {
