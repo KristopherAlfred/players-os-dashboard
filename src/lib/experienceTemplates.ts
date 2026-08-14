@@ -522,11 +522,13 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
       featureIconColor: s.accent,
       featureTextColor: featureText,
       featureRadius: 12,
+      featureColumns: 4,
       features: s.features.map((label, i) => ({
         id: `f${i + 1}`,
         icon: icons[i],
         label,
       })),
+
       heroOverlayFrom: s.light ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.18)",
       heroOverlayTo: s.light ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.88)",
       heroOverlayOpacity: 100,
