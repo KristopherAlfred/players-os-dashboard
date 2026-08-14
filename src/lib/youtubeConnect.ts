@@ -22,7 +22,7 @@ export async function connectYouTube(): Promise<void> {
   const athlete = await resolveCurrentAthlete().catch(() => null);
   const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(
     "youtube-auth",
-    { body: { athlete_id: athlete?.id ?? null } },
+    { body: { athlete_id: athlete?.id ?? null, origin: window.location.origin } },
   );
   const message =
     data?.error ?? (error ? (await readFunctionError(error)) ?? error.message : null);
