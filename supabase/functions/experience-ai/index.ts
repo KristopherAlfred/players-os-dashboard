@@ -155,13 +155,52 @@ async function callGateway(key: string, body: unknown) {
   return JSON.parse(text);
 }
 
+/** Best-effort JSON recovery: models sometimes truncate or trail commas. */
 function extractJson(raw: string) {
   const cleaned = raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
   const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-  if (start < 0 || end < 0) throw new Error("AI returned an unexpected response");
-  return JSON.parse(cleaned.slice(start, end + 1));
+  if (start < 0) throw new Error("AI returned an unexpected response");
+  const body = cleaned.slice(start);
+
+  const candidates: string[] = [];
+  const end = body.lastIndexOf("}");
+  if (end > 0) candidates.push(body.slice(0, end + 1));
+  candidates.push(repairJson(body));
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch { /* try next */ }
+  }
+  throw new Error("AI returned an unexpected response");
 }
+
+/** Close unterminated strings/braces from a truncated JSON stream. */
+function repairJson(input: string) {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+  const stack: string[] = [];
+
+  for (const ch of input) {
+    out += ch;
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === "{" || ch === "[") stack.push(ch === "{" ? "}" : "]");
+    else if (ch === "}" || ch === "]") stack.pop();
+  }
+
+  if (inString) out += '"';
+  out = out.replace(/,\s*$/, "").replace(/:\s*$/, ": null");
+  while (stack.length) out += stack.pop();
+  return out;
+}
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -237,6 +276,8 @@ Deno.serve(async (req) => {
         ...history,
         { role: "user", content },
       ],
+      response_format: { type: "json_object" },
+      max_tokens: 4000,
     });
 
     const raw = String(data?.choices?.[0]?.message?.content ?? "");
