@@ -1330,6 +1330,11 @@ function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceS
     glowIntensity: Math.max(0, Math.min(100, asNumber(row.glowIntensity, prev.glowIntensity))),
     scale: Math.max(40, Math.min(220, asNumber(row.scale, prev.scale ?? 100))),
     hidden: asBool(row.hidden, prev.hidden ?? false),
+    align:
+      row.align === "left" || row.align === "right" || row.align === "center"
+        ? row.align
+        : prev.align,
+
     fillFrom: asString(row.fillFrom, prev.fillFrom ?? ""),
     fillTo: asString(row.fillTo, prev.fillTo ?? ""),
     borderColor: asString(row.borderColor, prev.borderColor ?? ""),
