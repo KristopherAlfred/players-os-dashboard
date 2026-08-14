@@ -95,9 +95,25 @@ export function buildDashboardStats(
     },
     {
       label: "Engagement Rate",
-      requires: ["instagram", "tiktok", "x", "facebook"],
+      // Engagement comes from any platform that reports it, YouTube included.
+      requires: ["youtube", "instagram", "tiktok", "x", "facebook"],
       icon: "heart",
-      resolve: () => ({ value: AWAITING, hint: "Social sync pending" }),
+      resolve: () => {
+        if (!engagement) return { value: AWAITING, hint: "Loading platform engagement" };
+        if (engagement.perPlatform.length > 0) {
+          const sources = engagement.perPlatform.map((row) => row.label).join(" + ");
+          return {
+            value: `${engagement.average.toFixed(2)}%`,
+            hint: `Avg across ${sources}`,
+          };
+        }
+        return {
+          value: "0%",
+          hint: engagement.missing.length
+            ? `No engagement reported yet (${engagement.missing.join(", ")})`
+            : "No engagement reported yet",
+        };
+      },
     },
     {
       label: "Email/SMS Captures",
