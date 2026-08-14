@@ -653,7 +653,7 @@ function PageFreeformPreview({
         <StyledTextRuns
           runs={runsForPageField(page, "subhead")}
           fallbackColor={page.accentColor}
-          className="text-center text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em]"
+          className={`${stageAlignClass(item)} text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em]`}
           style={stageGlowStyle(item, "text")}
           interactive
           activeIndex={selectedId === id ? wordChip : undefined}
@@ -670,7 +670,7 @@ function PageFreeformPreview({
           : "";
       body = gradient ? (
         <p
-          className="text-center font-display text-xl font-extrabold"
+          className={`${stageAlignClass(item)} font-display text-xl font-extrabold leading-[1.05] tracking-[-0.01em]`}
           style={{
             backgroundImage: gradient,
             WebkitBackgroundClip: "text",
@@ -686,7 +686,7 @@ function PageFreeformPreview({
           as="p"
           runs={runsForPageField(page, "headline")}
           fallbackColor="#FFFFFF"
-          className="text-center font-display text-xl text-white"
+          className={`${stageAlignClass(item)} font-display text-xl leading-[1.05] tracking-[-0.01em] text-white`}
           style={stageGlowStyle(item, "text")}
           interactive
           activeIndex={selectedId === id ? wordChip : undefined}
@@ -702,7 +702,7 @@ function PageFreeformPreview({
         <StyledTextRuns
           runs={runsForPageField(page, "body")}
           fallbackColor="rgba(255,255,255,0.65)"
-          className="text-center text-[11px] leading-relaxed text-white/65"
+          className={`${stageAlignClass(item)} text-[11px] leading-relaxed text-white/65`}
           style={stageGlowStyle(item, "text")}
           interactive
           activeIndex={selectedId === id ? wordChip : undefined}
