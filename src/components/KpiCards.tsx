@@ -39,7 +39,8 @@ function AccentLoader({ className = "" }: { className?: string }) {
 export function KpiCards() {
   const { metrics, connections, loading } = useOverviewMetrics();
   const contentViews = useContentViews(connections.length);
-  const stats = buildDashboardStats(connections, metrics, contentViews);
+  const engagement = useEngagementRates(connections.length);
+  const stats = buildDashboardStats(connections, metrics, contentViews, engagement);
 
   return (
     <div data-tour="kpi-cards" className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
