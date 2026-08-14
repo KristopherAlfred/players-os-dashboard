@@ -51,6 +51,7 @@ import {
 } from "../../lib/experienceConfig";
 import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewUrl";
 import { TintedBrandLogo } from "./TintedBrandLogo";
+import { JoinAuthSheet, JoinedBadge } from "./JoinFlow";
 
 const ICONS: Record<string, LucideIcon> = {
   star: Star,
@@ -436,6 +437,12 @@ function PageView({
           ))}
         </div>
       );
+    } else if (role === "joinedBadge") {
+      body = (
+        <div className="flex w-full justify-center" style={stageGlowStyle(item, "box")}>
+          <JoinedBadge accent={page.accentColor || "#8FE3B8"} />
+        </div>
+      );
     } else if (role === "cta") {
       const grad =
         page.ctaGradientFrom && page.ctaGradientTo
@@ -631,51 +638,14 @@ export function ExperienceAppPreview({
           <PageView experience={experience} pageKey={pageKey} onNavigate={setPageKey} onCta={cta} />
 
           {unlock && pageKey === "landing" ? (
-            <div className="absolute inset-x-0 bottom-0 z-[160] px-3 pb-3 pt-16">
-              <div
-                className="relative rounded-2xl border px-4 pb-5 pt-7"
-                style={{
-                  borderColor: page.unlockPanelBorderColor || "#8C0000",
-                  background: `linear-gradient(165deg, ${page.unlockPanelBgFrom || "rgba(18,18,18,0.97)"} 0%, ${page.unlockPanelBgTo || "rgba(6,6,6,0.98)"} 100%)`,
-                  boxShadow: `0 0 24px ${page.unlockGlowColor || "#8FE3B8"}55`,
-                }}
-              >
-                <div
-                  className="absolute left-1/2 top-0 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border bg-black"
-                  style={{ borderColor: page.accentColor, color: page.accentColor }}
-                >
-                  <Lock size={14} />
-                </div>
-                <p className="text-center font-display text-sm tracking-wide text-white">
-                  {page.unlockHeadline || page.headline}
-                </p>
-                <p className="mt-1.5 text-center text-[10px] leading-relaxed text-white/75">
-                  {page.unlockBody || page.body}
-                </p>
-                <div className="mt-3 space-y-2">
-                  {["Continue with X", "Continue with Google", "Continue with Apple"].map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => {
-                        setUnlock(false);
-                        setPageKey("youreIn");
-                      }}
-                      className={`flex h-9 w-full items-center justify-center rounded-lg border text-[9px] font-semibold uppercase tracking-wide transition active:scale-[0.98] ${
-                        label.includes("Google")
-                          ? "border-white/20 bg-white text-black"
-                          : "border-white/15 bg-black text-white"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <p className="mt-2.5 text-center text-[8px] text-white/55">
-                  {page.unlockFooter || "100% Private · No Spam · You're in control"}
-                </p>
-              </div>
-            </div>
+            <JoinAuthSheet
+              page={page}
+              onSelect={() => {
+                setUnlock(false);
+                setPageKey("youreIn");
+              }}
+              onClose={() => setUnlock(false)}
+            />
           ) : null}
         </div>
       </div>
