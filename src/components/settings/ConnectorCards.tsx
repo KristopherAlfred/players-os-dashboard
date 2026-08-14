@@ -161,16 +161,17 @@ export function ConnectorCards() {
                           type="button"
                           disabled={busy}
                           onClick={
-                            row.platform === "instagram" ? () => resync(row) : undefined
+                            OAUTH_PLATFORMS.has(row.platform) ? () => resync(row) : undefined
                           }
                           className="flex-1 rounded-xl border border-dt-border bg-black/40 px-3 py-2 text-xs font-semibold text-white transition hover:border-dt-red/50 hover:text-dt-red disabled:opacity-50"
                         >
-                          {row.platform === "instagram"
+                          {OAUTH_PLATFORMS.has(row.platform)
                             ? busy
                               ? "Syncing…"
                               : "Sync now"
                             : "Configure"}
                         </button>
+
 
                         <button
                           type="button"
