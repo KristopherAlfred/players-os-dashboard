@@ -951,24 +951,23 @@ function PageFreeformPreview({
         <div className="flex w-full flex-col gap-2">
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-2 py-2.5 text-sm font-bold"
+            className="relative flex w-full items-center justify-center gap-2 overflow-hidden py-3 text-[13px] font-extrabold uppercase tracking-[0.14em]"
             style={{
               background: ctaGradient || page.ctaBg,
               color: page.ctaText,
               borderRadius: page.ctaRadius ?? experience.theme.buttonRadius,
+              boxShadow: `0 12px 30px -12px ${page.ctaGradientTo || page.ctaBg}, inset 0 1px 0 rgba(255,255,255,0.28)`,
               ...stageGlowStyle(item, "box"),
             }}
           >
-            <span>{page.ctaLabel || "Join My Circle"}</span>
-            {page.ctaShowArrow ? (
-              <span
-                className="flex h-5 w-5 items-center justify-center rounded-full"
-                style={{ background: "rgba(0,0,0,0.22)" }}
-              >
-                <ArrowRight size={12} strokeWidth={2.4} />
-              </span>
-            ) : null}
+            <span
+              className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+              style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18), transparent)" }}
+            />
+            <span className="relative">{page.ctaLabel || "Join My Circle"}</span>
+            {page.ctaShowArrow ? <ArrowRight className="relative" size={14} strokeWidth={3} /> : null}
           </button>
+
 
           {(page.extraButtons || []).map((btn) => (
             <button
