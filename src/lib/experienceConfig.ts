@@ -213,6 +213,12 @@ export type ExperiencePageConfig = {
   heroScale: number;
   heroFit: "contain" | "cover";
   heroPosition: string;
+  /** Free crop: horizontal focal point 0–100 (overrides heroPosition when set). */
+  heroOffsetX?: number;
+  /** Free crop: vertical focal point 0–100. */
+  heroOffsetY?: number;
+  /** Rotation in degrees (-180 to 180). */
+  heroRotate?: number;
   /** Content studio: green/hero band height in px */
   heroBandHeight: number;
   /** Content studio: vertical offset of tabs+list under the hero (px, can be negative) */
