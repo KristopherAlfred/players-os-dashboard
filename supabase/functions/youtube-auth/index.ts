@@ -27,18 +27,34 @@ function redirectUri(req: Request) {
   return `https://${url.host}/functions/v1/youtube-auth/callback`;
 }
 
-function htmlClose(message: string, ok: boolean) {
-  return new Response(
-    `<!doctype html><html><body style="background:#0b0f0d;color:#fff;font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0">
-      <div style="text-align:center;max-width:520px;padding:24px">
-        <h1 style="color:${ok ? "#8FE3B8" : "#ff8484"};font-size:20px">${ok ? "YouTube connected" : "Connection failed"}</h1>
-        <p style="opacity:.7;font-size:14px">${message}</p>
-        <p style="opacity:.5;font-size:12px">You can close this window.</p>
-      </div>
-      <script>try{window.opener&&window.opener.postMessage({type:"youtube-auth",ok:${ok}},"*")}catch(e){}<\/script>
-    </body></html>`,
-    { headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } },
-  );
+/** State carries the athlete id plus the app origin to return the popup to. */
+function encodeState(athleteId: string | null, origin: string | null) {
+  return btoa(JSON.stringify({ a: athleteId, o: origin })).replace(/=+$/, "");
+}
+
+function decodeState(raw: string): { athleteId: string | null; origin: string | null } {
+  try {
+    const parsed = JSON.parse(atob(raw)) as { a?: string | null; o?: string | null };
+    return { athleteId: parsed.a ?? null, origin: parsed.o ?? null };
+  } catch {
+    return { athleteId: /^[0-9a-f-]{36}$/i.test(raw) ? raw : null, origin: null };
+  }
+}
+
+/**
+ * The functions gateway serves our responses as text/plain under a sandbox CSP,
+ * so an HTML page here can never render. Redirect back to the app instead.
+ */
+function finishPopup(message: string, ok: boolean, origin: string | null) {
+  if (origin) {
+    const target = new URL("/settings", origin);
+    target.searchParams.set("youtube", ok ? "connected" : "error");
+    target.searchParams.set("youtube_message", message);
+    return new Response(null, { status: 302, headers: { ...corsHeaders, Location: target.toString() } });
+  }
+  return new Response(`${ok ? "YouTube connected" : "Connection failed"}: ${message}\nYou can close this window.`, {
+    headers: { ...corsHeaders, "Content-Type": "text/plain; charset=utf-8" },
+  });
 }
 
 Deno.serve(async (req) => {
