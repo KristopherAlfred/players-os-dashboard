@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
         .select("*")
         .eq("channel_id", auth.channel_id)
         .order("published_at", { ascending: false })
-        .limit(48),
+        .limit(500),
     ]);
     return json({ connected: true, stats: stats ?? null, videos: videos ?? [] });
   }
@@ -159,15 +159,33 @@ Deno.serve(async (req) => {
     let videoRows: Record<string, unknown>[] = [];
 
     if (uploads) {
-      const playlist = await api<{
-        items?: Array<{ contentDetails?: { videoId?: string } }>;
-      }>("playlistItems", { part: "contentDetails", playlistId: uploads, maxResults: "50" }, token);
+      // Walk the whole uploads playlist (capped) so the dashboard can show ALL content.
+      const ids: string[] = [];
+      let pageToken: string | undefined;
+      for (let page = 0; page < 10; page += 1) {
+        const playlist = await api<{
+          nextPageToken?: string;
+          items?: Array<{ contentDetails?: { videoId?: string } }>;
+        }>(
+          "playlistItems",
+          {
+            part: "contentDetails",
+            playlistId: uploads,
+            maxResults: "50",
+            ...(pageToken ? { pageToken } : {}),
+          },
+          token,
+        );
+        for (const item of playlist.items ?? []) {
+          const id = item.contentDetails?.videoId;
+          if (id) ids.push(id);
+        }
+        pageToken = playlist.nextPageToken;
+        if (!pageToken) break;
+      }
 
-      const ids = (playlist.items ?? [])
-        .map((item) => item.contentDetails?.videoId)
-        .filter((id): id is string => Boolean(id));
-
-      if (ids.length) {
+      for (let index = 0; index < ids.length; index += 50) {
+        const batch = ids.slice(index, index + 50);
         const details = await api<{
           items?: Array<{
             id: string;
@@ -182,32 +200,34 @@ Deno.serve(async (req) => {
           }>;
         }>(
           "videos",
-          { part: "snippet,statistics,contentDetails", id: ids.join(","), maxResults: "50" },
+          { part: "snippet,statistics,contentDetails", id: batch.join(","), maxResults: "50" },
           token,
         );
 
-        videoRows = (details.items ?? []).map((video) => ({
-          video_id: video.id,
-          channel_id: channel.id,
-          athlete_id: auth.athlete_id ?? null,
-          title: video.snippet?.title ?? null,
-          description: video.snippet?.description ?? null,
-          thumbnail_url:
-            video.snippet?.thumbnails?.high?.url ?? video.snippet?.thumbnails?.medium?.url ?? null,
-          published_at: video.snippet?.publishedAt ?? null,
-          duration_seconds: parseDuration(video.contentDetails?.duration),
-          view_count: Number(video.statistics?.viewCount ?? 0),
-          like_count: Number(video.statistics?.likeCount ?? 0),
-          comment_count: Number(video.statistics?.commentCount ?? 0),
-          last_synced_at: now,
-        }));
+        videoRows = videoRows.concat(
+          (details.items ?? []).map((video) => ({
+            video_id: video.id,
+            channel_id: channel.id,
+            athlete_id: auth.athlete_id ?? null,
+            title: video.snippet?.title ?? null,
+            description: video.snippet?.description ?? null,
+            thumbnail_url:
+              video.snippet?.thumbnails?.high?.url ?? video.snippet?.thumbnails?.medium?.url ?? null,
+            published_at: video.snippet?.publishedAt ?? null,
+            duration_seconds: parseDuration(video.contentDetails?.duration),
+            view_count: Number(video.statistics?.viewCount ?? 0),
+            like_count: Number(video.statistics?.likeCount ?? 0),
+            comment_count: Number(video.statistics?.commentCount ?? 0),
+            last_synced_at: now,
+          })),
+        );
+      }
 
-        if (videoRows.length) {
-          const { error: videoError } = await supabase
-            .from("youtube_videos")
-            .upsert(videoRows, { onConflict: "video_id" });
-          if (videoError) throw videoError;
-        }
+      if (videoRows.length) {
+        const { error: videoError } = await supabase
+          .from("youtube_videos")
+          .upsert(videoRows, { onConflict: "video_id" });
+        if (videoError) throw videoError;
       }
     }
 

@@ -10,6 +10,8 @@ export type YouTubeVideoAnalytics = {
   publishedAt: string;
   permalink: string;
   durationSeconds: number;
+  commentCount?: number;
+  thumbnailUrl?: string | null;
 };
 
 export type YouTubeAnalytics = {
@@ -33,6 +35,8 @@ export type YouTubeAnalytics = {
   };
   recentVideos: YouTubeVideoAnalytics[];
   topVideos: YouTubeVideoAnalytics[];
+  /** Every video we have for this channel — powers the full content library. */
+  allVideos?: YouTubeVideoAnalytics[];
 };
 
 function getApiBase() {
@@ -224,6 +228,7 @@ function buildYouTubeAnalyticsFromFeed(feed: {
     publishedAt: video.publishedAt || new Date().toISOString(),
     permalink: video.permalink || `https://www.youtube.com/watch?v=${video.id}`,
     durationSeconds: Number(video.durationSeconds ?? 0),
+    thumbnailUrl: `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`,
   }));
 
   if (!videos.length) return null;
@@ -258,6 +263,7 @@ function buildYouTubeAnalyticsFromFeed(feed: {
     },
     recentVideos,
     topVideos,
+    allVideos: videos,
   };
 }
 

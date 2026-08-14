@@ -30,6 +30,7 @@ import {
   type YouTubeVideoAnalytics,
 } from "../../lib/youtubeAnalyticsApi";
 import { SourceError, SourceLoading } from "../dametime/DametimeAnalyticsStates";
+import { YouTubeContentLibrary } from "./YouTubeContentLibrary";
 
 const CHART_GREEN = "#22c55e";
 
@@ -274,6 +275,8 @@ export function YouTubeAnalyticsView({ analytics }: { analytics: YouTubeAnalytic
           <TopVideosBarChart analytics={analytics} />
         </div>
       </div>
+
+      <YouTubeContentLibrary analytics={analytics} />
 
       <div className="grid grid-cols-12 items-stretch gap-3">
         <div className="col-span-12 lg:col-span-8">
