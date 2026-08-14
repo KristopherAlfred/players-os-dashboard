@@ -275,6 +275,8 @@ export function YouTubeAnalyticsView({ analytics }: { analytics: YouTubeAnalytic
         </div>
       </div>
 
+      <YouTubeContentLibrary analytics={analytics} />
+
       <div className="grid grid-cols-12 items-stretch gap-3">
         <div className="col-span-12 lg:col-span-8">
           <TopVideosTable videos={analytics.topVideos} />
