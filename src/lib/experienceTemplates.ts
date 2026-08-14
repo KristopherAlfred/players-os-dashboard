@@ -133,7 +133,7 @@ export const EXPERIENCE_TEMPLATES: ExperienceTemplate[] = [
         radius: 20,
       },
       stage: [
-        { id: "hero", x: 0, y: 0, w: 100, z: 4, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
+        { id: "hero", x: 0, y: 0, w: 100, h: 100, z: 4, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
         { id: "logo", x: 14, y: 6.5, w: 12, z: 22, glow: true, glowColor: "#2FE0D6", glowIntensity: 45 },
         { id: "wordmark", x: 27, y: 7.5, w: 60, z: 21, scale: 118, glow: false, glowColor: "#FFFFFF", glowIntensity: 0 },
         { id: "tagline", x: 27, y: 11, w: 60, z: 20, scale: 112, glow: false, glowColor: "#2FE0D6", glowIntensity: 0 },
@@ -491,7 +491,7 @@ function fullTemplate(s: FullTemplateSpec): ExperienceTemplate {
         { id: "logo", x: 5, y: 3, w: 12, z: 22, glow: false, glowColor: s.accent, glowIntensity: 0 },
         { id: "wordmark", x: 19, y: 3.5, w: 52, z: 21, glow: false, glowColor: s.text, glowIntensity: 0 },
         { id: "tagline", x: 19, y: 7.5, w: 55, z: 20, glow: false, glowColor: s.accent, glowIntensity: 0 },
-        { id: "hero", x: 0, y: 11, w: 100, z: 5, glow: false, glowColor: s.accent, glowIntensity: 0 },
+        { id: "hero", x: 0, y: 0, w: 100, h: 100, z: 5, glow: false, glowColor: s.accent, glowIntensity: 0 },
         { id: "titleArt", x: 10, y: 46, w: 70, z: 12, hidden: true, glow: false, glowColor: s.accent, glowIntensity: 0 },
         { id: "subhead", x: 6, y: 50, w: 88, z: 14, hidden: true, glow: false, glowColor: s.accent, glowIntensity: 0 },
         { id: "headline", x: 6, y: 55, w: 84, z: 15, scale: 108, glow: false, glowColor: s.text, glowIntensity: 0 },
