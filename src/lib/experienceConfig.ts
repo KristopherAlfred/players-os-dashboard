@@ -1269,6 +1269,7 @@ export function normalizeExperiencePage(
     featureIconColor: asString(p.featureIconColor, fallback.featureIconColor ?? "#8FE3B8"),
     featureTextColor: asString(p.featureTextColor, fallback.featureTextColor ?? "#FFFFFF"),
     featureRadius: Math.max(0, Math.min(999, asNumber(p.featureRadius, fallback.featureRadius ?? 18))),
+    featureColumns: Math.max(1, Math.min(4, asNumber(p.featureColumns, fallback.featureColumns ?? 2))),
     memberProof: normalizeMemberProof(p.memberProof, fallback.memberProof ?? DEFAULT_MEMBER_PROOF),
     heroOverlayFrom: asString(p.heroOverlayFrom, fallback.heroOverlayFrom ?? "rgba(0,0,0,0.15)"),
     heroOverlayTo: asString(p.heroOverlayTo, fallback.heroOverlayTo ?? "rgba(0,0,0,0.85)"),
