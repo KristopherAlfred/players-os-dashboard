@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
         .select("*")
         .eq("channel_id", auth.channel_id)
         .order("published_at", { ascending: false })
-        .limit(48),
+        .limit(500),
     ]);
     return json({ connected: true, stats: stats ?? null, videos: videos ?? [] });
   }
