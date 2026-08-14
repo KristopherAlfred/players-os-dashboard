@@ -141,8 +141,13 @@ export function ConnectorCards() {
   async function resync(row: PlatformConnection) {
     setBusyId(row.id);
     try {
-      if (row.platform === "youtube") await syncYouTube();
-      else await syncInstagram();
+      if (row.platform === "youtube") {
+        if (!(await isYouTubeConnected())) {
+          throw new Error("Connect your YouTube channel with Google first, then sync.");
+        }
+        await syncYouTube();
+      } else await syncInstagram();
+
       invalidateSocialSources();
       await load();
       setError(null);
