@@ -3,6 +3,8 @@ import { buildTemplatePages } from "./experienceTemplatePages";
 import { TEMPLATE_NAV_TABS } from "./templatePageCopy";
 import { TEMPLATE_ART } from "./templateArt";
 
+import { DEFAULT_EXPERIENCE_PAGES } from "./experienceConfig";
+
 import type {
   ExperienceBrand,
   ExperienceConfig,
@@ -1169,7 +1171,20 @@ export function applyExperienceTemplate(
   const templatePages = buildTemplatePages(template);
   const pages = Object.fromEntries(
     Object.entries(config.pages).map(([key, page]) => {
-      let next = ctaBg && ctaText ? { ...page, ctaBg, ctaText } : page;
+      /**
+       * Templates replace, they never stack: builtin pages start from a clean
+       * default so layers/art from a previously picked template are dropped
+       * instead of sitting underneath the new look.
+       */
+      const base =
+        (DEFAULT_EXPERIENCE_PAGES as Record<string, typeof page>)[key] ?? page;
+      const clean = {
+        ...base,
+        stage: (base.stage ?? []).map((s) => ({ ...s })),
+        features: (base.features ?? []).map((f) => ({ ...f })),
+        memberProof: { ...base.memberProof },
+      };
+      let next = ctaBg && ctaText ? { ...clean, ctaBg, ctaText } : clean;
       const built = templatePages[key as keyof typeof templatePages];
       if (built) {
         next = {
