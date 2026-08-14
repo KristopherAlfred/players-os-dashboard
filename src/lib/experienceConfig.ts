@@ -790,6 +790,7 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     featureIconColor: "#8FE3B8",
     featureTextColor: "#FFFFFF",
     featureRadius: 18,
+    featureColumns: 2,
     memberProof: { ...DEFAULT_MEMBER_PROOF },
     heroOverlayFrom: "rgba(0,0,0,0.15)",
     heroOverlayTo: "rgba(0,0,0,0.85)",
