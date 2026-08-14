@@ -10,6 +10,8 @@ export type YouTubeVideoAnalytics = {
   publishedAt: string;
   permalink: string;
   durationSeconds: number;
+  commentCount?: number;
+  thumbnailUrl?: string | null;
 };
 
 export type YouTubeAnalytics = {
