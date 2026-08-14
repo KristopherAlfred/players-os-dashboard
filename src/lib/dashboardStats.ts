@@ -43,6 +43,7 @@ function growthLabel(metrics: OverviewMetrics | null) {
 export function buildDashboardStats(
   connections: PlatformConnection[],
   metrics: OverviewMetrics | null,
+  contentViews?: ContentViewsBreakdown | null,
 ): DashboardStat[] {
   const anyConnected = connections.some((c) => c.connected);
   const connectedList = connections.filter((c) => c.connected);
