@@ -46,6 +46,7 @@ export function buildDashboardStats(
   connections: PlatformConnection[],
   metrics: OverviewMetrics | null,
   contentViews?: ContentViewsBreakdown | null,
+  engagement?: EngagementBreakdown | null,
 ): DashboardStat[] {
   const anyConnected = connections.some((c) => c.connected);
   const connectedList = connections.filter((c) => c.connected);
