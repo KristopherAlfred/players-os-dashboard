@@ -30,6 +30,7 @@ import {
   type YouTubeVideoAnalytics,
 } from "../../lib/youtubeAnalyticsApi";
 import { SourceError, SourceLoading } from "../dametime/DametimeAnalyticsStates";
+import { YouTubeContentLibrary } from "./YouTubeContentLibrary";
 
 const CHART_GREEN = "#22c55e";
 
