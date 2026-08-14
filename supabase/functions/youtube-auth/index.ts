@@ -65,17 +65,22 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const isCallback = url.pathname.endsWith("/callback");
 
+  const state = url.searchParams.get("state") ?? "";
+  const { athleteId: stateAthleteId, origin: appOrigin } = decodeState(state);
+
   if (!clientId || !clientSecret) {
     const msg = "Google OAuth credentials are not configured.";
-    return isCallback ? htmlClose(msg, false) : json({ error: msg }, 400);
+    return isCallback ? finishPopup(msg, false, appOrigin) : json({ error: msg }, 400);
   }
 
   try {
     if (!isCallback) {
       let athleteId: string | null = null;
+      let origin: string | null = null;
       try {
-        const body = (await req.json()) as { athlete_id?: string };
+        const body = (await req.json()) as { athlete_id?: string; origin?: string };
         athleteId = body?.athlete_id ?? null;
+        origin = body?.origin ?? null;
       } catch {
         // no body is fine
       }
@@ -88,15 +93,15 @@ Deno.serve(async (req) => {
       authUrl.searchParams.set("access_type", "offline");
       authUrl.searchParams.set("include_granted_scopes", "true");
       authUrl.searchParams.set("prompt", "consent");
-      authUrl.searchParams.set("state", athleteId ?? crypto.randomUUID());
+      authUrl.searchParams.set("state", encodeState(athleteId, origin));
       return json({ url: authUrl.toString() });
     }
 
     const oauthError = url.searchParams.get("error");
-    if (oauthError) return htmlClose(oauthError, false);
+    if (oauthError) return finishPopup(oauthError, false, appOrigin);
 
     const code = url.searchParams.get("code");
-    if (!code) return htmlClose("Missing authorization code.", false);
+    if (!code) return finishPopup("Missing authorization code.", false, appOrigin);
 
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -117,7 +122,7 @@ Deno.serve(async (req) => {
       error?: string;
     };
     if (!tokenRes.ok || !token.access_token) {
-      return htmlClose(token.error_description ?? token.error ?? "Token exchange failed.", false);
+      return finishPopup(token.error_description ?? token.error ?? "Token exchange failed.", false, appOrigin);
     }
 
     const channelRes = await fetch(
@@ -133,11 +138,11 @@ Deno.serve(async (req) => {
       error?: { message?: string };
     };
     if (!channelRes.ok) {
-      return htmlClose(channelBody.error?.message ?? "Could not read your channel.", false);
+      return finishPopup(channelBody.error?.message ?? "Could not read your channel.", false, appOrigin);
     }
     const channel = channelBody.items?.[0];
     if (!channel) {
-      return htmlClose("No YouTube channel is attached to that Google account.", false);
+      return finishPopup("No YouTube channel is attached to that Google account.", false, appOrigin);
     }
 
     const supabase = createClient(
@@ -145,8 +150,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    const state = url.searchParams.get("state") ?? "";
-    const athleteId = /^[0-9a-f-]{36}$/i.test(state) ? state : null;
+    const athleteId = stateAthleteId;
     const handle = channel.snippet?.customUrl ?? null;
 
     const { error: upsertError } = await supabase.from("youtube_auth").upsert(
@@ -176,13 +180,13 @@ Deno.serve(async (req) => {
       })
       .eq("platform", "youtube");
 
-    return htmlClose(
+    return finishPopup(
       `${channel.snippet?.title ?? "Your channel"} is now linked. Head back to the dashboard and hit Sync now.`,
       true,
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("youtube-auth failed:", message);
-    return isCallback ? htmlClose(message, false) : json({ error: message }, 500);
+    return isCallback ? htmlClose(message, false, appOrigin) : json({ error: message }, 500);
   }
 });
