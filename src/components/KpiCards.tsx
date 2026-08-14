@@ -9,6 +9,7 @@ import {
 import { useOverviewMetrics } from "../contexts/OverviewMetricsContext";
 import { buildDashboardStats } from "../lib/dashboardStats";
 import { useContentViews } from "../lib/contentViews";
+import { useEngagementRates } from "../lib/engagementRates";
 
 const iconMap: Record<string, typeof Users> = {
   users: Users,
