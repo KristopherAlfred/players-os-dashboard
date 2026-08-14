@@ -11,6 +11,9 @@ import {
   YAxis,
 } from "recharts";
 import { PageShell, Panel, StatCard } from "../components/PageShell";
+import { YouTubeContentLibrary } from "../components/youtube/YouTubeContentLibrary";
+import { fetchYouTubeAnalytics, type YouTubeAnalytics } from "../lib/youtubeAnalyticsApi";
+
 import { BRAND_COLORS, brandIconMap } from "../components/settings/BrandIcons";
 import {
   fetchFollowerSnapshots,
@@ -20,7 +23,53 @@ import {
   type PlatformConnection,
 } from "../lib/platformConnections";
 
+function YouTubeContentSection() {
+  const [analytics, setAnalytics] = useState<YouTubeAnalytics | null>(null);
+  const [state, setState] = useState<"loading" | "ready" | "empty">("loading");
+
+  useEffect(() => {
+    let active = true;
+    fetchYouTubeAnalytics()
+      .then((data) => {
+        if (!active) return;
+        if (data) {
+          setAnalytics(data);
+          setState("ready");
+        } else {
+          setState("empty");
+        }
+      })
+      .catch(() => active && setState("empty"));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (state === "loading") {
+    return (
+      <Panel title="All content">
+        <div className="flex items-center gap-2 py-6 text-sm text-dt-muted">
+          <Loader2 size={16} className="animate-spin" /> Loading your YouTube library…
+        </div>
+      </Panel>
+    );
+  }
+
+  if (state === "empty" || !analytics) {
+    return (
+      <Panel title="All content">
+        <p className="text-sm text-dt-muted">
+          Connect YouTube in Settings and run a sync to pull your full upload history here.
+        </p>
+      </Panel>
+    );
+  }
+
+  return <YouTubeContentLibrary analytics={analytics} />;
+}
+
 function formatCount(n: number | null | undefined) {
+
   if (!n) return "—";
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
@@ -256,25 +305,30 @@ export function PlatformDetailPage() {
         )}
       </Panel>
 
-      <Panel title="Recent content">
-        {feed.length ? (
-          <ul className="divide-y divide-dt-border">
-            {feed.map((item) => (
-              <li key={item.title} className="flex items-center justify-between gap-4 py-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm text-white">{item.title}</p>
-                  <p className="text-xs text-dt-muted">
-                    {item.published} · {item.engagement}
-                  </p>
-                </div>
-                <span className="shrink-0 text-xs font-medium text-dt-green">{item.views}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-dt-muted">No recent posts synced for this platform yet.</p>
-        )}
-      </Panel>
+      {key === "youtube" ? (
+        <YouTubeContentSection />
+      ) : (
+        <Panel title="Recent content">
+          {feed.length ? (
+            <ul className="divide-y divide-dt-border">
+              {feed.map((item) => (
+                <li key={item.title} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-white">{item.title}</p>
+                    <p className="text-xs text-dt-muted">
+                      {item.published} · {item.engagement}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xs font-medium text-dt-green">{item.views}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-dt-muted">No recent posts synced for this platform yet.</p>
+          )}
+        </Panel>
+      )}
+
     </PageShell>
   );
 }
