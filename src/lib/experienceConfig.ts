@@ -120,6 +120,25 @@ export function stageAlignClass(item?: { align?: "left" | "center" | "right" }):
   return "text-center";
 }
 
+/** Crop focal point (object-position) for a page's hero art. */
+export function heroObjectPosition(page: {
+  heroOffsetX?: number;
+  heroOffsetY?: number;
+  heroPosition?: string;
+}): string {
+  if (typeof page.heroOffsetX === "number" || typeof page.heroOffsetY === "number") {
+    return `${page.heroOffsetX ?? 50}% ${page.heroOffsetY ?? 50}%`;
+  }
+  return page.heroPosition || "top center";
+}
+
+/** Combined scale + rotation transform for a page's hero art. */
+export function heroTransform(page: { heroScale?: number; heroRotate?: number }, scale?: number): string {
+  const s = scale ?? (page.heroScale || 100) / 100;
+  const r = page.heroRotate || 0;
+  return `scale(${s})${r ? ` rotate(${r}deg)` : ""}`;
+}
+
 
 /** Saved reusable logos you can drop on any page. */
 export type ExperienceStamp = {
