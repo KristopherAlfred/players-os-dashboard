@@ -273,8 +273,9 @@ export function PlatformDetailPage() {
       </div>
 
       <Panel title="Follower growth">
-        {series.length >= 2 ? (
+        {series.length >= 1 ? (
           <div className="h-64">
+
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={series} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
                 <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
