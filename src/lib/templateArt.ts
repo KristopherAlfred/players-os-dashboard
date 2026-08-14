@@ -14,7 +14,7 @@ import joinTheCircle from "../assets/templates/join-the-circle.jpg";
 import innerCircle from "../assets/templates/inner-circle.jpg";
 import moveMind from "../assets/templates/move-mind.jpg";
 import ownYourPower from "../assets/templates/own-your-power.jpg";
-import builtDifferent from "../assets/templates/built-different.jpg";
+import builtDifferent from "../assets/templates/curry/curry-landing.png.asset.json";
 import builtToLead from "../assets/templates/built-to-lead.jpg";
 import trustTheVision from "../assets/templates/trust-the-vision.jpg";
 import serveReturnRepeat from "../assets/templates/serve-return-repeat.jpg";
@@ -37,7 +37,7 @@ export const TEMPLATE_ART: Record<string, string> = {
   "inner-circle": innerCircle,
   "move-mind": moveMind,
   "own-your-power": ownYourPower,
-  "built-different": builtDifferent,
+  "built-different": builtDifferent.url,
   "built-to-lead": builtToLead,
   "trust-the-vision": trustTheVision,
   "serve-return-repeat": serveReturnRepeat,
