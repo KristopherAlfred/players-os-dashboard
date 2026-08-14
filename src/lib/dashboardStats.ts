@@ -1,5 +1,6 @@
 import type { OverviewMetrics } from "./overviewAnalytics";
 import { formatMetric } from "./overviewAnalytics";
+import type { ContentViewsBreakdown } from "./contentViews";
 import type { PlatformConnection } from "./platformConnections";
 
 export type StatIcon = "users" | "user-check" | "mail" | "heart" | "eye" | "trending-up";
