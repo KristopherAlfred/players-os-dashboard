@@ -8,7 +8,12 @@ import {
   type PlatformConnection,
 } from "../../lib/platformConnections";
 import { connectInstagram, syncInstagram } from "../../lib/instagramGraphApi";
+import { connectYouTube, syncYouTube } from "../../lib/youtubeConnect";
 import { invalidateSocialSources } from "../../lib/socialSources";
+
+/** Platforms wired to a real OAuth connector (login popup + live sync). */
+const OAUTH_PLATFORMS = new Set(["instagram", "youtube"]);
+
 
 /** Platforms whose live analytics need the athlete's own handle / page / channel. */
 const HANDLE_HINTS: Record<string, string> = {
@@ -50,6 +55,9 @@ export function ConnectorCards() {
         await connectInstagram();
         await syncInstagram();
         if (handle) await setPlatformConnected(row.id, true, handle);
+      } else if (row.platform === "youtube" && connected) {
+        await connectYouTube();
+        await syncYouTube();
       } else {
         await setPlatformConnected(row.id, connected, handle ?? null);
       }
@@ -68,7 +76,8 @@ export function ConnectorCards() {
   async function resync(row: PlatformConnection) {
     setBusyId(row.id);
     try {
-      await syncInstagram();
+      if (row.platform === "youtube") await syncYouTube();
+      else await syncInstagram();
       invalidateSocialSources();
       await load();
       setError(null);
@@ -78,6 +87,7 @@ export function ConnectorCards() {
       setBusyId(null);
     }
   }
+
 
 
   return (
@@ -151,16 +161,17 @@ export function ConnectorCards() {
                           type="button"
                           disabled={busy}
                           onClick={
-                            row.platform === "instagram" ? () => resync(row) : undefined
+                            OAUTH_PLATFORMS.has(row.platform) ? () => resync(row) : undefined
                           }
                           className="flex-1 rounded-xl border border-dt-border bg-black/40 px-3 py-2 text-xs font-semibold text-white transition hover:border-dt-red/50 hover:text-dt-red disabled:opacity-50"
                         >
-                          {row.platform === "instagram"
+                          {OAUTH_PLATFORMS.has(row.platform)
                             ? busy
                               ? "Syncing…"
                               : "Sync now"
                             : "Configure"}
                         </button>
+
 
                         <button
                           type="button"
@@ -171,7 +182,7 @@ export function ConnectorCards() {
                           {busy ? "…" : "Disconnect"}
                         </button>
                       </>
-                    ) : HANDLE_HINTS[row.platform] ? (
+                    ) : HANDLE_HINTS[row.platform] && row.platform !== "youtube" ? (
                       handleDraft?.id === row.id ? (
                         <form
                           className="flex w-full flex-col gap-2"

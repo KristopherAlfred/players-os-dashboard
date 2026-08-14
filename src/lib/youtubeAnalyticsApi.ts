@@ -148,8 +148,14 @@ export async function fetchYouTubeVideosFeed(limit = 48): Promise<{
 }
 
 export async function fetchYouTubeAnalytics(): Promise<YouTubeAnalytics | null> {
+  // Official YouTube Data API (OAuth connector) first — it is the athlete's own channel.
+  const { fetchYouTubeAnalyticsFromCloud } = await import("./youtubeConnect");
+  const live = await fetchYouTubeAnalyticsFromCloud();
+  if (live) return live;
+
   const connected = await resolveSocialHandle("youtube");
   if (!connected) return null;
+
 
   const feed = await fetchYouTubeVideosFeed(48);
   if (feed?.videos.length) {
