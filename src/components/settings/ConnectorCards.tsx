@@ -108,6 +108,9 @@ export function ConnectorCards() {
         <p className="px-5 py-4 text-sm text-white/60">{error}</p>
       ) : null}
 
+      <YouTubeSetupNote />
+
+
       <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
