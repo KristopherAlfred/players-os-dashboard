@@ -603,10 +603,10 @@ function PageFreeformPreview({
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
           alt=""
-          className={heroFull ? "absolute left-0 top-0 w-full" : "w-full rounded-xl"}
+          className={heroFull ? "absolute inset-0 h-full w-full" : "w-full rounded-xl"}
           draggable={false}
           style={{
-            objectFit: heroFull ? "contain" : page.heroFit || "contain",
+            objectFit: heroFull ? "cover" : page.heroFit || "contain",
             objectPosition: page.heroPosition || "top center",
             transform: `scale(${scale})`,
             transformOrigin: "top center",
@@ -622,11 +622,9 @@ function PageFreeformPreview({
             <div
               className="pointer-events-none absolute inset-0"
               style={{
-                background: `linear-gradient(180deg, ${page.heroOverlayFrom || "rgba(0,0,0,0.10)"} 0%, ${
-                  page.heroOverlayFrom || "rgba(0,0,0,0.10)"
-                } 34%, ${page.heroOverlayTo || page.backgroundColor || "rgba(0,0,0,0.92)"} 62%, ${
-                  page.backgroundColor || page.heroOverlayTo || "#000"
-                } 78%)`,
+                background: `linear-gradient(180deg, transparent 0%, transparent 52%, ${
+                  page.heroOverlayTo || page.backgroundColor || "rgba(0,0,0,0.92)"
+                } 82%, ${page.backgroundColor || page.heroOverlayTo || "#000"} 100%)`,
                 opacity: (page.heroOverlayOpacity ?? 100) / 100,
               }}
             />
