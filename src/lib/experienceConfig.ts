@@ -97,6 +97,8 @@ export type ExperienceStageItem = {
   y: number;
   /** Optional width percent */
   w: number;
+  /** Optional height percent of the stage (0 = auto height) */
+  h?: number;
   z: number;
   glow: boolean;
   glowColor: string;
