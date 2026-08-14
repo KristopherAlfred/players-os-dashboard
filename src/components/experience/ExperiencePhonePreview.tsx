@@ -597,20 +597,41 @@ function PageFreeformPreview({
         </p>
       );
     } else if (role === "hero") {
-      body = page.heroImage ? (
+      const heroFull = (item.h ?? 0) > 0;
+      const heroImg = page.heroImage ? (
         <img
           src={resolveExperiencePreviewUrl(page.heroImage)}
           alt=""
-          className="w-full rounded-xl"
+          className={heroFull ? "h-full w-full" : "w-full rounded-xl"}
           draggable={false}
           style={{
-            objectFit: page.heroFit || "contain",
-            objectPosition: page.heroPosition || "right center",
+            objectFit: page.heroFit || (heroFull ? "cover" : "contain"),
+            objectPosition: page.heroPosition || "center",
             transform: `scale(${scale})`,
             transformOrigin: "center center",
             ...stageGlowStyle(item, "image"),
           }}
         />
+      ) : null;
+      body = page.heroImage ? (
+        heroFull ? (
+          <div className="relative h-full w-full overflow-hidden">
+            {heroImg}
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, ${page.heroOverlayFrom || "rgba(0,0,0,0.10)"} 0%, ${
+                  page.heroOverlayFrom || "rgba(0,0,0,0.10)"
+                } 34%, ${page.heroOverlayTo || page.backgroundColor || "rgba(0,0,0,0.92)"} 62%, ${
+                  page.backgroundColor || page.heroOverlayTo || "#000"
+                } 78%)`,
+                opacity: (page.heroOverlayOpacity ?? 100) / 100,
+              }}
+            />
+          </div>
+        ) : (
+          heroImg
+        )
       ) : (
         <div className="flex h-28 items-end justify-end rounded-xl border border-dashed border-white/25 bg-black/30 p-2">
           <span className="text-[9px] text-white/35">Hero placement</span>
