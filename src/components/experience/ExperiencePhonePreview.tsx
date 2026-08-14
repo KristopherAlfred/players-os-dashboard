@@ -57,6 +57,7 @@ import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewU
 import { resolveTitleFontFamily } from "../../lib/typography";
 import { TintedBrandLogo } from "./TintedBrandLogo";
 import { StyledTextRuns, WordStyleEditor, runsForPageField } from "./StyledText";
+import { JoinAuthSheet, JoinedBadge } from "./JoinFlow";
 
 export type PhonePreviewMode =
   | "brand"
@@ -86,6 +87,7 @@ const STAGE_LABELS: Record<ExperienceBuiltinStageId, string> = {
   navBar: "Top nav",
   signature: "Signature",
   cardGrid: "Feature cards",
+  joinedBadge: "You're in badge",
 };
 
 const FEATURE_ICONS: Record<string, LucideIcon> = {
@@ -506,6 +508,7 @@ function PageFreeformPreview({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [wordChip, setWordChip] = useState(0);
   const [showUnlock, setShowUnlock] = useState(false);
+  const [joined, setJoined] = useState(false);
   const selected = selectedId ? getStageItem(page, selectedId) : null;
   const scale = (page.heroScale || 100) / 100;
   const brand = experience.brand;
@@ -944,6 +947,12 @@ function PageFreeformPreview({
           ))}
         </div>
       );
+    } else if (role === "joinedBadge") {
+      body = (
+        <div className="flex w-full justify-center" style={stageGlowStyle(item, "box")}>
+          <JoinedBadge accent={page.accentColor || "#8FE3B8"} />
+        </div>
+      );
     } else if (role === "cta") {
       const ctaGradient =
         page.ctaGradientFrom && page.ctaGradientTo
@@ -953,6 +962,11 @@ function PageFreeformPreview({
         <div className="flex w-full flex-col gap-2">
           <button
             type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowUnlock(true);
+              setJoined(false);
+            }}
             className="relative flex w-full items-center justify-center gap-2 overflow-hidden py-3 text-[13px] font-extrabold uppercase tracking-[0.14em]"
             style={{
               background: ctaGradient || page.ctaBg,
@@ -1099,7 +1113,7 @@ function PageFreeformPreview({
                 : "border-white/15 text-white/60"
             }`}
           >
-            {showUnlock ? "Hide unlock slide-in" : "Preview unlock slide-in"}
+            {showUnlock ? "Hide join flow" : "Test join flow"}
           </button>
         </div>
       ) : null}
