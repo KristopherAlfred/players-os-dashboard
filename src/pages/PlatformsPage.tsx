@@ -294,15 +294,16 @@ export function PlatformDetailPage() {
                   dataKey="followers"
                   stroke="var(--theme-accent)"
                   strokeWidth={2}
-                  dot={false}
+                  dot={{ r: 3, fill: "var(--theme-accent)", strokeWidth: 0 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         ) : (
           <p className="text-sm text-dt-muted">
-            Not enough snapshot history yet — the growth chart appears once two or more daily snapshots exist.
+            No follower history yet — a daily snapshot is recorded every time this platform syncs.
           </p>
+
         )}
       </Panel>
 
