@@ -196,8 +196,35 @@ function PageView({
       );
     } else if (role === "featureRow") {
       if (!(page.features || []).length) return null;
-      body = (
-        <div className="grid w-full grid-cols-2 gap-2">
+      const cols = page.featureColumns ?? 2;
+      body = cols >= 4 ? (
+        <div
+          className="grid w-full grid-cols-4"
+          style={{
+            background: page.featureBg,
+            border: `1px solid ${page.featureBorderColor}`,
+            borderRadius: page.featureRadius,
+          }}
+        >
+          {page.features.map((feat, i) => (
+            <button
+              key={feat.id}
+              type="button"
+              className="flex flex-col items-center gap-1.5 px-1.5 py-2.5 text-center transition active:scale-[0.97]"
+              style={i ? { borderLeft: `1px solid ${page.featureBorderColor}` } : undefined}
+            >
+              <Glyph name={feat.icon} color={page.featureIconColor} />
+              <span
+                className="text-[8px] font-semibold uppercase leading-[1.25] tracking-[0.04em]"
+                style={{ color: page.featureTextColor }}
+              >
+                {feat.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="grid w-full gap-2" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
           {page.features.map((feat) => (
             <button
               key={feat.id}
@@ -229,11 +256,16 @@ function PageView({
             borderRadius: proof.radius,
           }}
         >
-          {proof.extraLabel ? (
-            <span className="flex h-5 items-center justify-center rounded-full border border-white/25 bg-black/60 px-1.5 text-[8px] font-bold text-white">
-              {proof.extraLabel}
-            </span>
-          ) : null}
+          <div className="flex -space-x-2">
+            {(proof.avatars || []).slice(0, 4).map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={resolveExperiencePreviewUrl(src)}
+                alt=""
+                className="h-5 w-5 rounded-full border border-white/25 object-cover"
+              />
+            ))}
+          </div>
           <div className="flex flex-col leading-tight">
             <span className="text-[11px] font-bold" style={{ color: proof.countColor }}>
               {proof.count}
@@ -241,6 +273,21 @@ function PageView({
             <span className="text-[8px]" style={{ color: proof.labelColor }}>
               {proof.label}
             </span>
+          </div>
+          <div className="ml-auto flex items-center gap-1">
+            {(proof.thumbs || []).slice(0, 3).map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={resolveExperiencePreviewUrl(src)}
+                alt=""
+                className="h-6 w-5 rounded-[4px] object-cover"
+              />
+            ))}
+            {proof.extraLabel ? (
+              <span className="flex h-5 items-center justify-center rounded-full border border-white/25 bg-black/60 px-1.5 text-[8px] font-bold text-white">
+                {proof.extraLabel}
+              </span>
+            ) : null}
           </div>
         </div>
       );

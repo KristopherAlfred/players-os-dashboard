@@ -250,6 +250,8 @@ export type ExperiencePageConfig = {
   featureIconColor: string;
   featureTextColor: string;
   featureRadius: number;
+  /** Columns in the feature strip (2 = cards grid, 4 = single centered row) */
+  featureColumns?: number;
   /** Member social-proof row */
   memberProof: ExperienceMemberProof;
   /** Dark readability wash rendered between the background photo and the text layers */
@@ -788,6 +790,7 @@ function pageDefaults(partial: Partial<ExperiencePageConfig> = {}): ExperiencePa
     featureIconColor: "#8FE3B8",
     featureTextColor: "#FFFFFF",
     featureRadius: 18,
+    featureColumns: 2,
     memberProof: { ...DEFAULT_MEMBER_PROOF },
     heroOverlayFrom: "rgba(0,0,0,0.15)",
     heroOverlayTo: "rgba(0,0,0,0.85)",
@@ -1266,6 +1269,7 @@ export function normalizeExperiencePage(
     featureIconColor: asString(p.featureIconColor, fallback.featureIconColor ?? "#8FE3B8"),
     featureTextColor: asString(p.featureTextColor, fallback.featureTextColor ?? "#FFFFFF"),
     featureRadius: Math.max(0, Math.min(999, asNumber(p.featureRadius, fallback.featureRadius ?? 18))),
+    featureColumns: Math.max(1, Math.min(4, asNumber(p.featureColumns, fallback.featureColumns ?? 2))),
     memberProof: normalizeMemberProof(p.memberProof, fallback.memberProof ?? DEFAULT_MEMBER_PROOF),
     heroOverlayFrom: asString(p.heroOverlayFrom, fallback.heroOverlayFrom ?? "rgba(0,0,0,0.15)"),
     heroOverlayTo: asString(p.heroOverlayTo, fallback.heroOverlayTo ?? "rgba(0,0,0,0.85)"),
