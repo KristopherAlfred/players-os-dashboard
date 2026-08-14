@@ -18,8 +18,8 @@ export type ContentViewsBreakdown = {
   missing: string[];
 };
 
-function sum(values: Array<number | null | undefined>) {
-  return values.reduce((acc, value) => acc + (Number(value) || 0), 0);
+function sum(values: Array<number | null | undefined>): number {
+  return values.reduce<number>((acc, value) => acc + (Number(value) || 0), 0);
 }
 
 async function youtubeViews(): Promise<number> {
