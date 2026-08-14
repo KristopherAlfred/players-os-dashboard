@@ -149,13 +149,38 @@ function pageStage(spec: PageSpec, accent: string, text: string, glow: boolean, 
     { id: "tagline", x: 18, y: 7.5, w: 55, z: 20, hidden: true, ...g },
     { id: "hero", x: 0, y: 0, w: 100, h: 100, z: 5, hidden: !spec.hero, ...g },
     { id: "titleArt", x: 10, y: 40, w: 70, z: 12, hidden: true, ...g },
+    { id: "joinedBadge", x: 5, y: 20, w: 90, z: 19, hidden: true, ...g },
     { id: "subhead", x: 6, y: top, w: 88, z: 14, align: "left" as const, ...g, glowIntensity: glow ? 18 : 0 },
     { id: "headline", x: 6, y: top + 4, w: 88, z: 15, scale: 106, align: "left" as const, ...g, glowColor: text },
     { id: "body", x: 6, y: top + 13, w: 82, z: 13, align: "left" as const, ...g, glowColor: text },
     { id: "cardGrid", x: 4, y: top + 20, w: 92, z: 16, hidden: !cards, ...g },
     { id: "featureRow", x: 4, y: top + 20, w: 92, z: 16, hidden: cards, ...g },
-    { id: "cta", x: 5, y: spec.proof ? 80 : 84, w: 90, z: 18, glow, glowColor: accent, glowIntensity: glow ? 28 : 0 },
+    { id: "cta", x: 5, y: spec.proof ? 79 : 84, w: 90, z: 18, glow, glowColor: accent, glowIntensity: glow ? 28 : 0 },
     { id: "memberProof", x: 5, y: 88, w: 90, z: 17, hidden: !spec.proof, ...g },
+  ];
+}
+
+/**
+ * The "You're In" welcome screen gets its own hero-first, centered composition:
+ * full-bleed art, glowing verified badge, centered copy, perks strip and a
+ * glossy enter button. Every layer stays draggable and editable.
+ */
+function youreInStage(accent: string, text: string, glow: boolean, cards: boolean) {
+  const g = { glow: false, glowColor: accent, glowIntensity: 0 };
+  return [
+    { id: "hero", x: 0, y: 0, w: 100, h: 100, z: 5, ...g },
+    { id: "logo", x: 44, y: 5, w: 13, z: 22, ...g },
+    { id: "wordmark", x: 20, y: 13, w: 60, z: 21, align: "center" as const, ...g, glowColor: text },
+    { id: "tagline", x: 20, y: 17, w: 60, z: 20, hidden: true, ...g },
+    { id: "titleArt", x: 15, y: 22, w: 70, z: 12, hidden: true, ...g },
+    { id: "joinedBadge", x: 5, y: 24, w: 90, z: 19, glow, glowColor: accent, glowIntensity: glow ? 30 : 0 },
+    { id: "subhead", x: 8, y: 45, w: 84, z: 14, align: "center" as const, ...g, glowIntensity: glow ? 18 : 0 },
+    { id: "headline", x: 6, y: 49, w: 88, z: 15, scale: 118, align: "center" as const, ...g, glowColor: text },
+    { id: "body", x: 10, y: 60, w: 80, z: 13, align: "center" as const, ...g, glowColor: text },
+    { id: "cardGrid", x: 5, y: 68, w: 90, z: 16, hidden: !cards, ...g },
+    { id: "featureRow", x: 4, y: 68, w: 92, z: 16, hidden: cards, ...g },
+    { id: "cta", x: 6, y: 79, w: 88, z: 18, glow, glowColor: accent, glowIntensity: glow ? 34 : 0 },
+    { id: "memberProof", x: 6, y: 88, w: 88, z: 17, ...g },
   ];
 }
 
@@ -269,7 +294,12 @@ export function buildTemplatePages(
         labelColor: muted,
         radius: 14,
       } as ExperiencePageConfig["memberProof"],
-      stage: pageStage(spec, accent, text, glow, cards.length > 0) as ExperiencePageConfig["stage"],
+      heroOverlayFrom: light ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.12)",
+      heroOverlayTo: light ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.92)",
+      heroOverlayOpacity: key === "youreIn" ? 100 : 92,
+      stage: (key === "youreIn"
+        ? youreInStage(accent, text, glow, cards.length > 0)
+        : pageStage(spec, accent, text, glow, cards.length > 0)) as ExperiencePageConfig["stage"],
       // reset per-word styling so template copy renders in the new palette
       headlineRuns: [],
       subheadRuns: [],

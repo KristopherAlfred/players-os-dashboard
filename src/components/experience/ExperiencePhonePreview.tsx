@@ -57,6 +57,7 @@ import { resolveExperiencePreviewUrl } from "../../lib/resolveExperiencePreviewU
 import { resolveTitleFontFamily } from "../../lib/typography";
 import { TintedBrandLogo } from "./TintedBrandLogo";
 import { StyledTextRuns, WordStyleEditor, runsForPageField } from "./StyledText";
+import { JoinAuthSheet, JoinedBadge } from "./JoinFlow";
 
 export type PhonePreviewMode =
   | "brand"
@@ -86,6 +87,7 @@ const STAGE_LABELS: Record<ExperienceBuiltinStageId, string> = {
   navBar: "Top nav",
   signature: "Signature",
   cardGrid: "Feature cards",
+  joinedBadge: "You're in badge",
 };
 
 const FEATURE_ICONS: Record<string, LucideIcon> = {
@@ -506,6 +508,7 @@ function PageFreeformPreview({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [wordChip, setWordChip] = useState(0);
   const [showUnlock, setShowUnlock] = useState(false);
+  const [joined, setJoined] = useState(false);
   const selected = selectedId ? getStageItem(page, selectedId) : null;
   const scale = (page.heroScale || 100) / 100;
   const brand = experience.brand;
@@ -944,6 +947,12 @@ function PageFreeformPreview({
           ))}
         </div>
       );
+    } else if (role === "joinedBadge") {
+      body = (
+        <div className="flex w-full justify-center" style={stageGlowStyle(item, "box")}>
+          <JoinedBadge accent={page.accentColor || "#8FE3B8"} />
+        </div>
+      );
     } else if (role === "cta") {
       const ctaGradient =
         page.ctaGradientFrom && page.ctaGradientTo
@@ -953,6 +962,11 @@ function PageFreeformPreview({
         <div className="flex w-full flex-col gap-2">
           <button
             type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowUnlock(true);
+              setJoined(false);
+            }}
             className="relative flex w-full items-center justify-center gap-2 overflow-hidden py-3 text-[13px] font-extrabold uppercase tracking-[0.14em]"
             style={{
               background: ctaGradient || page.ctaBg,
@@ -1052,55 +1066,34 @@ function PageFreeformPreview({
           </div>
         ) : null}
 
-        {showLandingChrome && showUnlock ? (
-          <div className="absolute inset-x-0 bottom-0 z-[120] px-2 pb-2 pt-16">
-            <div
-              className="relative rounded-2xl border px-3 pb-4 pt-6"
-              style={{
-                borderColor: page.unlockPanelBorderColor || "#8C0000",
-                background: `linear-gradient(165deg, ${page.unlockPanelBgFrom || "rgba(18,18,18,0.97)"} 0%, ${page.unlockPanelBgTo || "rgba(6,6,6,0.98)"} 100%)`,
-                boxShadow: `0 0 18px ${page.unlockGlowColor || "#8FE3B8"}66`,
+        {showUnlock && !joined ? (
+          <JoinAuthSheet
+            page={page}
+            compact
+            onSelect={() => setJoined(true)}
+            onClose={() => setShowUnlock(false)}
+          />
+        ) : null}
+        {joined ? (
+          <div className="absolute inset-0 z-[180] flex flex-col items-center justify-center gap-3 bg-black/80 px-6 text-center backdrop-blur-[3px]">
+            <JoinedBadge accent={page.accentColor || "#8FE3B8"} />
+            <p className="font-display text-lg font-extrabold uppercase tracking-[0.16em] text-white">
+              You&apos;re in
+            </p>
+            <p className="max-w-[14rem] text-[10px] leading-relaxed text-white/65">
+              This is the flow fans see — sign in, then the You&apos;re In page opens.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setJoined(false);
+                setShowUnlock(false);
               }}
+              className="rounded-full border px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em]"
+              style={{ borderColor: `${page.accentColor || "#8FE3B8"}66`, color: page.accentColor || "#8FE3B8" }}
             >
-              <div
-                className="absolute left-1/2 top-0 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border bg-black text-[10px]"
-                style={{ borderColor: page.accentColor || "#8FE3B8", color: page.accentColor || "#8FE3B8" }}
-              >
-                🔒
-              </div>
-              <p className="text-center font-display text-[13px] tracking-wide text-white">
-                {page.unlockHeadline || page.headline || "JOIN THE CIRCLE"}
-              </p>
-              <p
-                className="mt-1.5 text-center text-[9px] leading-relaxed text-white"
-                style={{
-                  textShadow: `0 0 6px ${page.unlockGlowColor || "#8FE3B8"}`,
-                  WebkitTextStroke: `0.35px ${page.unlockGlowColor || "#8FE3B8"}`,
-                }}
-              >
-                {page.unlockBody || page.body}
-              </p>
-              <div className="mt-3 space-y-1.5">
-                {["Continue with X", "Continue with Google", "Continue with Apple"].map((label) => (
-                  <div
-                    key={label}
-                    className={`flex h-8 items-center justify-center rounded-lg border text-[8px] font-semibold uppercase tracking-wide ${
-                      label.includes("Google")
-                        ? "border-white/20 bg-white text-black"
-                        : "border-white/15 bg-black text-white"
-                    }`}
-                  >
-                    {label}
-                  </div>
-                ))}
-              </div>
-              <p
-                className="mt-2.5 text-center text-[8px] text-white/90"
-                style={{ textShadow: `0 0 5px ${page.unlockGlowColor || "#8FE3B8"}` }}
-              >
-                {page.unlockFooter || "100% Private · No Spam · You're in control"}
-              </p>
-            </div>
+              Restart flow
+            </button>
           </div>
         ) : null}
         {!experience.nav?.hidden && pageKey !== "landing" && pageKey !== "youreIn" ? (
@@ -1120,7 +1113,7 @@ function PageFreeformPreview({
                 : "border-white/15 text-white/60"
             }`}
           >
-            {showUnlock ? "Hide unlock slide-in" : "Preview unlock slide-in"}
+            {showUnlock ? "Hide join flow" : "Test join flow"}
           </button>
         </div>
       ) : null}

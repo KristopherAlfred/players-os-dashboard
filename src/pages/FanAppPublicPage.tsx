@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Loader2, Lock } from "lucide-react";
 
 import { FanAppPageView } from "../components/experience/ExperienceAppPreview";
+import { JoinAuthSheet } from "../components/experience/JoinFlow";
 import type { ExperienceConfig, ExperiencePageKeyName } from "../lib/experienceConfig";
 import { themeBackgroundCss } from "../lib/experienceConfig";
 import { fetchPublicFanApp, registerFanAppView } from "../lib/fanAppPublish";
@@ -88,53 +89,14 @@ function FanAppRuntime({ experience }: { experience: ExperienceConfig }) {
     <div className="relative h-full w-full overflow-hidden">
       <FanAppPageView experience={experience} pageKey={pageKey} onNavigate={setPageKey} onCta={onCta} />
       {unlock && pageKey === "landing" ? (
-        <div className="absolute inset-x-0 bottom-0 z-[160] px-3 pb-4 pt-16">
-          <div
-            className="relative rounded-3xl border px-4 pb-5 pt-7"
-            style={{
-              borderColor: page.unlockPanelBorderColor || "rgba(255,255,255,0.14)",
-              background: `linear-gradient(165deg, ${page.unlockPanelBgFrom || "rgba(18,18,18,0.97)"} 0%, ${
-                page.unlockPanelBgTo || "rgba(6,6,6,0.98)"
-              } 100%)`,
-              boxShadow: `0 -10px 40px rgba(0,0,0,0.6)`,
-            }}
-          >
-            <span
-              className="absolute left-1/2 top-0 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border bg-black"
-              style={{ borderColor: page.accentColor, color: page.accentColor }}
-            >
-              <Lock size={14} />
-            </span>
-            <p className="text-center font-display text-sm tracking-wide text-white">
-              {page.unlockHeadline || page.headline}
-            </p>
-            <p className="mt-1.5 text-center text-[11px] leading-relaxed text-white/70">
-              {page.unlockBody || page.body}
-            </p>
-            <div className="mt-4 space-y-2">
-              {["Continue with X", "Continue with Google", "Continue with Apple"].map((label) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => {
-                    setUnlock(false);
-                    setPageKey("youreIn");
-                  }}
-                  className={`flex h-10 w-full items-center justify-center rounded-xl border text-[11px] font-semibold uppercase tracking-wide transition active:scale-[0.98] ${
-                    label.includes("Google")
-                      ? "border-white/20 bg-white text-black"
-                      : "border-white/15 bg-black text-white"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <p className="mt-3 text-center text-[9px] text-white/45">
-              {page.unlockFooter || "100% Private · No Spam · You're in control"}
-            </p>
-          </div>
-        </div>
+        <JoinAuthSheet
+          page={page}
+          onSelect={() => {
+            setUnlock(false);
+            setPageKey("youreIn");
+          }}
+          onClose={() => setUnlock(false)}
+        />
       ) : null}
     </div>
   );
