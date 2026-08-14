@@ -79,6 +79,7 @@ export type ExperienceBuiltinStageId =
   | "titleArt"
   | "navBar"
   | "signature"
+  | "joinedBadge"
   | "cardGrid";
 
 
@@ -547,6 +548,7 @@ export const STAGE_ITEM_IDS: ExperienceBuiltinStageId[] = [
   "body",
   "cardGrid",
   "featureRow",
+  "joinedBadge",
   "cta",
   "memberProof",
 ];
