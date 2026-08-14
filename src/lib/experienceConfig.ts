@@ -893,6 +893,7 @@ export function stageItemCss(item: ExperienceStageItem): Record<string, string |
     width: `${item.w || 80}%`,
     zIndex: item.z,
   };
+  if (item.h) css.height = `${item.h}%`;
   if (scalePct !== 100) {
     css.transform = `scale(${scalePct / 100})`;
     css.transformOrigin = "top left";
@@ -1312,6 +1313,7 @@ function normalizeStageItem(row: Partial<ExperienceStageItem>, prev: ExperienceS
     x: Math.max(0, Math.min(95, asNumber(row.x, prev.x))),
     y: Math.max(0, Math.min(95, asNumber(row.y, prev.y))),
     w: Math.max(8, Math.min(100, asNumber(row.w, prev.w))),
+    h: Math.max(0, Math.min(100, asNumber(row.h, prev.h ?? 0))),
     z: Math.max(0, Math.min(100, asNumber(row.z, prev.z))),
     glow: asBool(row.glow, prev.glow),
     glowColor: asString(row.glowColor, prev.glowColor),
