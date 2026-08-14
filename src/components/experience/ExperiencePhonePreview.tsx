@@ -693,8 +693,36 @@ function PageFreeformPreview({
       );
     } else if (role === "featureRow") {
       if (!(page.features || []).length) return null;
-      body = (
-        <div className="grid w-full grid-cols-2 gap-2" style={stageGlowStyle(item, "box")}>
+      const cols = page.featureColumns ?? 2;
+      const oneRow = cols >= 4;
+      body = oneRow ? (
+        <div
+          className="grid w-full grid-cols-4"
+          style={{
+            background: page.featureBg,
+            border: `1px solid ${page.featureBorderColor}`,
+            borderRadius: page.featureRadius,
+            ...stageGlowStyle(item, "box"),
+          }}
+        >
+          {(page.features || []).map((feat, i) => (
+            <div
+              key={feat.id}
+              className="flex flex-col items-center gap-1.5 px-1.5 py-2.5 text-center"
+              style={i ? { borderLeft: `1px solid ${page.featureBorderColor}` } : undefined}
+            >
+              <FeatureIcon name={feat.icon} color={page.featureIconColor} />
+              <span
+                className="text-[8px] font-semibold uppercase leading-[1.25] tracking-[0.04em]"
+                style={{ color: page.featureTextColor }}
+              >
+                {feat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={`grid w-full gap-2 grid-cols-${cols}`} style={stageGlowStyle(item, "box")}>
           {(page.features || []).map((feat) => (
             <div
               key={feat.id}
